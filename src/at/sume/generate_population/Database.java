@@ -68,6 +68,7 @@ public class Database {
 	    Statement stmt;
 		try {
 			stmt = con.createStatement();
+			// TODO: open resultset not in forward only mode
     		//stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		} catch (SQLException e) {
 			System.err.println("Error in Connection.createStatement()\n" + e);
@@ -80,6 +81,30 @@ public class Database {
 		} catch (SQLException e) {
 			System.err.println("Error in Statement.executeQuery(" + query + ")\n" + e);
 			return null;
+		}
+	}
+	
+	/**
+	 * Execute a SQL-statement
+	 * @param statement
+	 */
+	public void execute(String statement)
+	{
+		Statement stmt;
+
+		try {
+			stmt = con.createStatement();
+		} catch (SQLException e) {
+			System.err.println("Error in Connection.createStatement()\n" + e);
+			//e.printStackTrace();
+			return;
+		}
+        
+        try {
+			stmt.execute(statement);
+		} catch (SQLException e) {
+			System.err.println("Error in Statement.execute(" + statement + ")\n" + e);
+			return;
 		}
 	}
 }

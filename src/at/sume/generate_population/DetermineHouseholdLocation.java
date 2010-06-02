@@ -4,7 +4,9 @@
 package at.sume.generate_population;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import net.remesch.util.*;
 
 /**
  * @author ar
@@ -16,6 +18,7 @@ public class DetermineHouseholdLocation {
 	private static ArrayList<Long> SpatialUnit;
 	//private static HashMap<Long, Long> Distribution;
 	private static long total_households;
+	private static Database db;
 	
 	/**
 	 * Load distribution of households per spatial unit from database
@@ -23,7 +26,7 @@ public class DetermineHouseholdLocation {
 	public static void LoadDistribution()
 	{
 		int rowcount = 0;
-		Database db = new Database(Common.GetDbLocation());
+		db = new Database(Common.GetDbLocation());
 		ResultSet rs = db.executeQuery("select hh_gesamt, val(oestat) as gkz from [vz_2001_haushalte (zb)] where len(oestat) = 6 order by oestat");
 //		try {
 //			rs.last();
@@ -69,10 +72,15 @@ public class DetermineHouseholdLocation {
 	{
 		Random r = new Random();
 		// generate random household number
-		long random_household = (long) (r.nextDouble() * total_households) + 1;
+		long random_household = (long) (r.nextDouble() * total_households);
 		// lookup spatial unit
 		int index = Collections.binarySearch(HouseholdNumberThreshold, random_household);
-		return SpatialUnit.get(Math.abs(index));
+		if (index < 0)
+			index = (index + 1) * -1;
+		if (index > SpatialUnit.size())
+			System.out.println("random_household = " + random_household + ", total_households = " + total_households + ", index = " + index);
+		//return SpatialUnit.get(Math.abs(index));
+		return SpatialUnit.get(index);
 	}
 
 	/**
@@ -80,8 +88,20 @@ public class DetermineHouseholdLocation {
 	 */
 	public static void main(String[] args) {
 		// Test
+		// TODO: dzt. ca. 4 Std. zum Erzeugen der Haushalte und ODBC bringt Fehler. Gegenmaﬂnahmen:
+		// 1) Access 2007 in der VM installieren (oder einen aktuellen ODBC-Treiber), ev. DB-Format auf accdb ‰ndern, jedenfalls einen besseren
+		//    ODBC-Treiber verwenden
+		// 2) Erzeugen im RAM (ArrayList oder noch besser ResultSet) und dann Bulk-‹bertragung in die Datenbank! 
+        System.out.println("Start @ " + DateUtil.now());
+		//Database db = new Database(Common.GetDbLocation());
+		String sqlx;
 		LoadDistribution();
-		System.out.println("Sample spatial unit = " + Sample());
-		System.out.println("Sample spatial unit = " + Sample());
+		for (int i = 0; i != total_households; i++) {
+			sqlx = "insert into _DM_Households (HouseholdId, SpatialunitId) values (" + (i + 1) + ", " + Sample() + ")";
+			db.execute(sqlx);
+			if ((i % 1000) == 0)
+				System.out.println("i = " + i + " @ " + DateUtil.now());
+		}
+        System.out.println("Start @ " + DateUtil.now());
 	}
 }
