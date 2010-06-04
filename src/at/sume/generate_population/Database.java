@@ -11,7 +11,7 @@ import java.sql.*;
  */
 public class Database {
 	private String url;
-	private Connection con;
+	public Connection con;
 
 	/**
 	 * Construct class and open a database
@@ -28,7 +28,7 @@ public class Database {
 	 */
 	public void open(String pathname)
 	{
-        url = "jdbc:odbc:DRIVER={Microsoft Access Driver (*.mdb)};DBQ=" + pathname + ";";
+        url = "jdbc:odbc:DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + pathname + ";";
 
         try {
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
