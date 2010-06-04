@@ -45,6 +45,7 @@ public class GeneratePopulation {
 			//sqlx = "insert into _DM_Households (HouseholdId, SpatialunitId) values (" + (i + 1) + ", " + Sample() + ")";
 			//db.execute(sqlx);
 			try {
+				// Sample households
 				// Household number
 				ps.setString(1, Long.toString(i + 1));
 				// Household spatial unit
@@ -53,6 +54,16 @@ public class GeneratePopulation {
 				ps.setString(2, Long.toString(hhpsu.getSpatialUnitId()));
 				// Household size
 				ps.setString(3, Long.toString(SampleHouseholds.determineSize(index)));
+				
+				// Sample persons
+				// TODO: Household representative if first person
+				
+				// TODO: Person sex
+
+				// TODO: Person age
+				
+				// TODO: Yearly income
+				
 			} catch (SQLException e) {
 				System.err.println("Error in setLong(" + sqlx + ")\n" + e);
 				return;
