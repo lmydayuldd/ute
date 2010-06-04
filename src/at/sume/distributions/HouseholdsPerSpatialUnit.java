@@ -1,7 +1,12 @@
 package at.sume.distributions;
 
+/**
+ * Database wrapper class for distribution of households per spatial unit and household-size
+ * 
+ * @author Alexander Remesch
+ * 
+ */
 public class HouseholdsPerSpatialUnit {
-	private long index;
 	private long spatialUnitId;
 	private long nrHouseholdsTotal;
 	private long nrHouseholdsRunningTotal;

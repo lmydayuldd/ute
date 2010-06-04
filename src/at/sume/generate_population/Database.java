@@ -6,7 +6,9 @@ package at.sume.generate_population;
 import java.sql.*;
 
 /**
- * @author ar
+ * Common database handling routines
+ * 
+ * @author Alexander Remesch
  *
  */
 public class Database {

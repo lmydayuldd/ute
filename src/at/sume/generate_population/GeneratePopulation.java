@@ -6,6 +6,12 @@ import java.sql.SQLException;
 import net.remesch.util.DateUtil;
 import at.sume.distributions.*;
 
+/**
+ * Entry point class for generation of synthetic population
+ * 
+ * @author Alexander Remesch
+ *
+ */
 public class GeneratePopulation {
 
 	/**

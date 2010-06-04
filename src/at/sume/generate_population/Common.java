@@ -7,7 +7,9 @@ import java.util.*;
 import java.io.*;
 
 /**
- * @author ar
+ * Global functions, variables and parameters
+ * 
+ * @author Alexander Remesch
  *
  */
 public class Common {

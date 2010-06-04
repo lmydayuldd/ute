@@ -1,5 +1,11 @@
 package at.sume.db_wrapper;
 
+/**
+ * Database wrapper class for one record of table _DM_Households
+ * 
+ * @author Alexander Remesch
+ * 
+ */
 public class Household {
 	private long HouseholdId;
 	private long SpatialunitId;

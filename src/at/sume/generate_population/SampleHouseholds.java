@@ -8,7 +8,9 @@ import java.util.*;
 import at.sume.distributions.HouseholdsPerSpatialUnit;
 
 /**
- * @author ar
+ * Monte Carlo sampling for household locations and household sizes
+ * 
+ * @author Alexander Remesch
  *
  */
 public class SampleHouseholds {

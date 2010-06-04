@@ -7,12 +7,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
- * @author ar
+ * Utility class concerning date-handling
+ * 
+ * @author Alexander Remesch
  *
  */
 public class DateUtil {
 	/**
-	 * 
+	 * Get the current date and time in the format specified
 	 * @param Format
 	 * @return
 	 */
@@ -22,6 +24,10 @@ public class DateUtil {
         return sdf.format(cal.getTime());
     }
     
+    /**
+     * Get the current date and time in the format dd.MM.yyyy HH:mm:ss.SSS
+     * @return
+     */
     public static String now()
     {
     	return now("dd.MM.yyyy HH:mm:ss.SSS");

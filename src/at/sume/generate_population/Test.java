@@ -2,7 +2,11 @@ package at.sume.generate_population;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
- 
+
+/**
+ * Obsolete Test class for JDBC/ODBC access to Microsoft Access
+ * 
+ */
 class Test  {
     String url;
     Connection con;
