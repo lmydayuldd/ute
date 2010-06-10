@@ -1,12 +1,16 @@
 package at.sume.db_wrapper;
 
+import java.sql.SQLException;
+
+import at.sume.generate_population.Database;
+
 /**
  * Database wrapper class for one record of table _DM_Households
  * 
  * @author Alexander Remesch
  * 
  */
-public class Person {
+public class Person extends DatabaseRecord {
 	private long PersonId;
 	private long HouseholdId;
 	private short Sex;
@@ -14,6 +18,12 @@ public class Person {
 	private boolean HouseholdRepresentative;
 	private long YearlyIncome;
 	
+	public Person(Database db) throws SQLException {
+		super(db);
+		String sqlx = "insert into _DM_Households (HouseholdId, SpatialunitId, HouseholdSize) values (?, ?, ?)";
+		prepareStatement(sqlx);
+	}
+
 	public long getPersonId() {
 		return PersonId;
 	}
@@ -54,5 +64,10 @@ public class Person {
 	}
 	public void setYearlyIncome(long yearlyIncome) {
 		YearlyIncome = yearlyIncome;
+	}
+	@Override
+	public void dbInsert() throws SQLException {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -1,9 +1,9 @@
 package at.sume.generate_population;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import net.remesch.util.DateUtil;
+import at.sume.db_wrapper.Household;
 import at.sume.distributions.*;
 
 /**
@@ -20,40 +20,37 @@ public class GeneratePopulation {
 	public static void main(String[] args) {
         System.out.println("Start @ " + DateUtil.now());
 		Database db = new Database(Common.GetDbLocation());
-		String sqlx = "insert into _DM_Households (HouseholdId, SpatialunitId, HouseholdSize) values (?, ?, ?)";
-		PreparedStatement ps = null;
 		HouseholdsPerSpatialUnit hhpsu;
-		
+		Household hh;
+
+		try {
+			hh = new Household(db);
+		} catch (SQLException e) {
+			System.err.println("Error in constructor Household()\n" + e);
+			return;
+		}
+
 		try {
 			SampleHouseholds.LoadDistribution(db);
 		} catch (SQLException e) {
 			System.err.println("Error in DetermineHouseholdLocation.LoadDistribution()\n" + e);
 			return;
 		}
+		// TODO: put into a table-class, method truncate
 		db.execute("delete * from _DM_Households");
 		
-		// Use prepared statement for bulk inserts
-		try {
-			ps = db.con.prepareStatement(sqlx);
-		} catch (SQLException e) {
-			System.err.println("Error in prepareStatement(" + sqlx + ")\n" + e);
-			return;
-		}
-		
 		long total_households = HouseholdsPerSpatialUnit.getNrHouseholdsTotalSum();
-		for (int i = 0; i != total_households; i++) {
-			//sqlx = "insert into _DM_Households (HouseholdId, SpatialunitId) values (" + (i + 1) + ", " + Sample() + ")";
-			//db.execute(sqlx);
+		for (long i = 0; i != total_households; i++) {
 			try {
 				// Sample households
 				// Household number
-				ps.setString(1, Long.toString(i + 1));
+				hh.setHouseholdId(i + 1);
 				// Household spatial unit
 				int index = SampleHouseholds.determineLocationIndex();
 				hhpsu = SampleHouseholds.GetSpatialUnitData(index);
-				ps.setString(2, Long.toString(hhpsu.getSpatialUnitId()));
+				hh.setSpatialunitId(hhpsu.getSpatialUnitId());
 				// Household size
-				ps.setString(3, Long.toString(SampleHouseholds.determineSize(index)));
+				hh.setHouseholdSize(SampleHouseholds.determineSize(index));
 				
 				// Sample persons
 				// TODO: Household representative if first person
@@ -65,13 +62,13 @@ public class GeneratePopulation {
 				// TODO: Yearly income
 				
 			} catch (SQLException e) {
-				System.err.println("Error in setLong(" + sqlx + ")\n" + e);
+				System.err.println("Error while setting db fields for HouseholdId = " + i + "\n" + e);
 				return;
 			}
 			try {
-				ps.executeUpdate();
+				hh.dbInsert();
 			} catch (SQLException e) {
-				System.err.println("Error in executeUpdate(" + sqlx + ")\n" + e);
+				System.err.println("Error during db insert for HouseholdId = " + i + "\n" + e);
 				return;
 			}
 			if ((i % 1000) == 0)
