@@ -1,11 +1,12 @@
 /**
  * 
  */
-package at.sume.generate_population;
+package at.sume.sampling;
 
 import java.sql.*;
 import java.util.*;
 import at.sume.distributions.HouseholdsPerSpatialUnit;
+import at.sume.generate_population.Database;
 
 /**
  * Monte Carlo sampling for household locations and household sizes
@@ -14,8 +15,7 @@ import at.sume.distributions.HouseholdsPerSpatialUnit;
  *
  */
 public class SampleHouseholds {
-	private static ArrayList<HouseholdsPerSpatialUnit> spatialUnits;
-	private static ArrayList<Long> HouseholdNumberThreshold;	// needed for Collections.binarySearch()!
+	private static Distribution<HouseholdsPerSpatialUnit> spatialUnits;
 	
 	/**
 	 * Load distribution of households per spatial unit from database
@@ -36,8 +36,7 @@ public class SampleHouseholds {
 //		}
 		
 		// Transfer ResultSet to ArrayList
-		spatialUnits = new ArrayList<HouseholdsPerSpatialUnit>(rowcount);
-		HouseholdNumberThreshold = new ArrayList<Long>(rowcount);
+		spatialUnits = new Distribution<HouseholdsPerSpatialUnit>(rowcount);
 				
 		while (rs.next())
 		{
@@ -49,10 +48,8 @@ public class SampleHouseholds {
 			h.setNrHouseholds_2P(rs.getLong("hh_p2"));
 			h.setNrHouseholds_3P(rs.getLong("hh_p3"));
 			h.setNrHouseholds_4Pmore(rs.getLong("hh_p4") + rs.getLong("hh_p5") + rs.getLong("hh_p6"));
-			spatialUnits.add(h);
-			HouseholdNumberThreshold.add(HouseholdsPerSpatialUnit.getNrHouseholdsTotalSum());
+			spatialUnits.add(h.getNrHouseholdsTotal(), h);
 		}
-		System.out.println("Total = " + HouseholdsPerSpatialUnit.getNrHouseholdsTotalSum());
 	}
 
 	/**
@@ -61,16 +58,7 @@ public class SampleHouseholds {
 	 */
 	public static int determineLocationIndex()
 	{
-		Random r = new Random();
-		// generate random household number
-		long random_household = (long) (r.nextDouble() * HouseholdsPerSpatialUnit.getNrHouseholdsTotalSum());
-		// lookup spatial unit
-		int index = Collections.binarySearch(HouseholdNumberThreshold, random_household);
-		if (index < 0)
-			index = (index + 1) * -1;
-		if (index > spatialUnits.size())
-			System.out.println("random_household = " + random_household + ", total_households = " + HouseholdsPerSpatialUnit.getNrHouseholdsTotalSum() + ", index = " + index);
-		return index;
+		return spatialUnits.randomSample();
 	}
 	
 	/**
@@ -104,5 +92,9 @@ public class SampleHouseholds {
 	public static HouseholdsPerSpatialUnit GetSpatialUnitData(int index)
 	{
 		return spatialUnits.get(index);
+	}
+	
+	public static long getNrHouseholdsTotalSum() {
+		return spatialUnits.getMaxThreshold();
 	}
 }

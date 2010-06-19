@@ -86,6 +86,20 @@ public class Database {
 		}
 	}
 	
+	public void executeQuery(String query, Object ... variables) throws SQLException, Exception {
+		ResultSet rs = executeQuery(query);
+		for (int i = 0; i != variables.length; i++) {
+			if (variables[i].getClass() == String.class)
+				variables[i] = rs.getString(i);
+			else if (variables[i].getClass() == Integer.class)
+				variables[i] = rs.getInt(i);
+			else if (variables[i].getClass() == Long.class)
+				variables[i] = rs.getLong(i);
+			else
+				throw new Exception("Can't use type " + variables[i].getClass().toString());
+		}
+	}
+	
 	/**
 	 * Execute a SQL-statement
 	 * @param statement

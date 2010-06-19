@@ -3,8 +3,9 @@ package at.sume.generate_population;
 import java.sql.SQLException;
 
 import net.remesch.util.DateUtil;
-import at.sume.db_wrapper.Household;
+import at.sume.db_wrapper.*;
 import at.sume.distributions.*;
+import at.sume.sampling.SampleHouseholds;
 
 /**
  * Entry point class for generation of synthetic population
@@ -22,6 +23,7 @@ public class GeneratePopulation {
 		Database db = new Database(Common.GetDbLocation());
 		HouseholdsPerSpatialUnit hhpsu;
 		Household hh;
+		Person pers;
 
 		try {
 			hh = new Household(db);
@@ -31,6 +33,13 @@ public class GeneratePopulation {
 		}
 
 		try {
+			pers = new Person(db);
+		} catch (SQLException e) {
+			System.err.println("Error in constructor Person()\n" + e);
+			return;
+		}
+		
+		try {
 			SampleHouseholds.LoadDistribution(db);
 		} catch (SQLException e) {
 			System.err.println("Error in DetermineHouseholdLocation.LoadDistribution()\n" + e);
@@ -39,10 +48,12 @@ public class GeneratePopulation {
 		// TODO: put into a table-class, method truncate
 		db.execute("delete * from _DM_Households");
 		
-		long total_households = HouseholdsPerSpatialUnit.getNrHouseholdsTotalSum();
+		long total_households = SampleHouseholds.getNrHouseholdsTotalSum();
+		short hh_size;
+		long personId = 1;
+		// Sample households including persons
 		for (long i = 0; i != total_households; i++) {
 			try {
-				// Sample households
 				// Household number
 				hh.setHouseholdId(i + 1);
 				// Household spatial unit
@@ -50,17 +61,8 @@ public class GeneratePopulation {
 				hhpsu = SampleHouseholds.GetSpatialUnitData(index);
 				hh.setSpatialunitId(hhpsu.getSpatialUnitId());
 				// Household size
-				hh.setHouseholdSize(SampleHouseholds.determineSize(index));
-				
-				// Sample persons
-				// TODO: Household representative if first person
-				
-				// TODO: Person sex
-
-				// TODO: Person age
-				
-				// TODO: Yearly income
-				
+				hh_size = SampleHouseholds.determineSize(index);
+				hh.setHouseholdSize(hh_size);
 			} catch (SQLException e) {
 				System.err.println("Error while setting db fields for HouseholdId = " + i + "\n" + e);
 				return;
@@ -71,6 +73,32 @@ public class GeneratePopulation {
 				System.err.println("Error during db insert for HouseholdId = " + i + "\n" + e);
 				return;
 			}
+			// Sample persons for the current household
+			for (long j = 0; j != hh_size; j++) {
+				// Person number
+				pers.setPersonId(personId++);
+				// Household representative if first person
+				if (j == 0)
+					pers.setHouseholdRepresentative(true);
+				else
+					pers.setHouseholdRepresentative(false);
+					
+				// TODO: Person sex
+
+				// TODO: Person age
+				
+				// TODO: Yearly income
+				
+				try {
+					pers.dbInsert();
+				} catch (SQLException e) {
+					System.err.println("Error during db insert for PersonId = " + j + "\n" + e);
+					return;
+				}
+			}
+			// Sample dwelling of the current household
+			// TODO: vacant dwellings must be sampled somewhere else
+			
 			if ((i % 1000) == 0)
 				System.out.println("i = " + i + " @ " + DateUtil.now());
 		}

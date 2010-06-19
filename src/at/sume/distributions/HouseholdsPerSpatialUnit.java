@@ -1,7 +1,7 @@
 package at.sume.distributions;
 
 /**
- * Database wrapper class for distribution of households per spatial unit and household-size
+ * Database record class for distribution of households per spatial unit and household-size
  * 
  * @author Alexander Remesch
  * 
@@ -14,7 +14,7 @@ public class HouseholdsPerSpatialUnit {
 	private long nrHouseholds_2P;
 	private long nrHouseholds_3P;
 	private long nrHouseholds_4Pmore;
-	private static long nrHouseholdsTotalSum;
+	//private static long nrHouseholdsTotalSum;
 	
 	public HouseholdsPerSpatialUnit()
 	{
@@ -31,8 +31,8 @@ public class HouseholdsPerSpatialUnit {
 	}
 	public void setNrHouseholdsTotal(long nrHouseholdsTotal) {
 		this.nrHouseholdsTotal = nrHouseholdsTotal;
-		nrHouseholdsTotalSum += nrHouseholdsTotal;
-		this.nrHouseholdsRunningTotal = nrHouseholdsTotalSum;
+//		nrHouseholdsTotalSum += nrHouseholdsTotal;
+//		this.nrHouseholdsRunningTotal = nrHouseholdsTotalSum;
 	}
 	public long getNrHouseholdsRunningTotal() {
 		return nrHouseholdsRunningTotal;
@@ -61,7 +61,7 @@ public class HouseholdsPerSpatialUnit {
 	public long getNrHouseholds_4Pmore() {
 		return nrHouseholds_4Pmore;
 	}
-	public static long getNrHouseholdsTotalSum() {
-		return nrHouseholdsTotalSum;
-	}
+//	public static long getNrHouseholdsTotalSum() {
+//		return nrHouseholdsTotalSum;
+//	}
 }
