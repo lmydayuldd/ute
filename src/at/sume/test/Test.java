@@ -1,4 +1,4 @@
-package at.sume.generate_population;
+package at.sume.test;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

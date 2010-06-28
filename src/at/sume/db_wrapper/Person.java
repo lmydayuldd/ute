@@ -1,5 +1,6 @@
 package at.sume.db_wrapper;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import at.sume.generate_population.Database;
@@ -66,7 +67,7 @@ public class Person extends DatabaseRecord {
 		YearlyIncome = yearlyIncome;
 	}
 	@Override
-	public void dbInsert() throws SQLException {
+	public void populate(ResultSet rs) throws SQLException {
 		// TODO Auto-generated method stub
 		
 	}

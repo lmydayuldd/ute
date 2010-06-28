@@ -7,10 +7,10 @@ package at.sume.distributions;
 public class PersonsPerAgeSexHouseholdsizePersonnr {
 	private long id;
 	private long spatialUnitId;
-	private int sex;
+	private short sex;
 	private int ageGroup;
-	private int householdSize;
-	private int personNrInHousehold;
+	private short householdSize;
+	private short personNrInHousehold;
 	private double personCount;
 	
 	public long getId() {
@@ -25,10 +25,10 @@ public class PersonsPerAgeSexHouseholdsizePersonnr {
 	public void setSpatialUnitId(long spatialUnitId) {
 		this.spatialUnitId = spatialUnitId;
 	}
-	public int isSex() {
+	public short getSex() {
 		return sex;
 	}
-	public void setSex(int sex) {
+	public void setSex(short sex) {
 		this.sex = sex;
 	}
 	public int getAgeGroup() {
@@ -37,16 +37,16 @@ public class PersonsPerAgeSexHouseholdsizePersonnr {
 	public void setAgeGroup(int ageGroup) {
 		this.ageGroup = ageGroup;
 	}
-	public int getHouseholdSize() {
+	public short getHouseholdSize() {
 		return householdSize;
 	}
-	public void setHouseholdSize(int householdSize) {
+	public void setHouseholdSize(short householdSize) {
 		this.householdSize = householdSize;
 	}
-	public int getPersonNrInHousehold() {
+	public short getPersonNrInHousehold() {
 		return personNrInHousehold;
 	}
-	public void setPersonNrInHousehold(int personNrInHousehold) {
+	public void setPersonNrInHousehold(short personNrInHousehold) {
 		this.personNrInHousehold = personNrInHousehold;
 	}
 	public double getPersonCount() {

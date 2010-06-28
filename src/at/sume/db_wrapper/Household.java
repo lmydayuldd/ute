@@ -1,5 +1,6 @@
 package at.sume.db_wrapper;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import at.sume.generate_population.Database;
@@ -55,15 +56,16 @@ public class Household extends DatabaseRecord {
 		// TODO: set internal representation
 	}
 	
-	@Override
-	public void dbInsert() throws SQLException {
-		ps.executeUpdate();
-	}
-	
 	public void dbInsert(long householdId, long spatialunitId, short householdSize) throws SQLException {
 		setHouseholdId(householdId);
 		setSpatialunitId(spatialunitId);
 		setHouseholdSize(householdSize);
 		dbInsert();
+	}
+
+	@Override
+	public void populate(ResultSet rs) throws SQLException {
+		// TODO Auto-generated method stub
+		
 	}
 }

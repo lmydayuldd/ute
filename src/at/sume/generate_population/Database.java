@@ -4,6 +4,9 @@
 package at.sume.generate_population;
 
 import java.sql.*;
+import java.util.ArrayList;
+
+import at.sume.db_wrapper.DatabaseRecord;
 
 /**
  * Common database handling routines
@@ -98,6 +101,15 @@ public class Database {
 			else
 				throw new Exception("Can't use type " + variables[i].getClass().toString());
 		}
+	}
+	
+	public ArrayList<DatabaseRecord> queryToArray(String query) throws SQLException {
+		ResultSet rs = executeQuery(query);
+		ArrayList<DatabaseRecord> al = new ArrayList<DatabaseRecord>();
+		while (rs.next()) {
+
+		}
+		return null;
 	}
 	
 	/**

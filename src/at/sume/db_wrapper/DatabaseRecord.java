@@ -4,6 +4,7 @@
 package at.sume.db_wrapper;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import at.sume.generate_population.Database;
@@ -13,22 +14,26 @@ import at.sume.generate_population.Database;
  *
  */
 public abstract class DatabaseRecord {
-	static protected PreparedStatement ps;
-	static protected Database db;
+	protected PreparedStatement ps;
+	protected Database db;
 	
-	public DatabaseRecord(Database pdb) throws SQLException {}{
-		//db = pdb;
+	public DatabaseRecord(Database pdb) throws SQLException {
+		db = pdb;
 	}
 	
-	public static void prepareStatement(String sqlx) throws SQLException
+	public abstract void populate(ResultSet rs) throws SQLException;
+	
+	public void prepareStatement(String sqlx) throws SQLException
 	{
 		ps = db.con.prepareStatement(sqlx);
 	}
 
-	private static void executeUpdate() throws SQLException
+	private void executeUpdate() throws SQLException
 	{
 		ps.executeUpdate();
 	}
 	
-	public abstract void dbInsert() throws SQLException;
+	public void dbInsert() throws SQLException {
+		ps.executeUpdate();
+	}
 }
