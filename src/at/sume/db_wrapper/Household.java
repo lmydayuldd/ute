@@ -20,7 +20,7 @@ public class Household extends DatabaseRecord {
 
 	public Household(Database pdb) throws SQLException {
 		super(pdb);
-		db = pdb;
+		//db = pdb;
 		String sqlx = "insert into _DM_Households (HouseholdId, SpatialunitId, HouseholdSize) values (?, ?, ?)";
 		prepareStatement(sqlx);
 	}

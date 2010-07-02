@@ -1,7 +1,9 @@
 package at.sume.sampling;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Random;
 
 /**
@@ -10,7 +12,7 @@ import java.util.Random;
  *
  * @param <T> Data that may be stored with each sample record 
  */
-public class Distribution<T> {
+public class Distribution<T> implements Collection<T>, Iterable<T> {
 	private ArrayList<Long> idStore;
 	private ArrayList<Long> thresholdStore;
 	private ArrayList<T> objectStore;
@@ -91,5 +93,78 @@ public class Distribution<T> {
 	 */
 	public T get(int index) {
 		return objectStore.get(index);
+	}
+
+	@Override
+	public Iterator<T> iterator() {
+		return objectStore.iterator();
+	}
+
+	@Override
+	public boolean add(T arg0) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends T> arg0) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void clear() {
+		idStore.clear();
+		thresholdStore.clear();
+		objectStore.clear();
+		maxThreshold = 0;
+	}
+
+	@Override
+	public boolean contains(Object arg0) {
+		return objectStore.contains(arg0);
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> arg0) {
+		return objectStore.containsAll(arg0);
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return objectStore.isEmpty();
+	}
+
+	@Override
+	public boolean remove(Object arg0) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> arg0) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> arg0) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public int size() {
+		return objectStore.size();
+	}
+
+	@Override
+	public Object[] toArray() {
+		return objectStore.toArray();
+	}
+
+	@Override
+	public <T> T[] toArray(T[] arg0) {
+		return objectStore.toArray(arg0);
 	}
 }

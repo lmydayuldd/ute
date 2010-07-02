@@ -52,6 +52,11 @@ public class SampleHouseholds {
 		}
 	}
 
+	public static void FreeDistribution() {
+		if (spatialUnits != null)
+			spatialUnits.clear();
+	}
+	
 	/**
 	 * Return index of household-location based on given distribution
 	 * @return index of list of spatial units with household-numbers

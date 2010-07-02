@@ -9,17 +9,16 @@ package at.sume.distributions;
 public class HouseholdsPerSpatialUnit {
 	private long spatialUnitId;
 	private long nrHouseholdsTotal;
-	private long nrHouseholdsRunningTotal;
+//	private long nrHouseholdsRunningTotal;
 	private long nrHouseholds_1P;
 	private long nrHouseholds_2P;
 	private long nrHouseholds_3P;
 	private long nrHouseholds_4Pmore;
-	//private static long nrHouseholdsTotalSum;
 	
-	public HouseholdsPerSpatialUnit()
-	{
-		nrHouseholdsRunningTotal = 0;
-	}
+//	public HouseholdsPerSpatialUnit()
+//	{
+//		nrHouseholdsRunningTotal = 0;
+//	}
 	public long getSpatialUnitId() {
 		return spatialUnitId;
 	}
@@ -31,12 +30,10 @@ public class HouseholdsPerSpatialUnit {
 	}
 	public void setNrHouseholdsTotal(long nrHouseholdsTotal) {
 		this.nrHouseholdsTotal = nrHouseholdsTotal;
-//		nrHouseholdsTotalSum += nrHouseholdsTotal;
-//		this.nrHouseholdsRunningTotal = nrHouseholdsTotalSum;
 	}
-	public long getNrHouseholdsRunningTotal() {
-		return nrHouseholdsRunningTotal;
-	}
+//	public long getNrHouseholdsRunningTotal() {
+//		return nrHouseholdsRunningTotal;
+//	}
 	public void setNrHouseholds_1P(long nrHouseholds_1P) {
 		this.nrHouseholds_1P = nrHouseholds_1P;
 	}
@@ -61,7 +58,4 @@ public class HouseholdsPerSpatialUnit {
 	public long getNrHouseholds_4Pmore() {
 		return nrHouseholds_4Pmore;
 	}
-//	public static long getNrHouseholdsTotalSum() {
-//		return nrHouseholdsTotalSum;
-//	}
 }

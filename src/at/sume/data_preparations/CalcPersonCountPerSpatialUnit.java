@@ -35,7 +35,7 @@ public class CalcPersonCountPerSpatialUnit {
 			PersonsPerAgeSexHouseholdsizePersonnr p = new PersonsPerAgeSexHouseholdsizePersonnr();
 			p.setId(rs.getLong("ID"));
 			p.setSex(rs.getShort("Sex"));
-			p.setAgeGroup(rs.getInt("AgeGroup"));
+			p.setAgeGroupId(rs.getShort("AgeGroup"));
 			p.setHouseholdSize(rs.getShort("HouseholdSize"));
 			p.setPersonNrInHousehold(rs.getShort("PersonNr"));
 			p.setPersonCount(rs.getDouble("PersonCount"));
@@ -141,7 +141,7 @@ public class CalcPersonCountPerSpatialUnit {
 						pc_out.setId(maxid);
 						pc_out.setSpatialunitId(spatialunitid);
 						pc_out.setSex(pc_in.getSex());
-						pc_out.setAgeGroupId(pc_in.getAgeGroup());
+						pc_out.setAgeGroupId(pc_in.getAgeGroupId());
 						pc_out.setHouseholdSize(pc_in.getHouseholdSize());
 						pc_out.setPersonNr(pc_in.getPersonNrInHousehold());
 						pc_out.setPersonCount(m[x][y]);
