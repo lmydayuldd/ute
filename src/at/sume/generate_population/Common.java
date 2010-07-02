@@ -13,7 +13,7 @@ import java.io.*;
  *
  */
 public class Common {
-	public static String IniFileName = "generate_population.ini";
+	public static String IniFileName = "sume_dm.ini";
 	
 	/**
 	 * Get the location of the database from the INI-file
