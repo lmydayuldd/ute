@@ -1,7 +1,7 @@
 /**
  * 
  */
-package at.sume.generate_population;
+package net.remesch.util;
 
 import java.sql.*;
 import java.util.ArrayList;

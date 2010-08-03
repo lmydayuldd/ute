@@ -5,8 +5,9 @@ package at.sume.sampling;
 
 import java.sql.*;
 import java.util.*;
+
+import net.remesch.util.Database;
 import at.sume.distributions.HouseholdsPerSpatialUnit;
-import at.sume.generate_population.Database;
 
 /**
  * Monte Carlo sampling for household locations and household sizes

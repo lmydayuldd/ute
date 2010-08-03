@@ -3,9 +3,11 @@ package at.sume.generate_population;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import net.remesch.util.Database;
 import net.remesch.util.DateUtil;
 import at.sume.db_wrapper.*;
 import at.sume.distributions.*;
+import at.sume.dm.Common;
 import at.sume.sampling.SampleHouseholds;
 import at.sume.sampling.SamplePersons;
 

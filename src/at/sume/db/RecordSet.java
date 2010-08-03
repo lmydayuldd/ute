@@ -3,63 +3,107 @@
  */
 package at.sume.db;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+
+import net.remesch.util.Database;
+
 
 /***
- * 
- * General handling of database recordsets of a certain type
- * 
+ * General handling of database tables/views
  * @author Alexander Remesch
- *
- * @param <T> Data containing one database record 
+ * TODO: improve implementation of Iterable/Iterator (see head-first book on this issue!)
 */
-public abstract class RecordSet<T> {
-	private ArrayList<Long> idStore;
-	private ArrayList<T> objectStore;
+public abstract class RecordSet<E extends RecordSetRow> implements Iterable<E> {
+//	protected ArrayList<? extends RecordSetRow> rowList;
+	protected ArrayList<E> rowList;
 
 	/**
-	 * Construct an empty class
+	 * Construct class and load probabilities from the database. Variable parts have to be implemented in implementation
+	 * classes ("Factories")'
+	 * 
+	 * @param db Database to load rows from
+	 * @throws SQLException
 	 */
-	public RecordSet() {
-		idStore = new ArrayList<Long>(0);
-		objectStore = new ArrayList<T>(0);
+	public RecordSet(Database db) throws SQLException {
+		int rowcount = 0; // TODO: get correct row count
+
+		ResultSet rs = db.executeQuery(selectStatement());
+		
+		rowList = new ArrayList<E>(rowcount);
+		ArrayList<String> fields = new ArrayList<String>(Arrays.asList(fieldnames()));
+				
+		while (rs.next())
+		{
+			E row = createDatabaseRecord(this);
+			for (String field : fields) {
+				row.set(rs, field);
+			}
+			rowList.add(row);
+		}
+		rs.close();
 	}
 	
 	/**
-	 * Constructor that reserves memory for a given number of records
-	 * @param recordCount number of records memory will be reserved for
+	 * Factory for the SQL select statement to retrieve the database records 
+	 * @return SQL select string
 	 */
-	public RecordSet(int recordCount) {
-		idStore = new ArrayList<Long>(recordCount);
-		objectStore = new ArrayList<T>(recordCount);
-	}
-
-	/**
-	 * Add a record to the record store
-	 * @param delta Range that gives the probability with which this particular record may be chosen during random sampling
-	 * @param object Data that may be stored with each sample record
-	 */
-	public void add(long delta, T object) {
-		objectStore.add(object);
-	}
-
-	/**
-	 * Add a record to the record store
-	 * @param id Identification number
-	 * @param delta Range that gives the probability with which this particular record may be chosen during random sampling
-	 * @param object Data that may be stored with each sample record
-	 */
-	public void add(long id, long delta, T object) {
-		idStore.add(id);
-		add(delta, object);
-	}
+	// TODO: create default from fieldnames, tablename + pk-fieldnames
+	public abstract String selectStatement();
 	
 	/**
-	 * Get data stored with each sample record
-	 * @param index index of the sample record
+	 * Factory for the field names of the primary key fields
+	 * @return Array of field names retrieved by the SQL select statement
+	 */
+	public abstract String[] primaryKeyFieldnames();
+	
+	/**
+	 * Factory for the field names in the RecordSet
+	 * @return Field name retrieved by the SQL select statement
+	 */
+	public abstract String[] fieldnames();
+	
+	/**
+	 * Factory to create the specific instantiation of DatabaseRecord
+	 * @param recordSet Link to the RecordSet the RecordSetRow belongs to
 	 * @return
 	 */
-	public T get(int index) {
-		return objectStore.get(index);
+	public abstract E createDatabaseRecord(RecordSet<E> recordSet);
+
+	/**
+	 * Look up a row from a RecordSet matching the key values given 
+	 * @param lookupKeys Key values to search
+	 * @return
+	 */
+	public E lookup(Object... lookupKeys) {
+		for (E row : rowList) {
+			if (row.primaryKeyEquals(lookupKeys))
+				return row;
+		}
+		return null;
+	}
+
+	/**
+	 * Look up a row from a RecordSet matching the id value given. The lookup will be performed by binary search
+	 * algorithm.
+	 * @param id
+	 * @return
+	 */
+	public E lookup(Long id) {
+		E lookupKey = createDatabaseRecord(this);
+		lookupKey.setId(id);
+		int i = Collections.binarySearch(rowList, lookupKey);
+		return rowList.get(i);
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Iterable#iterator()
+	 */
+	public Iterator<E> iterator() {
+		return rowList.iterator();
 	}
 }

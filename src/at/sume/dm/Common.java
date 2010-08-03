@@ -1,7 +1,7 @@
 /**
  * 
  */
-package at.sume.generate_population;
+package at.sume.dm;
 
 import java.util.*;
 import java.io.*;

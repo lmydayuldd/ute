@@ -4,8 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
 
+import net.remesch.util.Database;
+
 import at.sume.distributions.PersonsPerAgeSexHouseholdsizePersonnr;
-import at.sume.generate_population.Database;
 
 public class SamplePersons {
 	private static Distribution<PersonsPerAgeSexHouseholdsizePersonnr> persons;

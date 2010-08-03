@@ -9,8 +9,9 @@ import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
 
-import at.sume.generate_population.Common;
-import at.sume.generate_population.Database;
+import net.remesch.util.Database;
+
+import at.sume.dm.Common;
 
 /**
  * Routines for data conversion

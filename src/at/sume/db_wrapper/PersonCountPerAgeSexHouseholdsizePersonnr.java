@@ -7,7 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 
-import at.sume.generate_population.Database;
+import net.remesch.util.Database;
+
 
 /**
  * Database wrapper class for one record of table _DM_Perrsons per age, sex, hh-size, personnr, spatial unit

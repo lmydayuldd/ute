@@ -7,7 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import at.sume.generate_population.Database;
+import net.remesch.util.Database;
+
 
 /**
  * @author ar
