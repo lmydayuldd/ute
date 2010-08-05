@@ -63,10 +63,10 @@ public class Households extends RecordSet<HouseholdRow> {
 	}
 
 	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSet#selectStatement()
+	 * @see at.sume.db.RecordSet#tablename()
 	 */
 	@Override
-	public String selectStatement() {
-		return "SELECT HouseholdId, SpatialunitId, HouseholdSize, DwellingId from _DM_Households ORDER BY HouseholdId";
+	public String tablename() {
+		return "_DM_Households";
 	}
 }
