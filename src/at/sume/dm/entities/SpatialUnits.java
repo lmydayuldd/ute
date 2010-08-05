@@ -49,11 +49,11 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	}
 
 	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSet#selectStatement()
+	 * @see at.sume.db.RecordSet#tablename()
 	 */
 	@Override
-	public String selectStatement() {
-		return "SELECT SpatialUnitId FROM _DM_SpatialUnits ORDER BY SpatialUnitId";
+	public String tablename() {
+		return "_DM_SpatialUnits";
 	}
 
 //	/* (non-Javadoc)
