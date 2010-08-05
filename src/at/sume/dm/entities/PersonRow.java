@@ -174,4 +174,11 @@ public class PersonRow extends RecordSetRow {
 			throw new IllegalArgumentException("PK must by of type Long");
 		}
 	}
+	
+	/**
+	 * Remove this record from the list
+	 */
+	public void remove() {
+		persons.remove(this);
+	}
 }
