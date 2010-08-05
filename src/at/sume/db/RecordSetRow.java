@@ -72,10 +72,20 @@ public abstract class RecordSetRow implements Comparable<RecordSetRow> {
 	 */
 	public abstract boolean primaryKeyEquals(Object... lookupKeys);
 	
+	/**
+	 * Compare to unique id field
+	 * @param row record from which the id will be taken for comparison
+	 * @return
+	 */
 	public int compareTo(RecordSetRow row) {
 		return id.compareTo(row.getId());
 	}
 	
+	/**
+	 * Compare to unique id field
+	 * @param id id to compare
+	 * @return
+	 */
 	public int compareTo(Long id) {
 		return this.id.compareTo(id);
 	}
