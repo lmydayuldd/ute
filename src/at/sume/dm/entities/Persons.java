@@ -48,14 +48,6 @@ public class Persons extends RecordSet<PersonRow>{
 		return s;
 	}
 
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSet#selectStatement()
-	 */
-	@Override
-	public String selectStatement() {
-		return "SELECT PersonId, HouseholdId, Sex, YearBorn, AgeGroupId, HouseholdRepresentative, YearlyIncome from _DM_Persons ORDER BY PersonId";
-	}
-
 	/**
 	 * Link households and persons according to the household-id in the person row
 	 * @param households
@@ -66,5 +58,13 @@ public class Persons extends RecordSet<PersonRow>{
 			p.setHousehold(hh);
 			hh.addMember(p);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see at.sume.db.RecordSet#tablename()
+	 */
+	@Override
+	public String tablename() {
+		return "_DM_Persons";
 	}
 }
