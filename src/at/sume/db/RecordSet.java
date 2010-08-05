@@ -16,10 +16,8 @@ import net.remesch.util.Database;
 /***
  * General handling of database tables/views
  * @author Alexander Remesch
- * TODO: improve implementation of Iterable/Iterator (see head-first book on this issue!)
 */
 public abstract class RecordSet<E extends RecordSetRow> implements Iterable<E> {
-//	protected ArrayList<? extends RecordSetRow> rowList;
 	protected ArrayList<E> rowList;
 
 	/**
@@ -49,11 +47,19 @@ public abstract class RecordSet<E extends RecordSetRow> implements Iterable<E> {
 	}
 	
 	/**
-	 * Factory for the SQL select statement to retrieve the database records 
+	 * Factory for the SQL select statement to retrieve the database records. Default implementation returns a
+	 * SELECT statement with all fields ordered by the primary key fields
 	 * @return SQL select string
 	 */
-	// TODO: create default from fieldnames, tablename + pk-fieldnames
-	public abstract String selectStatement();
+	public String selectStatement() {
+		return "SELECT " + fieldnames() + " FROM " + tablename() + " ORDER BY " + primaryKeyFieldnames();
+	}
+	
+	/**
+	 * Factory for the database table name
+	 * @return
+	 */
+	public abstract String tablename();
 	
 	/**
 	 * Factory for the field names of the primary key fields
