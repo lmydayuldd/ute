@@ -89,4 +89,10 @@ public abstract class RecordSetRow implements Comparable<RecordSetRow> {
 	public int compareTo(Long id) {
 		return this.id.compareTo(id);
 	}
+
+	/**
+	 * Remove this row from its recordset
+	 * TODO: this shall be non-abstract in future versions (implement the list here!)
+	 */
+	public abstract void remove();
 }

@@ -13,7 +13,9 @@ import java.io.*;
  *
  */
 public class Common {
-	public static String IniFileName = "sume_dm.ini";
+	public final static String INI_FILENAME = "sume_dm.ini";
+	// TODO: put the following into the database (table system parameters)
+	public final static int MODEL_ITERATIONS = 1;
 	
 	/**
 	 * Get the location of the database from the INI-file
@@ -23,7 +25,7 @@ public class Common {
 	{
 	    try {
 	        Properties p = new Properties();
-	        p.load(new FileInputStream(IniFileName));
+	        p.load(new FileInputStream(INI_FILENAME));
 	        return(p.getProperty("DbLocation"));
 	    } catch (Exception e) {
 	        System.out.println(e);

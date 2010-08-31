@@ -61,4 +61,13 @@ public class SpatialUnitRow extends RecordSetRow {
 			throw new IllegalArgumentException("PK must by of type Long");
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see at.sume.db.RecordSetRow#remove()
+	 */
+	@Override
+	public void remove() {
+		// TODO Auto-generated method stub
+		throw new IllegalArgumentException("SpatialUnitRow.remove() not yet implemented");
+	}
 }

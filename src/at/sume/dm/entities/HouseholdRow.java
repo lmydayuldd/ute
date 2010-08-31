@@ -8,12 +8,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import at.sume.db.RecordSetRow;
+import at.sume.dm.demography.events.EventObservable;
+import at.sume.dm.demography.events.EventObserver;
 
 /**
  * @author Alexander Remesch
  *
  */
-public class HouseholdRow extends RecordSetRow {
+public class HouseholdRow extends RecordSetRow implements EventObserver {
 //	private long householdId;
 	private long spatialunitId;
 	private short householdSize;
@@ -92,6 +94,17 @@ public class HouseholdRow extends RecordSetRow {
 		this.members.add(person);
 	}
 	
+	public void removeMember(PersonRow person) {
+		int i = members.indexOf(person);
+		if (i >= 0) {
+			members.remove(i);
+		}
+		// Remove a household if there are no members left
+		if (members.size() == 0) {
+			households.remove(this);
+		}
+	}
+	
 	public List<PersonRow> getMembers() {
 		return members;
 	}
@@ -158,6 +171,27 @@ public class HouseholdRow extends RecordSetRow {
 				return false;
 		} else {
 			throw new IllegalArgumentException("PK must by of type Long");
+		}
+	}
+
+	/**
+	 * Remove this record from the list
+	 */
+	@Override
+	public void remove() {
+		households.remove(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see at.sume.dm.demography.events.EventObserver#eventOccured(at.sume.dm.demography.events.EventObservable, java.lang.String)
+	 */
+	@Override
+	public void eventOccured(EventObservable observable, String event) {
+		if (event.equals("PERSON_REMOVED")) {
+			PersonRow person = (PersonRow) observable;
+			removeMember(person);
+		} else {
+			throw new IllegalArgumentException("Received unknown event " + event);
 		}
 	}
 }

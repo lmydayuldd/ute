@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import net.remesch.util.Database;
+import net.remesch.util.StringUtil;
 
 
 /***
@@ -52,7 +53,8 @@ public abstract class RecordSet<E extends RecordSetRow> implements Iterable<E> {
 	 * @return SQL select string
 	 */
 	public String selectStatement() {
-		return "SELECT " + fieldnames() + " FROM " + tablename() + " ORDER BY " + primaryKeyFieldnames();
+		return "SELECT " + StringUtil.arrayToString(fieldnames(), ", ") + " FROM " + tablename() 
+			+ " ORDER BY " + StringUtil.arrayToString(primaryKeyFieldnames(), ", ");
 	}
 	
 	/**
@@ -106,10 +108,29 @@ public abstract class RecordSet<E extends RecordSetRow> implements Iterable<E> {
 		return rowList.get(i);
 	}
 	
+	/**
+	 * Remove a row from the RecordSet (in memory, NOT in the database)
+	 * @param row
+	 */
+	public void remove(E row) {
+		int i = rowList.indexOf(row);
+		if (i >= 0) {
+			rowList.remove(i);
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Iterable#iterator()
 	 */
 	public Iterator<E> iterator() {
 		return rowList.iterator();
+	}
+	
+	/**
+	 * Returns number of elements in the recordset
+	 * @return
+	 */
+	public int size() {
+		return rowList.size();
 	}
 }

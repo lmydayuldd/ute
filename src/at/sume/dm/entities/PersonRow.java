@@ -5,13 +5,16 @@ package at.sume.dm.entities;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import at.sume.db.RecordSetRow;
+import at.sume.dm.demography.events.EventObservable;
+import at.sume.dm.demography.events.EventObserver;
 
 /**
  * @author Alexander Remesch
  *
  */
-public class PersonRow extends RecordSetRow {
+public class PersonRow extends RecordSetRow implements EventObservable {
 //	private long personId;
 	private long householdId;
 	private short sex;
@@ -21,6 +24,7 @@ public class PersonRow extends RecordSetRow {
 	private long yearlyIncome;
 	private HouseholdRow household;
 	private Persons persons;
+	private ArrayList<EventObserver> observers;
 	
 	public PersonRow(Persons persons) {
 		this.persons = persons;
@@ -178,7 +182,37 @@ public class PersonRow extends RecordSetRow {
 	/**
 	 * Remove this record from the list
 	 */
+	@Override
 	public void remove() {
 		persons.remove(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see net.remesch.util.Observable#notifyObservers()
+	 */
+	@Override
+	public void notifyObservers() {
+		for (EventObserver observer : observers) {
+			observer.notify();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see net.remesch.util.Observable#registerObserver(net.remesch.util.Observer)
+	 */
+	@Override
+	public void registerObserver(EventObserver observer) {
+		observers.add(observer);
+	}
+
+	/* (non-Javadoc)
+	 * @see net.remesch.util.Observable#removeObserver(net.remesch.util.Observer)
+	 */
+	@Override
+	public void removeObserver(EventObserver observer) {
+		int i = observers.indexOf(observer);
+		if (i >= 0) {
+			observers.remove(i);
+		}
 	}
 }

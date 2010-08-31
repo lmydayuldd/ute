@@ -5,8 +5,6 @@ package at.sume.dm.demography;
 
 import java.sql.SQLException;
 
-import at.sume.db.RecordSetRow;
-
 import net.remesch.util.Database;
 
 
@@ -14,14 +12,14 @@ import net.remesch.util.Database;
  * Implementation of mortality probability per age and sex
  * @author Alexander Remesch
  */
-public class Mortality extends ProbabilityDistribution {
+public class Mortality extends ProbabilityDistribution<MortalityProbabilityRow> {
 
 	public Mortality(Database db) throws SQLException {
 		super(db);
 	}
 
 	@Override
-	public RecordSetRow createProbabilityItem() {
+	public MortalityProbabilityRow createProbabilityItem() {
 		return new MortalityProbabilityRow();
 	}
 

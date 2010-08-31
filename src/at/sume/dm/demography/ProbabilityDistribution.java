@@ -20,14 +20,13 @@ import net.remesch.util.Database;
  * 
  * @author Alexander Remesch
  */
-public abstract class ProbabilityDistribution {
-	private ArrayList<RecordSetRow> itemList;
+public abstract class ProbabilityDistribution<E extends RecordSetRow> {
+	private ArrayList<E> itemList;
 	private ArrayList<Double> probabilityList;
 	
 	/**
 	 * Construct class and load probabilities from the database. Variable parts have to be implemented in implementation
 	 * classes ("Factories")
-	 * 
 	 * @param db Database to load rows from
 	 * @throws SQLException
 	 */
@@ -36,16 +35,19 @@ public abstract class ProbabilityDistribution {
 
 		ResultSet rs = db.executeQuery(selectStatement());
 		
-		itemList = new ArrayList<RecordSetRow>(rowcount);
+		itemList = new ArrayList<E>(rowcount);
+		probabilityList = new ArrayList<Double>(rowcount);
 		ArrayList<String> keys = new ArrayList<String>(Arrays.asList(keyFields()));
 				
 		while (rs.next())
 		{
-			RecordSetRow item = createProbabilityItem();
+			E item = createProbabilityItem();
 			for (String key : keys) {
 				item.set(rs, key);
 			}
-			probabilityList.add(rs.getDouble(valueField()));
+			String fieldname = valueField();
+			Double p = rs.getDouble(fieldname);
+			probabilityList.add(p);
 			itemList.add(item);
 		}
 		rs.close();
@@ -57,7 +59,7 @@ public abstract class ProbabilityDistribution {
 	 * @param lookupItem Entity to determine the probability for a certain event for an entity with certain properties
 	 * @return Probability of the occurrence of the event
 	 */
-	public double probability(RecordSetRow lookupItem) {
+	public double probability(E lookupItem) {
 		int i = itemList.indexOf(lookupItem);
 		if (i == -1) {
 			return 0;	// no matching ProbabilityItem found
@@ -86,5 +88,5 @@ public abstract class ProbabilityDistribution {
 	 * the probability of an event will depend on
 	 * @return
 	 */
-	public abstract RecordSetRow createProbabilityItem();
+	public abstract E createProbabilityItem();
 }

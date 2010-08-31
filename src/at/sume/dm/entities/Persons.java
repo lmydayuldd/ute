@@ -12,7 +12,7 @@ import at.sume.db.RecordSet;
  * @author Alexander Remesch
  *
  */
-public class Persons extends RecordSet<PersonRow>{
+public class Persons extends RecordSet<PersonRow> {
 
 	/**
 	 * @param db
