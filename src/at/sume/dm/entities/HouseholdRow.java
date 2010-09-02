@@ -88,9 +88,13 @@ public class HouseholdRow extends RecordSetRow implements EventObserver {
 
 	public void addMembers(ArrayList<PersonRow> members){
 		this.members.addAll(members);
+		for (PersonRow person : members) {
+			person.registerObserver(this);
+		}
 	}
 	
 	public void addMember(PersonRow person) {
+		person.registerObserver(this);
 		this.members.add(person);
 	}
 	
@@ -98,9 +102,11 @@ public class HouseholdRow extends RecordSetRow implements EventObserver {
 		int i = members.indexOf(person);
 		if (i >= 0) {
 			members.remove(i);
+		} else {
+			throw new IllegalArgumentException("Person " + person.getId() + " is not a member of household " + this.getId());
 		}
 		// Remove a household if there are no members left
-		if (members.size() == 0) {
+		if (members.size() <= 0) {
 			households.remove(this);
 		}
 	}
@@ -189,6 +195,7 @@ public class HouseholdRow extends RecordSetRow implements EventObserver {
 	public void eventOccured(EventObservable observable, String event) {
 		if (event.equals("PERSON_REMOVED")) {
 			PersonRow person = (PersonRow) observable;
+			person.removeObserver(this);
 			removeMember(person);
 		} else {
 			throw new IllegalArgumentException("Received unknown event " + event);

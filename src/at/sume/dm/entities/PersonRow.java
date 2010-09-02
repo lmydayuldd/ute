@@ -28,6 +28,7 @@ public class PersonRow extends RecordSetRow implements EventObservable {
 	
 	public PersonRow(Persons persons) {
 		this.persons = persons;
+		observers = new ArrayList<EventObserver>();
 	}
 
 	/**
@@ -180,11 +181,15 @@ public class PersonRow extends RecordSetRow implements EventObservable {
 	}
 	
 	/**
-	 * Remove this record from the list
+	 * Remove this record from the list of persons and the list of household members
 	 */
 	@Override
 	public void remove() {
+		// this is done by eventOccured()
+		//household.removeMember(this);
 		persons.remove(this);
+		notifyObservers();
+		
 	}
 
 	/* (non-Javadoc)
@@ -193,7 +198,7 @@ public class PersonRow extends RecordSetRow implements EventObservable {
 	@Override
 	public void notifyObservers() {
 		for (EventObserver observer : observers) {
-			observer.notify();
+			observer.eventOccured(this, "PERSON_REMOVED");
 		}
 	}
 
