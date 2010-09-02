@@ -7,13 +7,18 @@ import java.sql.SQLException;
 
 import net.remesch.util.Database;
 import at.sume.db.RecordSet;
+import at.sume.db.RecordSetClonable;
 
 /**
  * @author Alexander Remesch
  *
  */
-public class Persons extends RecordSet<PersonRow> {
+public class Persons extends RecordSetClonable<PersonRow> {
 
+	public Persons() {
+		super();
+	}
+	
 	/**
 	 * @param db
 	 * @throws SQLException
@@ -66,5 +71,13 @@ public class Persons extends RecordSet<PersonRow> {
 	@Override
 	public String tablename() {
 		return "_DM_Persons";
+	}
+
+	/* (non-Javadoc)
+	 * @see at.sume.db.RecordSetClonable#factory()
+	 */
+	@Override
+	public RecordSetClonable<PersonRow> factory() {
+		return new Persons();
 	}
 }

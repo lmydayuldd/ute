@@ -5,6 +5,8 @@ package at.sume.dm;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import net.remesch.util.Database;
 import net.remesch.util.DateUtil;
@@ -100,12 +102,16 @@ public class Main {
 	        System.out.println(DateUtil.now() + ": running model year " + i + " of " + iterations);
 			// Loop through all households
 	        int j = 0;
-			for (HouseholdRow household : households) {
+	        // the following clone() is necessary because otherwise it wouldn't be possible to remove households from
+	        // the original list while iterating through it
+	        Households hh_helper = (Households) households.clone();
+			for (HouseholdRow household : hh_helper) {
 				if (j % 1000 == 0) {
 					System.out.println(DateUtil.now() + ": Processing household " + j + " of " + households.size() + ", nr. of persons: " + persons.size());
 				}
 				// Loop through all persons of the household
-				for (PersonRow person : household.getMembers()) {
+				ArrayList<PersonRow> p_helper = (ArrayList<PersonRow>) ((ArrayList<PersonRow>) household.getMembers()).clone();
+				for (PersonRow person : p_helper) {
 					personEventManager.process(person);
 				}
 				j++;

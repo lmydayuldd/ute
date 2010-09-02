@@ -21,6 +21,10 @@ import net.remesch.util.StringUtil;
 public abstract class RecordSet<E extends RecordSetRow> implements Iterable<E> {
 	protected ArrayList<E> rowList;
 
+	public RecordSet() {
+		
+	}
+	
 	/**
 	 * Construct class and load probabilities from the database. Variable parts have to be implemented in implementation
 	 * classes ("Factories")'

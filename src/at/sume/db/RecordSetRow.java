@@ -12,6 +12,7 @@ import java.sql.SQLException;
  */
 public abstract class RecordSetRow implements Comparable<RecordSetRow> {
 	protected Long id;
+	protected boolean deleted = false;
 	
 	/**
 	 * @return the id
@@ -25,6 +26,21 @@ public abstract class RecordSetRow implements Comparable<RecordSetRow> {
 	 */
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	/**
+	 * @return Is this record deleted?
+	 */
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	/**
+	 * Mark this row for removal/deletion from its recordset
+	 * We need this instead of remove() to be able to remove the record during an iteration 
+	 */
+	public void setDeleted() {
+		this.deleted = true;
 	}
 
 	/* (non-Javadoc)

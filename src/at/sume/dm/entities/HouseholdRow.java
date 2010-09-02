@@ -7,16 +7,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import at.sume.db.RecordSetRow;
-import at.sume.dm.demography.events.EventObservable;
-import at.sume.dm.demography.events.EventObserver;
 
 /**
  * @author Alexander Remesch
  *
  */
-public class HouseholdRow extends RecordSetRow implements EventObserver {
-//	private long householdId;
+public class HouseholdRow extends RecordSetRow {
 	private long spatialunitId;
 	private short householdSize;
 	private long dwellingId;
@@ -88,13 +86,9 @@ public class HouseholdRow extends RecordSetRow implements EventObserver {
 
 	public void addMembers(ArrayList<PersonRow> members){
 		this.members.addAll(members);
-		for (PersonRow person : members) {
-			person.registerObserver(this);
-		}
 	}
 	
 	public void addMember(PersonRow person) {
-		person.registerObserver(this);
 		this.members.add(person);
 	}
 	
@@ -102,16 +96,16 @@ public class HouseholdRow extends RecordSetRow implements EventObserver {
 		int i = members.indexOf(person);
 		if (i >= 0) {
 			members.remove(i);
-		} else {
-			throw new IllegalArgumentException("Person " + person.getId() + " is not a member of household " + this.getId());
+//		} else {
+//			throw new IllegalArgumentException("Person " + person.getId() + " is not a member of household " + this.getId());
 		}
-		// Remove a household if there are no members left
+		// remove a household if there are no members left
 		if (members.size() <= 0) {
 			households.remove(this);
 		}
 	}
 	
-	public List<PersonRow> getMembers() {
+	public ArrayList<PersonRow> getMembers() {
 		return members;
 	}
 	
@@ -186,19 +180,5 @@ public class HouseholdRow extends RecordSetRow implements EventObserver {
 	@Override
 	public void remove() {
 		households.remove(this);
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.dm.demography.events.EventObserver#eventOccured(at.sume.dm.demography.events.EventObservable, java.lang.String)
-	 */
-	@Override
-	public void eventOccured(EventObservable observable, String event) {
-		if (event.equals("PERSON_REMOVED")) {
-			PersonRow person = (PersonRow) observable;
-			person.removeObserver(this);
-			removeMember(person);
-		} else {
-			throw new IllegalArgumentException("Received unknown event " + event);
-		}
 	}
 }

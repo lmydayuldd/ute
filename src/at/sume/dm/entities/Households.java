@@ -6,13 +6,14 @@ package at.sume.dm.entities;
 import java.sql.SQLException;
 import net.remesch.util.Database;
 import at.sume.db.RecordSet;
+import at.sume.db.RecordSetClonable;
 import at.sume.db.RecordSetRow;
 
 /**
  * @author Alexander Remesch
  *
  */
-public class Households extends RecordSet<HouseholdRow> {
+public class Households extends RecordSetClonable<HouseholdRow> {
 //	private SpatialUnits spatialunits;
 	
 	/**
@@ -21,6 +22,13 @@ public class Households extends RecordSet<HouseholdRow> {
 	 */
 	public Households(Database db) throws SQLException {
 		super(db);
+	}
+
+	/**
+	 * 
+	 */
+	public Households() {
+		super();
 	}
 
 	/**
@@ -40,7 +48,7 @@ public class Households extends RecordSet<HouseholdRow> {
 	 * @see at.sume.db.RecordSet#createDatabaseRecord()
 	 */
 	@Override
-	public HouseholdRow createDatabaseRecord(RecordSet recordset) {
+	public HouseholdRow createDatabaseRecord(RecordSet<HouseholdRow> recordset) {
 		return new HouseholdRow((Households) recordset);
 	}
 
@@ -68,5 +76,13 @@ public class Households extends RecordSet<HouseholdRow> {
 	@Override
 	public String tablename() {
 		return "_DM_Households";
+	}
+
+	/* (non-Javadoc)
+	 * @see at.sume.db.RecordSetClonable#factory()
+	 */
+	@Override
+	public RecordSetClonable<HouseholdRow> factory() {
+		return new Households();
 	}
 }
