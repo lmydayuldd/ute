@@ -5,19 +5,15 @@ package at.sume.dm;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import net.remesch.util.Database;
 import net.remesch.util.DateUtil;
-import at.sume.db.RecordSetRow;
+import at.sume.dm.demography.events.ChildBirth;
 import at.sume.dm.demography.events.EventManager;
 import at.sume.dm.demography.events.PersonDeath;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.Households;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
-import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
 
 /**
@@ -36,7 +32,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
         System.out.println(DateUtil.now() + ": start");
-		Database db = new Database(Common.GetDbLocation());
+		Database db = Common.openDatabase();
 
 		// Load entity sets from database
 		try {
@@ -63,7 +59,10 @@ public class Main {
 		// - Find unsatisfied households
 		// - Simulate moves of unsatisfied households
         try {
-			runModel(db, Common.MODEL_ITERATIONS);
+        	int modelIterations = Integer.parseInt(Common.getSysParam("ModelIterations"));
+        	
+        	
+			runModel(db, modelIterations);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -97,6 +96,7 @@ public class Main {
 		// TODO: how can the events be constructed at another place to have this class/function independent of the
 		//       concrete event types??? Maybe put into its own static class or a ModelMain class?
 		PersonDeath personDeath = new PersonDeath(db, personEventManager);
+		ChildBirth childBirth = new ChildBirth(db, personEventManager);
 		
 		for (int i = 0; i != iterations; i++) {
 	        System.out.println(DateUtil.now() + ": running model year " + i + " of " + iterations);

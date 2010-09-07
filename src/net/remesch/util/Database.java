@@ -4,9 +4,7 @@
 package net.remesch.util;
 
 import java.sql.*;
-import java.util.ArrayList;
-
-import at.sume.db_wrapper.DatabaseRecord;
+import java.util.Date;
 
 /**
  * Common database handling routines
@@ -103,14 +101,14 @@ public class Database {
 		}
 	}
 	
-	public ArrayList<DatabaseRecord> queryToArray(String query) throws SQLException {
-		ResultSet rs = executeQuery(query);
-		ArrayList<DatabaseRecord> al = new ArrayList<DatabaseRecord>();
-		while (rs.next()) {
-
-		}
-		return null;
-	}
+//	public ArrayList<DatabaseRecord> queryToArray(String query) throws SQLException {
+//		ResultSet rs = executeQuery(query);
+//		ArrayList<DatabaseRecord> al = new ArrayList<DatabaseRecord>();
+//		while (rs.next()) {
+//
+//		}
+//		return null;
+//	}
 	
 	/**
 	 * Execute a SQL-statement
@@ -133,6 +131,93 @@ public class Database {
 		} catch (SQLException e) {
 			System.err.println("Error in Statement.execute(" + statement + ")\n" + e);
 			return;
+		}
+	}
+	
+	/**
+	 * Lookup values from first matching database record 
+	 * @param sql
+	 * @param returnValues
+	 * @throws SQLException 
+	 */
+	//public void lookupSql(String sql, Object... returnValues) throws SQLException {
+	public void lookupSql(String sql, Object[] returnValues) throws SQLException {
+		ResultSet rs = executeQuery(sql);
+		// check if field count & return values comply
+		ResultSetMetaData rsmd = rs.getMetaData();
+		if (rsmd.getColumnCount() != returnValues.length) {
+			throw new IllegalArgumentException("lookupSql: query retrieved " + rsmd.getColumnCount() + " columns while function got " + returnValues.length + " return value parameters");
+		}
+//		rs.last();
+//		int count = rs.getRow();
+//		rs.beforeFirst();
+		if (rs.next()) {
+			int i = 1;
+			for(Object rv : returnValues) {
+				if (rv instanceof Long) {
+					rv = rs.getLong(i);
+				} else if (rv instanceof Integer) {
+					rv = rs.getInt(i);
+				} else if (rv instanceof Double) {
+					// TODO: das hier geht nicht, wegen call by reference und weil die Referenz auf das Double-Objekt neu erzeugt wird
+					// muss per array passieren????
+					rv = rs.getDouble(i);
+				} else if (rv instanceof java.util.Date) {
+					rv = rs.getDate(i);
+				} else if (rv instanceof StringBuffer) {
+					StringBuffer h = (StringBuffer) rv;
+					h.setLength(0);
+					h.append(rs.getString(i));
+				} else if (rv instanceof String) {
+					// TODO: don't know if this works
+					StringBuffer h = new StringBuffer((String) rv);
+					h.setLength(0);
+					h.append(rs.getString(i));
+				} else {
+					throw new IllegalArgumentException("lookupSql: can't handle type of return value parameter " + i);
+				}
+				i++;
+			}
+		} else {
+			for (Object rv : returnValues) {
+				rv = null;
+			}
+		}
+	}
+	
+	/**
+	 * Lookup first value from first matching database record
+	 * @param sql
+	 * @return
+	 * @throws SQLException
+	 */
+	public Object lookupSql(String sql) throws SQLException {
+//		String [] returnValue = { };
+//		lookupSql(sql, returnValue);
+//		return returnValue[0];
+		ResultSet rs = executeQuery(sql);
+		// check if field count & return values comply
+		ResultSetMetaData rsmd = rs.getMetaData();
+		if (rs.next()) {
+			int i = 1;
+			switch (rsmd.getColumnType(i)) {
+			case Types.DECIMAL:
+				return rs.getLong(i);
+			case Types.FLOAT:
+				return rs.getFloat(i);
+			case Types.DOUBLE:
+				return rs.getDouble(i);
+			case Types.VARCHAR:
+				return rs.getString(i);
+			case Types.DATE:
+				return rs.getDate(i);
+			case Types.INTEGER:
+				return rs.getInt(i);
+			default:
+				throw new IllegalArgumentException("lookupSql: can't handle type " + rsmd.getColumnType(i) + " on query " + sql);
+			}
+		} else {
+			return null;
 		}
 	}
 }

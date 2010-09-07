@@ -23,8 +23,11 @@ public class GeneratePopulation {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-        System.out.println("Start @ " + DateUtil.now());
-		Database db = new Database(Common.GetDbLocation());
+		System.out.println("don't run this accidentally!");
+
+		
+		System.out.println("Start @ " + DateUtil.now());
+		Database db = new Database(Common.getDbLocation());
 		HouseholdsPerSpatialUnit hhpsu;
 		Household hh;
 

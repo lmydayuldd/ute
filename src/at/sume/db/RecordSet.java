@@ -137,4 +137,13 @@ public abstract class RecordSet<E extends RecordSetRow> implements Iterable<E> {
 	public int size() {
 		return rowList.size();
 	}
+	
+	/**
+	 * Add a row to the recordset
+	 * @param row
+	 * @return
+	 */
+	public boolean add(E row) {
+		return rowList.add(row);
+	}
 }

@@ -25,7 +25,7 @@ public class DataConversion {
 	 * @throws SQLException 
 	 */
 	private static void Convert_VZ2001_HH_Age() throws SQLException {
-		Database db = new Database(Common.GetDbLocation());
+		Database db = new Database(Common.getDbLocation());
 		ResultSet res = db.executeQuery("select *, val([GKZ]) AS GKZnum from [VZ_2001_Alter_Geschlecht_Familienstand (ZB)] where len(gkz) = 6 and Geschlecht <> 'gesamt'");
 		String sqlx = "insert into [VZ_2001_Alter_Geschlecht_Familienstand (ZB) relational] (ID, SpatialunitId, Sex, AgeGroupId, PersonCount) " + 
 			" values (?, ?, ?, ?, ?)";
@@ -64,7 +64,7 @@ public class DataConversion {
 	}
 	
 	public static void Convert_VZ2001_HH_Size() throws SQLException {
-		Database db = new Database(Common.GetDbLocation());
+		Database db = new Database(Common.getDbLocation());
 		ResultSet res = db.executeQuery("select *, val([Oestat]) AS GKZnum from [VZ_2001_Haushalte (ZB)] where len(Oestat) = 6");
 		String sqlx = "insert into [VZ_2001_Haushalte (ZB) relational] (ID, SpatialunitId, HouseholdSize, HouseholdCount, PersonCount) " + 
 			" values (?, ?, ?, ?, ?)";

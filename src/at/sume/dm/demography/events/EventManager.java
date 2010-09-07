@@ -29,7 +29,9 @@ public class EventManager<E> {
 	
 	public void process(E entity) {
 		for (Event<E> eventHandler : eventHandlers) {
-			eventHandler.occur(entity);
+			if (eventHandler.condition(entity)) {
+				eventHandler.occur(entity);
+			}
 		}
 	}
 }

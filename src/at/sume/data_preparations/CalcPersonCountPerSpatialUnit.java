@@ -50,7 +50,7 @@ public class CalcPersonCountPerSpatialUnit {
 	 * @throws SQLException 
 	 */
 	public static void main(String[] args) {
-		Database db = new Database(Common.GetDbLocation());
+		Database db = new Database(Common.getDbLocation());
 
 		// a) determine array size
 		// TODO: get this from db!

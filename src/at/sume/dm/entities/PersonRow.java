@@ -16,6 +16,7 @@ public class PersonRow extends RecordSetRow {
 	private short sex;
 	private int yearBorn;
 	private short ageGroupId;
+	private short age;
 	private boolean householdRepresentative;
 	private long yearlyIncome;
 	private HouseholdRow household;
@@ -54,14 +55,14 @@ public class PersonRow extends RecordSetRow {
 	}
 
 	/**
-	 * @return the sex
+	 * @return the sex (1 = female, 2 = male)
 	 */
 	public short getSex() {
 		return sex;
 	}
 
 	/**
-	 * @param sex the sex to set
+	 * @param sex the sex to set (1 = female, 2 = male)
 	 */
 	public void setSex(short sex) {
 		this.sex = sex;
@@ -93,6 +94,20 @@ public class PersonRow extends RecordSetRow {
 	 */
 	public void setAgeGroupId(short ageGroupId) {
 		this.ageGroupId = ageGroupId;
+	}
+
+	/**
+	 * @param age the age to set
+	 */
+	public void setAge(short age) {
+		this.age = age;
+	}
+
+	/**
+	 * @return the age
+	 */
+	public short getAge() {
+		return age;
 	}
 
 	/**
@@ -131,6 +146,13 @@ public class PersonRow extends RecordSetRow {
 		this.household = household;
 	}
 
+	/**
+	 * @return the persons
+	 */
+	public Persons getPersons() {
+		return persons;
+	}
+
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSetRow#set(java.sql.ResultSet, java.lang.String)
 	 */
@@ -157,6 +179,8 @@ public class PersonRow extends RecordSetRow {
 
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSetRow#primaryKeyEquals(java.lang.Object[])
+	 * 
+	 * TODO: kann man glaube ich in die Superklasse tun!
 	 */
 	@Override
 	public boolean primaryKeyEquals(Object... lookupKeys) {
@@ -165,7 +189,7 @@ public class PersonRow extends RecordSetRow {
 		}
 		if (lookupKeys[0] instanceof Long) {
 			long lookupKey = (Long) lookupKeys[0];
-			if (lookupKey == getPersonId())
+			if (lookupKey == getId())
 				return true;
 			else
 				return false;

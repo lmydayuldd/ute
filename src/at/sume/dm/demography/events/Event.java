@@ -32,6 +32,13 @@ public abstract class Event<T> {
 	 * @param entity
 	 */
 	public abstract void action(T entity);
-	
-//	public double probability(T entity);
+
+	/**
+	 * Filter entities on which an event can't happen
+	 * @param entity
+	 * @return true if the event can happen to the entity, false if not
+	 */
+	public boolean condition(T entity) {
+		return true;
+	}
 }
