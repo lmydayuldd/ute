@@ -5,11 +5,13 @@ package at.sume.dm.demography.events;
 
 import java.util.ArrayList;
 
+import at.sume.db.RecordSetRow;
+
 /**
  * @author Alexander Remesch
  *
  */
-public class EventManager<E> {
+public class EventManager<E extends RecordSetRow> {
 	private ArrayList<Event<E>> eventHandlers;
 	
 	public EventManager() {
