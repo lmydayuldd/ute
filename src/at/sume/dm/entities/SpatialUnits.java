@@ -4,7 +4,6 @@
 package at.sume.dm.entities;
 
 import java.sql.SQLException;
-import at.sume.db.RecordSetRow;
 import at.sume.db.RecordSet;
 import net.remesch.util.Database;
 
@@ -26,7 +25,7 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	 * @see at.sume.db.RecordSet#createDatabaseRecord()
 	 */
 	@Override
-	public SpatialUnitRow createDatabaseRecord(RecordSet recordSet) {
+	public SpatialUnitRow createDatabaseRecord(RecordSet<SpatialUnitRow> recordSet) {
 		return new SpatialUnitRow();
 	}
 
