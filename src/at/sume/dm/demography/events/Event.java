@@ -4,13 +4,15 @@
 package at.sume.dm.demography.events;
 
 import java.util.Random;
+
+import at.sume.db.RecordSetRow;
 import net.remesch.util.Database;
 
 /**
  * @author Alexander Remesch
  *
  */
-public abstract class Event<T> {
+public abstract class Event<T extends RecordSetRow> {
 	public Event(Database db, EventManager<T> eventManager) {
 		eventManager.register(this);
 	}
