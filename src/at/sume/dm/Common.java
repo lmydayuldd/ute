@@ -48,7 +48,7 @@ public class Common {
 	public static String getSysParam(String paramName) {
 		String rv = null;
 		try {
-			rv = (String)db.lookupSql("select wert from systemparameter where name='" + paramName + "'");
+			rv = (String)db.lookupSql("select wert from SysParamsRuntime where name='" + paramName + "'");
 		} catch (SQLException e) {
 			System.err.println("getSysParam: error looking up parameter " + paramName);
 			e.printStackTrace();
