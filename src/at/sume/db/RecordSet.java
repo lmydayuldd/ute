@@ -18,13 +18,20 @@ import net.remesch.util.StringUtil;
  * General handling of database tables/views
  * @author Alexander Remesch
 */
-public abstract class RecordSet<E extends RecordSetRow> implements Iterable<E> {
+public abstract class RecordSet<E extends RecordSetRow<?>> implements Iterable<E> {
 	protected ArrayList<E> rowList;
 
 	public RecordSet() {
 		
 	}
 	
+	/**
+	 * @return the rowList
+	 */
+	protected ArrayList<E> getRowList() {
+		return rowList;
+	}
+
 	/**
 	 * Construct class and load probabilities from the database. Variable parts have to be implemented in implementation
 	 * classes ("Factories")'
@@ -42,9 +49,9 @@ public abstract class RecordSet<E extends RecordSetRow> implements Iterable<E> {
 				
 		while (rs.next())
 		{
-			E row = createDatabaseRecord(this);
+			E row = createDatabaseRecord();
 			for (String field : fields) {
-				row.set(rs, field);
+				row.loadFromDatabase(rs, field);
 			}
 			rowList.add(row);
 		}
@@ -84,7 +91,7 @@ public abstract class RecordSet<E extends RecordSetRow> implements Iterable<E> {
 	 * @param recordSet Link to the RecordSet the RecordSetRow belongs to
 	 * @return
 	 */
-	public abstract E createDatabaseRecord(RecordSet<E> recordSet);
+	public abstract E createDatabaseRecord();
 
 	/**
 	 * Look up a row from a RecordSet matching the key values given 
@@ -106,7 +113,7 @@ public abstract class RecordSet<E extends RecordSetRow> implements Iterable<E> {
 	 * @return
 	 */
 	public E lookup(Long id) {
-		E lookupKey = createDatabaseRecord(this);
+		E lookupKey = createDatabaseRecord();
 		lookupKey.setId(id);
 		int i = Collections.binarySearch(rowList, lookupKey);
 		return rowList.get(i);

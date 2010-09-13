@@ -14,12 +14,19 @@ import at.sume.db.RecordSetRow;
  * 
  * TODO: must include properties of each spatial unit, must include geo-coordinates for graphical representation 
  */
-public class SpatialUnitRow extends RecordSetRow {
+public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	private double avgRentBlw60;	// Average rent < 60 m² [€/m²]
 	private double avgRentAbv60;	// Average rent >= 60 m² [€/m²]
 	private double rngRentBlw60;	// Max. range of rent < 60 m² depending on the quality of the dwelling
 	private double rngRentAbv60;	// Max. range of rent >= 60 m² depending on the quality of the dwelling
 	
+	/**
+	 * @param rowList
+	 */
+	public SpatialUnitRow(SpatialUnits rowList) {
+		super(rowList);
+	}
+
 	/**
 	 * @return the spatialUnitId
 	 */
@@ -94,7 +101,7 @@ public class SpatialUnitRow extends RecordSetRow {
 	 * @see at.sume.db.DatabaseRecord#set(java.sql.ResultSet, java.lang.String)
 	 */
 	@Override
-	public void set(ResultSet rs, String name) throws SQLException {
+	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
 		if (name.equals("SpatialUnitId")) {
 			setSpatialUnitId(rs.getLong(name));
 		} else if (name.equals("Miete_Avg_bis60")) {
@@ -115,7 +122,6 @@ public class SpatialUnitRow extends RecordSetRow {
 	 */
 	@Override
 	public void remove() {
-		// TODO Auto-generated method stub
-		throw new IllegalArgumentException("SpatialUnitRow.remove() not implemented");
+		throw new IllegalArgumentException("SpatialUnitRow.remove() not allowed");
 	}
 }

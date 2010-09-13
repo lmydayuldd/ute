@@ -6,7 +6,6 @@ package at.sume.dm.entities;
 import java.sql.SQLException;
 
 import net.remesch.util.Database;
-import at.sume.db.RecordSet;
 import at.sume.db.RecordSetClonable;
 
 /**
@@ -31,8 +30,8 @@ public class Persons extends RecordSetClonable<PersonRow> {
 	 * @see at.sume.db.RecordSet#createDatabaseRecord(at.sume.db.RecordSet)
 	 */
 	@Override
-	public PersonRow createDatabaseRecord(RecordSet<PersonRow> recordSet) {
-		return new PersonRow((Persons) recordSet);
+	public PersonRow createDatabaseRecord() {
+		return new PersonRow(this);
 	}
 
 	/* (non-Javadoc)

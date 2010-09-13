@@ -9,7 +9,6 @@ import java.util.Comparator;
 
 import net.remesch.util.Database;
 import net.remesch.util.MathUtil;
-import at.sume.db.RecordSet;
 import at.sume.db.RecordSetClonable;
 import at.sume.db.RecordSetRow;
 
@@ -42,7 +41,7 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	public void linkSpatialUnits(SpatialUnits spatialunits) {
 //		this.spatialunits = spatialunits;
 		
-		for (RecordSetRow row : rowList) {
+		for (RecordSetRow<Households> row : rowList) {
 			HouseholdRow hh = (HouseholdRow) row;
 			hh.setSpatialunit(spatialunits.lookup(hh.getSpatialunitId()));
 		}
@@ -52,8 +51,8 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	 * @see at.sume.db.RecordSet#createDatabaseRecord()
 	 */
 	@Override
-	public HouseholdRow createDatabaseRecord(RecordSet<HouseholdRow> recordset) {
-		return new HouseholdRow((Households) recordset);
+	public HouseholdRow createDatabaseRecord() {
+		return new HouseholdRow(this);
 	}
 
 	/* (non-Javadoc)

@@ -22,11 +22,11 @@ public class Mortality extends ProbabilityDistribution<MortalityProbabilityRow> 
 
 	@Override
 	public MortalityProbabilityRow createProbabilityItem() {
-		return new MortalityProbabilityRow();
+		return new MortalityProbabilityRow(this);
 	}
 
 	@Override
-	public String[] keyFields() {
+	public String[] primaryKeyFieldnames() {
 		String s[] = { "AgeGroupId", "sex" };
 		return s;
 	}
@@ -44,13 +44,22 @@ public class Mortality extends ProbabilityDistribution<MortalityProbabilityRow> 
 	}
 
 	/* (non-Javadoc)
-	 * @see at.sume.dm.demography.ProbabilityDistribution#valueField()
+	 * @see at.sume.db.RecordSet#fieldnames()
 	 */
 	@Override
-	public String valueField() {
-		return "p";
+	public String[] fieldnames() {
+		String s[] = { "AgeGroupId", "sex", "p" };
+		return s;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see at.sume.db.RecordSet#tablename()
+	 */
+	@Override
+	public String tablename() {
+		return "StatA_Sterbetafel_W_2009";
+	}
+
 	/**
 	 * Return the probability of death for a given age-group and sex
 	 * @param ageGroupId
@@ -58,7 +67,7 @@ public class Mortality extends ProbabilityDistribution<MortalityProbabilityRow> 
 	 * @return
 	 */
 	public double probability(short ageGroupId, short sex) {
-		MortalityProbabilityRow mpi = new MortalityProbabilityRow();
+		MortalityProbabilityRow mpi = new MortalityProbabilityRow(this);
 		mpi.setAgeGroupId(ageGroupId);
 		mpi.setSex(sex);
 		return probability(mpi);

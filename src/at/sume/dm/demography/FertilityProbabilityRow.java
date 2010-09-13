@@ -12,9 +12,16 @@ import at.sume.db.RecordSetRow;
  * Implementation of ProbabilityItem for fertility (= event) depending on age (= properties)
  * @author Alexander Remesch
  */
-public class FertilityProbabilityRow extends RecordSetRow {
+public class FertilityProbabilityRow extends RecordSetRow<Fertility> {
 	private short ageGroupId;
 	
+	/**
+	 * @param rowList
+	 */
+	public FertilityProbabilityRow(Fertility rowList) {
+		super(rowList);
+	}
+
 	/**
 	 * @return the ageGroupId
 	 */
@@ -33,7 +40,7 @@ public class FertilityProbabilityRow extends RecordSetRow {
 	 * @see at.sume.dm.demography.ProbabilityItem#set(java.lang.String)
 	 */
 	@Override
-	public void set(ResultSet rs, String name) throws SQLException {
+	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
 		if (name.equals("AgeGroupId")) {
 			setAgeGroupId(rs.getShort("AgeGroupId"));
 		} else {
@@ -93,7 +100,6 @@ public class FertilityProbabilityRow extends RecordSetRow {
 	 */
 	@Override
 	public void remove() {
-		// TODO Auto-generated method stub
-		throw new IllegalArgumentException("FertilityProbabilityRow.remove() not yet implemented");
+		throw new IllegalArgumentException("FertilityProbabilityRow.remove() not allowed");
 	}
 }

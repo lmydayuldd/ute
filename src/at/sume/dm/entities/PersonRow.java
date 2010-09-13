@@ -11,7 +11,7 @@ import at.sume.db.RecordSetRow;
  * @author Alexander Remesch
  *
  */
-public class PersonRow extends RecordSetRow {
+public class PersonRow extends RecordSetRow<Persons> {
 	private long householdId;
 	private short sex;
 	private int yearBorn;
@@ -20,10 +20,9 @@ public class PersonRow extends RecordSetRow {
 	private boolean householdRepresentative;
 	private long yearlyIncome;
 	private HouseholdRow household;
-	private Persons persons;
 	
 	public PersonRow(Persons persons) {
-		this.persons = persons;
+		super(persons);
 	}
 
 	/**
@@ -150,14 +149,14 @@ public class PersonRow extends RecordSetRow {
 	 * @return the persons
 	 */
 	public Persons getPersons() {
-		return persons;
+		return recordSet;
 	}
 
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSetRow#set(java.sql.ResultSet, java.lang.String)
 	 */
 	@Override
-	public void set(ResultSet rs, String name) throws SQLException {
+	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
 		if (name.equals("PersonId")) {
 			setPersonId(rs.getLong(name));
 		} else if (name.equals("HouseholdId")) {
@@ -183,6 +182,6 @@ public class PersonRow extends RecordSetRow {
 	@Override
 	public void remove() {
 		household.removeMember(this);
-		persons.remove(this);
+		recordSet.remove(this);
 	}
 }

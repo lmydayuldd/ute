@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import at.sume.db.RecordSet;
 import at.sume.db.RecordSetRow;
 
 import net.remesch.util.Database;
@@ -16,11 +17,10 @@ import net.remesch.util.Database;
 /**
  * Base class for implementing probability distributions to store and retrieve the probability of an event for
  * a certain entity (e.g. person, household, etc.)
- * TODO: derive from at.sume.db.Recordset
  * 
  * @author Alexander Remesch
  */
-public abstract class ProbabilityDistribution<E extends RecordSetRow> {
+public abstract class ProbabilityDistribution<E extends RecordSetRow<?>> extends RecordSet<E> {
 	private ArrayList<E> itemList;
 	private ArrayList<Double> probabilityList;
 	
@@ -43,7 +43,7 @@ public abstract class ProbabilityDistribution<E extends RecordSetRow> {
 		{
 			E item = createProbabilityItem();
 			for (String key : keys) {
-				item.set(rs, key);
+				item.loadFromDatabase(rs, key);
 			}
 			String fieldname = valueField();
 			Double p = rs.getDouble(fieldname);
@@ -77,16 +77,28 @@ public abstract class ProbabilityDistribution<E extends RecordSetRow> {
 	 * Factory for the field names of the key fields (= properties that the event-probabilities depend on)
 	 * @return Array of field names retrieved by the SQL select statement
 	 */
-	public abstract String[] keyFields();
+	public String[] keyFields() {
+		return primaryKeyFieldnames();
+	}
 	/**
 	 * Factory for the field name of the probability value field retrieved by the SQL select statement
 	 * @return Field name retrieved by the SQL select statement
 	 */
-	public abstract String valueField();
+	public String valueField() {
+		return "p";
+	}
 	/**
 	 * Factory to create the implementation of ProbabilityItem, i.e. an object containing a description of the properties
 	 * the probability of an event will depend on
 	 * @return
 	 */
 	public abstract E createProbabilityItem();
+	
+	/* (non-Javadoc)
+	 * @see at.sume.db.RecordSet#createDatabaseRecord(at.sume.db.RecordSet)
+	 */
+	@Override
+	public E createDatabaseRecord() {
+		return createProbabilityItem();
+	}
 }

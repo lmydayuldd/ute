@@ -12,10 +12,18 @@ import at.sume.db.RecordSetRow;
  * Implementation of ProbabilityItem for mortality (= event) depending on age and sex (= properties)
  * @author Alexander Remesch
  */
-public class MortalityProbabilityRow extends RecordSetRow {
+public class MortalityProbabilityRow extends RecordSetRow<Mortality> {
 	private short ageGroupId;
 	private short sex;
 	
+	/**
+	 * @param rowList
+	 */
+	public MortalityProbabilityRow(Mortality rowList) {
+		super(rowList);
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * @return the ageGroupId
 	 */
@@ -48,7 +56,7 @@ public class MortalityProbabilityRow extends RecordSetRow {
 	 * @see at.sume.dm.demography.ProbabilityItem#set(java.lang.String)
 	 */
 	@Override
-	public void set(ResultSet rs, String name) throws SQLException {
+	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
 		if (name.equals("sex")) {
 			setSex(rs.getShort(name));
 		} else if (name.equals("AgeGroupId")) {
@@ -114,7 +122,6 @@ public class MortalityProbabilityRow extends RecordSetRow {
 	 */
 	@Override
 	public void remove() {
-		// TODO Auto-generated method stub
-		throw new IllegalArgumentException("MortalityProbabilityRow.remove() not yet implemented");
+		throw new IllegalArgumentException("MortalityProbabilityRow.remove() not allowed");
 	}
 }

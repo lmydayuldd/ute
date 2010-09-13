@@ -25,8 +25,8 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	 * @see at.sume.db.RecordSet#createDatabaseRecord()
 	 */
 	@Override
-	public SpatialUnitRow createDatabaseRecord(RecordSet<SpatialUnitRow> recordSet) {
-		return new SpatialUnitRow();
+	public SpatialUnitRow createDatabaseRecord() {
+		return new SpatialUnitRow(this);
 	}
 
 	/* (non-Javadoc)

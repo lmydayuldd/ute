@@ -10,9 +10,14 @@ import java.sql.SQLException;
  * Interface for single items from a database
  * @author Alexander Remesch
  */
-public abstract class RecordSetRow implements Comparable<RecordSetRow> {
+public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable<RecordSetRow<?>> {
 	protected Long id;
 	protected boolean deleted = false;
+	protected T recordSet; 
+	
+	public RecordSetRow(T rowList) {
+		this.recordSet = rowList;
+	}
 	
 	/**
 	 * @return the id
@@ -65,7 +70,7 @@ public abstract class RecordSetRow implements Comparable<RecordSetRow> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		RecordSetRow other = (RecordSetRow) obj;
+		RecordSetRow<?> other = (RecordSetRow<?>) obj;
 		if (id != other.id)
 			return false;
 		return true;
@@ -77,8 +82,12 @@ public abstract class RecordSetRow implements Comparable<RecordSetRow> {
 	 * @param name Name of the field whose value shall be set from the ResultSet
 	 * @throws SQLException 
 	 */
-	public abstract void set(ResultSet rs, String name) throws SQLException;
+	public abstract void loadFromDatabase(ResultSet rs, String name) throws SQLException;
 
+	public void loadFromDatabase(ResultSet rs) throws SQLException {
+//		for (String fieldName : )
+	}
+	
 	//public Object get(Class<T> class, String name);
 	
 	/**
@@ -107,7 +116,7 @@ public abstract class RecordSetRow implements Comparable<RecordSetRow> {
 	 * @param row record from which the id will be taken for comparison
 	 * @return
 	 */
-	public int compareTo(RecordSetRow row) {
+	public int compareTo(RecordSetRow<?> row) {
 		return id.compareTo(row.getId());
 	}
 	
@@ -122,7 +131,9 @@ public abstract class RecordSetRow implements Comparable<RecordSetRow> {
 
 	/**
 	 * Remove this row from its recordset
-	 * TODO: this shall be non-abstract in future versions (implement the list here!)
 	 */
-	public abstract void remove();
+	public void remove() {
+//		rowList.remove(this);
+		recordSet.getRowList().remove(this);
+	}
 }

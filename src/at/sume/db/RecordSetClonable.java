@@ -12,7 +12,7 @@ import net.remesch.util.Database;
  * @author Alexander Remesch
  *
  */
-public abstract class RecordSetClonable<E extends RecordSetRow> extends RecordSet<E> implements Cloneable {
+public abstract class RecordSetClonable<E extends RecordSetRow<?>> extends RecordSet<E> implements Cloneable {
 
 	public RecordSetClonable() {
 		super();
