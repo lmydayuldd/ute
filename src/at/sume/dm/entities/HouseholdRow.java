@@ -6,8 +6,6 @@ package at.sume.dm.entities;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
-
 import at.sume.db.RecordSetRow;
 
 /**
@@ -21,6 +19,10 @@ public class HouseholdRow extends RecordSetRow {
 	private ArrayList<PersonRow> members;
 	private SpatialUnitRow spatialunit;
 	private Households households;
+	
+	// the following parameters might eventually go into a separate Dwelling-class
+	private long livingSpace;
+	private long costOfResidence;
 
 	public HouseholdRow(Households households) {
 		this.households = households;
@@ -137,6 +139,34 @@ public class HouseholdRow extends RecordSetRow {
 		this.households = households;
 	}
 
+	/**
+	 * @return the livingSpace
+	 */
+	public long getLivingSpace() {
+		return livingSpace;
+	}
+
+	/**
+	 * @param livingSpace the livingSpace to set
+	 */
+	public void setLivingSpace(long livingSpace) {
+		this.livingSpace = livingSpace;
+	}
+
+	/**
+	 * @return the costOfResidence
+	 */
+	public long getCostOfResidence() {
+		return costOfResidence;
+	}
+
+	/**
+	 * @param costOfResidence the costOfResidence to set
+	 */
+	public void setCostOfResidence(long costOfResidence) {
+		this.costOfResidence = costOfResidence;
+	}
+
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSetRow#set(java.sql.ResultSet, java.lang.String)
 	 */
@@ -150,27 +180,12 @@ public class HouseholdRow extends RecordSetRow {
 			setHouseholdSize(rs.getShort(name));
 		} else if (name.equals("DwellingId")) {
 			setDwellingId(rs.getLong(name));
+		} else if (name.equals("LivingSpace")) {
+			setDwellingId(rs.getInt(name));
+		} else if (name.equals("CostOfResidence")) {
+			setDwellingId(rs.getLong(name));
 		} else {
 			throw new UnsupportedOperationException("Unknown field name " + name);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSetRow#primaryKeyEquals(java.lang.Object[])
-	 */
-	@Override
-	public boolean primaryKeyEquals(Object... lookupKeys) {
-		if (lookupKeys.length != 1) {
-			throw new IllegalArgumentException("PK is only one field");
-		}
-		if (lookupKeys[0] instanceof Long) {
-			long lookupKey = (Long) lookupKeys[0];
-			if (lookupKey == getHouseholdId())
-				return true;
-			else
-				return false;
-		} else {
-			throw new IllegalArgumentException("PK must by of type Long");
 		}
 	}
 
@@ -180,5 +195,17 @@ public class HouseholdRow extends RecordSetRow {
 	@Override
 	public void remove() {
 		households.remove(this);
+	}
+
+	/**
+	 * Calculate and return the yearly household income
+	 * @return the yearly income
+	 */
+	public long getYearlyIncome() {
+		long yearlyIncome = 0;
+		for (PersonRow person : members) {
+			yearlyIncome += person.getYearlyIncome();
+		}
+		return yearlyIncome;
 	}
 }

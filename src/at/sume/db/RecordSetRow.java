@@ -83,10 +83,24 @@ public abstract class RecordSetRow implements Comparable<RecordSetRow> {
 	
 	/**
 	 * Compare primary keys with a set of values
+	 * Default implementation handles Id field as PK of type long (can be overridden)
 	 * @param lookupKeys
 	 * @return true if equal, false if non-equal
 	 */
-	public abstract boolean primaryKeyEquals(Object... lookupKeys);
+	public boolean primaryKeyEquals(Object... lookupKeys) {
+		if (lookupKeys.length != 1) {
+			throw new IllegalArgumentException("PK is only one field");
+		}
+		if (lookupKeys[0] instanceof Long) {
+			long lookupKey = (Long) lookupKeys[0];
+			if (lookupKey == getId())
+				return true;
+			else
+				return false;
+		} else {
+			throw new IllegalArgumentException("PK must by of type Long");
+		}
+	}
 	
 	/**
 	 * Compare to unique id field

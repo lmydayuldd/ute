@@ -15,6 +15,8 @@ import at.sume.dm.entities.Households;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.entities.SpatialUnits;
+import at.sume.dm.model.core.EntityDecisionManager;
+import at.sume.dm.model.residential_mobility.MinimumIncome;
 
 /**
  * @author Alexander Remesch
@@ -91,12 +93,19 @@ public class Main {
 	 * @param iterations number of iterations to be run
 	 * @throws SQLException 
 	 */
+	@SuppressWarnings("unchecked")
 	public static void runModel(Database db, int iterations) throws SQLException {
 		EventManager<PersonRow> personEventManager = new EventManager<PersonRow>();
 		// TODO: how can the events be constructed at another place to have this class/function independent of the
 		//       concrete event types??? Maybe put into its own static class or a ModelMain class?
+		@SuppressWarnings("unused")
 		PersonDeath personDeath = new PersonDeath(db, personEventManager);
+		@SuppressWarnings("unused")
 		ChildBirth childBirth = new ChildBirth(db, personEventManager);
+		
+		EntityDecisionManager<HouseholdRow, Households> householdDecisionManager = new EntityDecisionManager<HouseholdRow, Households>();
+		@SuppressWarnings("unused")
+		MinimumIncome minimumIncome = new MinimumIncome(db, householdDecisionManager, households);
 		
 		for (int i = 0; i != iterations; i++) {
 	        System.out.println(DateUtil.now() + ": running model year " + i + " of " + iterations);
@@ -114,6 +123,9 @@ public class Main {
 				for (PersonRow person : p_helper) {
 					personEventManager.process(person);
 				}
+				
+				// Process household decisions
+				householdDecisionManager.process(household);
 				j++;
 			}
 		}

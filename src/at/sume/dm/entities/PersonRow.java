@@ -177,27 +177,6 @@ public class PersonRow extends RecordSetRow {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSetRow#primaryKeyEquals(java.lang.Object[])
-	 * 
-	 * TODO: kann man glaube ich in die Superklasse tun!
-	 */
-	@Override
-	public boolean primaryKeyEquals(Object... lookupKeys) {
-		if (lookupKeys.length != 1) {
-			throw new IllegalArgumentException("PK is only one field");
-		}
-		if (lookupKeys[0] instanceof Long) {
-			long lookupKey = (Long) lookupKeys[0];
-			if (lookupKey == getId())
-				return true;
-			else
-				return false;
-		} else {
-			throw new IllegalArgumentException("PK must by of type Long");
-		}
-	}
-	
 	/**
 	 * Remove this record from the list of persons and the list of household members
 	 */
