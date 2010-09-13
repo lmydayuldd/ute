@@ -11,7 +11,7 @@ import at.sume.db.RecordSetRow;
  * @author Alexander Remesch
  *
  */
-public abstract class EntityDecision<T extends RecordSetRow, S extends RecordSet<?>> {
+public abstract class EntityDecision<T extends RecordSetRow<?>, S extends RecordSet<?>> {
 	public EntityDecision(Database db, EntityDecisionManager<T, S> entityDecisionManager) {
 		entityDecisionManager.register(this);
 	}

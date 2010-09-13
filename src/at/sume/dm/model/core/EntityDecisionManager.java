@@ -12,7 +12,7 @@ import at.sume.db.RecordSetRow;
  * @author Alexander Remesch
  *
  */
-public class EntityDecisionManager<E extends RecordSetRow, F extends RecordSet<?>> {
+public class EntityDecisionManager<E extends RecordSetRow<?>, F extends RecordSet<?>> {
 	private ArrayList<EntityDecision<E, F>> entityDecisionHandlers;
 	
 	public EntityDecisionManager() {

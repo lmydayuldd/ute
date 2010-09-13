@@ -4,7 +4,6 @@
 package net.remesch.util;
 
 import java.sql.*;
-import java.util.Date;
 
 /**
  * Common database handling routines
@@ -179,7 +178,7 @@ public class Database {
 				i++;
 			}
 		} else {
-			for (Object rv : returnValues) {
+			for (@SuppressWarnings("unused") Object rv : returnValues) {
 				rv = null;
 			}
 		}
