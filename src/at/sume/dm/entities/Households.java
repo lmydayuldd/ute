@@ -51,7 +51,7 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	 * @see at.sume.db.RecordSet#createDatabaseRecord()
 	 */
 	@Override
-	public HouseholdRow createDatabaseRecord() {
+	public HouseholdRow createRecordSetRow() {
 		return new HouseholdRow(this);
 	}
 
@@ -60,7 +60,7 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	 */
 	@Override
 	public String[] fieldnames() {
-		String s[] = { "HouseholdId", "SpatialunitId", "HouseholdSize", "DwellingId", "LivingSpace", "CostOfResidence" };
+		String s[] = { "HouseholdId", "SpatialunitId", "HouseholdSize", "DwellingId", "LivingSpace", "CostOfResidence", "LivingSpaceGroupId", "CostOfResidenceGroupId" };
 		return s;
 	}
 

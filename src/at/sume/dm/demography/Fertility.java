@@ -38,14 +38,6 @@ public class Fertility extends ProbabilityDistribution<FertilityProbabilityRow> 
 			"WHERE Jahr = 2009";
 	}
 
-	/* (non-Javadoc)
-	 * @see at.sume.dm.demography.ProbabilityDistribution#valueField()
-	 */
-	@Override
-	public String valueField() {
-		return "p";
-	}
-
 	/**
 	 * Return the probability of birth for a given age-group of females
 	 * @param ageGroupId

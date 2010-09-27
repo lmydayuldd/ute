@@ -7,15 +7,18 @@ import java.util.Iterator;
 import java.util.Random;
 
 /**
- * General handling of distributions for random ("Monte Carlo") sampling
+ * General handling of distributions for random ("Monte Carlo") sampling.
+ * 
+ * USE OF THIS CLASS IS DEPRECATED - USE CLASS SamplingDistribution INSTEAD!
+ * 
  * @author Alexander Remesch
  *
- * @param <T> Data that may be stored with each sample record 
+ * @param <E> Data that may be stored with each sample record 
  */
-public class Distribution<T> implements Collection<T>, Iterable<T> {
+public class Distribution<E> implements Collection<E>, Iterable<E> {
 	private ArrayList<Long> idStore;
 	private ArrayList<Long> thresholdStore;
-	private ArrayList<T> objectStore;
+	private ArrayList<E> objectStore;
 	private long maxThreshold;
 
 	/**
@@ -32,7 +35,7 @@ public class Distribution<T> implements Collection<T>, Iterable<T> {
 	public Distribution() {
 		idStore = new ArrayList<Long>(0);
 		thresholdStore = new ArrayList<Long>(0);
-		objectStore = new ArrayList<T>(0);
+		objectStore = new ArrayList<E>(0);
 	}
 	
 	/**
@@ -42,7 +45,7 @@ public class Distribution<T> implements Collection<T>, Iterable<T> {
 	public Distribution(int recordCount) {
 		idStore = new ArrayList<Long>(recordCount);
 		thresholdStore = new ArrayList<Long>(recordCount);
-		objectStore = new ArrayList<T>(recordCount);
+		objectStore = new ArrayList<E>(recordCount);
 	}
 
 	/**
@@ -50,7 +53,7 @@ public class Distribution<T> implements Collection<T>, Iterable<T> {
 	 * @param delta Range that gives the probability with which this particular record may be chosen during random sampling
 	 * @param object Data that may be stored with each sample record
 	 */
-	public void add(long delta, T object) {
+	public void add(long delta, E object) {
 		maxThreshold += delta;
 		thresholdStore.add(maxThreshold);
 		objectStore.add(object);
@@ -62,7 +65,7 @@ public class Distribution<T> implements Collection<T>, Iterable<T> {
 	 * @param delta Range that gives the probability with which this particular record may be chosen during random sampling
 	 * @param object Data that may be stored with each sample record
 	 */
-	public void add(long id, long delta, T object) {
+	public void add(long id, long delta, E object) {
 		idStore.add(id);
 		add(delta, object);
 	}
@@ -91,23 +94,23 @@ public class Distribution<T> implements Collection<T>, Iterable<T> {
 	 * @param index index of the sample record
 	 * @return
 	 */
-	public T get(int index) {
+	public E get(int index) {
 		return objectStore.get(index);
 	}
 
 	@Override
-	public Iterator<T> iterator() {
+	public Iterator<E> iterator() {
 		return objectStore.iterator();
 	}
 
 	@Override
-	public boolean add(T arg0) {
+	public boolean add(E arg0) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends T> arg0) {
+	public boolean addAll(Collection<? extends E> arg0) {
 		// TODO Auto-generated method stub
 		return false;
 	}

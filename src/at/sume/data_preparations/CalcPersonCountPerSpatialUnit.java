@@ -9,11 +9,9 @@ import javax.swing.JOptionPane;
 import net.remesch.util.Database;
 import net.remesch.util.LeastSquareAdjustment;
 
-import at.sume.db_wrapper.*;
-import at.sume.distributions.PersonsPerAgeSexHouseholdsizePersonnr;
 import at.sume.dm.Common;
-import at.sume.generate_population.*;
 import at.sume.sampling.Distribution;
+import at.sume.sampling.distributions.PersonsPerAgeSexHouseholdsizePersonnr;
 
 public class CalcPersonCountPerSpatialUnit {
 

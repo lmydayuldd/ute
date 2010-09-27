@@ -14,6 +14,9 @@ import at.sume.db.RecordSetClonable;
  */
 public class Persons extends RecordSetClonable<PersonRow> {
 
+	/**
+	 * needed for cloning
+	 */
 	public Persons() {
 		super();
 	}
@@ -30,7 +33,7 @@ public class Persons extends RecordSetClonable<PersonRow> {
 	 * @see at.sume.db.RecordSet#createDatabaseRecord(at.sume.db.RecordSet)
 	 */
 	@Override
-	public PersonRow createDatabaseRecord() {
+	public PersonRow createRecordSetRow() {
 		return new PersonRow(this);
 	}
 
@@ -39,7 +42,7 @@ public class Persons extends RecordSetClonable<PersonRow> {
 	 */
 	@Override
 	public String[] fieldnames() {
-		String s[] = { "PersonId", "HouseholdId", "Sex", "YearBorn", "AgeGroupId", "HouseholdRepresentative", "YearlyIncome" };
+		String s[] = { "PersonId", "HouseholdId", "Sex", "Age", "AgeGroupId", "HouseholdRepresentative", "YearlyIncome", "PersonNrInHousehold" };
 		return s;
 	}
 

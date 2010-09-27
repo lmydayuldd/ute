@@ -20,8 +20,10 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	private SpatialUnitRow spatialunit;
 	
 	// the following parameters might eventually go into a separate Dwelling-class
-	private long livingSpace;
+	private int livingSpace;
 	private long costOfResidence;
+	private short livingSpaceGroupId;
+	private short costOfResidenceGroupId;
 
 	public HouseholdRow(Households households) {
 		super(households);
@@ -68,6 +70,8 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @param householdSize the householdSize to set
 	 */
 	public void setHouseholdSize(short householdSize) {
+		if (householdSize < 1 || householdSize > 4)
+			throw new IllegalArgumentException("householdSize must be in the range from 1 to 4");
 		this.householdSize = householdSize;
 	}
 
@@ -103,6 +107,11 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		// remove a household if there are no members left
 		if (members.size() <= 0) {
 			recordSet.remove(this);
+		} else {
+			if (person.isHouseholdRepresentative()) {
+				// TODO: make the oldest person in the household the household-representative
+				// - but currently this information is not used within the model...
+			}
 		}
 	}
 	
@@ -148,7 +157,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	/**
 	 * @param livingSpace the livingSpace to set
 	 */
-	public void setLivingSpace(long livingSpace) {
+	public void setLivingSpace(int livingSpace) {
 		this.livingSpace = livingSpace;
 	}
 
@@ -164,6 +173,34 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 */
 	public void setCostOfResidence(long costOfResidence) {
 		this.costOfResidence = costOfResidence;
+	}
+
+	/**
+	 * @return the livingSpaceGroupId
+	 */
+	public short getLivingSpaceGroupId() {
+		return livingSpaceGroupId;
+	}
+
+	/**
+	 * @param livingSpaceGroupId the livingSpaceGroupId to set
+	 */
+	public void setLivingSpaceGroupId(short livingSpaceGroupId) {
+		this.livingSpaceGroupId = livingSpaceGroupId;
+	}
+
+	/**
+	 * @return the costOfResidenceGroupId
+	 */
+	public short getCostOfResidenceGroupId() {
+		return costOfResidenceGroupId;
+	}
+
+	/**
+	 * @param costOfResidenceGroupId the costOfResidenceGroupId to set
+	 */
+	public void setCostOfResidenceGroupId(short costOfResidenceGroupId) {
+		this.costOfResidenceGroupId = costOfResidenceGroupId;
 	}
 
 	/* (non-Javadoc)
@@ -183,6 +220,10 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			setDwellingId(rs.getInt(name));
 		} else if (name.equals("CostOfResidence")) {
 			setDwellingId(rs.getLong(name));
+		} else if (name.equals("LivingSpaceGroupId")) {
+			setLivingSpaceGroupId(rs.getShort(name));
+		} else if (name.equals("CostOfResidenceGroupId")) {
+			setCostOfResidenceGroupId(rs.getShort(name));
 		} else {
 			throw new UnsupportedOperationException("Unknown field name " + name);
 		}
@@ -198,5 +239,36 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			yearlyIncome += person.getYearlyIncome();
 		}
 		return yearlyIncome;
+	}
+
+	/* (non-Javadoc)
+	 * @see at.sume.db.RecordSetRow#saveToDatabase()
+	 */
+	@Override
+	public void saveToDatabase() throws SQLException {
+		// TODO: make this more sophisticated depending on whether a parameter is set or not
+		// INSERT: "HouseholdId", "SpatialunitId", "HouseholdSize", "DwellingId", "LivingSpace", "CostOfResidence"
+		if (psInsert != null) {
+			psInsert.setString(1, Long.toString(getHouseholdId()));
+			psInsert.setString(2, Long.toString(spatialunitId));
+			psInsert.setString(3, Long.toString(householdSize));
+			psInsert.setString(4, Long.toString(dwellingId));
+			psInsert.setString(5, Integer.toString(livingSpace));
+			psInsert.setString(6, Long.toString(costOfResidence));
+			psInsert.setString(7, Integer.toString(livingSpaceGroupId));
+			psInsert.setString(8, Long.toString(costOfResidenceGroupId));
+		}
+		// UPDATE: "SpatialunitId", "HouseholdSize", "DwellingId", "LivingSpace", "CostOfResidence", "HouseholdId"
+		if (psUpdate != null) {
+			psUpdate.setString(1, Long.toString(spatialunitId));
+			psUpdate.setString(2, Long.toString(householdSize));
+			psUpdate.setString(3, Long.toString(dwellingId));
+			psUpdate.setString(4, Integer.toString(livingSpace));
+			psUpdate.setString(5, Long.toString(costOfResidence));
+			psUpdate.setString(6, Integer.toString(livingSpaceGroupId));
+			psUpdate.setString(7, Long.toString(costOfResidenceGroupId));
+			// UPDATE: WHERE
+			psUpdate.setString(8, Long.toString(getHouseholdId()));
+		}
 	}
 }

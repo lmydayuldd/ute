@@ -50,10 +50,9 @@ public class ChildBirth extends Event<PersonRow> {
 		PersonRow child = new PersonRow(entity.getPersons());
 		child.setHousehold(entity.getHousehold());
 		child.setAgeGroupId((short) 1);
-		child.setAge((short) 0);
+//		child.setAge((short) 0);
 		child.setHouseholdRepresentative(false);
-		// TODO: implement model years!!!
-		child.setYearBorn(0);
+		child.setAge((short)0);
 		// determine sex - sexProportion male (2) per 1000 female (1) births
 		Random r = new Random();
 		long rand = (long) (r.nextDouble() * (sexProportion + 1000));

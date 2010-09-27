@@ -3,6 +3,7 @@
  */
 package at.sume.db;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -10,11 +11,17 @@ import java.sql.SQLException;
  * Interface for single items from a database
  * @author Alexander Remesch
  */
-public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable<RecordSetRow<?>> {
+public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable<RecordSetRow<T>> {
 	protected Long id;
-	protected boolean deleted = false;
 	protected T recordSet; 
 	
+	protected PreparedStatement psInsert;
+	protected PreparedStatement psUpdate;
+	
+	/**
+	 * Create a row and make it member of the given recordset
+	 * @param rowList
+	 */
 	public RecordSetRow(T rowList) {
 		this.recordSet = rowList;
 	}
@@ -31,21 +38,6 @@ public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable
 	 */
 	public void setId(long id) {
 		this.id = id;
-	}
-
-	/**
-	 * @return Is this record deleted?
-	 */
-	public boolean isDeleted() {
-		return deleted;
-	}
-
-	/**
-	 * Mark this row for removal/deletion from its recordset
-	 * We need this instead of remove() to be able to remove the record during an iteration 
-	 */
-	public void setDeleted() {
-		this.deleted = true;
 	}
 
 	/* (non-Javadoc)
@@ -77,17 +69,32 @@ public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable
 	}
 
 	/**
-	 * Set field values of the item from a data source
+	 * Set field values of the row from a data source
 	 * @param rs ResultSet with database records
 	 * @param name Name of the field whose value shall be set from the ResultSet
 	 * @throws SQLException 
 	 */
 	public abstract void loadFromDatabase(ResultSet rs, String name) throws SQLException;
 
-	public void loadFromDatabase(ResultSet rs) throws SQLException {
-//		for (String fieldName : )
+	/**
+	 * Set all field values of the row from a data source
+	 * @param rs ResultSet with database records
+	 * @throws SQLException
+	 */
+	public final void loadFromDatabase(ResultSet rs) throws SQLException {
+		for (String fieldName : recordSet.fieldnames()) {
+			loadFromDatabase(rs, fieldName);
+		}
 	}
 	
+	/**
+	 * Set all fields to update/insert the row into the corresponding database table
+	 * @throws SQLException 
+	 */
+	public void saveToDatabase() throws SQLException {
+		throw new IllegalArgumentException("This recordset cannot be saved to the database");
+	}
+
 	//public Object get(Class<T> class, String name);
 	
 	/**
@@ -116,7 +123,7 @@ public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable
 	 * @param row record from which the id will be taken for comparison
 	 * @return
 	 */
-	public int compareTo(RecordSetRow<?> row) {
+	public int compareTo(RecordSetRow<T> row) {
 		return id.compareTo(row.getId());
 	}
 	
@@ -130,10 +137,29 @@ public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable
 	}
 
 	/**
-	 * Remove this row from its recordset
+	 * Remove this row from its recordset (only in RAM)
 	 */
 	public void remove() {
 //		rowList.remove(this);
 		recordSet.getRowList().remove(this);
+	}
+
+	public void prepareStatement() throws SQLException {
+		psInsert = recordSet.db.con.prepareStatement(recordSet.insertStatement());
+		psUpdate = recordSet.db.con.prepareStatement(recordSet.updateStatement());
+	}
+	
+	/**
+	 * INSERT or UPDATE the current record in the database
+	 * @throws SQLException 
+	 */
+	public void executeUpdate() throws SQLException {
+		saveToDatabase();
+		psUpdate.executeUpdate();
+	}
+	
+	public void executeInsert() throws SQLException {
+		saveToDatabase();
+		psInsert.executeUpdate();
 	}
 }

@@ -21,7 +21,6 @@ import net.remesch.util.Database;
  * @author Alexander Remesch
  */
 public abstract class ProbabilityDistribution<E extends RecordSetRow<?>> extends RecordSet<E> {
-	private ArrayList<E> itemList;
 	private ArrayList<Double> probabilityList;
 	
 	/**
@@ -31,11 +30,13 @@ public abstract class ProbabilityDistribution<E extends RecordSetRow<?>> extends
 	 * @throws SQLException
 	 */
 	public ProbabilityDistribution(Database db) throws SQLException {
+		super();
+		
 		int rowcount = 0; // TODO: get correct row count
 
 		ResultSet rs = db.executeQuery(selectStatement());
 		
-		itemList = new ArrayList<E>(rowcount);
+		rowList = new ArrayList<E>(rowcount);
 		probabilityList = new ArrayList<Double>(rowcount);
 		ArrayList<String> keys = new ArrayList<String>(Arrays.asList(keyFields()));
 				
@@ -48,7 +49,7 @@ public abstract class ProbabilityDistribution<E extends RecordSetRow<?>> extends
 			String fieldname = valueField();
 			Double p = rs.getDouble(fieldname);
 			probabilityList.add(p);
-			itemList.add(item);
+			rowList.add(item);
 		}
 		rs.close();
 	}
@@ -60,7 +61,7 @@ public abstract class ProbabilityDistribution<E extends RecordSetRow<?>> extends
 	 * @return Probability of the occurrence of the event
 	 */
 	public double probability(E lookupItem) {
-		int i = itemList.indexOf(lookupItem);
+		int i = rowList.indexOf(lookupItem);
 		if (i == -1) {
 			return 0;	// no matching ProbabilityItem found
 		} else {
@@ -71,6 +72,7 @@ public abstract class ProbabilityDistribution<E extends RecordSetRow<?>> extends
 	/**
 	 * Factory for the SQL select statement to retrieve the event-probabilities depending on various properties 
 	 * @return SQL select string
+	 * TODO: default implementation?
 	 */
 	public abstract String selectStatement();
 	/**
@@ -81,8 +83,8 @@ public abstract class ProbabilityDistribution<E extends RecordSetRow<?>> extends
 		return primaryKeyFieldnames();
 	}
 	/**
-	 * Factory for the field name of the probability value field retrieved by the SQL select statement
-	 * @return Field name retrieved by the SQL select statement
+	 * Default factory for the field name of the probability value field retrieved by the SQL select statement
+	 * @return Field name "p"
 	 */
 	public String valueField() {
 		return "p";
@@ -98,7 +100,7 @@ public abstract class ProbabilityDistribution<E extends RecordSetRow<?>> extends
 	 * @see at.sume.db.RecordSet#createDatabaseRecord(at.sume.db.RecordSet)
 	 */
 	@Override
-	public E createDatabaseRecord() {
+	public E createRecordSetRow() {
 		return createProbabilityItem();
 	}
 }

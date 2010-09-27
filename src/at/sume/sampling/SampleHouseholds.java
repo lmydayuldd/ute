@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.*;
 
 import net.remesch.util.Database;
-import at.sume.distributions.HouseholdsPerSpatialUnit;
+import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
 
 /**
  * Monte Carlo sampling for household locations and household sizes
@@ -51,6 +51,7 @@ public class SampleHouseholds {
 			h.setNrHouseholds_4Pmore(rs.getLong("hh_p4") + rs.getLong("hh_p5") + rs.getLong("hh_p6"));
 			spatialUnits.add(h.getNrHouseholdsTotal(), h);
 		}
+		rs.close();
 	}
 
 	public static void FreeDistribution() {

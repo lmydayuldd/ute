@@ -24,7 +24,6 @@ public abstract class RecordSetClonable<E extends RecordSetRow<?>> extends Recor
 	 */
 	public RecordSetClonable(Database db) throws SQLException {
 		super(db);
-		// TODO Auto-generated constructor stub
 	}
 
 	public abstract RecordSetClonable<E> factory();
@@ -33,6 +32,7 @@ public abstract class RecordSetClonable<E extends RecordSetRow<?>> extends Recor
 	public Object clone() {
 		RecordSetClonable<E> copy = factory();
 		copy.rowList = (ArrayList<E>) rowList.clone();
+		copy.db = db;
 		return(copy);
 	}
 }
