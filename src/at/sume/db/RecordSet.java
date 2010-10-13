@@ -53,6 +53,14 @@ public abstract class RecordSet<E extends RecordSetRow<?>> implements Iterable<E
 		rs.close();
 	}
 	
+	public Database getDb() {
+		return db;
+	}
+	
+	public void setDb(Database db) {
+		this.db = db;
+	}
+	
 	/**
 	 * @return the rowList
 	 */
