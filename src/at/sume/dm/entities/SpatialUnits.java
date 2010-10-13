@@ -21,6 +21,10 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 		super(db);
 	}
 
+	public SpatialUnits() {
+		super();
+	}
+	
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSet#createDatabaseRecord()
 	 */
