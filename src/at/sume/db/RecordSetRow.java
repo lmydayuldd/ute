@@ -19,6 +19,13 @@ public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable
 	protected PreparedStatement psUpdate;
 	
 	/**
+	 * Necessary for cloning of RecordSetRow
+	 */
+	public RecordSetRow() {
+		
+	}
+
+	/**
 	 * Create a row and make it member of the given recordset
 	 * @param rowList
 	 */
