@@ -19,7 +19,6 @@ import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
-import at.sume.dm.indicators.IncomeIndicators;
 import at.sume.dm.model.residential_satisfaction.UDPClassification;
 
 /**
