@@ -106,6 +106,7 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	/**
 	 * Calculate the median yearly income of all households
 	 * @return
+	 * TODO: implement in indicators
 	 */
 	public long calcMedianYearlyIncome() {
 		// comparator version
@@ -123,6 +124,7 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	/**
 	 * Calculate the median yearly cost of living for all households
 	 * @return
+	 * TODO: implement in indicators
 	 */
 	public long calcMedianIncomeLeftForLiving() {
 		Long yearlyIncomeLeftForLiving[];
@@ -137,6 +139,7 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	/**
 	 * Calculate the median yearly cost of living for a certain household type
 	 * @return
+	 * TODO: implement in indicators
 	 */
 	@SuppressWarnings("unchecked")
 	public void calcMedianIncomeLeftForLiving(Long[] medianIncomeLeftForLiving) {
