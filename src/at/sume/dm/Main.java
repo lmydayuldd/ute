@@ -15,8 +15,10 @@ import at.sume.dm.entities.Households;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.entities.SpatialUnits;
+import at.sume.dm.indicators.IndicatorManager;
 import at.sume.dm.model.core.EntityDecisionManager;
 import at.sume.dm.model.residential_mobility.MinimumIncome;
+import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 
 /**
  * @author Alexander Remesch
@@ -35,6 +37,7 @@ public class Main {
 	public static void main(String[] args) {
         System.out.println(DateUtil.now() + ": start");
 		Database db = Common.openDatabase();
+		Common.init();
 
 		// Load entity sets from database
 		try {
@@ -56,14 +59,16 @@ public class Main {
         persons.linkHouseholds(households);
         System.out.println(DateUtil.now() + ": linked households + persons");
 		
+        // Initial build of model indicators
+		buildIndicators();			
+        System.out.println(DateUtil.now() + ": initial built of model indicators complete");
+        
 		// Model main loop
 		// - Biographical events for all persons/households
 		// - Find unsatisfied households
 		// - Simulate moves of unsatisfied households
         try {
         	int modelIterations = Integer.parseInt(Common.getSysParam("ModelIterations"));
-        	
-        	
 			runModel(db, modelIterations);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -98,6 +103,7 @@ public class Main {
 		EventManager<PersonRow> personEventManager = new EventManager<PersonRow>();
 		// TODO: how can the events be constructed at another place to have this class/function independent of the
 		//       concrete event types??? Maybe put into its own static class or a ModelMain class?
+		// TODO: Use enums!
 		@SuppressWarnings("unused")
 		PersonDeath personDeath = new PersonDeath(db, personEventManager);
 		@SuppressWarnings("unused")
@@ -118,16 +124,47 @@ public class Main {
 				if (j % 1000 == 0) {
 					System.out.println(DateUtil.now() + ": Processing household " + j + " of " + households.size() + ", nr. of persons: " + persons.size());
 				}
-				// Loop through all persons of the household
+				
+				// TODO: Store household in its original state for later removal from the indicators
+//				HouseholdRow hhr_helper = household.clone();
+				// Remove household from all indicators in its original state
+				// the disadvantage of this solution is that the currently processed household
+				// is missing in the indicators while it is processed - the up side is we don't need a clone-method
+				IndicatorManager.removeHousehold(household);
+				
+				// Process demographic events for all household members
 				ArrayList<PersonRow> p_helper = (ArrayList<PersonRow>) ((ArrayList<PersonRow>) household.getMembers()).clone();
 				for (PersonRow person : p_helper) {
 					personEventManager.process(person);
 				}
 				
 				// Process household decisions
+				// (minimum income, minimum living space, calculation of residential satisfaction)
 				householdDecisionManager.process(household);
+
+				// TODO: residential mobility depending on previous decisions
+				
+				// Add potentially changed household to the indicators
+				IndicatorManager.addHousehold(household);
+				
 				j++;
 			}
+		}
+	}
+	
+	public static void buildIndicators() {
+		IndicatorManager.resetIndicators();
+		for (HouseholdRow household : households) {
+			IndicatorManager.addHousehold(household);
+		}
+	}
+	
+	public static void calcResidentialSatisfaction(int modelYear) {
+		for (HouseholdRow household : households) {
+			ResidentialSatisfactionManager.calcResidentialSatisfaction(household, household.getSpatialunit(), modelYear);
+			// TODO: Ergebnis merken, wenn unter threshold, dann Haushalt in eigene Liste hinzufügen (an
+			// zufälliger Stelle), die dann anschließend abgearbeitet wird für die Umzüge
+			// TODO: how is the residential satisfaction influenced by its value from previous year?
 		}
 	}
 }
