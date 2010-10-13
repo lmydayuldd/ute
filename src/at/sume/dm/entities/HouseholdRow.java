@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import at.sume.db.RecordSetRow;
+import at.sume.dm.Common;
+import at.sume.dm.types.HouseholdType;
 
 /**
  * @author Alexander Remesch
@@ -18,16 +20,35 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	private long dwellingId;
 	private ArrayList<PersonRow> members;
 	private SpatialUnitRow spatialunit;
+	private double residentialSatisfactionThreshMod;
+	private HouseholdType householdType;
 	
 	// the following parameters might eventually go into a separate Dwelling-class
 	private int livingSpace;
 	private long costOfResidence;
 	private short livingSpaceGroupId;
 	private short costOfResidenceGroupId;
+	private static double childrenWeight = 0;
+	private static short childrenMaxAge = 0;
 
 	public HouseholdRow(Households households) {
 		super(households);
 		members = new ArrayList<PersonRow>();
+		if (childrenWeight == 0) {
+			String sp = Common.getSysParam("ChildrenWeight");
+			if (sp.equals(null))
+				childrenWeight = 0.5;
+			else
+				childrenWeight = Double.parseDouble(sp);
+			
+		}
+		if (childrenMaxAge == 0) {
+			String sp = Common.getSysParam("ChildrenMaxAge");
+			if (sp.equals(null))
+				childrenWeight = 14;
+			else
+				childrenMaxAge = Short.parseShort(sp);
+		}
 	}
 	
 	/**
@@ -131,6 +152,135 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 */
 	public void setSpatialunit(SpatialUnitRow spatialunit) {
 		this.spatialunit = spatialunit;
+	}
+
+	/**
+	 * @param socialPrestigeThreshMod the socialPrestigeThreshMod to set
+	 */
+	public void setSocialPrestigeThreshMod(double socialPrestigeThreshMod) {
+		this.residentialSatisfactionThreshMod = socialPrestigeThreshMod;
+	}
+
+	/**
+	 * @return the socialPrestigeThreshMod
+	 */
+	public double getSocialPrestigeThreshMod() {
+		return residentialSatisfactionThreshMod;
+	}
+
+	/**
+	 * Determine the household type from the household structure and save it for later use
+	 * This function is only intended for the first determination of the household type. Later on in the
+	 * model run, it makes more sense to determine the household type through the type of demographic event
+	 * happening to the household
+	 * @param householdType the householdType to set
+	 */
+	public HouseholdType determineInitialHouseholdType() {
+		short age1, age2, sex1, sex2;
+		switch (householdSize) {
+		case 1:
+			if (members.get(0).getAge() <= 45)
+				this.householdType = HouseholdType.SINGLE_YOUNG;
+			else
+				this.householdType = HouseholdType.SINGLE_OLD;
+			break;
+		case 2:
+			age1 = members.get(0).getAge();
+			age2 = members.get(1).getAge();
+			sex1 = members.get(0).getSex();
+			sex2 = members.get(1).getSex();
+			if (Math.abs(age1 - age2) > 15) {
+				// this could be either parent-child, a couple or a flat-sharing community
+				// the most common case is parent with a young child so we ignore the other cases for now
+				// - no change if the household type is already set
+				if (this.householdType == null) {
+					if ((Math.min(age1, age2) > 25) && (sex1 != sex2)) {
+						this.householdType = HouseholdType.COUPLE_YOUNG;
+					} else {
+						this.householdType = HouseholdType.SINGLE_PARENT;
+					}
+				}
+			} else {
+				if (sex1 == sex2) {
+					// heterosexuality is not seen as necessity for being a couple here - a flat-sharing
+					// community might be more common in that case, but don't have data to decide that
+					// currently
+					if ((age1 > 45) || (age2 > 45)) {
+						this.householdType = HouseholdType.COUPLE_OLD;
+					} else {
+						this.householdType = HouseholdType.COUPLE_YOUNG;
+					}
+				} else {
+					// the age of the female determines whether it is a "young" or "old" couple, i.e. whether
+					// it can become a family or not
+					if (sex1 == 1) {	// person 1 is the female
+						if (age1 > 45) {
+							this.householdType = HouseholdType.COUPLE_OLD;
+						} else {
+							this.householdType = HouseholdType.COUPLE_YOUNG;
+						}
+					} else {			// person 2 is the female 
+						if (age2 > 45) {
+							this.householdType = HouseholdType.COUPLE_OLD;
+						} else {
+							this.householdType = HouseholdType.COUPLE_YOUNG;
+						}
+					}
+				}
+			}
+			break;
+		case 3:
+		case 4:
+			// determine the number of children
+			int numChildren = 0;
+			for (PersonRow member : members) {
+				if (member.getAge() < 19)
+					numChildren++;
+			}
+			switch (numChildren) {
+			case 0:
+				this.householdType = HouseholdType.OTHER;
+				break;
+			case 1:
+				if (householdSize == 3)
+					this.householdType = HouseholdType.SMALL_FAMILY;	// TODO: maybe we should look for mal/female relationships here?
+				else
+					this.householdType = HouseholdType.OTHER;
+				break;
+			case 2:
+				if (householdSize == 3)
+					this.householdType = HouseholdType.SINGLE_PARENT;
+				else
+					this.householdType = HouseholdType.LARGE_FAMILY;
+				break;
+			case 3:
+				this.householdType = HouseholdType.SINGLE_PARENT;
+				break;
+			case 4:
+				throw new AssertionError("Household with 4 children unexpected");
+			}
+			break;
+		default:
+			throw new AssertionError("Unexpeceted HouseholdSize = " + householdSize);
+		}
+		return this.householdType;
+	}
+
+	/**
+	 * Setter for the household type - should be only necessary in the demographic module for transitions
+	 * between household-types
+	 * @param householdType
+	 */
+	public void setHouseholdType(HouseholdType householdType) {
+		this.householdType = householdType;
+	}
+	
+	/**
+	 * Return the stored household type calculated previously by determineHouseholdType()
+	 * @return the householdType
+	 */
+	public HouseholdType getHouseholdType() {
+		return householdType;
 	}
 
 	/**
@@ -241,6 +391,33 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		return yearlyIncome;
 	}
 
+	/**
+	 * Calculate and return the yearly household income per household member
+	 * @return the yearly household income per household member
+	 */
+	public long getYearlyIncomePerMember() {
+		return getYearlyIncome() / getMembers().size();
+	}
+	
+	/**
+	 * Calculate and return the yearly household income per weighted household member
+	 * Weight is a factor children are multiplied with
+	 * @return
+	 */
+	public long getYearlyIncomePerMemberWeighted() {
+		long yearlyIncome = 0;
+		double memberCount = 0;
+		for (PersonRow person : members) {
+			yearlyIncome += person.getYearlyIncome();
+			if (person.getAge() <= childrenMaxAge) {
+				memberCount += childrenWeight;
+			} else {
+				memberCount++;
+			}
+		}
+		return Math.round(yearlyIncome / memberCount);
+	}
+	
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSetRow#saveToDatabase()
 	 */
