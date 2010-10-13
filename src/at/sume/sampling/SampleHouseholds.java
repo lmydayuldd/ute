@@ -93,6 +93,7 @@ public class SampleHouseholds {
 //			return 4;
 //		System.out.println("Problem: random_household (" + random_household + ") > hh_threshold (" + hh_threshold + ") bei GKZ " + hhpsu.getSpatialUnitId());
 //		return 0;
+		// TODO: we should be able to make households larger than 4 persons as well!!!
 		return 4;
 	}
 	
