@@ -19,6 +19,11 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	private double avgRentAbv60;	// Average rent >= 60 m² [€/m²]
 	private double rngRentBlw60;	// Max. range of rent < 60 m² depending on the quality of the dwelling
 	private double rngRentAbv60;	// Max. range of rent >= 60 m² depending on the quality of the dwelling
+	private double AvgIncomePerHousehold;
+	private double AvgIncomePerCapita;
+	private long HouseholdCount;
+	private long PersonCount;
+	
 	
 	/**
 	 * @param rowList
