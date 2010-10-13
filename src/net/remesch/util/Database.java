@@ -3,7 +3,10 @@
  */
 package net.remesch.util;
 
+import java.lang.reflect.Field;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Common database handling routines
@@ -218,5 +221,45 @@ public class Database {
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * Based on a function taken from generics tutorial @ http://java.sun.com/j2se/1.5/pdf/generics-tutorial.pdf (p.17)
+	 * @param <T>
+	 * @param c
+	 * @param sqlStatement
+	 * @return
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws SQLException 
+	 */
+	public <T> ArrayList<T> select(Class<T>c, String sqlStatement) throws SQLException, InstantiationException, IllegalAccessException {
+		// TODO: complete this function!
+		ArrayList<T> result = new ArrayList<T>();
+		ResultSet rs = executeQuery(sqlStatement);
+		while (rs.next()) {
+			T item = c.newInstance();
+			
+			for (Field field : c.getFields()) {
+				// TODO: use annotations for diverging field names
+//				field.getDeclaredAnnotations()
+				String type = field.getType().getName();
+				String fieldName = field.getName();
+				if (type.equals("java.lang.String")) {
+					field.set(item, rs.getString(fieldName));
+				} else if (type.equals("long") || type.equals("java.lang.Long")) {
+					field.set(item, rs.getLong(fieldName));
+				} else if (type.equals("int") || type.equals("java.lang.Integer")) {
+					field.set(item, rs.getInt(fieldName));
+				} else if (type.equals("short") || type.equals("java.lang.Short")) {
+					field.set(item, rs.getShort(fieldName));
+				} else {
+					throw new AssertionError("fieldName = " + fieldName + ", type = " + type);
+				}
+			}
+			result.add(item);
+		}
+		rs.close();
+		return result;
 	}
 }
