@@ -15,11 +15,14 @@ import at.sume.dm.entities.HouseholdRow;
 public class IndicatorsPerSpatialUnit implements Indicator {
 	private static class BaseIndicators implements Comparable<BaseIndicators> {
 		private long spatialUnitId;
+		private long householdCount;
+		private long personCount;
 		private long incomeSum;
 		private long incomePerHouseholdMemberSum;
 		private long incomePerWeightedHouseholdMemberSum;
-		private long householdCount;
-		private long personCount;
+		private long costOfResidenceSum;
+		private long costOfResidencePerSqmSum;
+		private long livingSpacePerHouseholdMemberSum;
 		/**
 		 * @return the spatialUnitId
 		 */
@@ -93,6 +96,43 @@ public class IndicatorsPerSpatialUnit implements Indicator {
 		public void setPersonCount(long personCount) {
 			this.personCount = personCount;
 		}
+		/**
+		 * @return the costOfResidenceSum
+		 */
+		public long getCostOfResidenceSum() {
+			return costOfResidenceSum;
+		}
+		/**
+		 * @param costOfResidenceSum the costOfResidenceSum to set
+		 */
+		public void setCostOfResidenceSum(long costOfResidenceSum) {
+			this.costOfResidenceSum = costOfResidenceSum;
+		}
+		/**
+		 * @return the costOfResidencePerSqmSum
+		 */
+		public long getCostOfResidencePerSqmSum() {
+			return costOfResidencePerSqmSum;
+		}
+		/**
+		 * @param costOfResidencePerSqmSum the costOfResidencePerSqmSum to set
+		 */
+		public void setCostOfResidencePerSqmSum(long costOfResidencePerSqmSum) {
+			this.costOfResidencePerSqmSum = costOfResidencePerSqmSum;
+		}
+		/**
+		 * @return the livingSpacePerHouseholdMemberSum
+		 */
+		public long getLivingSpacePerHouseholdMemberSum() {
+			return livingSpacePerHouseholdMemberSum;
+		}
+		/**
+		 * @param livingSpacePerHouseholdMemberSum the livingSpacePerHouseholdMemberSum to set
+		 */
+		public void setLivingSpacePerHouseholdMemberSum(
+				long livingSpacePerHouseholdMemberSum) {
+			this.livingSpacePerHouseholdMemberSum = livingSpacePerHouseholdMemberSum;
+		}
 		/* (non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
@@ -112,30 +152,38 @@ public class IndicatorsPerSpatialUnit implements Indicator {
 	 */
 	@Override
 	public void add(HouseholdRow hh) {
-		IndicatorsPerSpatialUnit.add(hh.getSpatialunitId(), hh.getHouseholdSize(), hh.getYearlyIncome(), hh.getYearlyIncomePerMember(), hh.getYearlyIncomePerMemberWeighted());
+		IndicatorsPerSpatialUnit.add(hh.getSpatialunitId(), hh.getHouseholdSize(), hh.getYearlyIncome(), hh.getYearlyIncomePerMemberWeighted(), hh.getCostOfResidence(), hh.getLivingSpace());
 	}
 	
-	private static void add(long spatialUnitId, short memberCount, long income, long incomePerHouseholdMember, long incomePerWeightedHouseholdMember) {
+	private static void add(long spatialUnitId, short memberCount, long income, long incomePerWeightedHouseholdMember, long costOfResidence, long livingSpace) {
 		BaseIndicators lookup = new BaseIndicators();
 		lookup.setSpatialUnitId(spatialUnitId);
 		int pos = Collections.binarySearch(indicatorList, lookup);
 		if (pos < 0) {
 			// insert at position pos
 			pos = (pos + 1) * -1;
-			lookup.setIncomeSum(income);
-			lookup.setIncomePerHouseholdMemberSum(incomePerHouseholdMember);
-			lookup.setIncomePerWeightedHouseholdMemberSum(incomePerWeightedHouseholdMember);
-			lookup.setHouseholdCount(1);
-			lookup.setPersonCount(memberCount);
-			indicatorList.add(pos, lookup);
+			BaseIndicators b = new BaseIndicators();
+			b.setSpatialUnitId(spatialUnitId);
+			b.setIncomeSum(income);
+			b.setIncomePerHouseholdMemberSum(income / memberCount);
+			b.setIncomePerWeightedHouseholdMemberSum(incomePerWeightedHouseholdMember);
+			b.setHouseholdCount(1);
+			b.setPersonCount(memberCount);
+			b.setCostOfResidenceSum(costOfResidence);
+			b.setCostOfResidencePerSqmSum(costOfResidence / livingSpace);
+			b.setLivingSpacePerHouseholdMemberSum(livingSpace / memberCount);
+			indicatorList.add(pos, b);
 		} else {
 			// available at position pos
 			BaseIndicators b = indicatorList.get(pos);
 			b.setIncomeSum(b.getIncomeSum() + income);
-			b.setIncomePerHouseholdMemberSum(b.getIncomePerHouseholdMemberSum() + incomePerHouseholdMember);
+			b.setIncomePerHouseholdMemberSum(b.getIncomePerHouseholdMemberSum() + income / memberCount);
 			b.setIncomePerWeightedHouseholdMemberSum(b.getIncomePerWeightedHouseholdMemberSum() + incomePerWeightedHouseholdMember);
 			b.setHouseholdCount(b.getHouseholdCount() + 1);
 			b.setPersonCount(b.getPersonCount() + memberCount);
+			b.setCostOfResidenceSum(b.getCostOfResidenceSum() + costOfResidence);
+			b.setCostOfResidencePerSqmSum(b.getCostOfResidencePerSqmSum() + costOfResidence / livingSpace);
+			b.setLivingSpacePerHouseholdMemberSum(b.getLivingSpacePerHouseholdMemberSum() + livingSpace / memberCount);
 			indicatorList.set(pos, b);
 		}
 	}
@@ -208,10 +256,10 @@ public class IndicatorsPerSpatialUnit implements Indicator {
 	 */
 	@Override
 	public void remove(HouseholdRow hh) {
-		IndicatorsPerSpatialUnit.remove(hh.getSpatialunitId(), hh.getHouseholdSize(), hh.getYearlyIncome(), hh.getYearlyIncomePerMember(), hh.getYearlyIncomePerMemberWeighted());
+		IndicatorsPerSpatialUnit.remove(hh.getSpatialunitId(), hh.getHouseholdSize(), hh.getYearlyIncome(), hh.getYearlyIncomePerMemberWeighted(), hh.getCostOfResidence(), hh.getLivingSpace());
 	}
 
-	private static void remove(long spatialUnitId, short memberCount, long income, long incomePerHouseholdMember, long incomePerWeightedHouseholdMember) {
+	private static void remove(long spatialUnitId, short memberCount, long income, long incomePerWeightedHouseholdMember, long costOfResidence, long livingSpace) {
 		BaseIndicators lookup = new BaseIndicators();
 		lookup.setSpatialUnitId(spatialUnitId);
 		int pos = Collections.binarySearch(indicatorList, lookup);
@@ -222,10 +270,13 @@ public class IndicatorsPerSpatialUnit implements Indicator {
 			// available at position pos - remove
 			BaseIndicators b = indicatorList.get(pos);
 			b.setIncomeSum(b.getIncomeSum() - income);
-			b.setIncomePerHouseholdMemberSum(b.getIncomePerHouseholdMemberSum() - incomePerHouseholdMember);
+			b.setIncomePerHouseholdMemberSum(b.getIncomePerHouseholdMemberSum() - income / memberCount);
 			b.setIncomePerWeightedHouseholdMemberSum(b.getIncomePerWeightedHouseholdMemberSum() - incomePerWeightedHouseholdMember);
 			b.setHouseholdCount(b.getHouseholdCount() - 1);
 			b.setPersonCount(b.getPersonCount() - memberCount);
+			b.setCostOfResidenceSum(b.getCostOfResidenceSum() - costOfResidence);
+			b.setCostOfResidencePerSqmSum(b.getCostOfResidencePerSqmSum() - costOfResidence / livingSpace);
+			b.setLivingSpacePerHouseholdMemberSum(b.getLivingSpacePerHouseholdMemberSum() - livingSpace / memberCount);
 			indicatorList.set(pos, b);
 			
 			assert b.getIncomeSum() >= 0 : "IncomeIndicators.remove() - " + spatialUnitId + ": incomeSum < 0";
