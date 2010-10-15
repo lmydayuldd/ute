@@ -24,7 +24,7 @@ public class PersonCountPerSpatialUnit implements Indicator {
 	 * @see at.sume.dm.indicators.Indicator#reset()
 	 */
 	@Override
-	public void reset() {
+	public void clear() {
 		// TODO Auto-generated method stub
 		
 	}

@@ -107,7 +107,7 @@ public class IndicatorManagerTest {
 	 */
 	@Test
 	public void testGetAvgHouseholdIncome() {
-		assertEquals("Avg household income", 40000, IncomeIndicators.getAvgHouseholdIncome(90101));
+		assertEquals("Avg household income", 40000, IndicatorsPerSpatialUnit.getAvgHouseholdIncome(90101));
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class IndicatorManagerTest {
 	 */
 	@Test
 	public void testGetAvgHouseholdIncomePerMember() {
-		assertEquals("Avg household income", 17500, IncomeIndicators.getAvgHouseholdIncomePerMember(90101));
+		assertEquals("Avg household income", 17500, IndicatorsPerSpatialUnit.getAvgHouseholdIncomePerMember(90101));
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class IndicatorManagerTest {
 	 */
 	@Test
 	public void testGetAvgHouseholdIncomePerMemberWeighted() {
-		assertEquals("Avg household income", 18500, IncomeIndicators.getAvgHouseholdIncomePerMemberWeighted(90101));
+		assertEquals("Avg household income", 18500, IndicatorsPerSpatialUnit.getAvgHouseholdIncomePerMemberWeighted(90101));
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class IndicatorManagerTest {
 	 */
 	@Test
 	public void testGetAvgPersonIncome() {
-		assertEquals("Avg household income", 16000, IncomeIndicators.getAvgPersonIncome(90101));
+		assertEquals("Avg household income", 16000, IndicatorsPerSpatialUnit.getAvgPersonIncome(90101));
 	}
 
 }

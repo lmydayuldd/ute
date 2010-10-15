@@ -5,7 +5,7 @@ package at.sume.dm.model.residential_satisfaction;
 
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.SpatialUnitRow;
-import at.sume.dm.indicators.IncomeIndicators;
+import at.sume.dm.indicators.IndicatorsPerSpatialUnit;
 
 /**
  * Calculate the conformity level of the social prestige of a spatial unit and a household
@@ -24,7 +24,7 @@ public class SocialPrestige extends ResidentialSatisfactionComponent {
 		// Calculate household income per member
 		long hhIncome = hh.getYearlyIncomePerMemberWeighted();
 		// Calculate average household income per member
-		long avgIncome = IncomeIndicators.getAvgHouseholdIncomePerMemberWeighted(su.getId());
+		long avgIncome = IndicatorsPerSpatialUnit.getAvgHouseholdIncomePerMemberWeighted(su.getId());
 		
 		// income only influences residential satisfaction if the neighborhood income is lower
 		// TODO: individual threshold for this comparison?!?

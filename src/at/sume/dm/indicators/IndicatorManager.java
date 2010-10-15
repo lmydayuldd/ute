@@ -14,7 +14,7 @@ public enum IndicatorManager {
 	//       to be able to build menus directly from the indicator classes
 //	PERSONCOUNT_PER_SPATIALUNIT("Number of persons per spatial unit", PersonCountPerSpatialUnit.class),
 //	HOUSEHOLDCOUNT_PER_SPATIALUNIT("Number of households per spatial unit", HouseholdCountPerSpatialUnit.class),
-	INCOME_PER_SPATIALUNIT("Income per spatial unit", new IncomeIndicators());
+	INCOME_PER_SPATIALUNIT("Income per spatial unit", new IndicatorsPerSpatialUnit());
 	
 	private String label;
 	private Indicator indicator;
@@ -38,7 +38,7 @@ public enum IndicatorManager {
 	
 	public static void resetIndicators() {
 		for (IndicatorManager indicatorManager : values()) {
-			indicatorManager.indicator.reset();
+			indicatorManager.indicator.clear();
 		}
 	}
 	

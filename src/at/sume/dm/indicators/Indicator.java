@@ -23,5 +23,5 @@ public interface Indicator {
 	/**
 	 * Reset the set of indicators to zero
 	 */
-	public void reset();
+	public void clear();
 }
