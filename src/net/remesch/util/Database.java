@@ -252,6 +252,8 @@ public class Database {
 					field.set(item, rs.getInt(fieldName));
 				} else if (type.equals("short") || type.equals("java.lang.Short")) {
 					field.set(item, rs.getShort(fieldName));
+				} else if (type.equals("double") || type.equals("java.lang.Double")) {
+					field.set(item, rs.getDouble(fieldName));
 				} else {
 					throw new AssertionError("fieldName = " + fieldName + ", type = " + type);
 				}
