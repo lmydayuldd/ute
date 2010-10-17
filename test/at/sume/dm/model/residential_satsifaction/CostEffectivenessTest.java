@@ -127,9 +127,11 @@ public class CostEffectivenessTest {
 		sur.setSpatialUnitId(92222);
 		double residentialSatisfaction1 = costEffectiveness.calc(hhr1, sur, 2001);
 //		System.out.println(residentialSatisfaction1);
+		// TODO: Values here are not checked!!!!
 		assertEquals("Residential satisfaction hh1", 0.615, residentialSatisfaction1, 0.0);
 		double residentialSatisfaction2 = costEffectiveness.calc(hhr2, sur, 2001);
 //		System.out.println(residentialSatisfaction2);
+		// TODO: Values here are not checked!!!!
 		assertEquals("Residential satisfaction hh2", 0.656, residentialSatisfaction2, 0.0);
 	}
 }
