@@ -224,6 +224,7 @@ public class Database {
 
 	/**
 	 * Based on a function taken from generics tutorial @ http://java.sun.com/j2se/1.5/pdf/generics-tutorial.pdf (p.17)
+	 * This function supports only static (= "nested") inner classes!
 	 * @param <T>
 	 * @param c
 	 * @param sqlStatement
@@ -233,12 +234,12 @@ public class Database {
 	 * @throws SQLException 
 	 */
 	public <T> ArrayList<T> select(Class<T>c, String sqlStatement) throws SQLException, InstantiationException, IllegalAccessException {
-		// TODO: complete this function!
+		// TODO: Private fields can't be modified - use the appropriate setter or find another solution for this
 		ArrayList<T> result = new ArrayList<T>();
 		ResultSet rs = executeQuery(sqlStatement);
 		while (rs.next()) {
 			T item = c.newInstance();
-			
+			assert c.getFields().length > 0 : "No fields in class " + c.getName();
 			for (Field field : c.getFields()) {
 				// TODO: use annotations for diverging field names
 //				field.getDeclaredAnnotations()
