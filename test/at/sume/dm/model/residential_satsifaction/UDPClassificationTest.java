@@ -31,8 +31,13 @@ public class UDPClassificationTest {
 	Households hh;
 	HouseholdRow hhr1, hhr2;
 
+	@Test(expected=AssertionError.class)
+	  public void testAssertionsEnabled() {
+	    assert(false);
+	  }
+
 	/**
-	 * Setup for unit test of {@link at.sume.dm.indicators.IndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
+	 * Setup for unit test of {@link at.sume.dm.indicators.HouseholdIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 * @throws SQLException
 	 */
 	@Before
