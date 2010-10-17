@@ -398,6 +398,28 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	public long getYearlyIncomePerMember() {
 		return getYearlyIncome() / getMembers().size();
 	}
+	/**
+	 * Get the number of household members
+	 * @return
+	 */
+	public int getMemberCount() {
+		return getMembers().size();
+	}
+	/**
+	 * Get the number of household members with children weighted by a factor defined as a systemparameter
+	 * @return
+	 */
+	public double getWeightedMemberCount() {
+		double memberCount = 0;
+		for (PersonRow person : members) {
+			if (person.getAge() <= childrenMaxAge) {
+				memberCount += childrenWeight;
+			} else {
+				memberCount++;
+			}
+		}
+		return memberCount;
+	}
 	
 	/**
 	 * Calculate and return the yearly household income per weighted household member
@@ -405,16 +427,16 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @return
 	 */
 	public long getYearlyIncomePerMemberWeighted() {
-		long yearlyIncome = 0;
-		double memberCount = 0;
-		for (PersonRow person : members) {
-			yearlyIncome += person.getYearlyIncome();
-			if (person.getAge() <= childrenMaxAge) {
-				memberCount += childrenWeight;
-			} else {
-				memberCount++;
-			}
-		}
+		long yearlyIncome = getYearlyIncome();
+		double memberCount = getWeightedMemberCount();
+//		for (PersonRow person : members) {
+//			yearlyIncome += person.getYearlyIncome();
+//			if (person.getAge() <= childrenMaxAge) {
+//				memberCount += childrenWeight;
+//			} else {
+//				memberCount++;
+//			}
+//		}
 		return Math.round(yearlyIncome / memberCount);
 	}
 	
