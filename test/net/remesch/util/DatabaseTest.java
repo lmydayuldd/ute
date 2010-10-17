@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import at.sume.dm.Common;
-import at.sume.dm.model.residential_satisfaction.entities.SpatialUnitUdp;
+import at.sume.dm.model.residential_satisfaction.UDPClassification.SpatialUnitUdp;
 
 /**
  * @author Alexander Remesch
