@@ -15,7 +15,7 @@ import at.sume.dm.entities.Households;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.entities.SpatialUnits;
-import at.sume.dm.indicators.IndicatorManager;
+import at.sume.dm.indicators.HouseholdIndicatorManager;
 import at.sume.dm.model.core.EntityDecisionManager;
 import at.sume.dm.model.residential_mobility.MinimumIncome;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
@@ -130,7 +130,7 @@ public class Main {
 				// Remove household from all indicators in its original state
 				// the disadvantage of this solution is that the currently processed household
 				// is missing in the indicators while it is processed - the up side is we don't need a clone-method
-				IndicatorManager.removeHousehold(household);
+				HouseholdIndicatorManager.removeHousehold(household);
 				
 				// Process demographic events for all household members
 				ArrayList<PersonRow> p_helper = (ArrayList<PersonRow>) ((ArrayList<PersonRow>) household.getMembers()).clone();
@@ -145,7 +145,7 @@ public class Main {
 				// TODO: residential mobility depending on previous decisions
 				
 				// Add potentially changed household to the indicators
-				IndicatorManager.addHousehold(household);
+				HouseholdIndicatorManager.addHousehold(household);
 				
 				j++;
 			}
@@ -153,9 +153,9 @@ public class Main {
 	}
 	
 	public static void buildIndicators() {
-		IndicatorManager.resetIndicators();
+		HouseholdIndicatorManager.resetIndicators();
 		for (HouseholdRow household : households) {
-			IndicatorManager.addHousehold(household);
+			HouseholdIndicatorManager.addHousehold(household);
 		}
 	}
 	

@@ -1,0 +1,214 @@
+/**
+ * 
+ */
+package at.sume.dm.indicators;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
+import at.sume.dm.entities.HouseholdRow;
+import at.sume.dm.types.HouseholdType;
+import at.sume.dm.types.IncomeGroup;
+
+/**
+ * @author Alexander Remesch
+ *
+ */
+public class IndicatorsPerHouseholdTypeAndIncome implements Indicator<HouseholdRow> {
+	private static class BaseIndicators implements Comparable<BaseIndicators> {
+		private HouseholdType householdType;
+		private short incomeGroup;
+		private long householdCount;
+		private long personCount;
+		private long livingSpaceSum;
+		private long livingSpacePerHouseholdMemberSum;
+		private long livingSpacePerWeightedHouseholdMemberSum;
+		
+		/**
+		 * @return the householdType
+		 */
+		public HouseholdType getHouseholdType() {
+			return householdType;
+		}
+		/**
+		 * @param householdType the householdType to set
+		 */
+		public void setHouseholdType(HouseholdType householdType) {
+			this.householdType = householdType;
+		}
+		/**
+		 * @return the incomeGroup
+		 */
+		public short getIncomeGroup() {
+			return incomeGroup;
+		}
+		/**
+		 * @param incomeGroup the incomeGroup to set
+		 */
+		public void setIncomeGroup(short incomeGroup) {
+			this.incomeGroup = incomeGroup;
+		}
+		/**
+		 * @return the householdCount
+		 */
+		public long getHouseholdCount() {
+			return householdCount;
+		}
+		/**
+		 * @param householdCount the householdCount to set
+		 */
+		public void setHouseholdCount(long householdCount) {
+			this.householdCount = householdCount;
+		}
+		/**
+		 * @return the personCount
+		 */
+		public long getPersonCount() {
+			return personCount;
+		}
+		/**
+		 * @param personCount the personCount to set
+		 */
+		public void setPersonCount(long personCount) {
+			this.personCount = personCount;
+		}
+		/**
+		 * @return the livingSpaceSum
+		 */
+		public long getLivingSpaceSum() {
+			return livingSpaceSum;
+		}
+		/**
+		 * @param livingSpaceSum the livingSpaceSum to set
+		 */
+		public void setLivingSpaceSum(long livingSpaceSum) {
+			this.livingSpaceSum = livingSpaceSum;
+		}
+		/**
+		 * @return the livingSpacePerHouseholdMemberSum
+		 */
+		public long getLivingSpacePerHouseholdMemberSum() {
+			return livingSpacePerHouseholdMemberSum;
+		}
+		/**
+		 * @param livingSpacePerHouseholdMemberSum the livingSpacePerHouseholdMemberSum to set
+		 */
+		public void setLivingSpacePerHouseholdMemberSum(
+				long livingSpacePerHouseholdMemberSum) {
+			this.livingSpacePerHouseholdMemberSum = livingSpacePerHouseholdMemberSum;
+		}
+		/**
+		 * @return the livingSpacePerWeightedHouseholdMemberSum
+		 */
+		public long getLivingSpacePerWeightedHouseholdMemberSum() {
+			return livingSpacePerWeightedHouseholdMemberSum;
+		}
+		/**
+		 * @param livingSpacePerWeightedHouseholdMemberSum the livingSpacePerWeightedHouseholdMemberSum to set
+		 */
+		public void setLivingSpacePerWeightedHouseholdMemberSum(
+				long livingSpacePerWeightedHouseholdMemberSum) {
+			this.livingSpacePerWeightedHouseholdMemberSum = livingSpacePerWeightedHouseholdMemberSum;
+		}
+		/* (non-Javadoc)
+		 * @see java.lang.Comparable#compareTo(java.lang.Object)
+		 */
+		@Override
+		public int compareTo(BaseIndicators arg0) {
+			int comp1 = householdType.compareTo(arg0.getHouseholdType());
+			int comp2 = ((Short)incomeGroup).compareTo(arg0.getIncomeGroup());
+			if (comp1 != 0)
+				return comp1;
+			else
+				if (comp1 != 0)
+					return comp2;
+			return 0;
+		}
+	}
+
+	private static ArrayList<BaseIndicators> indicatorList;
+	
+	public IndicatorsPerHouseholdTypeAndIncome() {
+		indicatorList = new ArrayList<BaseIndicators>();
+	}
+
+	/* (non-Javadoc)
+	 * @see at.sume.dm.indicators.Indicator#add(at.sume.db.RecordSetRow)
+	 */
+	@Override
+	public void add(HouseholdRow hh) {
+		HouseholdType householdType = hh.getHouseholdType();
+		short incomeGroup = IncomeGroup.getIncomeGroupId(hh.getYearlyIncome());
+		int pos = lookupIndicator(householdType, incomeGroup);
+		if (pos < 0) {
+			// insert at position pos
+			pos = (pos + 1) * -1;
+			BaseIndicators b = new BaseIndicators();
+			b.setHouseholdType(householdType);
+			b.setIncomeGroup(incomeGroup);
+			b.setHouseholdCount(1);
+			b.setPersonCount(hh.getMemberCount());
+			b.setLivingSpaceSum(hh.getLivingSpace());
+			b.setLivingSpacePerHouseholdMemberSum(hh.getLivingSpace() / hh.getMemberCount());
+			b.setLivingSpacePerWeightedHouseholdMemberSum((long)((double)hh.getLivingSpace() / hh.getWeightedMemberCount()));
+			indicatorList.add(pos, b);
+		} else {
+			// available at position pos
+			BaseIndicators b = indicatorList.get(pos);
+			b.setHouseholdCount(b.getHouseholdCount() + 1);
+			b.setPersonCount(b.getPersonCount() + hh.getMemberCount());
+			b.setLivingSpaceSum(b.getLivingSpaceSum() + hh.getLivingSpace());
+			b.setLivingSpacePerHouseholdMemberSum(b.getLivingSpacePerHouseholdMemberSum() + hh.getLivingSpace() / hh.getMemberCount());
+			b.setLivingSpacePerWeightedHouseholdMemberSum(b.getLivingSpacePerWeightedHouseholdMemberSum() + (long)((double)hh.getLivingSpace() / hh.getWeightedMemberCount()));
+			indicatorList.set(pos, b);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see at.sume.dm.indicators.Indicator#clear()
+	 */
+	@Override
+	public void clear() {
+		IndicatorsPerHouseholdTypeAndIncome.indicatorList.clear();
+	}
+
+	/* (non-Javadoc)
+	 * @see at.sume.dm.indicators.Indicator#remove(at.sume.db.RecordSetRow)
+	 */
+	@Override
+	public void remove(HouseholdRow hh) {
+		HouseholdType householdType = hh.getHouseholdType();
+		short incomeGroup = IncomeGroup.getIncomeGroupId(hh.getYearlyIncome());
+		int pos = lookupIndicator(householdType, incomeGroup);
+		if (pos < 0) {
+			// not there, unable to remove - throw exception
+			throw new AssertionError("IndicatorsPerHouseholdTypeAndIncome.remove() - incomeGroup " + incomeGroup + ", householdType " + householdType + " is not in the list of spatial units");
+		} else {
+			// available at position pos - remove
+			BaseIndicators b = indicatorList.get(pos);
+			b.setHouseholdCount(b.getHouseholdCount() - 1);
+			b.setPersonCount(b.getPersonCount() - hh.getMemberCount());
+			b.setLivingSpaceSum(b.getLivingSpaceSum() - hh.getLivingSpace());
+			b.setLivingSpacePerHouseholdMemberSum(b.getLivingSpacePerHouseholdMemberSum() - hh.getLivingSpace() / hh.getMemberCount());
+			b.setLivingSpacePerWeightedHouseholdMemberSum(b.getLivingSpacePerWeightedHouseholdMemberSum() - (long)((double)hh.getLivingSpace() / hh.getWeightedMemberCount()));
+			indicatorList.set(pos, b);
+		}
+	}
+
+	private static int lookupIndicator(HouseholdType householdType, short incomeGroup) {
+		BaseIndicators lookup = new BaseIndicators();
+		lookup.setHouseholdType(householdType);
+		lookup.setIncomeGroup(incomeGroup);
+		return Collections.binarySearch(indicatorList, lookup);
+	}
+	
+	public static long getAvgLivingSpacePerHousehold(HouseholdType householdType, short incomeGroup) {
+		int pos = lookupIndicator(householdType, incomeGroup);
+		if (pos >= 0) {
+			BaseIndicators b = indicatorList.get(pos);
+			return b.getLivingSpaceSum() / b.getHouseholdCount();
+		} else {
+			throw new AssertionError("IndicatorsPerHouseholdTypeAndIncome.remove() - incomeGroup " + incomeGroup + ", householdType " + householdType + " is not in the list of spatial units");
+		}
+	}
+}

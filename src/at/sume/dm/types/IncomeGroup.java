@@ -9,8 +9,10 @@ import java.util.ArrayList;
 import at.sume.dm.Common;
 
 /**
+ * This class is used to convert between income and income-groups through the data given in table
+ * _DM_IncomeGroup
+ * 
  * @author Alexander Remesch
- *
  */
 public class IncomeGroup {
 	public static class IncomeGroupRow {
@@ -35,8 +37,12 @@ public class IncomeGroup {
 			e.printStackTrace();
 		}
 	}
-	
-	static short getIncomeGroupId(long income) {
+	/**
+	 * Get the income group for a certain income 
+	 * @param income
+	 * @return
+	 */
+	public static short getIncomeGroupId(long income) {
 		for (IncomeGroupRow i : incomeGroups) {
 			if ((i.minincome <= income) && (income <= i.maxincome)) {
 				return i.id;

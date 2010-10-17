@@ -12,7 +12,8 @@ import at.sume.dm.entities.HouseholdRow;
  * @author Alexander Remesch
  *
  */
-public class IndicatorsPerSpatialUnit implements Indicator {
+public class IndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
+	// TODO: find common base class with ResidentialObjectRent
 	private static class BaseIndicators implements Comparable<BaseIndicators> {
 		private long spatialUnitId;
 		private long householdCount;
@@ -265,7 +266,7 @@ public class IndicatorsPerSpatialUnit implements Indicator {
 		int pos = Collections.binarySearch(indicatorList, lookup);
 		if (pos < 0) {
 			// not there, unable to remove - throw exception
-			throw new AssertionError("IncomeIndicators.remove() - " + spatialUnitId + " is not in the list of spatial units");
+			throw new AssertionError("IndicatorsPerSpatialUnit.remove() - " + spatialUnitId + " is not in the list of spatial units");
 		} else {
 			// available at position pos - remove
 			BaseIndicators b = indicatorList.get(pos);

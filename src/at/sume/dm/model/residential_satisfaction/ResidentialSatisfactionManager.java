@@ -12,11 +12,10 @@ import at.sume.dm.entities.SpatialUnitRow;
  */
 public enum ResidentialSatisfactionManager {
 	SOCIALPRESTIGE(new SocialPrestige()),
-	COSTOFRESIDENCESHARE(new CostOfResidenceShare()),
-	LIVINGSPACEREQUIREMENT(new LivingSpaceRequirement()),
+	COSTEFFECTIVENESS(new CostEffectiveness()),
+	DESIREDLIVINGSPACE(new DesiredLivingSpace()),
 	ENVIRONMENTALAMENITIES(new EnvironmentalAmenities()),
-	UDPCLASSIFICATION(new UDPClassification()),
-	LOCATIONFACTORS(new LocationFactors());
+	UDPCLASSIFICATION(new UDPClassification());
 	
 	private ResidentialSatisfactionComponent component;
 	private double weight;
