@@ -15,18 +15,18 @@ public class ResidentialSatisfactionComponent {
 	 * Calculate residential satisfaction for the household in the given spatial unit
 	 * @param hh
 	 * @param su
-	 * @return
+	 * @return Residential satisfaction in thousandth part
 	 */
-	public double calc(HouseholdRow hh, SpatialUnitRow su, int modelYear) {
-		return (double)1;
+	public long calc(HouseholdRow hh, SpatialUnitRow su, int modelYear) {
+		return (long)1000;
 	}
 	
 	/**
 	 * Calculate residential satisfaction for the household in its current spatial unit
 	 * @param hh
-	 * @return
+	 * @return Residential satisfaction in thousandth part
 	 */
-	public final double calc(HouseholdRow hh, int modelYear) {
+	public final long calc(HouseholdRow hh, int modelYear) {
 		return calc(hh, hh.getSpatialunit(), modelYear);
 	}
 }

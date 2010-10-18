@@ -19,17 +19,18 @@ import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
-import at.sume.dm.model.residential_satisfaction.UDPClassification;
+import at.sume.dm.indicators.HouseholdIndicatorManager;
+import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 
 /**
  * @author Alexander Remesch
  *
  */
-public class UDPClassificationTest {
-	UDPClassification udpClassification;
+public class ResidentialSatisfactionManagerTest {
 	Database db;
 	Households hh;
 	HouseholdRow hhr1, hhr2;
+	SpatialUnits spatialUnits;
 
 	@Test(expected=AssertionError.class)
 	  public void testAssertionsEnabled() {
@@ -51,7 +52,7 @@ public class UDPClassificationTest {
 		hhr1.setId(1);
 		hhr1.setHouseholdSize((short)2);
 		hhr1.setSpatialunitId(90101);
-		hhr1.setCostOfResidence(3000);
+		hhr1.setCostOfResidence(12000);
 		hhr1.setLivingSpace(90);
 		Persons p;
 		p = new Persons();
@@ -75,13 +76,14 @@ public class UDPClassificationTest {
 		pr.setYearlyIncome(20000);
 		hhr1.addMember(pr);
 		hhr1.determineInitialHouseholdType();
+		hh.add(hhr1);
 		
 		// Household 1: 2 persons + 1 child, 30000 + 0
 		hhr2 = new HouseholdRow(hh);
 		hhr2.setId(2);
 		hhr2.setHouseholdSize((short)3);
 		hhr2.setSpatialunitId(90101);
-		hhr2.setCostOfResidence(5000);
+		hhr2.setCostOfResidence(15000);
 		hhr2.setLivingSpace(120);
 		
 		pr = new PersonRow(p);
@@ -111,26 +113,29 @@ public class UDPClassificationTest {
 		pr.setYearlyIncome(0);
 		hhr2.addMember(pr);
 		hhr2.determineInitialHouseholdType();
+		hh.add(hhr2);
+		
+		spatialUnits = new SpatialUnits(db);
+		hh.linkSpatialUnits(spatialUnits);
+
+		HouseholdIndicatorManager.resetIndicators();
+		for (HouseholdRow household : hh) {
+			HouseholdIndicatorManager.addHousehold(household);
+		}
 	}
 
 	/**
-	 * Test method for {@link at.sume.dm.model.residential_satisfaction.UDPClassification#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow, int)}.
+	 * Test method for {@link at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager#calcResidentialSatisfaction(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow, int)}.
 	 */
 	@Test
-	public void testCalc() {
-		udpClassification = new UDPClassification();
-
-		SpatialUnits su = new SpatialUnits();
-		su.setDb(db);
-		SpatialUnitRow sur = new SpatialUnitRow(su);
-		sur.setSpatialUnitId(92222);
-		long residentialSatisfaction1 = udpClassification.calc(hhr1, sur, 2001);
-		assertEquals("Residential satisfaction hh1", 500, residentialSatisfaction1);
-		residentialSatisfaction1 = udpClassification.calc(hhr1, sur, 2010);
-		assertEquals("Residential satisfaction hh1", 625, residentialSatisfaction1);
-		long residentialSatisfaction2 = udpClassification.calc(hhr2, sur, 2001);
-		assertEquals("Residential satisfaction hh2", 500, residentialSatisfaction2);
-		residentialSatisfaction2 = udpClassification.calc(hhr2, sur, 2010);
-		assertEquals("Residential satisfaction hh2", 750, residentialSatisfaction2);
+	public void testCalcResidentialSatisfactionHouseholdRowSpatialUnitRowInt() {
+		int residentialSatisfaction;
+		for (SpatialUnitRow su : spatialUnits) {
+			residentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(hhr1, su, 2001);
+			System.out.println(su.getId() + " " + residentialSatisfaction);
+			residentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(hhr2, su, 2001);
+			System.out.println(su.getId() + " " + residentialSatisfaction);
+		}
 	}
+
 }

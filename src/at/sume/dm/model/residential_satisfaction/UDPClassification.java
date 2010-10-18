@@ -303,7 +303,7 @@ public class UDPClassification extends ResidentialSatisfactionComponent {
 	 * @see at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionComponent#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow)
 	 */
 	@Override
-	public double calc(HouseholdRow hh, SpatialUnitRow su, int modelYear) {
+	public long calc(HouseholdRow hh, SpatialUnitRow su, int modelYear) {
 		// Lookup the UDP-indicators for the given spatial unit
 		SpatialUnitUdp lookupSpatialUnitUdp = new SpatialUnitUdp();
 		lookupSpatialUnitUdp.setSpatialUnitId(su.getSpatialUnitId());
@@ -312,7 +312,7 @@ public class UDPClassification extends ResidentialSatisfactionComponent {
 		assert posUdp >= 0 : "No UDP data found for spatial unit " + su.getSpatialUnitId();
 		lookupSpatialUnitUdp = spatialUnitUdp.get(posUdp);
 		// Get indicator set for the given model year
-		while (lookupSpatialUnitUdp.getSpatialUnitId() == su.getSpatialUnitId()) {
+		while ((lookupSpatialUnitUdp.getSpatialUnitId() == su.getSpatialUnitId()) && (posUdp > 0)) {
 			lookupSpatialUnitUdp = spatialUnitUdp.get(--posUdp);
 		}
 		lookupSpatialUnitUdp = spatialUnitUdp.get(++posUdp);
@@ -334,6 +334,6 @@ public class UDPClassification extends ResidentialSatisfactionComponent {
 		// Calculate the score
 		int hhScore = lookupHouseholdPrefs.getPrefDiversity() * lookupSpatialUnitUdp.getDiversityIndicator() + lookupHouseholdPrefs.getPrefTransportAccess() * lookupSpatialUnitUdp.getPublicTransportIndicator();
 		int hhScoreMax = lookupHouseholdPrefs.getPrefDiversity() * 4 + lookupHouseholdPrefs.getPrefTransportAccess() * 4;
-		return (double) hhScore / (double) hhScoreMax;
+		return (hhScore * 1000) / hhScoreMax;
 	}
 }

@@ -20,13 +20,15 @@ public class DesiredLivingSpace extends ResidentialSatisfactionComponent {
 	 * @see at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionComponent#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow, int)
 	 */
 	@Override
-	public double calc(HouseholdRow hh, SpatialUnitRow su, int modelYear) {
+	public long calc(HouseholdRow hh, SpatialUnitRow su, int modelYear) {
 		// TODO: add household-specific desiredLivingSpace modifier here
-		double desiredLivingSpace = IndicatorsPerHouseholdTypeAndIncome.getAvgLivingSpacePerHousehold(hh.getHouseholdType(), IncomeGroup.getIncomeGroupId(hh.getYearlyIncome()));
-		double currentLivingSpace = hh.getLivingSpace();
+		long desiredLivingSpace = IndicatorsPerHouseholdTypeAndIncome.getAvgLivingSpacePerHousehold(hh.getHouseholdType(), IncomeGroup.getIncomeGroupId(hh.getYearlyIncome()));
+		long currentLivingSpace = hh.getLivingSpace();
+		assert desiredLivingSpace > 0 : "Desired living space <= 0 (" + desiredLivingSpace + ") for household " + hh.getId();
+		assert currentLivingSpace > 0 : "Current living space <= 0 (" + currentLivingSpace + ") for household " + hh.getId();
 		if (desiredLivingSpace >= currentLivingSpace)
-			return 1;
+			return 1000;
 		else
-			return desiredLivingSpace / currentLivingSpace;
+			return (desiredLivingSpace * 1000) / currentLivingSpace;
 	}
 }

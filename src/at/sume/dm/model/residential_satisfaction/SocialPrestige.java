@@ -20,7 +20,7 @@ public class SocialPrestige extends ResidentialSatisfactionComponent {
 	 * @see at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionComponent#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow)
 	 */
 	@Override
-	public double calc(HouseholdRow hh, SpatialUnitRow su, int modelYear) {
+	public long calc(HouseholdRow hh, SpatialUnitRow su, int modelYear) {
 		// Calculate household income per member
 		long hhIncome = hh.getYearlyIncomePerMemberWeighted();
 		// Calculate average household income per member
@@ -28,12 +28,12 @@ public class SocialPrestige extends ResidentialSatisfactionComponent {
 		
 		// income only influences residential satisfaction if the neighborhood income is lower
 		// TODO: individual threshold for this comparison?!?
-		if (hhIncome > avgIncome) {
+		if ((hhIncome > avgIncome) && (hhIncome > 0)) {
 			// satisfaction = percentage of avg. income to household income
-			return avgIncome / hhIncome;
+			return (avgIncome * 1000) / hhIncome;
 		} else {
 			// 100% satisfaction here
-			return 1;
+			return 1000;
 		}
 	}
 }

@@ -26,7 +26,7 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 	public static class RentPerSpatialUnit implements Comparable<RentPerSpatialUnit> {
 		// must be public in order to be able to use Database.select()/java reflection api
 		public long spatialUnitId;
-		public double yearlyRentPerSqm;
+		public long yearlyRentPerSqm;
 		/**
 		 * @return the spatialUnitId
 		 */
@@ -42,13 +42,13 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 		/**
 		 * @return the yearlyPricePerSqm
 		 */
-		public double getYearlyRentPerSqm() {
+		public long getYearlyRentPerSqm() {
 			return yearlyRentPerSqm;
 		}
 		/**
 		 * @param yearlyRentPerSqm the yearlyPricePerSqm to set
 		 */
-		public void setYearlyRentPerSqm(double yearlyRentPerSqm) {
+		public void setYearlyRentPerSqm(long yearlyRentPerSqm) {
 			this.yearlyRentPerSqm = yearlyRentPerSqm;
 		}
 		/* (non-Javadoc)
@@ -82,15 +82,15 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 	 * @see at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionComponent#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow, int)
 	 */
 	@Override
-	public double calc(HouseholdRow hh, SpatialUnitRow su, int modelYear) {
+	public long calc(HouseholdRow hh, SpatialUnitRow su, int modelYear) {
 		// TODO: add household-specific rentPerceptionModifier here, that may also increase over the years if the household
 		// is unable to find a new residence for a long time (?)
-		double conceivableCostOfResidence = Math.round(hh.getLivingSpace() * getYearlyAverageRent(su.getSpatialUnitId()));
-		double currentCostOfResidence = hh.getCostOfResidence();
+		long conceivableCostOfResidence = Math.round(hh.getLivingSpace() * getYearlyAverageRent(su.getSpatialUnitId()));
+		long currentCostOfResidence = hh.getCostOfResidence();
 		if (conceivableCostOfResidence >= currentCostOfResidence)
-			return 1;
+			return 1000;
 		else
-			return conceivableCostOfResidence / currentCostOfResidence;
+			return (conceivableCostOfResidence * 1000) / currentCostOfResidence;
 	}
 
 	private int lookupSpatialUnitPos(long spatialUnitId) {
@@ -99,7 +99,7 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 		return Collections.binarySearch(rentPerSpatialUnit, lookup);
 	}
 	
-	private double getYearlyAverageRent(long spatialUnitId) {
+	private long getYearlyAverageRent(long spatialUnitId) {
 		int pos = lookupSpatialUnitPos(spatialUnitId);
 		assert pos >= 0 : "Can't lookup a price for spatial unit id " + spatialUnitId;
 		return rentPerSpatialUnit.get(pos).getYearlyRentPerSqm();

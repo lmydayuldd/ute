@@ -18,18 +18,18 @@ public enum ResidentialSatisfactionManager {
 	UDPCLASSIFICATION(new UDPClassification());
 	
 	private ResidentialSatisfactionComponent component;
-	private double weight;
+	private int weight;
 
 	ResidentialSatisfactionManager(ResidentialSatisfactionComponent component) {
 		this.component = component;
-		this.weight = 1;
+		this.weight = 1000;
 	}
 	
 	/**
 	 * Set the weight for each component of residential satisfaction
 	 * @param weight
 	 */
-	public void setWeight(double weight) {
+	public void setWeight(int weight) {
 		this.weight = weight;
 	}
 	
@@ -38,7 +38,7 @@ public enum ResidentialSatisfactionManager {
 	 * @param hh
 	 * @return
 	 */
-	public double calcResidentialSatisfaction(HouseholdRow hh, int modelYear) {
+	public int calcResidentialSatisfaction(HouseholdRow hh, int modelYear) {
 		return calcResidentialSatisfaction(hh, hh.getSpatialunit(), modelYear);
 	}
 	
@@ -46,13 +46,14 @@ public enum ResidentialSatisfactionManager {
 	 * Calculate the residential satisfaction level for a household in an arbitrary spatial unit 
 	 * @param hh
 	 * @param su
-	 * @return
+	 * @return Overall residential satisfaction in thousandth part
 	 */
-	public static double calcResidentialSatisfaction(HouseholdRow hh, SpatialUnitRow su, int modelYear) {
-		double rv = 0;
+	public static int calcResidentialSatisfaction(HouseholdRow hh, SpatialUnitRow su, int modelYear) {
+		int rv = 0;
 		for (ResidentialSatisfactionManager rs : values()) {
-			rv += rs.component.calc(hh, su, modelYear) * rs.weight;
+			rv += rs.component.calc(hh, su, modelYear) * (rs.weight / 1000);
 		}
-		return rv;
+		return rv / values().length;
+		
 	}
 }
