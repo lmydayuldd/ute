@@ -280,11 +280,11 @@ public class IndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 			b.setLivingSpacePerHouseholdMemberSum(b.getLivingSpacePerHouseholdMemberSum() - livingSpace / memberCount);
 			indicatorList.set(pos, b);
 			
-			assert b.getIncomeSum() >= 0 : "IncomeIndicators.remove() - " + spatialUnitId + ": incomeSum < 0";
-			assert b.getIncomePerHouseholdMemberSum() >= 0 : "IncomeIndicators.remove() - " + spatialUnitId + ": incomePerHouseholdMemberSum < 0";
-			assert b.getIncomePerWeightedHouseholdMemberSum() >= 0 : "IncomeIndicators.remove() - " + spatialUnitId + ": incomePerWeightedHouseholdMemberSum < 0";
-			assert b.getHouseholdCount() >= 0 : "IncomeIndicators.remove() - " + spatialUnitId + ": householdCount < 0";
-			assert b.getPersonCount() >= 0 : "IncomeIndicators.remove() - " + spatialUnitId + ": personCount < 0";
+			assert b.getIncomeSum() >= 0 : "IndicatorsPerSpatialUnit.remove() - " + spatialUnitId + ": incomeSum < 0";
+			assert b.getIncomePerHouseholdMemberSum() >= 0 : "IndicatorsPerSpatialUnit.remove() - " + spatialUnitId + ": incomePerHouseholdMemberSum < 0";
+			assert b.getIncomePerWeightedHouseholdMemberSum() >= 0 : "IndicatorsPerSpatialUnit.remove() - " + spatialUnitId + ": incomePerWeightedHouseholdMemberSum < 0";
+			assert b.getHouseholdCount() >= 0 : "IndicatorsPerSpatialUnit.remove() - " + spatialUnitId + ": householdCount < 0";
+			assert b.getPersonCount() >= 0 : "IndicatorsPerSpatialUnit.remove() - " + spatialUnitId + ": personCount < 0";
 		}
 	}
 }
