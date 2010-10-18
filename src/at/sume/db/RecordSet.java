@@ -28,7 +28,7 @@ public abstract class RecordSet<E extends RecordSetRow<?>> implements Iterable<E
 	 * recordset (e.g. ProbabilityDistribution)
 	 */
 	public RecordSet() {
-		
+		rowList = new ArrayList<E>();
 	}
 	
 	/**
