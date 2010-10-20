@@ -192,6 +192,12 @@ public class IndicatorsPerHouseholdTypeAndIncome implements Indicator<HouseholdR
 			b.setLivingSpacePerHouseholdMemberSum(b.getLivingSpacePerHouseholdMemberSum() - hh.getLivingSpace() / hh.getMemberCount());
 			b.setLivingSpacePerWeightedHouseholdMemberSum(b.getLivingSpacePerWeightedHouseholdMemberSum() - (long)((double)hh.getLivingSpace() / hh.getWeightedMemberCount()));
 			indicatorList.set(pos, b);
+
+			assert b.getLivingSpaceSum() >= 0 : "IndicatorsPerHouseholdTypeAndIncome.remove() - incomeGroup " + incomeGroup + ", householdType " + householdType + ": livingSpaceSum < 0";
+			assert b.getLivingSpacePerHouseholdMemberSum() >= 0 : "IndicatorsPerHouseholdTypeAndIncome.remove() - incomeGroup " + incomeGroup + ", householdType " + householdType + ": livingSpacePerHouseholdMemberSum < 0";
+			assert b.getLivingSpacePerWeightedHouseholdMemberSum() >= 0 : "IndicatorsPerHouseholdTypeAndIncome.remove() - incomeGroup " + incomeGroup + ", householdType " + householdType + ": livingSpacePerWeightedHouseholdMemberSum < 0";
+			assert b.getHouseholdCount() >= 0 : "IndicatorsPerHouseholdTypeAndIncome.remove() - incomeGroup " + incomeGroup + ", householdType " + householdType + ": householdCount < 0";
+			assert b.getPersonCount() >= 0 : "IndicatorsPerHouseholdTypeAndIncome.remove() - incomeGroup " + incomeGroup + ", householdType " + householdType + ": personCount < 0";
 		}
 	}
 
