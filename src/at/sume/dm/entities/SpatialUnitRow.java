@@ -9,21 +9,19 @@ import java.sql.SQLException;
 import at.sume.db.RecordSetRow;
 
 /**
- * List of spatial units in the model
- * @author Alexander Remesch
+ * List of spatial units in the model including information about the area size and land use.
+ * This information was provided by GIS data mainly from the ÖIR.
  * 
- * TODO: must include properties of each spatial unit, must include geo-coordinates for graphical representation 
+ * @author Alexander Remesch
  */
 public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
-	private double avgRentBlw60;	// Average rent < 60 m² [€/m²]
-	private double avgRentAbv60;	// Average rent >= 60 m² [€/m²]
-	private double rngRentBlw60;	// Max. range of rent < 60 m² depending on the quality of the dwelling
-	private double rngRentAbv60;	// Max. range of rent >= 60 m² depending on the quality of the dwelling
-	private double AvgIncomePerHousehold;
-	private double AvgIncomePerCapita;
-	private long HouseholdCount;
-	private long PersonCount;
-	
+	private double totalArea;
+	private short areaShareContinousAndDiscontinousUrbanFabric;
+	private short areaShareIndustrialCommercialConstructionInfrastructure;
+	private short areaShareArtificialVegetation;
+	private short areaShareAgricultural;
+	private short areaShareForest;
+	private short areaShareWater;
 	
 	/**
 	 * @param rowList
@@ -47,76 +45,113 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	}
 
 	/**
-	 * @return the avgRentBlw60
+	 * @return the totalArea
 	 */
-	public double getAvgRentBlw60() {
-		return avgRentBlw60;
+	public double getTotalArea() {
+		return totalArea;
 	}
 
 	/**
-	 * @param avgRentBlw60 the avgRentBlw60 to set
+	 * @param totalArea the totalArea to set
 	 */
-	public void setAvgRentBlw60(double avgRentBlw60) {
-		this.avgRentBlw60 = avgRentBlw60;
+	public void setTotalArea(double totalArea) {
+		this.totalArea = totalArea;
 	}
 
 	/**
-	 * @return the avgRentAbv60
+	 * @return the areaShareContinousAndDiscontinousUrbanFabric
 	 */
-	public double getAvgRentAbv60() {
-		return avgRentAbv60;
+	public short getAreaShareContinousAndDiscontinousUrbanFabric() {
+		return areaShareContinousAndDiscontinousUrbanFabric;
 	}
 
 	/**
-	 * @param avgRentAbv60 the avgRentAbv60 to set
+	 * @param areaShareContinousAndDiscontinousUrbanFabric the areaShareContinousAndDiscontinousUrbanFabric to set
 	 */
-	public void setAvgRentAbv60(double avgRentAbv60) {
-		this.avgRentAbv60 = avgRentAbv60;
+	public void setAreaShareContinousAndDiscontinousUrbanFabric(
+			short areaShareContinousAndDiscontinousUrbanFabric) {
+		this.areaShareContinousAndDiscontinousUrbanFabric = areaShareContinousAndDiscontinousUrbanFabric;
 	}
 
 	/**
-	 * @return the rngRentBlw60
+	 * @return the areaShareIndustrialCommercialConstructionInfrastructure
 	 */
-	public double getRngRentBlw60() {
-		return rngRentBlw60;
+	public short getAreaShareIndustrialCommercialConstructionInfrastructure() {
+		return areaShareIndustrialCommercialConstructionInfrastructure;
 	}
 
 	/**
-	 * @param rngRentBlw60 the rngRentBlw60 to set
+	 * @param areaShareIndustrialCommercialConstructionInfrastructure the areaShareIndustrialCommercialConstructionInfrastructure to set
 	 */
-	public void setRngRentBlw60(double rngRentBlw60) {
-		this.rngRentBlw60 = rngRentBlw60;
+	public void setAreaShareIndustrialCommercialConstructionInfrastructure(
+			short areaShareIndustrialCommercialConstructionInfrastructure) {
+		this.areaShareIndustrialCommercialConstructionInfrastructure = areaShareIndustrialCommercialConstructionInfrastructure;
 	}
 
 	/**
-	 * @return the rngRentAbv60
+	 * @return the areaShareArtificialVegetation
 	 */
-	public double getRngRentAbv60() {
-		return rngRentAbv60;
+	public short getAreaShareArtificialVegetation() {
+		return areaShareArtificialVegetation;
 	}
 
 	/**
-	 * @param rngRentAbv60 the rngRentAbv60 to set
+	 * @param areaShareArtificialVegetation the areaShareArtificialVegetation to set
 	 */
-	public void setRngRentAbv60(double rngRentAbv60) {
-		this.rngRentAbv60 = rngRentAbv60;
+	public void setAreaShareArtificialVegetation(short areaShareArtificialVegetation) {
+		this.areaShareArtificialVegetation = areaShareArtificialVegetation;
+	}
+
+	/**
+	 * @return the areaShareAgricultural
+	 */
+	public short getAreaShareAgricultural() {
+		return areaShareAgricultural;
+	}
+
+	/**
+	 * @param areaShareAgricultural the areaShareAgricultural to set
+	 */
+	public void setAreaShareAgricultural(short areaShareAgricultural) {
+		this.areaShareAgricultural = areaShareAgricultural;
+	}
+
+	/**
+	 * @return the areaShareForest
+	 */
+	public short getAreaShareForest() {
+		return areaShareForest;
+	}
+
+	/**
+	 * @param areaShareForest the areaShareForest to set
+	 */
+	public void setAreaShareForest(short areaShareForest) {
+		this.areaShareForest = areaShareForest;
+	}
+
+	/**
+	 * @return the areaShareWater
+	 */
+	public short getAreaShareWater() {
+		return areaShareWater;
+	}
+
+	/**
+	 * @param areaShareWater the areaShareWater to set
+	 */
+	public void setAreaShareWater(short areaShareWater) {
+		this.areaShareWater = areaShareWater;
 	}
 
 	/* (non-Javadoc)
 	 * @see at.sume.db.DatabaseRecord#set(java.sql.ResultSet, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
 		if (name.equals("SpatialUnitId")) {
 			setSpatialUnitId(rs.getLong(name));
-		} else if (name.equals("Miete_Avg_bis60")) {
-			setAvgRentBlw60(rs.getDouble(name));
-		} else if (name.equals("Miete_Avg_ab60")) {
-			setAvgRentAbv60(rs.getDouble(name));
-		} else if (name.equals("Miete_Range_bis60")) {
-			setRngRentBlw60(rs.getDouble(name));
-		} else if (name.equals("Miete_Range_ab60")) {
-			setRngRentAbv60(rs.getDouble(name));
 		} else {
 			throw new UnsupportedOperationException("Unknown field name " + name);
 		}
@@ -126,6 +161,7 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	 * @see at.sume.db.RecordSetRow#remove()
 	 */
 	@Override
+	@Deprecated
 	public void remove() {
 		throw new IllegalArgumentException("SpatialUnitRow.remove() not allowed");
 	}

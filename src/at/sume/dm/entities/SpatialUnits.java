@@ -5,7 +5,7 @@ package at.sume.dm.entities;
 
 import java.sql.SQLException;
 import at.sume.db.RecordSet;
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 
 /**
  * @author Alexander Remesch
@@ -16,9 +16,12 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	/**
 	 * @param db
 	 * @throws SQLException
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
-	public SpatialUnits(Database db) throws SQLException {
-		super(db);
+	public SpatialUnits(Database db) throws SQLException, InstantiationException, IllegalAccessException {
+		setDb(db);
+		rowList = db.select(SpatialUnitRow.class, selectStatement());
 	}
 
 	public SpatialUnits() {
@@ -26,29 +29,38 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	}
 	
 	/* (non-Javadoc)
+	 * @see at.sume.db.RecordSet#selectStatement()
+	 */
+	@Override
+	public String selectStatement() {
+		return "select * from _DM_SpatialUnits order by spatialunitId";
+	}
+
+	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSet#createDatabaseRecord()
 	 */
 	@Override
+	@Deprecated
 	public SpatialUnitRow createRecordSetRow() {
-		return new SpatialUnitRow(this);
+		throw new AssertionError("SpatialUnits.createRecordSetRow is depreceated");
 	}
 
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSet#fieldnames()
 	 */
 	@Override
+	@Deprecated
 	public String[] fieldnames() {
-		String s[] = { "SpatialUnitId" };
-		return s;
+		throw new AssertionError("SpatialUnits.fieldnames is depreceated");
 	}
 
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSet#primaryKeyFieldnames()
 	 */
 	@Override
+	@Deprecated
 	public String[] primaryKeyFieldnames() {
-		String s[] = { "SpatialUnitId" };
-		return s;
+		throw new AssertionError("SpatialUnits.primaryKeyFieldnames is depreceated");
 	}
 
 	/* (non-Javadoc)
@@ -58,29 +70,4 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	public String tablename() {
 		return "_DM_SpatialUnits";
 	}
-
-//	/* (non-Javadoc)
-//	 * @see at.sume.db.RecordSetIndexed#lookup(at.sume.db.RecordSetRow)
-//	 */
-//	@Override
-//	public SpatialUnitRow lookup(RecordSetRow lookupKeys) {
-//		SpatialUnitRow suLookup = (SpatialUnitRow) lookupKeys;
-//		return lookup(suLookup.getSpatialUnitId());
-//	}
-//	
-//	/**
-//	 * Lookup a spatial unit row by its id, find the correct row by iterating through the RecordSet (which should contain 59 or 250
-//	 * records maximum)
-//	 * @param spatialUnitId
-//	 * @return
-//	 */
-//	public SpatialUnitRow lookup(long spatialUnitId) {
-//		for (RecordSetRow row : rowList) {
-//			SpatialUnitRow su = (SpatialUnitRow) row;
-//			if (su.getSpatialUnitId() == spatialUnitId)
-//				return su;
-//		}
-//		return null;
-//	}
-
 }
