@@ -33,14 +33,14 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	 */
 	@Override
 	public String selectStatement() {
-		return "select dwellingId, spatialunitId, dwellingSize, dwellingCosts, livingSpaceGroup6Id, costOfResidenceGroupId, constructionPeriod7Id, taken from _DM_Dwellings " +
-		"order by dwellingId";
+		return "select * from _DM_Dwellings order by dwellingId";
 	}
 
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSet#primaryKeyFieldnames()
 	 */
 	@Override
+	@Deprecated
 	public String[] primaryKeyFieldnames() {
 		throw new AssertionError("Dwellings.primaryKeyFieldnames is depreceated");
 	}
@@ -49,6 +49,7 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	 * @see at.sume.db.RecordSet#fieldnames()
 	 */
 	@Override
+	@Deprecated
 	public String[] fieldnames() {
 		throw new AssertionError("Dwellings.fieldnames is depreceated");
 	}
@@ -57,6 +58,7 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	 * @see at.sume.db.RecordSet#createRecordSetRow()
 	 */
 	@Override
+	@Deprecated
 	public DwellingRow createRecordSetRow() {
 		throw new AssertionError("Dwellings.createRecordSetRow is depreceated");
 	}

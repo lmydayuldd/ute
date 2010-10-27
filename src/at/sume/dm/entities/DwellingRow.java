@@ -24,7 +24,6 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	public short livingSpaceGroup6Id;
 	public short costOfResidenceGroupId;
 	public short constructionPeriod7Id;
-	public boolean taken;
 	
 	/**
 	 * @return the dwellingId
@@ -138,24 +137,11 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 		this.constructionPeriod7Id = constructionPeriod7Id;
 	}
 
-	/**
-	 * @return the taken
-	 */
-	public boolean isTaken() {
-		return taken;
-	}
-
-	/**
-	 * @param taken the taken to set
-	 */
-	public void setTaken(boolean taken) {
-		this.taken = taken;
-	}
-
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSetRow#loadFromDatabase(java.sql.ResultSet, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
 		// use Common.select() instead
 		throw new AssertionError("DwellingRow.loadFromDatabase is depreceated");
