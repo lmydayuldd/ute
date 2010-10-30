@@ -33,16 +33,17 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	 */
 	@Override
 	public String selectStatement() {
-		return "select * from _DM_SpatialUnits order by spatialunitId";
+		return "select spatialUnitId AS id, spatialUnitId, totalarea, areaShareContinousAndDiscontinousUrbanFabric, " +
+			"areaShareIndustrialCommercialConstructionInfrastructure, areaShareArtificialVegetation, " +
+			"areaShareAgricultural, areaShareForest, areaShareWater from _DM_SpatialUnits order by spatialunitId";
 	}
 
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSet#createDatabaseRecord()
 	 */
 	@Override
-	@Deprecated
 	public SpatialUnitRow createRecordSetRow() {
-		throw new AssertionError("SpatialUnits.createRecordSetRow is depreceated");
+		return new SpatialUnitRow(this);
 	}
 
 	/* (non-Javadoc)

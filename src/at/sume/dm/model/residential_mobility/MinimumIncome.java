@@ -3,7 +3,7 @@
  */
 package at.sume.dm.model.residential_mobility;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.Households;
@@ -43,18 +43,29 @@ public class MinimumIncome extends EntityDecision<HouseholdRow, Households> {
 	}
 
 	/**
+	 * Estimate the minimum income left for living needed by a certain household
+	 * by calculating a defined percentage (sysparam) of the median income left for living for the
+	 * household size 
+	 * @param entity
+	 * @return
+	 */
+	public long estimateMinIncomeLeftForLiving(HouseholdRow entity) {
+		int householdSize = entity.getMembers().size();
+		assert householdSize > 0 : "MinimumIncome.decide(): Invalid household size: " + householdSize;
+		if (householdSize > householdSizeGroups)
+			householdSize = householdSizeGroups;
+		return medianIncomeLeftForLiving[householdSize] * thresholdMinIncomeLeftForLiving / 100;
+	}
+	
+	/**
 	 * Check if the household income is sufficient for the current dwelling
 	 * @return true, if the household must take consequences (the income is insufficient);
 	 *         false, if the income is sufficient
 	 */
 	@Override
 	protected boolean decide(HouseholdRow entity) {
-		int householdSize = entity.getMembers().size();
-		if (householdSize <= 0)
-			throw new IllegalArgumentException("MinimumIncome.decide(): Household-size must not be 0");
-		if (householdSize > householdSizeGroups)
-			householdSize = householdSizeGroups;
-		long minIncomeLeftForLiving = medianIncomeLeftForLiving[householdSize] * thresholdMinIncomeLeftForLiving / 100;
+		// TODO: use method in HouseholdRow to calculate minincomeleftforliving
+		long minIncomeLeftForLiving = estimateMinIncomeLeftForLiving(entity);
 		long actualIncomeLeftForLiving = entity.getYearlyIncome() - entity.getCostOfResidence();
 		if ( actualIncomeLeftForLiving < minIncomeLeftForLiving) {
 			return true;

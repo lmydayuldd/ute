@@ -3,7 +3,8 @@ package at.sume.sampling;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import net.remesch.util.Database;
+
+import net.remesch.db.Database;
 import at.sume.sampling.distributions.PersonsPerAgeSexHouseholdsizePersonnr;
 
 public class SamplePersons {

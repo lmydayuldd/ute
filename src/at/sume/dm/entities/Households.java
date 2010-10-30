@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 import net.remesch.util.MathUtil;
 import at.sume.db.RecordSetClonable;
 import at.sume.db.RecordSetRow;
@@ -17,7 +17,7 @@ import at.sume.db.RecordSetRow;
  *
  */
 public class Households extends RecordSetClonable<HouseholdRow> {
-//	private SpatialUnits spatialunits;
+	private SpatialUnits spatialunits;
 	
 	/**
 	 * @param db
@@ -35,15 +35,15 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	}
 
 	/**
-	 * Link all households in the collection to their corresponding spatial unit according to the spatialunit-id
-	 * @param spatialunits Collection of spatial units
+	 * Inter-Link all households in the collection to their corresponding dwelling according to the dwelling-id
+	 * @param dwellings Collection of dwellings
 	 */
-	public void linkSpatialUnits(SpatialUnits spatialunits) {
-//		this.spatialunits = spatialunits;
-		
+	public void linkDwellings(Dwellings dwellings) {
 		for (RecordSetRow<Households> row : rowList) {
 			HouseholdRow hh = (HouseholdRow) row;
-			hh.setSpatialunit(spatialunits.lookup(hh.getSpatialunitId()));
+			hh.setDwelling(dwellings.lookup(hh.getDwellingId()));
+			// link dwellings back to households
+			hh.getDwelling().setHousehold(hh);
 		}
 	}
 	
@@ -159,5 +159,19 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 			Long a[] = yearlyIncomeLeftForLiving[i].toArray(new Long[yearlyIncomeLeftForLiving[i].size()]);
 			medianIncomeLeftForLiving[i] = MathUtil.median(a);
 		}
+	}
+
+	/**
+	 * @return the spatialunits
+	 */
+	public SpatialUnits getSpatialunits() {
+		return spatialunits;
+	}
+
+	/**
+	 * @param spatialunits the spatialunits to set
+	 */
+	public void setSpatialunits(SpatialUnits spatialunits) {
+		this.spatialunits = spatialunits;
 	}
 }

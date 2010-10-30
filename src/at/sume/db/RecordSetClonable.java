@@ -6,7 +6,7 @@ package at.sume.db;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 
 /**
  * @author Alexander Remesch

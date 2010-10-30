@@ -6,7 +6,7 @@ package at.sume.dm.demography.events;
 import java.sql.SQLException;
 import java.util.Random;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 import at.sume.dm.demography.Fertility;
 import at.sume.dm.entities.PersonRow;
 

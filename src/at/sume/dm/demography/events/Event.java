@@ -6,7 +6,7 @@ package at.sume.dm.demography.events;
 import java.util.Random;
 
 import at.sume.db.RecordSetRow;
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 
 /**
  * @author Alexander Remesch

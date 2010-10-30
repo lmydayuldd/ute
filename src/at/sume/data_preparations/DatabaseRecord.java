@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 
 
 /**

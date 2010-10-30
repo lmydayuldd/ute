@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 
 import at.sume.dm.Common;
 

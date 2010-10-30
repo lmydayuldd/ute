@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.io.*;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 
 /**
  * Global functions, variables and parameters
@@ -18,8 +18,69 @@ import net.remesch.util.Database;
 public class Common {
 	public final static String INI_FILENAME = "sume_dm.ini";
 	public static Database db;
-	public static short scenarioId;
+	private static short scenarioId;
+	private static int residentialSatisfactionThreshold;
+	private static int searchAreaSize;
+	private static int dwellingsConsideredPerYear;
+	private static int dwellingsOnMarketShare;
+	private static int alwaysLookForDwellings = 0;
 	
+	/**
+	 * @return the iniFilename
+	 */
+	public static String getIniFilename() {
+		return INI_FILENAME;
+	}
+
+	/**
+	 * @return the db
+	 */
+	public static Database getDb() {
+		return db;
+	}
+
+	/**
+	 * @return the scenarioId
+	 */
+	public static short getScenarioId() {
+		return scenarioId;
+	}
+
+	/**
+	 * @return the residentialSatisfactionThreshold
+	 */
+	public static int getResidentialSatisfactionThreshold() {
+		return residentialSatisfactionThreshold;
+	}
+
+	/**
+	 * @return the searchAreaSize
+	 */
+	public static int getSearchAreaSize() {
+		return searchAreaSize;
+	}
+
+	/**
+	 * @return the dwellingsConsideredPerYear
+	 */
+	public static int getDwellingsConsideredPerYear() {
+		return dwellingsConsideredPerYear;
+	}
+
+	/**
+	 * @return the dwellingsOnMarketShare
+	 */
+	public static int getDwellingsOnMarketShare() {
+		return dwellingsOnMarketShare;
+	}
+
+	/**
+	 * @return the alwaysLookForDwellings
+	 */
+	public static int getAlwaysLookForDwellings() {
+		return alwaysLookForDwellings;
+	}
+
 	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
@@ -43,6 +104,11 @@ public class Common {
 
 	public static void init() {
 		scenarioId = Short.parseShort(getSysParam("DefaultScenario"));
+		residentialSatisfactionThreshold = Integer.parseInt(getSysParam("THR_ResSatisfaction"));
+		searchAreaSize = Integer.parseInt(getSysParam("HouseholdSearchAreaSize"));
+		dwellingsConsideredPerYear = Integer.parseInt(getSysParam("HouseholdDwellingsConsideredPerYear"));
+		dwellingsOnMarketShare = Integer.parseInt(getSysParam("DwellingsOnMarketShare"));
+		alwaysLookForDwellings = Integer.parseInt(getSysParam("AlwaysLookForDwellings"));
 	}
 	
 	/**

@@ -4,7 +4,8 @@
 package at.sume.dm.demography.events;
 
 import java.sql.SQLException;
-import net.remesch.util.Database;
+
+import net.remesch.db.Database;
 import at.sume.dm.demography.Mortality;
 import at.sume.dm.entities.PersonRow;
 

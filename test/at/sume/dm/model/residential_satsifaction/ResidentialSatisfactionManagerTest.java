@@ -3,23 +3,23 @@
  */
 package at.sume.dm.model.residential_satsifaction;
 
-import static org.junit.Assert.*;
-
 import java.sql.SQLException;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import at.sume.dm.Common;
+import at.sume.dm.entities.DwellingRow;
+import at.sume.dm.entities.Dwellings;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.Households;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
-import at.sume.dm.indicators.HouseholdIndicatorManager;
+import at.sume.dm.indicators.AllHouseholdsIndicatorManager;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 
 /**
@@ -29,8 +29,10 @@ import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 public class ResidentialSatisfactionManagerTest {
 	Database db;
 	Households hh;
+	Dwellings dw;
 	HouseholdRow hhr1, hhr2;
 	SpatialUnits spatialUnits;
+	DwellingRow dr;
 
 	@Test(expected=AssertionError.class)
 	  public void testAssertionsEnabled() {
@@ -38,22 +40,29 @@ public class ResidentialSatisfactionManagerTest {
 	  }
 
 	/**
-	 * Setup for unit test of {@link at.sume.dm.indicators.HouseholdIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
+	 * Setup for unit test of {@link at.sume.dm.indicators.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 * @throws SQLException
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
 	@Before
-	public void setUp() throws SQLException {
+	public void setUp() throws SQLException, InstantiationException, IllegalAccessException {
 		db = Common.openDatabase();
 		Common.init();
 		// Household 1: 2 persons, 30000 + 20000
 		hh = new Households();
 		hh.setDb(db);
+		dw = new Dwellings();
+		dw.setDb(db);
 		hhr1 = new HouseholdRow(hh);
 		hhr1.setId(1);
 		hhr1.setHouseholdSize((short)2);
-		hhr1.setSpatialunitId(90101);
-		hhr1.setCostOfResidence(12000);
-		hhr1.setLivingSpace(90);
+		dr = new DwellingRow();
+		hhr1.setDwelling(dr);
+		dr.setSpatialunitId(90101);
+		dr.setDwellingCosts(12000);
+		dr.setDwellingSize(90);
+		dw.add(dr);
 		Persons p;
 		p = new Persons();
 		p.setDb(db);
@@ -82,9 +91,12 @@ public class ResidentialSatisfactionManagerTest {
 		hhr2 = new HouseholdRow(hh);
 		hhr2.setId(2);
 		hhr2.setHouseholdSize((short)3);
-		hhr2.setSpatialunitId(90101);
-		hhr2.setCostOfResidence(15000);
-		hhr2.setLivingSpace(120);
+		dr = new DwellingRow();
+		hhr2.setDwelling(dr);
+		dr.setSpatialunitId(90101);
+		dr.setDwellingCosts(15000);
+		dr.setDwellingSize(120);
+		dw.add(dr);
 		
 		pr = new PersonRow(p);
 		pr.setId(3);
@@ -116,11 +128,11 @@ public class ResidentialSatisfactionManagerTest {
 		hh.add(hhr2);
 		
 		spatialUnits = new SpatialUnits(db);
-		hh.linkSpatialUnits(spatialUnits);
+		dw.linkSpatialUnits(spatialUnits);
 
-		HouseholdIndicatorManager.resetIndicators();
+		AllHouseholdsIndicatorManager.resetIndicators();
 		for (HouseholdRow household : hh) {
-			HouseholdIndicatorManager.addHousehold(household);
+			AllHouseholdsIndicatorManager.addHousehold(household);
 		}
 	}
 

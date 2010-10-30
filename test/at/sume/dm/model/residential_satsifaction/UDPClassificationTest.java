@@ -7,12 +7,13 @@ import static org.junit.Assert.*;
 
 import java.sql.SQLException;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import at.sume.dm.Common;
+import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.Households;
 import at.sume.dm.entities.PersonRow;
@@ -37,7 +38,7 @@ public class UDPClassificationTest {
 	  }
 
 	/**
-	 * Setup for unit test of {@link at.sume.dm.indicators.HouseholdIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
+	 * Setup for unit test of {@link at.sume.dm.indicators.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 * @throws SQLException
 	 */
 	@Before
@@ -50,9 +51,11 @@ public class UDPClassificationTest {
 		hhr1 = new HouseholdRow(hh);
 		hhr1.setId(1);
 		hhr1.setHouseholdSize((short)2);
-		hhr1.setSpatialunitId(90101);
-		hhr1.setCostOfResidence(3000);
-		hhr1.setLivingSpace(90);
+		DwellingRow dr = new DwellingRow();
+		hhr1.setDwelling(dr);
+		dr.setSpatialunitId(90101);
+		dr.setDwellingCosts(3000);
+		dr.setDwellingSize(90);
 		Persons p;
 		p = new Persons();
 		p.setDb(db);
@@ -80,9 +83,11 @@ public class UDPClassificationTest {
 		hhr2 = new HouseholdRow(hh);
 		hhr2.setId(2);
 		hhr2.setHouseholdSize((short)3);
-		hhr2.setSpatialunitId(90101);
-		hhr2.setCostOfResidence(5000);
-		hhr2.setLivingSpace(120);
+		dr = new DwellingRow();
+		hhr1.setDwelling(dr);
+		dr.setSpatialunitId(90101);
+		dr.setDwellingCosts(5000);
+		dr.setDwellingSize(120);
 		
 		pr = new PersonRow(p);
 		pr.setId(3);

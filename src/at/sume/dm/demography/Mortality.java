@@ -4,7 +4,8 @@
 package at.sume.dm.demography;
 
 import java.sql.SQLException;
-import net.remesch.util.Database;
+
+import net.remesch.db.Database;
 
 /**
  * Implementation of mortality probability per age and sex

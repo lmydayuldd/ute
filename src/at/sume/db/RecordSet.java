@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 import net.remesch.util.StringUtil;
 
 
@@ -273,5 +273,13 @@ public abstract class RecordSet<E extends RecordSetRow<?>> implements Iterable<E
 	@Override
 	public <T> T[] toArray(T[] a) {
 		return rowList.toArray(a);
+	}
+	
+	public E get(int index) {
+		return rowList.get(index);
+	}
+	
+	public int indexOf(E row) {
+		return rowList.indexOf(row);
 	}
 }

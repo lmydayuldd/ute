@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 import net.remesch.util.LeastSquareAdjustment;
 
 import at.sume.dm.Common;

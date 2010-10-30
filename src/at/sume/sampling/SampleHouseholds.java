@@ -6,7 +6,7 @@ package at.sume.sampling;
 import java.sql.*;
 import java.util.*;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
 
 /**

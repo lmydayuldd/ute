@@ -6,31 +6,81 @@ package at.sume.dm.entities;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
+
 import at.sume.db.RecordSetRow;
 import at.sume.dm.Common;
+import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
+import at.sume.dm.indicators.MoversIndicatorManager;
+import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 import at.sume.dm.types.HouseholdType;
+import at.sume.dm.types.IncomeGroup;
+//import at.sume.dm.types.ReasonForMoving;
 
 /**
  * @author Alexander Remesch
  *
  */
 public class HouseholdRow extends RecordSetRow<Households> {
-	private long spatialunitId;
+	private class SpatialUnitScore {
+		private long spatialUnitId;
+		private long score;
+		/**
+		 * @return the spatialUnitId
+		 */
+		public long getSpatialUnitId() {
+			return spatialUnitId;
+		}
+		/**
+		 * @param spatialUnitId the spatialUnitId to set
+		 */
+		public void setSpatialUnitId(long spatialUnitId) {
+			this.spatialUnitId = spatialUnitId;
+		}
+		/**
+		 * @return the score
+		 */
+		public long getScore() {
+			return score;
+		}
+		/**
+		 * @param score the score to set
+		 */
+		public void setScore(long score) {
+			this.score = score;
+		}
+	}
+	
+	class CompareSpatialUnitScore implements Comparator<SpatialUnitScore> {
+		/* (non-Javadoc)
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public int compare(SpatialUnitScore arg0, SpatialUnitScore arg1) {
+			return ((Long)arg0.getScore()).compareTo(arg1.getScore());
+		}
+	}
+	
+	private static double childrenWeight = 0;
+	private static short childrenMaxAge = 0;
+	private static short desiredLivingSpaceRandomPct = 0;
+	private static short desiredLivingSpaceRangePct = 0;
+
 	private short householdSize;
 	private long dwellingId;
 	private ArrayList<PersonRow> members;
-	private SpatialUnitRow spatialunit;
+	private DwellingRow dwelling;
 	private double residentialSatisfactionThreshMod;
 	private HouseholdType householdType;
+	private int movingDecisionYear = 0;
+//	private ReasonForMoving movingDecisionReason;
+	private int aspirationRegionLivingSpaceMin;
+	private int aspirationRegionLivingSpaceMax;
+	private long aspirationRegionMaxCosts;
+	private ArrayList<SpatialUnitScore> residentialSatisfactionEstimate;
 	
-	// the following parameters might eventually go into a separate Dwelling-class
-	private int livingSpace;
-	private long costOfResidence;
-	private short livingSpaceGroupId;
-	private short costOfResidenceGroupId;
-	private static double childrenWeight = 0;
-	private static short childrenMaxAge = 0;
-
 	public HouseholdRow(Households households) {
 		super(households);
 		members = new ArrayList<PersonRow>();
@@ -49,6 +99,20 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			else
 				childrenMaxAge = Short.parseShort(sp);
 		}
+		if (desiredLivingSpaceRandomPct == 0) {
+			String sp = Common.getSysParam("DesiredLivingSpaceRandomPct");
+			if (sp.equals(null))
+				desiredLivingSpaceRandomPct = 10;
+			else
+				desiredLivingSpaceRandomPct = Short.parseShort(sp);
+		}
+		if (desiredLivingSpaceRangePct == 0) {
+			String sp = Common.getSysParam("DesiredLivingSpaceRangePct");
+			if (sp.equals(null))
+				desiredLivingSpaceRangePct = 10;
+			else
+				desiredLivingSpaceRangePct = Short.parseShort(sp);
+		}
 	}
 	
 	/**
@@ -66,18 +130,10 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	}
 
 	/**
-	 * @return the spatialunitId
+	 * @return the spatialunitId of the dwelling
 	 */
 	public long getSpatialunitId() {
-		return spatialunitId;
-	}
-
-	/**
-	 * @param spatialunitId the spatialunitId to set
-	 */
-	public void setSpatialunitId(long spatialunitId) {
-		this.spatialunitId = spatialunitId;
-		this.spatialunit = null;
+		return dwelling.getSpatialunitId();
 	}
 
 	/**
@@ -141,17 +197,39 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	}
 	
 	/**
-	 * @return the spatialunit
+	 * @return the spatialunit of the dwelling
 	 */
 	public SpatialUnitRow getSpatialunit() {
-		return spatialunit;
+		return dwelling.getSpatialunit();
 	}
 
 	/**
-	 * @param spatialunit the spatialunit to set
+	 * @return the dwelling
 	 */
-	public void setSpatialunit(SpatialUnitRow spatialunit) {
-		this.spatialunit = spatialunit;
+	public DwellingRow getDwelling() {
+		return dwelling;
+	}
+
+	/**
+	 * @param dwelling the dwelling to set
+	 */
+	public void setDwelling(DwellingRow dwelling) {
+		this.dwelling = dwelling;
+	}
+
+	/**
+	 * @return the residentialSatisfactionThreshMod
+	 */
+	public double getResidentialSatisfactionThreshMod() {
+		return residentialSatisfactionThreshMod;
+	}
+
+	/**
+	 * @param residentialSatisfactionThreshMod the residentialSatisfactionThreshMod to set
+	 */
+	public void setResidentialSatisfactionThreshMod(
+			double residentialSatisfactionThreshMod) {
+		this.residentialSatisfactionThreshMod = residentialSatisfactionThreshMod;
 	}
 
 	/**
@@ -284,6 +362,78 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	}
 
 	/**
+	 * @return the movingDecisionYear
+	 */
+	public int getMovingDecisionYear() {
+		return movingDecisionYear;
+	}
+
+	/**
+	 * @param movingDecisionYear the movingDecisionYear to set
+	 */
+	public void setMovingDecisionYear(int movingDecisionYear) {
+		this.movingDecisionYear = movingDecisionYear;
+	}
+
+//	/**
+//	 * @return the movingDecisionReason
+//	 */
+//	public ReasonForMoving getMovingDecisionReason() {
+//		return movingDecisionReason;
+//	}
+//
+//	/**
+//	 * @param movingDecisionReason the movingDecisionReason to set
+//	 */
+//	public void setMovingDecisionReason(ReasonForMoving movingDecisionReason) {
+//		this.movingDecisionReason = movingDecisionReason;
+//	}
+
+	/**
+	 * @return the aspirationRegionLivingSpaceMin
+	 */
+	public int getAspirationRegionLivingSpaceMin() {
+		return aspirationRegionLivingSpaceMin;
+	}
+
+	/**
+	 * @param aspirationRegionLivingSpaceMin the aspirationRegionLivingSpaceMin to set
+	 */
+	public void setAspirationRegionLivingSpaceMin(
+			int aspirationRegionLivingSpaceMin) {
+		this.aspirationRegionLivingSpaceMin = aspirationRegionLivingSpaceMin;
+	}
+
+	/**
+	 * @return the aspirationRegionLivingSpaceMax
+	 */
+	public int getAspirationRegionLivingSpaceMax() {
+		return aspirationRegionLivingSpaceMax;
+	}
+
+	/**
+	 * @param aspirationRegionLivingSpaceMax the aspirationRegionLivingSpaceMax to set
+	 */
+	public void setAspirationRegionLivingSpaceMax(
+			int aspirationRegionLivingSpaceMax) {
+		this.aspirationRegionLivingSpaceMax = aspirationRegionLivingSpaceMax;
+	}
+
+	/**
+	 * @return the maximum yearly rent per m² that the household is willing/able to pay for a new dwelling
+	 */
+	public long getAspirationRegionMaxCosts() {
+		return aspirationRegionMaxCosts;
+	}
+
+	/**
+	 * @param aspirationRegionMaxCosts the maximum yearly rent per m² that the household is willing/able to pay for a new dwelling to set
+	 */
+	public void setAspirationRegionMaxCosts(long aspirationRegionMaxCosts) {
+		this.aspirationRegionMaxCosts = aspirationRegionMaxCosts;
+	}
+
+	/**
 	 * @return the households
 	 */
 	public Households getHouseholds() {
@@ -298,59 +448,31 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	}
 
 	/**
-	 * @return the livingSpace
+	 * @return the livingSpace of the dwelling
 	 */
-	public long getLivingSpace() {
-		return livingSpace;
+	public int getLivingSpace() {
+		return dwelling.getDwellingSize();
 	}
 
 	/**
-	 * @param livingSpace the livingSpace to set
-	 */
-	public void setLivingSpace(int livingSpace) {
-		this.livingSpace = livingSpace;
-	}
-
-	/**
-	 * @return the costOfResidence
+	 * @return the costOfResidence of the dwelling
 	 */
 	public long getCostOfResidence() {
-		return costOfResidence;
+		return dwelling.getDwellingCosts();
 	}
 
 	/**
-	 * @param costOfResidence the costOfResidence to set
-	 */
-	public void setCostOfResidence(long costOfResidence) {
-		this.costOfResidence = costOfResidence;
-	}
-
-	/**
-	 * @return the livingSpaceGroupId
+	 * @return the livingSpaceGroupId of the dwelling
 	 */
 	public short getLivingSpaceGroupId() {
-		return livingSpaceGroupId;
-	}
-
-	/**
-	 * @param livingSpaceGroupId the livingSpaceGroupId to set
-	 */
-	public void setLivingSpaceGroupId(short livingSpaceGroupId) {
-		this.livingSpaceGroupId = livingSpaceGroupId;
+		return dwelling.getLivingSpaceGroup6Id();
 	}
 
 	/**
 	 * @return the costOfResidenceGroupId
 	 */
 	public short getCostOfResidenceGroupId() {
-		return costOfResidenceGroupId;
-	}
-
-	/**
-	 * @param costOfResidenceGroupId the costOfResidenceGroupId to set
-	 */
-	public void setCostOfResidenceGroupId(short costOfResidenceGroupId) {
-		this.costOfResidenceGroupId = costOfResidenceGroupId;
+		return dwelling.getCostOfResidenceGroupId();
 	}
 
 	/* (non-Javadoc)
@@ -360,8 +482,8 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
 		if (name.equals("HouseholdId")) {
 			setHouseholdId(rs.getLong(name));
-		} else if (name.equals("SpatialunitId")) {
-			setSpatialunitId(rs.getLong(name));
+//		} else if (name.equals("SpatialunitId")) {
+//			setSpatialunitId(rs.getLong(name));
 		} else if (name.equals("HouseholdSize")) {
 			setHouseholdSize(rs.getShort(name));
 		} else if (name.equals("DwellingId")) {
@@ -370,10 +492,10 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			setDwellingId(rs.getInt(name));
 		} else if (name.equals("CostOfResidence")) {
 			setDwellingId(rs.getLong(name));
-		} else if (name.equals("LivingSpaceGroupId")) {
-			setLivingSpaceGroupId(rs.getShort(name));
-		} else if (name.equals("CostOfResidenceGroupId")) {
-			setCostOfResidenceGroupId(rs.getShort(name));
+//		} else if (name.equals("LivingSpaceGroupId")) {
+//			setLivingSpaceGroupId(rs.getShort(name));
+//		} else if (name.equals("CostOfResidenceGroupId")) {
+//			setCostOfResidenceGroupId(rs.getShort(name));
 		} else {
 			throw new UnsupportedOperationException("Unknown field name " + name);
 		}
@@ -445,29 +567,110 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 */
 	@Override
 	public void saveToDatabase() throws SQLException {
-		// TODO: make this more sophisticated depending on whether a parameter is set or not
+		// TODO: this is completely obsolete now (101023) and should be replaced by a general insert/update routine
 		// INSERT: "HouseholdId", "SpatialunitId", "HouseholdSize", "DwellingId", "LivingSpace", "CostOfResidence"
 		if (psInsert != null) {
 			psInsert.setString(1, Long.toString(getHouseholdId()));
-			psInsert.setString(2, Long.toString(spatialunitId));
+//			psInsert.setString(2, Long.toString(spatialunitId));
 			psInsert.setString(3, Long.toString(householdSize));
 			psInsert.setString(4, Long.toString(dwellingId));
-			psInsert.setString(5, Integer.toString(livingSpace));
-			psInsert.setString(6, Long.toString(costOfResidence));
-			psInsert.setString(7, Integer.toString(livingSpaceGroupId));
-			psInsert.setString(8, Long.toString(costOfResidenceGroupId));
+//			psInsert.setString(5, Integer.toString(livingSpace));
+//			psInsert.setString(6, Long.toString(costOfResidence));
+//			psInsert.setString(7, Integer.toString(livingSpaceGroupId));
+//			psInsert.setString(8, Long.toString(costOfResidenceGroupId));
 		}
 		// UPDATE: "SpatialunitId", "HouseholdSize", "DwellingId", "LivingSpace", "CostOfResidence", "HouseholdId"
 		if (psUpdate != null) {
-			psUpdate.setString(1, Long.toString(spatialunitId));
+//			psUpdate.setString(1, Long.toString(spatialunitId));
 			psUpdate.setString(2, Long.toString(householdSize));
 			psUpdate.setString(3, Long.toString(dwellingId));
-			psUpdate.setString(4, Integer.toString(livingSpace));
-			psUpdate.setString(5, Long.toString(costOfResidence));
-			psUpdate.setString(6, Integer.toString(livingSpaceGroupId));
-			psUpdate.setString(7, Long.toString(costOfResidenceGroupId));
+//			psUpdate.setString(4, Integer.toString(livingSpace));
+//			psUpdate.setString(5, Long.toString(costOfResidence));
+//			psUpdate.setString(6, Integer.toString(livingSpaceGroupId));
+//			psUpdate.setString(7, Long.toString(costOfResidenceGroupId));
 			// UPDATE: WHERE
 			psUpdate.setString(8, Long.toString(getHouseholdId()));
 		}
+	}
+	
+	/**
+	 * Estimate the desired living space of the household based on the number of persons in the household 
+	 * and set the values of aspirationRegionLivingSpaceMin and aspirationRegionLivingSpaceMax according to the results
+	 */
+	public void estimateDesiredLivingSpace() {
+		if (getAspirationRegionLivingSpaceMin() == 0 && getAspirationRegionLivingSpaceMax() == 0) {
+			Random r = new Random();
+			// calculate mean
+			long desiredLivingSpaceSqm = AllHouseholdsIndicatorsPerHouseholdTypeAndIncome.getAvgLivingSpacePerHousehold(getHouseholdType(), IncomeGroup.getIncomeGroupId(getYearlyIncome()));
+			short desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRandomPct * r.nextGaussian());
+			desiredLivingSpaceSqm = desiredLivingSpaceSqm + desiredLivingSpaceModifier;
+			// calculate boundary 1
+			desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRangePct * r.nextGaussian());
+			short desiredLivingSpaceSqm1 = (short) (desiredLivingSpaceSqm + desiredLivingSpaceModifier);
+			// calculate boundary 2
+			desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRangePct * r.nextGaussian());
+			short desiredLivingSpaceSqm2 = (short) (desiredLivingSpaceSqm + desiredLivingSpaceModifier);
+			if (desiredLivingSpaceSqm1 > desiredLivingSpaceSqm2) {
+				setAspirationRegionLivingSpaceMin(desiredLivingSpaceSqm2);
+				setAspirationRegionLivingSpaceMax(desiredLivingSpaceSqm1);
+			} else  {
+				setAspirationRegionLivingSpaceMin(desiredLivingSpaceSqm1);
+				setAspirationRegionLivingSpaceMax(desiredLivingSpaceSqm2);
+			}
+		}
+	}
+	
+	/**
+	 * Estimate residential satisfaction for the given spatial units and store results in array
+	 * residentialSatisfactionEstimate
+	 * 
+	 * @param spatialUnitIdList
+	 * @param modelYear
+	 * @return highest residential satisfaction found
+	 */
+	public int estimateResidentialSatisfaction(ArrayList<Long> spatialUnitIdList, int modelYear) {
+		SpatialUnits spatialUnits = recordSet.getSpatialunits();
+		int result = 0;
+		for (Long spatialUnitId : spatialUnitIdList) {
+			SpatialUnitScore s = new SpatialUnitScore();
+			s.setSpatialUnitId(spatialUnitId);
+			// TODO: introduce random factor into score (sysparam ~10%?)
+			int residentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(this, spatialUnits.lookup(spatialUnitId), modelYear); 
+			s.setScore(residentialSatisfaction);
+			residentialSatisfactionEstimate.add(s);
+			if (residentialSatisfaction > result)
+				result = residentialSatisfaction;
+		}
+		return result;
+	}
+	
+	/**
+	 * Return the spatial units that are estimated to provide the highest residential satisfaction
+	 * for the household
+	 * 
+	 * @param numSpatialUnits the number of spatial units to return
+	 * @return
+	 * TODO: prefer target areas that are close to the current residence
+	 */
+	public ArrayList<Long> getPreferredSpatialUnits(int numSpatialUnits) {
+		// sort results descending according to residential satisfaction (find highest scoring spatial units)
+		Comparator<SpatialUnitScore> compareSpatialUnitScoresDesc = Collections.reverseOrder(new CompareSpatialUnitScore());
+		Collections.sort(residentialSatisfactionEstimate, compareSpatialUnitScoresDesc);
+		// build new array to return
+		ArrayList<Long> ret = new ArrayList<Long>(numSpatialUnits);
+		for (int i = 0; i != numSpatialUnits; i++) {
+			ret.set(i, residentialSatisfactionEstimate.get(i).getSpatialUnitId());
+		}
+		return ret;
+	}
+	/**
+	 * Relocate the household to the given dwelling
+	 * 
+	 * @param dwelling
+	 */
+	public void relocate(DwellingRow dwelling) {
+		setDwelling(dwelling);
+		// Update indicators
+		MoversIndicatorManager.addHousehold(this);
 	}
 }

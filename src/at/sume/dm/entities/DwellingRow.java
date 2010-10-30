@@ -24,7 +24,15 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	public short livingSpaceGroup6Id;
 	public short costOfResidenceGroupId;
 	public short constructionPeriod7Id;
+	private HouseholdRow household;
+	private Dwellings dwellings;
 	
+	public DwellingRow() {
+		
+	}
+	public DwellingRow(Dwellings dwellings) {
+		this.dwellings = dwellings;
+	}
 	/**
 	 * @return the dwellingId
 	 */
@@ -37,6 +45,7 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	 */
 	public void setDwellingId(long dwellingId) {
 		this.dwellingId = dwellingId;
+		this.id = dwellingId;
 	}
 
 	/**
@@ -68,28 +77,28 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	}
 
 	/**
-	 * @return the dwellingSize
+	 * @return the total living space of the dwelling
 	 */
 	public int getDwellingSize() {
 		return dwellingSize;
 	}
 
 	/**
-	 * @param dwellingSize the dwellingSize to set
+	 * @param dwellingSize the total living space of the dwelling to set
 	 */
 	public void setDwellingSize(int dwellingSize) {
 		this.dwellingSize = dwellingSize;
 	}
 
 	/**
-	 * @return the dwellingCosts
+	 * @return the yearly total costs of the dwelling
 	 */
 	public long getDwellingCosts() {
 		return dwellingCosts;
 	}
 
 	/**
-	 * @param dwellingCosts the dwellingCosts to set
+	 * @param dwellingCosts the yearly total costs of the dwelling to set
 	 */
 	public void setDwellingCosts(long dwellingCosts) {
 		this.dwellingCosts = dwellingCosts;
@@ -135,6 +144,20 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	 */
 	public void setConstructionPeriod7Id(short constructionPeriod7Id) {
 		this.constructionPeriod7Id = constructionPeriod7Id;
+	}
+
+	/**
+	 * @return the household
+	 */
+	public HouseholdRow getHousehold() {
+		return household;
+	}
+
+	/**
+	 * @param household the household to set
+	 */
+	public void setHousehold(HouseholdRow household) {
+		this.household = household;
 	}
 
 	/* (non-Javadoc)

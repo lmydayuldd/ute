@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 import net.remesch.util.DateUtil;
 import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;

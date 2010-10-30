@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 
 
 /**

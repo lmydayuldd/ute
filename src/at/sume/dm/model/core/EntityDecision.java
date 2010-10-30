@@ -3,7 +3,7 @@
  */
 package at.sume.dm.model.core;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 import at.sume.db.RecordSet;
 import at.sume.db.RecordSetRow;
 

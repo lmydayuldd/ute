@@ -25,7 +25,7 @@ public class DatabaseTest {
 	private Database db;
 	
 	/**
-	 * Setup for unit test of {@link at.sume.dm.indicators.HouseholdIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
+	 * Setup for unit test of {@link at.sume.dm.indicators.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 * @throws SQLException
 	 */
 	@Before

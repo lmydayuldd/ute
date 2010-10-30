@@ -12,7 +12,7 @@ import java.sql.SQLException;
  * @author Alexander Remesch
  */
 public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable<RecordSetRow<T>> {
-	protected Long id;
+	public Long id;
 	protected T recordSet; 
 	
 	protected PreparedStatement psInsert;

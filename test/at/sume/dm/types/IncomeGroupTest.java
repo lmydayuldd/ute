@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.sql.SQLException;
 
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class IncomeGroupTest {
 	  }
 
 	/**
-	 * Setup for unit test of {@link at.sume.dm.indicators.HouseholdIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
+	 * Setup for unit test of {@link at.sume.dm.indicators.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 * @throws SQLException
 	 */
 	@Before

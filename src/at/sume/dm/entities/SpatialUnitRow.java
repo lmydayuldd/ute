@@ -15,14 +15,18 @@ import at.sume.db.RecordSetRow;
  * @author Alexander Remesch
  */
 public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
-	private double totalArea;
-	private short areaShareContinousAndDiscontinousUrbanFabric;
-	private short areaShareIndustrialCommercialConstructionInfrastructure;
-	private short areaShareArtificialVegetation;
-	private short areaShareAgricultural;
-	private short areaShareForest;
-	private short areaShareWater;
+	public long spatialUnitId;
+	public double totalArea;
+	public short areaShareContinousAndDiscontinousUrbanFabric;
+	public short areaShareIndustrialCommercialConstructionInfrastructure;
+	public short areaShareArtificialVegetation;
+	public short areaShareAgricultural;
+	public short areaShareForest;
+	public short areaShareWater;
 	
+	public SpatialUnitRow() {
+		
+	}
 	/**
 	 * @param rowList
 	 */
@@ -34,13 +38,14 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	 * @return the spatialUnitId
 	 */
 	public long getSpatialUnitId() {
-		return id;
+		return spatialUnitId;
 	}
 
 	/**
 	 * @param spatialUnitId the spatialUnitId to set
 	 */
 	public void setSpatialUnitId(long spatialUnitId) {
+		this.spatialUnitId = spatialUnitId;
 		this.id = spatialUnitId;
 	}
 

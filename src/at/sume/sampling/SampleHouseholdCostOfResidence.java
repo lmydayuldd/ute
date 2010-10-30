@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.Random;
 
 import at.sume.sampling.distributions.CostOfResidenceDistributionRow;
-import net.remesch.util.Database;
+import net.remesch.db.Database;
 
 /**
  * @author Alexander Remesch
