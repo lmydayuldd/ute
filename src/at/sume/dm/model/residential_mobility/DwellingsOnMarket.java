@@ -54,12 +54,14 @@ public class DwellingsOnMarket {
 		Random r = new Random();
 		this.spatialUnits = spatialUnits;
 		dwellingsOnMarketList = (ArrayList<DwellingRow>[])new ArrayList[spatialUnits.size()];
+		for (int i = 0; i != spatialUnits.size(); i++)
+			dwellingsOnMarketList[i] = new ArrayList<DwellingRow>();
 		grossFreeDwellingCount = new int[spatialUnits.size()];
 		for (DwellingRow row : dwellings) {
-			if (row.getHousehold().equals(null)) {
+			if (row.getHousehold() == null) {
 				int pos = spatialUnits.indexOf(row.getSpatialunit());
 				grossFreeDwellingCount[pos]++;
-				if (r.nextInt() <= Common.getDwellingsOnMarketShare()) {
+				if (r.nextInt(100) <= Common.getDwellingsOnMarketShare()) {
 					dwellingsOnMarketList[pos].add(row);
 				}
 			}

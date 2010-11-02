@@ -86,7 +86,7 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 		}
 	}
 
-	private static ArrayList<BaseIndicators> indicatorList;
+	private static ArrayList<BaseIndicators> indicatorList = new ArrayList<BaseIndicators>();;
 
 	/* (non-Javadoc)
 	 * @see at.sume.dm.indicators.Indicator#add(at.sume.db.RecordSetRow)

@@ -313,10 +313,12 @@ public class UDPClassification extends ResidentialSatisfactionComponent {
 		assert posUdp >= 0 : "No UDP data found for spatial unit " + spatialUnit.getSpatialUnitId();
 		lookupSpatialUnitUdp = spatialUnitUdp.get(posUdp);
 		// Get indicator set for the given model year
-		while ((lookupSpatialUnitUdp.getSpatialUnitId() == spatialUnit.getSpatialUnitId()) && (posUdp > 0)) {
-			lookupSpatialUnitUdp = spatialUnitUdp.get(--posUdp);
+		if ((modelYear < lookupSpatialUnitUdp.getStartYear()) || (modelYear > lookupSpatialUnitUdp.getEndYear())) {
+			while ((lookupSpatialUnitUdp.getSpatialUnitId() == spatialUnit.getSpatialUnitId()) && (posUdp > 0)) {
+				lookupSpatialUnitUdp = spatialUnitUdp.get(--posUdp);
+			}
+			lookupSpatialUnitUdp = spatialUnitUdp.get(++posUdp);
 		}
-		lookupSpatialUnitUdp = spatialUnitUdp.get(++posUdp);
 		while ((modelYear < lookupSpatialUnitUdp.getStartYear()) || (modelYear > lookupSpatialUnitUdp.getEndYear())) {
 			lookupSpatialUnitUdp = spatialUnitUdp.get(++posUdp);
 			if (lookupSpatialUnitUdp.getSpatialUnitId() != spatialUnit.getSpatialUnitId()) {

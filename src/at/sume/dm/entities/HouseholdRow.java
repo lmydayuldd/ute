@@ -133,9 +133,14 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @return the spatialunitId of the dwelling
 	 */
 	public long getSpatialunitId() {
+		assert dwelling != null : "no dwelling for household " + getHouseholdId();
 		return dwelling.getSpatialunitId();
 	}
 
+	// TODO: remove
+//	public void setSpatialunitId(long spatialUnitId) {
+//		this.spatialUnitId = spatialUnitId;
+//	}
 	/**
 	 * @return the householdSize
 	 */
@@ -200,6 +205,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @return the spatialunit of the dwelling
 	 */
 	public SpatialUnitRow getSpatialunit() {
+		assert dwelling != null : "no dwelling for household " + getHouseholdId();
 		return dwelling.getSpatialunit();
 	}
 
@@ -334,8 +340,12 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			case 3:
 				this.householdType = HouseholdType.SINGLE_PARENT;
 				break;
-			case 4:
-				throw new AssertionError("Household with 4 children unexpected");
+			default:
+//				throw new AssertionError("Household with 4 children unexpected");
+				// TODO: do something about this in the synthetic population generation!
+				System.out.println("Household " + getHouseholdId() + " unexpectedly consists of " + numChildren + " children.");
+				this.householdType = HouseholdType.OTHER;
+				break;
 			}
 			break;
 		default:
@@ -451,13 +461,17 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @return the livingSpace of the dwelling
 	 */
 	public int getLivingSpace() {
-		return dwelling.getDwellingSize();
+		if (dwelling != null)
+			return dwelling.getDwellingSize();
+		else
+			return 0;
 	}
 
 	/**
 	 * @return the costOfResidence of the dwelling
 	 */
 	public long getCostOfResidence() {
+		assert dwelling != null : "no dwelling for household " + getHouseholdId();
 		return dwelling.getDwellingCosts();
 	}
 
@@ -465,6 +479,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @return the livingSpaceGroupId of the dwelling
 	 */
 	public short getLivingSpaceGroupId() {
+		assert dwelling != null : "no dwelling for household " + getHouseholdId();
 		return dwelling.getLivingSpaceGroup6Id();
 	}
 
@@ -472,6 +487,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @return the costOfResidenceGroupId
 	 */
 	public short getCostOfResidenceGroupId() {
+		assert dwelling != null : "no dwelling for household " + getHouseholdId();
 		return dwelling.getCostOfResidenceGroupId();
 	}
 
@@ -488,16 +504,16 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			setHouseholdSize(rs.getShort(name));
 		} else if (name.equals("DwellingId")) {
 			setDwellingId(rs.getLong(name));
-		} else if (name.equals("LivingSpace")) {
-			setDwellingId(rs.getInt(name));
-		} else if (name.equals("CostOfResidence")) {
-			setDwellingId(rs.getLong(name));
+//		} else if (name.equals("LivingSpace")) {
+//			setDwellingId(rs.getInt(name));
+//		} else if (name.equals("CostOfResidence")) {
+//			setDwellingId(rs.getLong(name));
 //		} else if (name.equals("LivingSpaceGroupId")) {
 //			setLivingSpaceGroupId(rs.getShort(name));
 //		} else if (name.equals("CostOfResidenceGroupId")) {
 //			setCostOfResidenceGroupId(rs.getShort(name));
 		} else {
-			throw new UnsupportedOperationException("Unknown field name " + name);
+			throw new AssertionError("Unknown field name " + name);
 		}
 	}
 

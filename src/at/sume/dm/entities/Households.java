@@ -41,12 +41,22 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	public void linkDwellings(Dwellings dwellings) {
 		for (RecordSetRow<Households> row : rowList) {
 			HouseholdRow hh = (HouseholdRow) row;
-			hh.setDwelling(dwellings.lookup(hh.getDwellingId()));
-			// link dwellings back to households
-			hh.getDwelling().setHousehold(hh);
+			// TODO: dwellingId == 0 should eventually be impossible - put an assertion here!
+			if (hh.getDwellingId() != 0) {
+				hh.setDwelling(dwellings.lookup(hh.getDwellingId()));
+				// link dwellings back to households
+				hh.getDwelling().setHousehold(hh);
+			}
 		}
 	}
-	
+	/**
+	 * Determine all initial household-types
+	 */
+	public void determineHouseholdTypes() {
+		for (HouseholdRow household : rowList) {
+			household.determineInitialHouseholdType();
+		}
+	}
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSet#createDatabaseRecord()
 	 */
@@ -54,13 +64,12 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	public HouseholdRow createRecordSetRow() {
 		return new HouseholdRow(this);
 	}
-
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSet#fieldnames()
 	 */
 	@Override
 	public String[] fieldnames() {
-		String s[] = { "HouseholdId", "SpatialunitId", "HouseholdSize", "DwellingId", "LivingSpace", "CostOfResidence", "LivingSpaceGroupId", "CostOfResidenceGroupId" };
+		String s[] = { "HouseholdId", "HouseholdSize", "DwellingId" };
 		return s;
 	}
 

@@ -79,6 +79,9 @@ public class Main {
         // get all dwellings on the housing market
         dwellingsOnMarket = new DwellingsOnMarket(dwellings, spatialUnits);
         System.out.println(DateUtil.now() + ": determined all available dwellings on the housing market");
+        // determine household-types
+        households.determineHouseholdTypes();
+        System.out.println(DateUtil.now() + ": determined all household types");
         
         // Initial build of model indicators
 		buildIndicators();			
@@ -96,7 +99,8 @@ public class Main {
 		}
 		
         System.out.println(DateUtil.now() + ": end");
-	}
+        System.exit(0);
+    }
 
 	/**
 	 * Main model loop
@@ -116,9 +120,10 @@ public class Main {
 		
 		EntityDecisionManager<HouseholdRow, Households> householdDecisionManager = new EntityDecisionManager<HouseholdRow, Households>();
 		MinimumIncome minimumIncome = new MinimumIncome(db, householdDecisionManager, households);
-		
-		for (int modelYear = 0; modelYear != iterations; modelYear++) {
-	        System.out.println(DateUtil.now() + ": running model year " + modelYear + " of " + iterations);
+		int modelStartYear = Common.getModelStartYear();
+		int modelEndYear = modelStartYear + iterations;
+		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
+	        System.out.println(DateUtil.now() + ": running model year " + modelYear + " of " + modelEndYear);
 			ArrayList<HouseholdRow> potential_movers = new ArrayList<HouseholdRow>();
 	        int j = 0;
 	        // the following clone() is necessary because otherwise it wouldn't be possible to remove households from
@@ -141,6 +146,9 @@ public class Main {
 				for (PersonRow person : p_helper) {
 					personEventManager.process(person);
 				}
+				// Household was removed during demographic events -> process next household 
+				if (household.getMembers().size() == 0)
+					continue;
 				
 				// Process household decisions
 				// (minimum income, minimum living space, calculation of residential satisfaction)
@@ -148,6 +156,7 @@ public class Main {
 				// TODO: add to potential_movers if this is the result of householdDecisionManager
 
 				// Calculate residential mobility depending on previous decisions
+				// TODO: save residential satisfaction result for later use
 				int residential_satisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, household.getSpatialunit(), modelYear);
 				if (residential_satisfaction + household.getResidentialSatisfactionThreshMod() < Common.getResidentialSatisfactionThreshold()) {
 					// TODO: add the household to a random position in the ArrayList
@@ -162,8 +171,8 @@ public class Main {
 				
 				j++;
 			}
-			// Save changes
-			households = hh_helper;
+//			// Save changes
+//			households = hh_helper;
 			// Update rent prices for each spatial unit from last years data (from the movers indicators)
 			// from the second year on
 			CostEffectiveness costEffectiveness = (CostEffectiveness)ResidentialSatisfactionManager.COSTEFFECTIVENESS.getComponent();

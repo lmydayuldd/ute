@@ -37,7 +37,8 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	 */
 	@Override
 	public String selectStatement() {
-		return "select dwellingId AS id, * from _DM_Dwellings order by dwellingId";
+		return "select dwellingId AS id, dwellingId, spatialUnitId, dwellingSize, dwellingCosts, " +
+			"livingSpaceGroup6Id, costOfResidenceGroupId, constructionPeriod7Id from _DM_Dwellings order by dwellingId";
 	}
 
 	/* (non-Javadoc)

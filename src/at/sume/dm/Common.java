@@ -24,6 +24,7 @@ public class Common {
 	private static int dwellingsConsideredPerYear;
 	private static int dwellingsOnMarketShare;
 	private static int alwaysLookForDwellings = 0;
+	private static int modelStartYear;
 	
 	/**
 	 * @return the iniFilename
@@ -82,6 +83,13 @@ public class Common {
 	}
 
 	/**
+	 * @return the modelStartYear
+	 */
+	public static int getModelStartYear() {
+		return modelStartYear;
+	}
+
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -109,6 +117,7 @@ public class Common {
 		dwellingsConsideredPerYear = Integer.parseInt(getSysParam("HouseholdDwellingsConsideredPerYear"));
 		dwellingsOnMarketShare = Integer.parseInt(getSysParam("DwellingsOnMarketShare"));
 		alwaysLookForDwellings = Integer.parseInt(getSysParam("AlwaysLookForDwellings"));
+		modelStartYear = Integer.parseInt(getSysParam("ModelStartYear"));
 	}
 	
 	/**

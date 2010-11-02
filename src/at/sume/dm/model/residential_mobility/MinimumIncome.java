@@ -54,7 +54,7 @@ public class MinimumIncome extends EntityDecision<HouseholdRow, Households> {
 		assert householdSize > 0 : "MinimumIncome.decide(): Invalid household size: " + householdSize;
 		if (householdSize > householdSizeGroups)
 			householdSize = householdSizeGroups;
-		return medianIncomeLeftForLiving[householdSize] * thresholdMinIncomeLeftForLiving / 100;
+		return medianIncomeLeftForLiving[householdSize - 1] * thresholdMinIncomeLeftForLiving / 100;
 	}
 	
 	/**

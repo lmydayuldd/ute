@@ -48,6 +48,7 @@ public abstract class RecordSet<E extends RecordSetRow<?>> implements Iterable<E
 		{
 			E row = createRecordSetRow();
 			row.loadFromDatabase(rs);
+			preAddRow(row);
 			rowList.add(row);
 		}
 		rs.close();
@@ -134,7 +135,13 @@ public abstract class RecordSet<E extends RecordSetRow<?>> implements Iterable<E
 	 * @throws SQLException 
 	 */
 	public abstract E createRecordSetRow();
-
+	/**
+	 * Processing of the row before adding it to the rowList 
+	 * @param row
+	 */
+	public void preAddRow(E row) {
+		
+	}
 	/**
 	 * Look up a row from a RecordSet matching the key values given 
 	 * @param lookupKeys Key values to search
