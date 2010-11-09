@@ -44,4 +44,18 @@ public class StringUtil {
 	    }
 	    return result.toString();
 	}
+	/**
+	 * Concatenate all given strings using the given separator
+	 * @param separator
+	 * @param string
+	 * @return
+	 */
+	public static String concat(String separator, String ... string) {
+		int i = 0;
+		String result = string[i++];
+		while (i != string.length) {
+			result += separator + string[i++];
+		}
+		return result;
+	}
 }

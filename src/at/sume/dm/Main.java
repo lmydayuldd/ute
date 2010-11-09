@@ -3,6 +3,8 @@
  */
 package at.sume.dm;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -96,6 +98,12 @@ public class Main {
 			runModel(db, modelIterations);
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
         System.out.println(DateUtil.now() + ": end");
@@ -106,9 +114,11 @@ public class Main {
 	 * Main model loop
 	 * @param iterations number of iterations to be run
 	 * @throws SQLException 
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
 	@SuppressWarnings("unchecked")
-	public static void runModel(Database db, int iterations) throws SQLException {
+	public static void runModel(Database db, int iterations) throws SQLException, FileNotFoundException, IOException {
 		EventManager<PersonRow> personEventManager = new EventManager<PersonRow>();
 		// TODO: how can the events be constructed at another place to have this class/function independent of the
 		//       concrete event types??? Maybe put into its own static class or a ModelMain class?
@@ -124,6 +134,7 @@ public class Main {
 		int modelEndYear = modelStartYear + iterations;
 		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
 	        System.out.println(DateUtil.now() + ": running model year " + modelYear + " of " + modelEndYear);
+	        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
 			ArrayList<HouseholdRow> potential_movers = new ArrayList<HouseholdRow>();
 	        int j = 0;
 	        // the following clone() is necessary because otherwise it wouldn't be possible to remove households from
