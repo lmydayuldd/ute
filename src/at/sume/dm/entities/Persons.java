@@ -34,7 +34,7 @@ public class Persons extends RecordSetClonable<PersonRow> {
 	 */
 	@Override
 	public PersonRow createRecordSetRow() {
-		return new PersonRow(this);
+		return new PersonRow();
 	}
 
 	/* (non-Javadoc)

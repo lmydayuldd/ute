@@ -43,7 +43,7 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	 */
 	@Override
 	public SpatialUnitRow createRecordSetRow() {
-		return new SpatialUnitRow(this);
+		return new SpatialUnitRow();
 	}
 
 	/* (non-Javadoc)

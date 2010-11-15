@@ -81,8 +81,11 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	private long aspirationRegionMaxCosts;
 	private ArrayList<SpatialUnitScore> residentialSatisfactionEstimate;
 	
-	public HouseholdRow(Households households) {
-		super(households);
+	
+	/**
+	 * 
+	 */
+	public HouseholdRow() {
 		members = new ArrayList<PersonRow>();
 		if (childrenWeight == 0) {
 			String sp = Common.getSysParam("ChildrenWeight");
@@ -114,7 +117,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 				desiredLivingSpaceRangePct = Short.parseShort(sp);
 		}
 	}
-	
+
 	/**
 	 * @return the householdId
 	 */
@@ -137,10 +140,6 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		return dwelling.getSpatialunitId();
 	}
 
-	// TODO: remove
-//	public void setSpatialunitId(long spatialUnitId) {
-//		this.spatialUnitId = spatialUnitId;
-//	}
 	/**
 	 * @return the householdSize
 	 */

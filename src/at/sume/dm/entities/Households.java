@@ -62,7 +62,7 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	 */
 	@Override
 	public HouseholdRow createRecordSetRow() {
-		return new HouseholdRow(this);
+		return new HouseholdRow();
 	}
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSet#fieldnames()

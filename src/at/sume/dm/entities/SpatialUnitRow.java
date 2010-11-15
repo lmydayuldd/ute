@@ -24,14 +24,11 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	public short areaShareForest;
 	public short areaShareWater;
 	
-	public SpatialUnitRow() {
-		
-	}
 	/**
 	 * @param rowList
 	 */
-	public SpatialUnitRow(SpatialUnits rowList) {
-		super(rowList);
+	public SpatialUnitRow() {
+		super();
 	}
 
 	/**

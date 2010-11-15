@@ -22,8 +22,8 @@ public class PersonRow extends RecordSetRow<Persons> {
 	private HouseholdRow household;
 	private short personNrInHousehold;
 	
-	public PersonRow(Persons persons) {
-		super(persons);
+	public PersonRow() {
+		super();
 	}
 
 	/**
