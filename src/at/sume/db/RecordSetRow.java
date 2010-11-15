@@ -19,21 +19,6 @@ public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable
 	protected PreparedStatement psUpdate;
 	
 	/**
-	 * Necessary for cloning of RecordSetRow
-	 */
-	public RecordSetRow() {
-		
-	}
-
-	/**
-	 * Create a row and make it member of the given recordset
-	 * @param rowList
-	 */
-	public RecordSetRow(T rowList) {
-		this.recordSet = rowList;
-	}
-	
-	/**
 	 * @return the id
 	 */
 	public long getId() {
@@ -168,5 +153,12 @@ public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable
 	public void executeInsert() throws SQLException {
 		saveToDatabase();
 		psInsert.executeUpdate();
+	}
+
+	/**
+	 * @param recordSet the recordSet to set
+	 */
+	public void setRecordSet(RecordSet<?> recordSet) {
+		this.recordSet = (T) recordSet;
 	}
 }

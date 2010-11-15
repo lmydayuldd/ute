@@ -49,7 +49,7 @@ public abstract class RecordSet<E extends RecordSetRow<?>> implements Iterable<E
 			E row = createRecordSetRow();
 			row.loadFromDatabase(rs);
 			preAddRow(row);
-			rowList.add(row);
+			this.add(row);
 		}
 		rs.close();
 	}
@@ -199,6 +199,7 @@ public abstract class RecordSet<E extends RecordSetRow<?>> implements Iterable<E
 	 */
 	@Override
 	public boolean add(E row) {
+		row.setRecordSet(this);
 		return rowList.add(row);
 	}
 
@@ -207,6 +208,8 @@ public abstract class RecordSet<E extends RecordSetRow<?>> implements Iterable<E
 	 */
 	@Override
 	public boolean addAll(Collection<? extends E> c) {
+		for (E e : c)
+			e.setRecordSet(this);
 		return rowList.addAll(c);
 	}
 
