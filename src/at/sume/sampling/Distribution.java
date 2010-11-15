@@ -15,7 +15,6 @@ import java.util.Random;
  *
  * @param <E> Data that may be stored with each sample record 
  */
-@Deprecated
 public class Distribution<E> implements Collection<E>, Iterable<E> {
 	private ArrayList<Long> idStore;
 	private ArrayList<Long> thresholdStore;
