@@ -236,15 +236,20 @@ public class Database {
 	 * @throws SQLException 
 	 */
 	public <T> ArrayList<T> select(Class<T>c, String sqlStatement) throws SQLException, InstantiationException, IllegalAccessException {
-		// TODO: Private fields can't be modified - use the appropriate setter or find another solution for this
+		boolean modifiedFieldAccessibility = false;
 		ArrayList<T> result = new ArrayList<T>();
 		ResultSet rs = executeQuery(sqlStatement);
 		while (rs.next()) {
 			T item = c.newInstance();
-			assert c.getFields().length > 0 : "No public fields in class " + c.getName();
-			for (Field field : c.getFields()) {
+//			assert c.getFields().length > 0 : "No public fields in class " + c.getName();
+			//for (Field field : c.getFields()) {
+			for (Field field : c.getDeclaredFields()) {
 				String type = field.getType().getName();
 				String fieldName = field.getName();
+				if (!field.isAccessible()) {
+					field.setAccessible(true);
+					modifiedFieldAccessibility = true;
+				}
 				if (field.isAnnotationPresent(net.remesch.db.schema.DatabaseField.class)) {
 					DatabaseField dbf = field.getAnnotation(net.remesch.db.schema.DatabaseField.class);
 					fieldName = dbf.fieldName();
@@ -266,6 +271,8 @@ public class Database {
 						throw new AssertionError("fieldName = " + c.getName() + "." + fieldName + ", type = " + type);
 					}
 				}
+				if (modifiedFieldAccessibility)
+					field.setAccessible(false);
 			}
 			result.add(item);
 		}
