@@ -9,8 +9,8 @@ package net.remesch.util;
  */
 public class MathUtil {
 	/**
-	 * Calculate the median of a given list of values
-	 * @param m
+	 * Calculate the median of a given list of values - requires the array to be sorted!
+	 * @param m sorted array of values
 	 * @return the median, i.e. the value separating the higher half of the array from the lower half
 	 */
 	public static double median(Double[] m) {
@@ -26,8 +26,8 @@ public class MathUtil {
 	}
 
 	/**
-	 * Calculate the median of a given list of values
-	 * @param m
+	 * Calculate the median of a given list of values - requires the array to be sorted
+	 * @param m sorted array of values
 	 * @return the median, i.e. the value separating the higher half of the array from the lower half
 	 */
 	public static long median(Long[] m) {
