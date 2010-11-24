@@ -15,16 +15,18 @@ import at.sume.db.RecordSetRow;
  *
  */
 public class DwellingRow extends RecordSetRow<Dwellings> {
-	public long dwellingId;
-	public long spatialunitId;
+	private long dwellingId;
+	private long spatialunitId;
 	@Ignore // Ignore is not really necessary here because spatialUnit is private anyway
 	private SpatialUnitRow spatialunit;
-	public int dwellingSize;
-	public long dwellingCosts;
-	public short livingSpaceGroup6Id;
-	public short costOfResidenceGroupId;
-	public short constructionPeriod7Id;
+	private int dwellingSize;
+	private long dwellingCosts;
+	private short livingSpaceGroup6Id;
+	private short costOfResidenceGroupId;
+	private short constructionPeriod7Id;
+	@Ignore
 	private HouseholdRow household;
+	@Ignore
 	private Dwellings dwellings;
 	
 	public DwellingRow() {

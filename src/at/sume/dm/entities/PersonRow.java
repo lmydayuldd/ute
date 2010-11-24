@@ -17,10 +17,10 @@ public class PersonRow extends RecordSetRow<Persons> {
 //	private int yearBorn;
 	private short ageGroupId;
 	private short age;
-	private boolean householdRepresentative;
+//	private boolean householdRepresentative;
 	private long yearlyIncome;
 	private HouseholdRow household;
-	private short personNrInHousehold;
+//	private short personNrInHousehold;
 	
 	public PersonRow() {
 		super();
@@ -110,19 +110,19 @@ public class PersonRow extends RecordSetRow<Persons> {
 		return age;
 	}
 
-	/**
-	 * @return the householdRepresentative
-	 */
-	public boolean isHouseholdRepresentative() {
-		return householdRepresentative;
-	}
-
-	/**
-	 * @param householdRepresentative the householdRepresentative to set
-	 */
-	public void setHouseholdRepresentative(boolean householdRepresentative) {
-		this.householdRepresentative = householdRepresentative;
-	}
+//	/**
+//	 * @return the householdRepresentative
+//	 */
+//	public boolean isHouseholdRepresentative() {
+//		return householdRepresentative;
+//	}
+//
+//	/**
+//	 * @param householdRepresentative the householdRepresentative to set
+//	 */
+//	public void setHouseholdRepresentative(boolean householdRepresentative) {
+//		this.householdRepresentative = householdRepresentative;
+//	}
 
 	/**
 	 * @return the yearlyIncome
@@ -146,19 +146,19 @@ public class PersonRow extends RecordSetRow<Persons> {
 		this.household = household;
 	}
 
-	/**
-	 * @return the personNrInHousehold
-	 */
-	public short getPersonNrInHousehold() {
-		return personNrInHousehold;
-	}
-
-	/**
-	 * @param personNrInHousehold the personNrInHousehold to set
-	 */
-	public void setPersonNrInHousehold(short personNrInHousehold) {
-		this.personNrInHousehold = personNrInHousehold;
-	}
+//	/**
+//	 * @return the personNrInHousehold
+//	 */
+//	public short getPersonNrInHousehold() {
+//		return personNrInHousehold;
+//	}
+//
+//	/**
+//	 * @param personNrInHousehold the personNrInHousehold to set
+//	 */
+//	public void setPersonNrInHousehold(short personNrInHousehold) {
+//		this.personNrInHousehold = personNrInHousehold;
+//	}
 
 	/**
 	 * @return the persons
@@ -185,11 +185,11 @@ public class PersonRow extends RecordSetRow<Persons> {
 		} else if (name.equals("AgeGroupId")) {
 			setAgeGroupId(rs.getShort(name));
 		} else if (name.equals("HouseholdRepresentative")) {
-			setHouseholdRepresentative(rs.getBoolean(name));
+//			setHouseholdRepresentative(rs.getBoolean(name));
 		} else if (name.equals("YearlyIncome")) {
 			setYearlyIncome(rs.getLong(name));
 		} else if (name.equals("PersonNrInHousehold")) {
-			setPersonNrInHousehold(rs.getShort(name));
+//			setPersonNrInHousehold(rs.getShort(name));
 		} else {
 			throw new UnsupportedOperationException("Unknown field name " + name);
 		}
@@ -218,13 +218,13 @@ public class PersonRow extends RecordSetRow<Persons> {
 //			psInsert.setString(4, Integer.toString(yearBorn));
 			psInsert.setString(4, Integer.toString(age));
 			psInsert.setString(5, Short.toString(ageGroupId));
-			if (householdRepresentative) {
-				psInsert.setString(6, "-1");
-			} else {
-				psInsert.setString(6, "0");
-			}
+//			if (householdRepresentative) {
+//				psInsert.setString(6, "-1");
+//			} else {
+//				psInsert.setString(6, "0");
+//			}
 			psInsert.setString(7, Long.toString(yearlyIncome));
-			psInsert.setString(8, Short.toString(personNrInHousehold));
+//			psInsert.setString(8, Short.toString(personNrInHousehold));
 		}
 		// UPDATE: "HouseholdId", "Sex", "YearBorn", "AgeGroupId", "HouseholdRepresentative", "YearlyIncome", "PersonId"
 		if (psUpdate != null) {
@@ -233,9 +233,9 @@ public class PersonRow extends RecordSetRow<Persons> {
 //			psUpdate.setString(3, Integer.toString(yearBorn));
 			psUpdate.setString(3, Integer.toString(age));
 			psUpdate.setString(4, Short.toString(ageGroupId));
-			psUpdate.setString(5, Boolean.toString(householdRepresentative));
+//			psUpdate.setString(5, Boolean.toString(householdRepresentative));
 			psUpdate.setString(6, Long.toString(yearlyIncome));
-			psUpdate.setString(7, Short.toString(personNrInHousehold));
+//			psUpdate.setString(7, Short.toString(personNrInHousehold));
 			// UPDATE: WHERE
 			psUpdate.setString(8, Long.toString(id));
 		}

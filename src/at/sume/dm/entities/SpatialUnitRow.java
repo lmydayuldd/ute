@@ -15,14 +15,14 @@ import at.sume.db.RecordSetRow;
  * @author Alexander Remesch
  */
 public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
-	public long spatialUnitId;
-	public double totalArea;
-	public short areaShareContinousAndDiscontinousUrbanFabric;
-	public short areaShareIndustrialCommercialConstructionInfrastructure;
-	public short areaShareArtificialVegetation;
-	public short areaShareAgricultural;
-	public short areaShareForest;
-	public short areaShareWater;
+	private long spatialUnitId;
+	private double totalArea;
+	private short areaShareContinousAndDiscontinousUrbanFabric;
+	private short areaShareIndustrialCommercialConstructionInfrastructure;
+	private short areaShareArtificialVegetation;
+	private short areaShareAgricultural;
+	private short areaShareForest;
+	private short areaShareWater;
 	
 	/**
 	 * @param rowList
@@ -167,4 +167,12 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	public void remove() {
 		throw new IllegalArgumentException("SpatialUnitRow.remove() not allowed");
 	}
+
+//	/* (non-Javadoc)
+//	 * @see at.sume.db.RecordSetRow#compareTo(at.sume.db.RecordSetRow)
+//	 */
+//	@Override
+//	public int compareTo(RecordSetRow<SpatialUnits> row) {
+//		return ((Long) spatialUnitId).compareTo(((SpatialUnitRow)row).getSpatialUnitId());
+//	}
 }

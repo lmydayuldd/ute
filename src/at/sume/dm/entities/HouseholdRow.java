@@ -13,7 +13,7 @@ import java.util.Random;
 import at.sume.db.RecordSetRow;
 import at.sume.dm.Common;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
-import at.sume.dm.indicators.MoversIndicatorManager;
+import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
@@ -80,7 +80,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	private int aspirationRegionLivingSpaceMax;
 	private long aspirationRegionMaxCosts;
 	private ArrayList<SpatialUnitScore> residentialSatisfactionEstimate;
-	
+	private int currentResidentialSatisfaction;
 	
 	/**
 	 * 
@@ -188,11 +188,11 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		// remove a household if there are no members left
 		if (members.size() <= 0) {
 			recordSet.remove(this);
-		} else {
-			if (person.isHouseholdRepresentative()) {
-				// TODO: make the oldest person in the household the household-representative
-				// - but currently this information is not used within the model...
-			}
+//		} else {
+//			if (person.isHouseholdRepresentative()) {
+//				// TODO: make the oldest person in the household the household-representative
+//				// - but currently this information is not used within the model...
+//			}
 		}
 	}
 	
@@ -442,19 +442,19 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		this.aspirationRegionMaxCosts = aspirationRegionMaxCosts;
 	}
 
-	/**
-	 * @return the households
-	 */
-	public Households getHouseholds() {
-		return recordSet;
-	}
-
-	/**
-	 * @param households the households to set
-	 */
-	public void setHouseholds(Households households) {
-		this.recordSet = households;
-	}
+//	/**
+//	 * @return the households
+//	 */
+//	public Households getHouseholds() {
+//		return recordSet;
+//	}
+//
+//	/**
+//	 * @param households the households to set
+//	 */
+//	public void setHouseholds(Households households) {
+//		this.recordSet = households;
+//	}
 
 	/**
 	 * @return the livingSpace of the dwelling
@@ -687,5 +687,20 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		setDwelling(dwelling);
 		// Update indicators
 		MoversIndicatorManager.addHousehold(this);
+	}
+
+	/**
+	 * @param currentResidentialSatisfaction the currentResidentialSatisfaction to set
+	 */
+	public void setCurrentResidentialSatisfaction(
+			int currentResidentialSatisfaction) {
+		this.currentResidentialSatisfaction = currentResidentialSatisfaction;
+	}
+
+	/**
+	 * @return the currentResidentialSatisfaction
+	 */
+	public int getCurrentResidentialSatisfaction() {
+		return currentResidentialSatisfaction;
 	}
 }
