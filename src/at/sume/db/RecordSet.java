@@ -47,6 +47,7 @@ public abstract class RecordSet<E extends RecordSetRow<?>> implements Iterable<E
 		while (rs.next())
 		{
 			E row = createRecordSetRow();
+			row.setRecordSet(this);
 			row.loadFromDatabase(rs);
 			preAddRow(row);
 			this.add(row);

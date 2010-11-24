@@ -13,7 +13,7 @@ import java.sql.SQLException;
  */
 public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable<RecordSetRow<T>> {
 	public Long id;
-	protected T recordSet; 
+	protected T recordSet; // TODO: remove recordSet here and implement it as a static global variable (Common or Main)
 	
 	protected PreparedStatement psInsert;
 	protected PreparedStatement psUpdate;
