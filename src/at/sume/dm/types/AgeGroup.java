@@ -6,6 +6,7 @@ package at.sume.dm.types;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 import at.sume.dm.Common;
 
@@ -19,8 +20,8 @@ public class AgeGroup {
 	public static class AgeGroupRow implements Comparable<AgeGroupRow> {
 		public short ageGroupId;
 		public String ageGroup;
-		public long minage;
-		public long maxage;
+		public short minage;
+		public short maxage;
 		/* (non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
@@ -81,5 +82,13 @@ public class AgeGroup {
 		assert ageGroupId > 0 : "ageGroupId <= 0";
 		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
 		return ageGroups.get(ageGroupId - 1).ageGroup;
+	}
+	public static short sampleAge(short ageGroupId) {
+		assert ageGroupId > 0 : "ageGroupId <= 0";
+		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
+		Random r = new Random();
+		AgeGroupRow ageGroup = ageGroups.get(ageGroupId - 1);
+//		return (short) (ageGroup.minage + (r.nextDouble() * (ageGroup.maxage - ageGroup.minage)));
+		return (short) (ageGroup.minage + r.nextInt(ageGroup.maxage - ageGroup.minage));
 	}
 }

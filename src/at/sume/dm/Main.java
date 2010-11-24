@@ -13,18 +13,20 @@ import net.remesch.util.DateUtil;
 import at.sume.dm.demography.events.ChildBirth;
 import at.sume.dm.demography.events.EventManager;
 import at.sume.dm.demography.events.PersonDeath;
-import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.Dwellings;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.Households;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.entities.SpatialUnits;
-import at.sume.dm.indicators.AllHouseholdsIndicatorManager;
-import at.sume.dm.indicators.MoversIndicatorManager;
+import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
+import at.sume.dm.indicators.managers.MoversIndicatorManager;
+import at.sume.dm.indicators.managers.PercentileIndicatorManager;
+import at.sume.dm.migration.SampleImmigratingHouseholds;
 import at.sume.dm.model.core.EntityDecisionManager;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_mobility.MinimumIncome;
+import at.sume.dm.model.residential_mobility.ResidentialMobility;
 import at.sume.dm.model.residential_satisfaction.CostEffectiveness;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 
@@ -104,6 +106,21 @@ public class Main {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
         System.out.println(DateUtil.now() + ": end");
@@ -116,9 +133,14 @@ public class Main {
 	 * @throws SQLException 
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
+	 * @throws NoSuchFieldException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws IllegalArgumentException 
+	 * @throws SecurityException 
 	 */
 	@SuppressWarnings("unchecked")
-	public static void runModel(Database db, int iterations) throws SQLException, FileNotFoundException, IOException {
+	public static void runModel(Database db, int iterations) throws SQLException, FileNotFoundException, IOException, SecurityException, IllegalArgumentException, InstantiationException, IllegalAccessException, NoSuchFieldException {
 		EventManager<PersonRow> personEventManager = new EventManager<PersonRow>();
 		// TODO: how can the events be constructed at another place to have this class/function independent of the
 		//       concrete event types??? Maybe put into its own static class or a ModelMain class?
@@ -127,9 +149,12 @@ public class Main {
 		PersonDeath personDeath = new PersonDeath(db, personEventManager);
 		@SuppressWarnings("unused")
 		ChildBirth childBirth = new ChildBirth(db, personEventManager);
+		// TODO: include scenario handling!!!
+		SampleImmigratingHouseholds sampleImmigratingHouseholds = new SampleImmigratingHouseholds("STATA2010");
 		
 		EntityDecisionManager<HouseholdRow, Households> householdDecisionManager = new EntityDecisionManager<HouseholdRow, Households>();
 		MinimumIncome minimumIncome = new MinimumIncome(db, householdDecisionManager, households);
+		ResidentialMobility residentialMobility = new ResidentialMobility(minimumIncome);
 		int modelStartYear = Common.getModelStartYear();
 		int modelEndYear = modelStartYear + iterations;
 		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
@@ -140,7 +165,7 @@ public class Main {
 	        // the following clone() is necessary because otherwise it wouldn't be possible to remove households from
 	        // the original list while iterating through it
 	        Households hh_helper = (Households) households.clone();
-			// Loop through all households to find potential movers
+			// Loop through all households to find potential movers, process demographic events
 			for (HouseholdRow household : hh_helper) {
 				if (j % 1000 == 0) {
 					System.out.println(DateUtil.now() + ": Processing household " + j + " of " + households.size() + ", nr. of persons: " + persons.size());
@@ -193,68 +218,28 @@ public class Main {
 			MoversIndicatorManager.resetIndicators();
 			// Loop through potential movers
 			for (HouseholdRow household : potential_movers) {
-				int currentResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, modelYear);
+				household.setCurrentResidentialSatisfaction(ResidentialSatisfactionManager.calcResidentialSatisfaction(household, modelYear));
 				// 1) estimate the aspiration region: 
 				//    a) needed living space - by household size 
 				//    b) maximum costs - by current costs, household income
 				// lower limit: commonly defined by the current dwelling; upper limit: set by the standards to
 				// which the household can reasonably aspire (Knox/Pinch 2010, p.263)
-				// TODO: make this part of HouseholdRow (estimateAspirationRegion()) - problem is access to minimumIncome!
-				// TODO: or even better: put this in an extra class HouseholdMove which contains all information belonging to a move from
-				//       definition of the aspiration region to the actual move itself
-				long maxCostOfResidence = household.getYearlyIncome() - minimumIncome.estimateMinIncomeLeftForLiving(household);
-				if (household.getMovingDecisionYear() == modelYear) {
-					// Household just began searching - set initial values
-					household.estimateDesiredLivingSpace();
-					// lower value from income share and current dwelling costs (per m²)
-					long maxCostOfResidencePerSqm = maxCostOfResidence / household.getAspirationRegionLivingSpaceMin();
-					long currentCostOfResidencePerSqm = household.getCostOfResidence() / household.getLivingSpace();
-					household.setAspirationRegionMaxCosts(Math.min(maxCostOfResidencePerSqm, currentCostOfResidencePerSqm));
-				} else {
-					// Household continues searching - modify values from previous year
-					// if maximum costs are already at the maximum for the household then reduce minimum
-					// living space
-					long maxCostOfResidencePerSqm = maxCostOfResidence / household.getAspirationRegionLivingSpaceMin();
-					if (maxCostOfResidencePerSqm <= household.getAspirationRegionMaxCosts()) {
-						// reduce aspired minimum living space until it drops below the current living space
-						// TODO: maybe do this over a configurable number of years
-						if (household.getAspirationRegionLivingSpaceMin() > household.getLivingSpace()) {
-							household.setAspirationRegionLivingSpaceMin(household.getLivingSpace());
-						}
-					} else {
-						// increase aspired max costs of residence
-						// TODO: maybe do this over a configurable number of years
-						household.setAspirationRegionMaxCosts(maxCostOfResidencePerSqm);
-					}
-				}
+				residentialMobility.estimateAspirationRegion(household, modelYear);
+				
 				// 2) define the search area
 				// a) get all spatial units with costs within the aspiration region of the household
 				ArrayList<Long> potentialTargetSpatialUnitIds = costEffectiveness.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
 				// b) compare estimated residential satisfaction in these spatial units and select the highest scoring 
 				//    spatial units (random component for each unit, number of units selected as sysparam)
 				int maxResidentialSatisfactionEstimate = household.estimateResidentialSatisfaction(potentialTargetSpatialUnitIds, modelYear);
-				potentialTargetSpatialUnitIds = household.getPreferredSpatialUnits(Common.getSearchAreaSize());
 				// c) look for a configurable number of randomly chosen dwellings in these units and compute residential satisfaction. take the first
 				//    dwelling with a higher result than the current dwelling (= satisfying). limit the number of dwellings
 				//    considered (sysparam)
 				// do this only, if the potential residential satisfaction is higher than the current
 				// residential satisfaction - otherwise save computing time! (depending on a sysparam)
-				if ((maxResidentialSatisfactionEstimate > currentResidentialSatisfaction) || (Common.getAlwaysLookForDwellings() != 0)) {
+				if ((maxResidentialSatisfactionEstimate > household.getCurrentResidentialSatisfaction()) || (Common.getAlwaysLookForDwellings() != 0)) {
 					// do the extra mile and look for a dwelling
-					dwellingsOnMarket.selectSuitableDwellingsOnMarket(potentialTargetSpatialUnitIds, household.getAspirationRegionLivingSpaceMin(), household.getAspirationRegionLivingSpaceMax(), household.getAspirationRegionMaxCosts());
-					DwellingRow suitableDwelling;
-					boolean householdMoved = false;
-					for (int i = 0; i != Common.getDwellingsConsideredPerYear(); i++) {
-						suitableDwelling = dwellingsOnMarket.pickRandomSuitableDwelling();
-						int potentialResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, suitableDwelling, modelYear);
-						if (potentialResidentialSatisfaction > currentResidentialSatisfaction) {
-							// we have the dwelling - move there!
-							household.relocate(suitableDwelling);
-							householdMoved = true;
-							break;
-						}
-					}
-					if (!householdMoved) {
+					if (!residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket)) {
 						// if number of maximum search years reached - stop searching
 						//household.redefineAspirations();
 					}
@@ -264,13 +249,30 @@ public class Main {
 					// the current one - household stays (except on a forced move)
 				}
 			}
-		}
+			// Immigrating Households
+			ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(modelYear);
+			for (HouseholdRow household : immigratingHouseholds) {
+				residentialMobility.estimateAspirationRegion(household, modelYear);
+				if (!residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket)) {
+					// household didn't find a suitable dwelling -> join another household
+					// TODO: update indicators
+					//household.redefineAspirations();
+				} else {
+					// update indicators
+				}
+			}
+		} // model year
 	}
 	
 	public static void buildIndicators() {
+		int j = 0;
 		AllHouseholdsIndicatorManager.resetIndicators();
 		for (HouseholdRow household : households) {
+			if (++j % 10000 == 0) {
+				System.out.println(DateUtil.now() + ": Added household " + j + " of " + households.size() + " to indicators");
+			}
 			AllHouseholdsIndicatorManager.addHousehold(household);
+			PercentileIndicatorManager.addHousehold(household);
 		}
 	}
 }

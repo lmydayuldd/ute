@@ -17,13 +17,14 @@ import at.sume.dm.Common;
 public class IncomeGroup {
 	public static class IncomeGroupRow {
 		public short id;
+		public String incomeGroup;
 		public long minincome;
 		public long maxincome;
 	}
 	static ArrayList<IncomeGroupRow> incomeGroups;
 	static {
 //		incomeGroups = new ArrayList<IncomeGroupRow>();
-		String selectStatement = "select id, minincome, maxincome from _DM_IncomeGroup order by id";
+		String selectStatement = "select id, incomeGroup, minincome, maxincome from _DM_IncomeGroup order by id";
 		try {
 			incomeGroups = Common.db.select(IncomeGroupRow.class, selectStatement);
 		} catch (SQLException e) {
@@ -49,5 +50,16 @@ public class IncomeGroup {
 			}
 		}
 		return 0;
+	}
+	/**
+	 * Get the printable name of a certain income group by direct access to ArrayList
+	 * NOTE: Requires continuously ascending incomeGroupId
+	 * @param incomeGroupId
+	 * @return
+	 */
+	public static String getIncomeGroupNameDirect(short incomeGroupId) {
+		assert incomeGroupId > 0 : "incomeGroupId <= 0";
+		assert incomeGroupId <= incomeGroups.size() : "incomeGroupId > " + incomeGroups.size();
+		return incomeGroups.get(incomeGroupId - 1).incomeGroup;
 	}
 }
