@@ -20,13 +20,6 @@ public class LivingSpaceDistributionRow extends RecordSetRow<SampleHouseholdLivi
 	private int maxLivingSpace;
 
 	/**
-	 * @param rowList
-	 */
-	public LivingSpaceDistributionRow(SampleHouseholdLivingSpace rowList) {
-		super(rowList);
-	}
-
-	/**
 	 * @return the householdSize
 	 */
 	public short getHouseholdSize() {

@@ -23,13 +23,6 @@ public class IncomeDistributionRow extends RecordSetRow<SamplePersonIncome> {
 	private long maxIncome;
 	
 	/**
-	 * @param rowList
-	 */
-	public IncomeDistributionRow(SamplePersonIncome rowList) {
-		super(rowList);
-	}
-
-	/**
 	 * @return the spatialUnitId
 	 */
 	public long getSpatialUnitId() {

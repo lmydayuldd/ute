@@ -20,13 +20,6 @@ public class CostOfResidenceDistributionRow extends RecordSetRow<SampleHousehold
 	private int maxCostOfResidence;
 	
 	/**
-	 * @param rowList
-	 */
-	public CostOfResidenceDistributionRow(SampleHouseholdCostOfResidence rowList) {
-		super(rowList);
-	}
-
-	/**
 	 * @return the livingSpaceGroupId
 	 */
 	public short getLivingSpaceGroupId() {
