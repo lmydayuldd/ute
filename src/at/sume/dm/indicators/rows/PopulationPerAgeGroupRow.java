@@ -3,6 +3,7 @@
  */
 package at.sume.dm.indicators.rows;
 
+import at.sume.dm.indicators.base.IndicatorRow;
 import at.sume.dm.types.AgeGroup;
 
 /**
