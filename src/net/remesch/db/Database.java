@@ -8,6 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 import net.remesch.db.schema.DatabaseField;
+import net.remesch.util.Reflection;
 
 /**
  * Common database handling routines
@@ -235,15 +236,19 @@ public class Database {
 	 * @throws InstantiationException 
 	 * @throws SQLException 
 	 */
-	public <T> ArrayList<T> select(Class<T>c, String sqlStatement) throws SQLException, InstantiationException, IllegalAccessException {
+	public <T> ArrayList<T> select(Class<T> c, String sqlStatement) throws SQLException, InstantiationException, IllegalAccessException {
 		boolean modifiedFieldAccessibility = false;
 		ArrayList<T> result = new ArrayList<T>();
 		ResultSet rs = executeQuery(sqlStatement);
+		Field fields[] = Reflection.getFields(c);
+		assert fields.length > 0 : "No fields in class " + c.getName() + " or in its superclasses";
 		while (rs.next()) {
 			T item = c.newInstance();
-//			assert c.getFields().length > 0 : "No public fields in class " + c.getName();
 			//for (Field field : c.getFields()) {
-			for (Field field : c.getDeclaredFields()) {
+//			for (Field field : c.getDeclaredFields()) {
+			for (Field field : fields) {
+				if (field.isAnnotationPresent(net.remesch.db.schema.Ignore.class))
+					continue;
 				String type = field.getType().getName();
 				String fieldName = field.getName();
 				if (!field.isAccessible()) {
@@ -254,22 +259,20 @@ public class Database {
 					DatabaseField dbf = field.getAnnotation(net.remesch.db.schema.DatabaseField.class);
 					fieldName = dbf.fieldName();
 				}
-				if (!field.isAnnotationPresent(net.remesch.db.schema.Ignore.class)) {
-					if (type.equals("java.lang.String")) {
-						field.set(item, rs.getString(fieldName));
-					} else if (type.equals("long") || type.equals("java.lang.Long")) {
-						field.set(item, rs.getLong(fieldName));
-					} else if (type.equals("int") || type.equals("java.lang.Integer")) {
-						field.set(item, rs.getInt(fieldName));
-					} else if (type.equals("short") || type.equals("java.lang.Short")) {
-						field.set(item, rs.getShort(fieldName));
-					} else if (type.equals("double") || type.equals("java.lang.Double")) {
-						field.set(item, rs.getDouble(fieldName));
-					} else if (type.equals("boolean") || type.equals("java.lang.Boolean")) {
-						field.set(item, rs.getBoolean(fieldName));
-					} else {
-						throw new AssertionError("fieldName = " + c.getName() + "." + fieldName + ", type = " + type);
-					}
+				if (type.equals("java.lang.String")) {
+					field.set(item, rs.getString(fieldName));
+				} else if (type.equals("long") || type.equals("java.lang.Long")) {
+					field.set(item, rs.getLong(fieldName));
+				} else if (type.equals("int") || type.equals("java.lang.Integer")) {
+					field.set(item, rs.getInt(fieldName));
+				} else if (type.equals("short") || type.equals("java.lang.Short")) {
+					field.set(item, rs.getShort(fieldName));
+				} else if (type.equals("double") || type.equals("java.lang.Double")) {
+					field.set(item, rs.getDouble(fieldName));
+				} else if (type.equals("boolean") || type.equals("java.lang.Boolean")) {
+					field.set(item, rs.getBoolean(fieldName));
+				} else {
+					throw new AssertionError("fieldName = " + c.getName() + "." + fieldName + ", type = " + type);
 				}
 				if (modifiedFieldAccessibility)
 					field.setAccessible(false);
