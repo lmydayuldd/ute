@@ -47,11 +47,11 @@ public class ChildBirth extends Event<PersonRow> {
 	@Override
 	public void action(PersonRow entity) {
 		// if a child is born, it will be added to the household of the mother
-		PersonRow child = new PersonRow(entity.getPersons());
+		PersonRow child = new PersonRow();
 		child.setHousehold(entity.getHousehold());
 		child.setAgeGroupId((short) 1);
 //		child.setAge((short) 0);
-		child.setHouseholdRepresentative(false);
+//		child.setHouseholdRepresentative(false);
 		child.setAge((short)0);
 		// determine sex - sexProportion male (2) per 1000 female (1) births
 		Random r = new Random();
