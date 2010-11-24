@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import at.sume.dm.entities.HouseholdRow;
+import at.sume.dm.indicators.base.Indicator;
 
 /**
  * @author Alexander Remesch

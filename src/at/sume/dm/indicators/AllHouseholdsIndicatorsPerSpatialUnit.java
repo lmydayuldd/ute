@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import at.sume.dm.entities.HouseholdRow;
+import at.sume.dm.indicators.base.Indicator;
 
 /**
  * @author Alexander Remesch
@@ -152,8 +153,8 @@ public class AllHouseholdsIndicatorsPerSpatialUnit implements Indicator<Househol
 	 * @see at.sume.dm.indicators.Indicator#build(at.sume.dm.entities.HouseholdRow)
 	 */
 	@Override
-	public void add(HouseholdRow hh) {
-		AllHouseholdsIndicatorsPerSpatialUnit.add(hh.getSpatialunitId(), hh.getHouseholdSize(), hh.getYearlyIncome(), hh.getYearlyIncomePerMemberWeighted(), hh.getCostOfResidence(), hh.getLivingSpace());
+	public void add(HouseholdRow household) {
+		AllHouseholdsIndicatorsPerSpatialUnit.add(household.getSpatialunitId(), household.getHouseholdSize(), household.getYearlyIncome(), household.getYearlyIncomePerMemberWeighted(), household.getCostOfResidence(), household.getLivingSpace());
 	}
 	
 	private static void add(long spatialUnitId, short memberCount, long income, long incomePerWeightedHouseholdMember, long costOfResidence, long livingSpace) {
@@ -256,8 +257,8 @@ public class AllHouseholdsIndicatorsPerSpatialUnit implements Indicator<Househol
 	 * @see at.sume.dm.indicators.Indicator#remove(at.sume.dm.entities.HouseholdRow)
 	 */
 	@Override
-	public void remove(HouseholdRow hh) {
-		AllHouseholdsIndicatorsPerSpatialUnit.remove(hh.getSpatialunitId(), hh.getHouseholdSize(), hh.getYearlyIncome(), hh.getYearlyIncomePerMemberWeighted(), hh.getCostOfResidence(), hh.getLivingSpace());
+	public void remove(HouseholdRow household) {
+		AllHouseholdsIndicatorsPerSpatialUnit.remove(household.getSpatialunitId(), household.getHouseholdSize(), household.getYearlyIncome(), household.getYearlyIncomePerMemberWeighted(), household.getCostOfResidence(), household.getLivingSpace());
 	}
 
 	private static void remove(long spatialUnitId, short memberCount, long income, long incomePerWeightedHouseholdMember, long costOfResidence, long livingSpace) {

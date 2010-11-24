@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import at.sume.dm.entities.HouseholdRow;
+import at.sume.dm.indicators.base.Indicator;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
 
@@ -136,9 +137,9 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 	 * @see at.sume.dm.indicators.Indicator#add(at.sume.db.RecordSetRow)
 	 */
 	@Override
-	public void add(HouseholdRow hh) {
-		HouseholdType householdType = hh.getHouseholdType();
-		short incomeGroup = IncomeGroup.getIncomeGroupId(hh.getYearlyIncome());
+	public void add(HouseholdRow household) {
+		HouseholdType householdType = household.getHouseholdType();
+		short incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
 		int pos = lookupIndicator(householdType, incomeGroup);
 		if (pos < 0) {
 			// insert at position pos
@@ -147,19 +148,19 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 			b.setHouseholdType(householdType);
 			b.setIncomeGroup(incomeGroup);
 			b.setHouseholdCount(1);
-			b.setPersonCount(hh.getMemberCount());
-			b.setLivingSpaceSum(hh.getLivingSpace());
-			b.setLivingSpacePerHouseholdMemberSum(hh.getLivingSpace() / hh.getMemberCount());
-			b.setLivingSpacePerWeightedHouseholdMemberSum((long)((double)hh.getLivingSpace() / hh.getWeightedMemberCount()));
+			b.setPersonCount(household.getMemberCount());
+			b.setLivingSpaceSum(household.getLivingSpace());
+			b.setLivingSpacePerHouseholdMemberSum(household.getLivingSpace() / household.getMemberCount());
+			b.setLivingSpacePerWeightedHouseholdMemberSum((long)((double)household.getLivingSpace() / household.getWeightedMemberCount()));
 			indicatorList.add(pos, b);
 		} else {
 			// available at position pos
 			BaseIndicators b = indicatorList.get(pos);
 			b.setHouseholdCount(b.getHouseholdCount() + 1);
-			b.setPersonCount(b.getPersonCount() + hh.getMemberCount());
-			b.setLivingSpaceSum(b.getLivingSpaceSum() + hh.getLivingSpace());
-			b.setLivingSpacePerHouseholdMemberSum(b.getLivingSpacePerHouseholdMemberSum() + hh.getLivingSpace() / hh.getMemberCount());
-			b.setLivingSpacePerWeightedHouseholdMemberSum(b.getLivingSpacePerWeightedHouseholdMemberSum() + (long)((double)hh.getLivingSpace() / hh.getWeightedMemberCount()));
+			b.setPersonCount(b.getPersonCount() + household.getMemberCount());
+			b.setLivingSpaceSum(b.getLivingSpaceSum() + household.getLivingSpace());
+			b.setLivingSpacePerHouseholdMemberSum(b.getLivingSpacePerHouseholdMemberSum() + household.getLivingSpace() / household.getMemberCount());
+			b.setLivingSpacePerWeightedHouseholdMemberSum(b.getLivingSpacePerWeightedHouseholdMemberSum() + (long)((double)household.getLivingSpace() / household.getWeightedMemberCount()));
 			indicatorList.set(pos, b);
 		}
 	}
@@ -176,9 +177,9 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 	 * @see at.sume.dm.indicators.Indicator#remove(at.sume.db.RecordSetRow)
 	 */
 	@Override
-	public void remove(HouseholdRow hh) {
-		HouseholdType householdType = hh.getHouseholdType();
-		short incomeGroup = IncomeGroup.getIncomeGroupId(hh.getYearlyIncome());
+	public void remove(HouseholdRow household) {
+		HouseholdType householdType = household.getHouseholdType();
+		short incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
 		int pos = lookupIndicator(householdType, incomeGroup);
 		if (pos < 0) {
 			// not there, unable to remove - throw exception
@@ -187,10 +188,10 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 			// available at position pos - remove
 			BaseIndicators b = indicatorList.get(pos);
 			b.setHouseholdCount(b.getHouseholdCount() - 1);
-			b.setPersonCount(b.getPersonCount() - hh.getMemberCount());
-			b.setLivingSpaceSum(b.getLivingSpaceSum() - hh.getLivingSpace());
-			b.setLivingSpacePerHouseholdMemberSum(b.getLivingSpacePerHouseholdMemberSum() - hh.getLivingSpace() / hh.getMemberCount());
-			b.setLivingSpacePerWeightedHouseholdMemberSum(b.getLivingSpacePerWeightedHouseholdMemberSum() - (long)((double)hh.getLivingSpace() / hh.getWeightedMemberCount()));
+			b.setPersonCount(b.getPersonCount() - household.getMemberCount());
+			b.setLivingSpaceSum(b.getLivingSpaceSum() - household.getLivingSpace());
+			b.setLivingSpacePerHouseholdMemberSum(b.getLivingSpacePerHouseholdMemberSum() - household.getLivingSpace() / household.getMemberCount());
+			b.setLivingSpacePerWeightedHouseholdMemberSum(b.getLivingSpacePerWeightedHouseholdMemberSum() - (long)((double)household.getLivingSpace() / household.getWeightedMemberCount()));
 			indicatorList.set(pos, b);
 
 			assert b.getLivingSpaceSum() >= 0 : "IndicatorsPerHouseholdTypeAndIncome.remove() - incomeGroup " + incomeGroup + ", householdType " + householdType + ": livingSpaceSum < 0";

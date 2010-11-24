@@ -7,6 +7,7 @@ import java.util.Collections;
 
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
+import at.sume.dm.indicators.base.IndicatorBase;
 import at.sume.dm.indicators.rows.PopulationPerAgeGroupRow;
 import at.sume.dm.types.AgeGroup;
 
