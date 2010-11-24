@@ -16,13 +16,6 @@ public class FertilityProbabilityRow extends RecordSetRow<Fertility> {
 	private short ageGroupId;
 	
 	/**
-	 * @param rowList
-	 */
-	public FertilityProbabilityRow(Fertility rowList) {
-		super(rowList);
-	}
-
-	/**
 	 * @return the ageGroupId
 	 */
 	public short getAgeGroupId() {

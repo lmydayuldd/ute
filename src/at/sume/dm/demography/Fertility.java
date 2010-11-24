@@ -26,7 +26,7 @@ public class Fertility extends ProbabilityDistribution<FertilityProbabilityRow> 
 	 */
 	@Override
 	public FertilityProbabilityRow createProbabilityItem() {
-		return new FertilityProbabilityRow(this);
+		return new FertilityProbabilityRow();
 	}
 
 	/* (non-Javadoc)
@@ -45,7 +45,7 @@ public class Fertility extends ProbabilityDistribution<FertilityProbabilityRow> 
 	 * @return
 	 */
 	public double probability(short ageGroupId) {
-		FertilityProbabilityRow fpi = new FertilityProbabilityRow(this);
+		FertilityProbabilityRow fpi = new FertilityProbabilityRow();
 		fpi.setAgeGroupId(ageGroupId);
 		return probability(fpi);
 	}

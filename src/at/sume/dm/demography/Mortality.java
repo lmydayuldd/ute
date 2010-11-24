@@ -23,7 +23,7 @@ public class Mortality extends ProbabilityDistribution<MortalityProbabilityRow> 
 
 	@Override
 	public MortalityProbabilityRow createProbabilityItem() {
-		return new MortalityProbabilityRow(this);
+		return new MortalityProbabilityRow();
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class Mortality extends ProbabilityDistribution<MortalityProbabilityRow> 
 	 * @return
 	 */
 	public double probability(short ageGroupId, short sex) {
-		MortalityProbabilityRow mpi = new MortalityProbabilityRow(this);
+		MortalityProbabilityRow mpi = new MortalityProbabilityRow();
 		mpi.setAgeGroupId(ageGroupId);
 		mpi.setSex(sex);
 		return probability(mpi);

@@ -17,14 +17,6 @@ public class MortalityProbabilityRow extends RecordSetRow<Mortality> {
 	private short sex;
 	
 	/**
-	 * @param rowList
-	 */
-	public MortalityProbabilityRow(Mortality rowList) {
-		super(rowList);
-		// TODO Auto-generated constructor stub
-	}
-
-	/**
 	 * @return the ageGroupId
 	 */
 	public short getAgeGroupId() {
