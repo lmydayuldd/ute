@@ -99,7 +99,7 @@ public class TotalImmigrationPerYear {
 	}
 	public long get_v2(int modelYear) {
 		int index = modelYear - migrationsPerYear.get(0).getModelYear();
-		assert index < migrationsPerYear.size() : "Model year " + modelYear + " not included in migrationsPerYear (_DM_Migration) for this scenario";
+		assert (index >= 0) && (index < migrationsPerYear.size()) : "Model year " + modelYear + " not included in migrationsPerYear (_DM_Migration) for this scenario";
 		MigrationsPerYear m = migrationsPerYear.get(index);
 		assert m.getModelYear() == modelYear : "Calculated index for year " + modelYear + " returns data for year " + m.getModelYear(); 
 		return m.getImmigrationInternational() + m.getImmigrationNational();
