@@ -13,7 +13,6 @@ import at.sume.dm.entities.PersonRow;
 import at.sume.dm.indicators.IncomePercentiles;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
 import at.sume.dm.types.AgeGroup;
-import at.sume.sampling.Distribution;
 import at.sume.sampling.ExactDistribution;
 
 /**
@@ -25,7 +24,7 @@ public class SampleImmigratingHouseholds {
 		private long id;
 		private short ageGroupId;
 		private short sex;
-		private double share;
+		public double share;
 		/**
 		 * @return the id
 		 */
@@ -153,6 +152,8 @@ public class SampleImmigratingHouseholds {
 			"ORDER BY householdSize";
 		migrationHouseholdSize = Common.db.select(MigrationHouseholdSize.class, selectStatement);
 		assert migrationHouseholdSize.size() > 0 : "No rows selected from _DM_MigrationHouseholdSize (scenarioName = " + scenarioName + ")";
+		
+		totalImmigrationsPerYear = new TotalImmigrationPerYear(scenarioName);
 	}
 	
 	public ArrayList<HouseholdRow> sample(int modelYear) {
@@ -161,15 +162,17 @@ public class SampleImmigratingHouseholds {
 		
 		// 1) Get number of persons immigrating in that year
 		long numImmigrants = totalImmigrationsPerYear.get(modelYear);
+		//    and calculate the exact age & sex distribution
+		migrationsPerAgeSex.buildExactThresholds(numImmigrants);
 		
 		// 2) Calculate the number of households per household size
 		int numHouseholds = 0;
 		int remainingHouseholds = Math.round(numImmigrants * migrationHouseholdSize.get(migrationHouseholdSize.size() - 1).getShare());
-		for (short householdSize = 0; householdSize != 9; householdSize++) {
-			if (householdSize < migrationHouseholdSize.size() - 1) {
+		for (short householdSize = 1; householdSize != 10; householdSize++) {
+			if (householdSize < migrationHouseholdSize.size()) {
 				numHouseholds = Math.round(numImmigrants * migrationHouseholdSize.get(householdSize).getShare());
 			} else {
-				if (householdSize == 8) {
+				if (householdSize == 9) {
 					numHouseholds = remainingHouseholds;
 				} else {
 					numHouseholds = Math.max(r.nextInt(remainingHouseholds), remainingHouseholds);
