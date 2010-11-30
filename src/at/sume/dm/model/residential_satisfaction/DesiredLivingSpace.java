@@ -26,7 +26,7 @@ public class DesiredLivingSpace extends ResidentialSatisfactionComponent {
 		long currentLivingSpace = dwelling.getDwellingSize();
 		assert desiredLivingSpace > 0 : "Desired living space <= 0 (" + desiredLivingSpace + ") for household " + household.getId();
 		assert currentLivingSpace > 0 : "Current living space <= 0 (" + currentLivingSpace + ") for household " + household.getId();
-		if (desiredLivingSpace >= currentLivingSpace)
+		if (desiredLivingSpace <= currentLivingSpace)
 			return 1000;
 		else
 			return (desiredLivingSpace * 1000) / currentLivingSpace;
