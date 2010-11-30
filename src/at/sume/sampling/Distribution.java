@@ -1,5 +1,6 @@
 package at.sume.sampling;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,18 +10,41 @@ import java.util.Random;
 /**
  * General handling of distributions for random ("Monte Carlo") sampling.
  * 
- * USE OF THIS CLASS IS DEPRECATED - USE CLASS SamplingDistribution INSTEAD!
+ * This is a simpler form of class SamplingDistribution.
  * 
  * @author Alexander Remesch
  *
  * @param <E> Data that may be stored with each sample record 
  */
 public class Distribution<E> implements Collection<E>, Iterable<E> {
-	private ArrayList<Long> idStore;
-	private ArrayList<Long> thresholdStore;
-	private ArrayList<E> objectStore;
-	private long maxThreshold;
+//	private ArrayList<Long> idStore; // TODO: do we really need the idstore???
+	protected ArrayList<Long> thresholdStore;
+	protected ArrayList<E> objectStore;
+	protected long maxThreshold;
 
+	/**
+	 * Construct an empty class
+	 */
+	public Distribution() {
+//		idStore = new ArrayList<Long>(0);
+		thresholdStore = new ArrayList<Long>();
+		objectStore = new ArrayList<E>();
+	}
+	/**
+	 * Constructor that reserves memory for a given number of records
+	 * @param recordCount number of records memory will be reserved for
+	 */
+	public Distribution(int recordCount) {
+//		idStore = new ArrayList<Long>(recordCount);
+		thresholdStore = new ArrayList<Long>(recordCount);
+		objectStore = new ArrayList<E>(recordCount);
+	}
+	public Distribution(ArrayList<E> objectStore, String sourceFieldName) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
+//		idStore = new ArrayList<Long>();
+		thresholdStore = new ArrayList<Long>();
+		this.objectStore = objectStore;
+		buildThresholds(sourceFieldName);
+	}
 	/**
 	 * Get maximum boundary of the sampling range
 	 * @return maximum boundary of the sampling range
@@ -28,26 +52,23 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 	public long getMaxThreshold() {
 		return maxThreshold;
 	}
-
-	/**
-	 * Construct an empty class
-	 */
-	public Distribution() {
-		idStore = new ArrayList<Long>(0);
-		thresholdStore = new ArrayList<Long>(0);
-		objectStore = new ArrayList<E>(0);
+	public void buildThresholds(String sourceFieldName) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		maxThreshold = 0;
+		Class<?> c = objectStore.get(0).getClass();
+		// TODO: implement ability to access private fields
+		Field field = c.getField(sourceFieldName);
+		String type = field.getType().getName();
+		for (int i = 0; i != objectStore.size(); i++) {
+			if (type.equals("long") || type.equals("java.lang.Long")) {
+				maxThreshold += field.getLong(objectStore.get(i));
+			} else if (type.equals("double") || type.equals("java.lang.Double")) {
+				maxThreshold += Math.round(field.getDouble(objectStore.get(i)) * 1000);
+			} else {
+				throw new AssertionError("fieldName = " + c.getName() + "." + sourceFieldName + ", type = " + type);
+			}
+			thresholdStore.add(maxThreshold);
+		}
 	}
-	
-	/**
-	 * Constructor that reserves memory for a given number of records
-	 * @param recordCount number of records memory will be reserved for
-	 */
-	public Distribution(int recordCount) {
-		idStore = new ArrayList<Long>(recordCount);
-		thresholdStore = new ArrayList<Long>(recordCount);
-		objectStore = new ArrayList<E>(recordCount);
-	}
-
 	/**
 	 * Add a record to the sample
 	 * @param delta Range that gives the probability with which this particular record may be chosen during random sampling
@@ -66,7 +87,7 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 	 * @param object Data that may be stored with each sample record
 	 */
 	public void add(long id, long delta, E object) {
-		idStore.add(id);
+//		idStore.add(id);
 		add(delta, object);
 	}
 	
@@ -79,13 +100,12 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 	{
 		Random r = new Random();
 		// generate random number for sampling
-		long rand = (long) (r.nextDouble() * maxThreshold);
+		long rand = (long) r.nextInt((int) maxThreshold);
 		// lookup index of element where random number falls within the boundaries
 		int index = Collections.binarySearch(thresholdStore, rand);
 		if (index < 0)
 			index = (index + 1) * -1;
-		if (index > thresholdStore.size())
-			throw(new ArrayIndexOutOfBoundsException("rand = " + rand + ", max threshold = " + maxThreshold + ", index = " + index + ", max index = " + thresholdStore.size()));
+		assert index < thresholdStore.size() : "Array index too large; rand = " + rand + ", max threshold = " + maxThreshold + ", index = " + index + ", max index = " + thresholdStore.size();
 		return index;
 	}
 	
@@ -117,7 +137,7 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 
 	@Override
 	public void clear() {
-		idStore.clear();
+//		idStore.clear();
 		thresholdStore.clear();
 		objectStore.clear();
 		maxThreshold = 0;
