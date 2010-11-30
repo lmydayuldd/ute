@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 import net.remesch.db.schema.DatabaseField;
-import net.remesch.db.schema.DatabaseFieldMap;
+
 import net.remesch.util.Reflection;
 
 /**
@@ -243,8 +243,8 @@ public class Database {
 		String fieldName = "?";
 		ArrayList<T> result = new ArrayList<T>();
 		ResultSet rs = executeQuery(sqlStatement);
-		ArrayList<DatabaseFieldMap> fields = Reflection.getFields(c);
-		assert fields.size() > 0 : "No fields in class " + c.getName() + " or in its superclasses";
+		Field fields[] = Reflection.getFieldNames(c);
+		assert fields.length > 0 : "No fields in class " + c.getName() + " or in its superclasses";
 		while (rs.next()) {
 			T item = c.newInstance();
 			//for (Field field : c.getFields()) {
@@ -280,4 +280,5 @@ public class Database {
 		return result;
 	}
 	
+}
 }
