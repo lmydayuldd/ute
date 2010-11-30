@@ -236,11 +236,9 @@ public class Database {
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 * @throws SQLException 
-	 * 
-	 * Problem: this function throws an SQLException if all fields are public (have to investigate!)
 	 */
-	public <T> ArrayList<T> select(Class<T> c, String sqlStatement) throws InstantiationException, IllegalAccessException, SQLException {
-		String fieldName = "?";
+	public <T> ArrayList<T> select(Class<T> c, String sqlStatement) throws SQLException, InstantiationException, IllegalAccessException {
+		boolean modifiedFieldAccessibility = false;
 		ArrayList<T> result = new ArrayList<T>();
 		ResultSet rs = executeQuery(sqlStatement);
 		Field fields[] = Reflection.getFieldNames(c);
@@ -249,29 +247,36 @@ public class Database {
 			T item = c.newInstance();
 			//for (Field field : c.getFields()) {
 //			for (Field field : c.getDeclaredFields()) {
-			for (DatabaseFieldMap fieldMap : fields) {
-				fieldName = fieldMap.getDbFieldName();
-				String type = fieldMap.getFieldType();
-				Field field = fieldMap.getField();
-				try {
-					if (type.equals("java.lang.String")) {
-						field.set(item, rs.getString(fieldName));
-					} else if (type.equals("long") || type.equals("java.lang.Long")) {
-						field.set(item, rs.getLong(fieldName));
-					} else if (type.equals("int") || type.equals("java.lang.Integer")) {
-						field.set(item, rs.getInt(fieldName));
-					} else if (type.equals("short") || type.equals("java.lang.Short")) {
-						field.set(item, rs.getShort(fieldName));
-					} else if (type.equals("double") || type.equals("java.lang.Double")) {
-						field.set(item, rs.getDouble(fieldName));
-					} else if (type.equals("boolean") || type.equals("java.lang.Boolean")) {
-						field.set(item, rs.getBoolean(fieldName));
-					} else {
-						throw new AssertionError("fieldName = " + c.getName() + "." + fieldName + ", type = " + type);
-					}
-				} catch (SQLException e) {
-					throw new SQLException("Statement: " + sqlStatement + "; Field " + fieldName, e);
+			for (Field field : fields) {
+				if (field.isAnnotationPresent(net.remesch.db.schema.Ignore.class))
+					continue;
+				String type = field.getType().getName();
+				String fieldName = field.getName();
+				if (!field.isAccessible()) {
+					field.setAccessible(true);
+					modifiedFieldAccessibility = true;
 				}
+				if (field.isAnnotationPresent(net.remesch.db.schema.DatabaseField.class)) {
+					DatabaseField dbf = field.getAnnotation(net.remesch.db.schema.DatabaseField.class);
+					fieldName = dbf.fieldName();
+				}
+				if (type.equals("java.lang.String")) {
+					field.set(item, rs.getString(fieldName));
+				} else if (type.equals("long") || type.equals("java.lang.Long")) {
+					field.set(item, rs.getLong(fieldName));
+				} else if (type.equals("int") || type.equals("java.lang.Integer")) {
+					field.set(item, rs.getInt(fieldName));
+				} else if (type.equals("short") || type.equals("java.lang.Short")) {
+					field.set(item, rs.getShort(fieldName));
+				} else if (type.equals("double") || type.equals("java.lang.Double")) {
+					field.set(item, rs.getDouble(fieldName));
+				} else if (type.equals("boolean") || type.equals("java.lang.Boolean")) {
+					field.set(item, rs.getBoolean(fieldName));
+				} else {
+					throw new AssertionError("fieldName = " + c.getName() + "." + fieldName + ", type = " + type);
+				}
+				if (modifiedFieldAccessibility)
+					field.setAccessible(false);
 			}
 			result.add(item);
 		}
@@ -280,5 +285,4 @@ public class Database {
 		return result;
 	}
 	
-}
 }
