@@ -68,7 +68,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	private static short desiredLivingSpaceRandomPct = 0;
 	private static short desiredLivingSpaceRangePct = 0;
 
-	private short householdSize;
+//	private short householdSize;
 	private long dwellingId;
 	private ArrayList<PersonRow> members;
 	private DwellingRow dwelling;
@@ -144,17 +144,17 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @return the householdSize
 	 */
 	public short getHouseholdSize() {
-		return householdSize;
+		return (short) members.size();
 	}
 
-	/**
-	 * @param householdSize the householdSize to set
-	 */
-	public void setHouseholdSize(short householdSize) {
-		if (householdSize < 1 || householdSize > 4)
-			throw new IllegalArgumentException("householdSize must be in the range from 1 to 4");
-		this.householdSize = householdSize;
-	}
+//	/**
+//	 * @param householdSize the householdSize to set
+//	 */
+//	public void setHouseholdSize(short householdSize) {
+//		if (householdSize < 1 || householdSize > 4)
+//			throw new IllegalArgumentException("householdSize must be in the range from 1 to 4");
+//		this.householdSize = householdSize;
+//	}
 
 	/**
 	 * @return the dwellingId
@@ -260,7 +260,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 */
 	public HouseholdType determineInitialHouseholdType() {
 		short age1, age2, sex1, sex2;
-		switch (householdSize) {
+		switch (getHouseholdSize()) {
 		case 1:
 			if (members.get(0).getAge() <= 45)
 				this.householdType = HouseholdType.SINGLE_YOUNG;
@@ -325,13 +325,13 @@ public class HouseholdRow extends RecordSetRow<Households> {
 				this.householdType = HouseholdType.OTHER;
 				break;
 			case 1:
-				if (householdSize == 3)
+				if (getHouseholdSize() == 3)
 					this.householdType = HouseholdType.SMALL_FAMILY;	// TODO: maybe we should look for mal/female relationships here?
 				else
 					this.householdType = HouseholdType.OTHER;
 				break;
 			case 2:
-				if (householdSize == 3)
+				if (getHouseholdSize() == 3)
 					this.householdType = HouseholdType.SINGLE_PARENT;
 				else
 					this.householdType = HouseholdType.LARGE_FAMILY;
@@ -348,7 +348,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			}
 			break;
 		default:
-			throw new AssertionError("Unexpeceted HouseholdSize = " + householdSize);
+			throw new AssertionError("Unexpeceted HouseholdSize = " + getHouseholdSize());
 		}
 		return this.householdType;
 	}
@@ -499,8 +499,8 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			setHouseholdId(rs.getLong(name));
 //		} else if (name.equals("SpatialunitId")) {
 //			setSpatialunitId(rs.getLong(name));
-		} else if (name.equals("HouseholdSize")) {
-			setHouseholdSize(rs.getShort(name));
+//		} else if (name.equals("HouseholdSize")) {
+//			setHouseholdSize(rs.getShort(name));
 		} else if (name.equals("DwellingId")) {
 			setDwellingId(rs.getLong(name));
 //		} else if (name.equals("LivingSpace")) {
@@ -587,7 +587,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		if (psInsert != null) {
 			psInsert.setString(1, Long.toString(getHouseholdId()));
 //			psInsert.setString(2, Long.toString(spatialunitId));
-			psInsert.setString(3, Long.toString(householdSize));
+//			psInsert.setString(3, Long.toString(householdSize));
 			psInsert.setString(4, Long.toString(dwellingId));
 //			psInsert.setString(5, Integer.toString(livingSpace));
 //			psInsert.setString(6, Long.toString(costOfResidence));
@@ -597,7 +597,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		// UPDATE: "SpatialunitId", "HouseholdSize", "DwellingId", "LivingSpace", "CostOfResidence", "HouseholdId"
 		if (psUpdate != null) {
 //			psUpdate.setString(1, Long.toString(spatialunitId));
-			psUpdate.setString(2, Long.toString(householdSize));
+//			psUpdate.setString(2, Long.toString(householdSize));
 			psUpdate.setString(3, Long.toString(dwellingId));
 //			psUpdate.setString(4, Integer.toString(livingSpace));
 //			psUpdate.setString(5, Long.toString(costOfResidence));
