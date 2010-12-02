@@ -69,7 +69,7 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	 */
 	@Override
 	public String[] fieldnames() {
-		String s[] = { "HouseholdId", "HouseholdSize", "DwellingId" };
+		String s[] = { "HouseholdId", "DwellingId" };
 		return s;
 	}
 
