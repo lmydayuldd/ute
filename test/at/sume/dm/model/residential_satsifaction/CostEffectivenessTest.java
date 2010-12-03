@@ -153,9 +153,9 @@ public class CostEffectivenessTest {
 //		System.out.println(residentialSatisfaction2);
 		// TODO: Values here are not checked!!!!
 		assertEquals("Residential satisfaction hh2", 656, residentialSatisfaction2);
-//		long residentialSatisfaction3 = costEffectiveness.calc(hhr3, sur, 2001);
+		long residentialSatisfaction3 = costEffectiveness.calc(hhr3, sur, 2001);
+		assertEquals("Residential satisfaction hh3/3", 1000, residentialSatisfaction3);
 //		System.out.println(residentialSatisfaction3);
-//		assertEquals("Residential satisfaction hh1", 615, residentialSatisfaction1);
 		long residentialSatisfaction4 = costEffectiveness.calc(hhr3, hhr1.getDwelling(), 2001);
 		assertEquals("Residential satisfaction hh3/4", 1000, residentialSatisfaction4);
 //		System.out.println(residentialSatisfaction4);
