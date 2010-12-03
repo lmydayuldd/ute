@@ -117,15 +117,21 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 		long currentCostOfResidence = 0;
 		long result = 0;
 		if (!household.hasDwelling()) {
-			assert dwelling != null : "Household has no dwelling and no other dwelling was given for cost effectiveness calculation";
-			// Household has no dwelling - CostEffectiveness must be calculated between cost of new dwelling considered and
-			// potential cost of residence in the target area
-			currentCostOfResidence = dwelling.getDwellingCosts();
-			potentialCostOfResidence = Math.round(dwelling.getDwellingSize() * getYearlyAverageRent(spatialUnitId.getSpatialUnitId()));
-			if (currentCostOfResidence <= 0)
+//			assert dwelling != null : "Household has no dwelling and no other dwelling was given for cost effectiveness calculation";
+			if (dwelling == null) {
+				// Household has no dwelling and no alternative dwelling was given
+				// RS could be calculated by comparation with the aspiration region or could be simply set to 1000
 				result = 1000;
-			else
-				result = Math.round(potentialCostOfResidence * 1000 / currentCostOfResidence);
+			} else {
+				// Household has no dwelling - CostEffectiveness must be calculated between cost of new dwelling considered and
+				// potential cost of residence in the target area
+				currentCostOfResidence = dwelling.getDwellingCosts();
+				potentialCostOfResidence = Math.round(dwelling.getDwellingSize() * getYearlyAverageRent(spatialUnitId.getSpatialUnitId()));
+				if (currentCostOfResidence <= 0)
+					result = 1000;
+				else
+					result = Math.round(potentialCostOfResidence * 1000 / currentCostOfResidence);
+			}
 		} else {
 			if ((dwelling == null) || (dwelling == household.getDwelling())) {
 				// Calculate cost effectiveness satisfaction for the household's own dwelling (no other dwelling was given)
