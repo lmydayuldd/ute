@@ -21,11 +21,11 @@ public class ResidentialSatisfactionComponent {
 	 *  
 	 * @param household
 	 * @param dwelling
-	 * @param spatialUnit
+	 * @param spatialUnitId
 	 * @param ModelYear
 	 * @return
 	 */
-	public long calc(HouseholdRow household, DwellingRow dwelling, SpatialUnitRow spatialUnit, int ModelYear) {
+	public long calc(HouseholdRow household, DwellingRow dwelling, SpatialUnitRow spatialUnitId, int ModelYear) {
 		return (long)1000;
 	}
 	/**
@@ -34,11 +34,11 @@ public class ResidentialSatisfactionComponent {
 	 * the households current dwelling)
 	 * 
 	 * @param household
-	 * @param spatialUnit
+	 * @param spatialUnitId
 	 * @return Residential satisfaction in thousandth part
 	 */
-	public final long calc(HouseholdRow household, SpatialUnitRow spatialUnit, int modelYear) {
-		return calc(household, household.getDwelling(), spatialUnit, modelYear);
+	public final long calc(HouseholdRow household, SpatialUnitRow spatialUnitId, int modelYear) {
+		return calc(household, household.getDwelling(), spatialUnitId, modelYear);
 	}
 	/**
 	 * Calculate residential satisfaction for the household in its current spatial unit & dwelling
@@ -57,6 +57,6 @@ public class ResidentialSatisfactionComponent {
 	 * @return Residential satisfaction in thousandth part
 	 */
 	public final long calc(HouseholdRow household, DwellingRow dwelling, int modelYear) {
-		return calc(household, dwelling.getSpatialunit(), modelYear);
+		return calc(household, dwelling, dwelling.getSpatialunit(), modelYear);
 	}
 }
