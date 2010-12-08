@@ -39,7 +39,7 @@ public enum ResidentialSatisfactionManager {
 	 * @param household
 	 * @return
 	 */
-	public static int calcResidentialSatisfaction(HouseholdRow household, int modelYear) {
+	public static short calcResidentialSatisfaction(HouseholdRow household, int modelYear) {
 		return calcResidentialSatisfaction(household, household.getDwelling(), modelYear);
 	}
 	/**
@@ -65,12 +65,12 @@ public enum ResidentialSatisfactionManager {
 	 * @param dwelling
 	 * @return Overall residential satisfaction in thousandth part
 	 */
-	public static int calcResidentialSatisfaction(HouseholdRow household, DwellingRow dwelling, int modelYear) {
+	public static short calcResidentialSatisfaction(HouseholdRow household, DwellingRow dwelling, int modelYear) {
 		int rv = 0;
 		for (ResidentialSatisfactionManager rs : values()) {
 			rv += rs.component.calc(household, dwelling, modelYear) * (rs.weight / 1000);
 		}
-		return rv / values().length;
+		return (short) (rv / values().length);
 	}
 	public ResidentialSatisfactionComponent getComponent() {
 		return component;

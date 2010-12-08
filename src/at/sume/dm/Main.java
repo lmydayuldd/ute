@@ -97,7 +97,7 @@ public class Main {
 		// - Find unsatisfied households
 		// - Simulate moves of unsatisfied households
         try {
-        	int modelIterations = Integer.parseInt(Common.getSysParam("ModelIterations"));
+        	short modelIterations = Short.parseShort(Common.getSysParam("ModelIterations"));
 			runModel(db, modelIterations);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -141,7 +141,7 @@ public class Main {
 	 * @throws SecurityException 
 	 */
 	@SuppressWarnings("unchecked")
-	public static void runModel(Database db, int iterations) throws SQLException, FileNotFoundException, IOException, SecurityException, IllegalArgumentException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+	public static void runModel(Database db, short iterations) throws SQLException, FileNotFoundException, IOException, SecurityException, IllegalArgumentException, InstantiationException, IllegalAccessException, NoSuchFieldException {
 		EventManager<PersonRow> personEventManager = new EventManager<PersonRow>();
 		// TODO: how can the events be constructed at another place to have this class/function independent of the
 		//       concrete event types??? Maybe put into its own static class or a ModelMain class?
@@ -199,7 +199,7 @@ public class Main {
 					// TODO: add the household to a random position in the ArrayList
 					potential_movers.add(household);
 					if (household.getMovingDecisionYear() == 0)
-						household.setMovingDecisionYear(modelYear);
+						household.setMovingDecisionYear((short) modelYear);
 					// TODO: add potential mover to the indicators
 				}
 				
@@ -229,7 +229,7 @@ public class Main {
 				
 				// 2) define the search area
 				// a) get all spatial units with costs within the aspiration region of the household
-				ArrayList<Long> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
+				ArrayList<Integer> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
 				// b) compare estimated residential satisfaction in these spatial units and select the highest scoring 
 				//    spatial units (random component for each unit, number of units selected as sysparam)
 				ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
@@ -257,7 +257,7 @@ public class Main {
 			int hhFoundNoDwellings = 0;
 			for (HouseholdRow household : immigratingHouseholds) {
 				residentialMobility.estimateAspirationRegion(household, modelYear);
-				ArrayList<Long> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
+				ArrayList<Integer> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
 				if (potentialTargetSpatialUnitIds.size() > 0) {
 					ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
 					household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);

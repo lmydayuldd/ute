@@ -15,15 +15,15 @@ import at.sume.db.RecordSetRow;
  *
  */
 public class DwellingRow extends RecordSetRow<Dwellings> {
-	private long dwellingId;
-	private long spatialunitId;
+	private int dwellingId;
+	private int spatialunitId;
 	@Ignore // Ignore is not really necessary here because spatialUnit is private anyway
 	private SpatialUnitRow spatialunit;
-	private int dwellingSize;
-	private long totalYearlyDwellingCosts;
-	private short livingSpaceGroup6Id;
-	private short costOfResidenceGroupId;
-	private short constructionPeriod7Id;
+	private short dwellingSize;
+	private int totalYearlyDwellingCosts;
+	private byte livingSpaceGroup6Id;
+	private byte costOfResidenceGroupId;
+	private byte constructionPeriod7Id;
 	@Ignore
 	private HouseholdRow household;
 //	@Ignore
@@ -45,7 +45,7 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	/**
 	 * @param dwellingId the dwellingId to set
 	 */
-	public void setDwellingId(long dwellingId) {
+	public void setDwellingId(int dwellingId) {
 		this.dwellingId = dwellingId;
 		this.id = dwellingId;
 	}
@@ -53,14 +53,14 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	/**
 	 * @return the spatialunitId
 	 */
-	public long getSpatialunitId() {
+	public int getSpatialunitId() {
 		return spatialunitId;
 	}
 
 	/**
 	 * @param spatialunitId the spatialunitId to set
 	 */
-	public void setSpatialunitId(long spatialunitId) {
+	public void setSpatialunitId(int spatialunitId) {
 		this.spatialunitId = spatialunitId;
 	}
 
@@ -81,70 +81,70 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	/**
 	 * @return the total living space of the dwelling
 	 */
-	public int getDwellingSize() {
+	public short getDwellingSize() {
 		return dwellingSize;
 	}
 
 	/**
 	 * @param dwellingSize the total living space of the dwelling to set
 	 */
-	public void setDwellingSize(int dwellingSize) {
+	public void setDwellingSize(short dwellingSize) {
 		this.dwellingSize = dwellingSize;
 	}
 
 	/**
 	 * @return the yearly total costs of the dwelling
 	 */
-	public long getTotalYearlyDwellingCosts() {
+	public int getTotalYearlyDwellingCosts() {
 		return totalYearlyDwellingCosts;
 	}
 
 	/**
 	 * @param totalYearlyDwellingCosts the yearly total costs of the dwelling to set
 	 */
-	public void setTotalYearlyDwellingCosts(long totalYearlyDwellingCosts) {
+	public void setTotalYearlyDwellingCosts(int totalYearlyDwellingCosts) {
 		this.totalYearlyDwellingCosts = totalYearlyDwellingCosts;
 	}
 
 	/**
 	 * @return the livingSpaceGroup6Id
 	 */
-	public short getLivingSpaceGroup6Id() {
+	public byte getLivingSpaceGroup6Id() {
 		return livingSpaceGroup6Id;
 	}
 
 	/**
 	 * @param livingSpaceGroup6Id the livingSpaceGroup6Id to set
 	 */
-	public void setLivingSpaceGroup6Id(short livingSpaceGroup6Id) {
+	public void setLivingSpaceGroup6Id(byte livingSpaceGroup6Id) {
 		this.livingSpaceGroup6Id = livingSpaceGroup6Id;
 	}
 
 	/**
 	 * @return the costOfResidenceGroupId
 	 */
-	public short getCostOfResidenceGroupId() {
+	public byte getCostOfResidenceGroupId() {
 		return costOfResidenceGroupId;
 	}
 
 	/**
 	 * @param costOfResidenceGroupId the costOfResidenceGroupId to set
 	 */
-	public void setCostOfResidenceGroupId(short costOfResidenceGroupId) {
+	public void setCostOfResidenceGroupId(byte costOfResidenceGroupId) {
 		this.costOfResidenceGroupId = costOfResidenceGroupId;
 	}
 
 	/**
 	 * @return the constructionPeriod7Id
 	 */
-	public short getConstructionPeriod7Id() {
+	public byte getConstructionPeriod7Id() {
 		return constructionPeriod7Id;
 	}
 
 	/**
 	 * @param constructionPeriod7Id the constructionPeriod7Id to set
 	 */
-	public void setConstructionPeriod7Id(short constructionPeriod7Id) {
+	public void setConstructionPeriod7Id(byte constructionPeriod7Id) {
 		this.constructionPeriod7Id = constructionPeriod7Id;
 	}
 
@@ -171,5 +171,4 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 		// use Common.select() instead
 		throw new AssertionError("DwellingRow.loadFromDatabase is depreceated");
 	}
-
 }

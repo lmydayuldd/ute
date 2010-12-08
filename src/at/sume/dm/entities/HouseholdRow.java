@@ -64,24 +64,24 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		}
 	}
 	
-	private static double childrenWeight = 0;
-	private static short childrenMaxAge = 0;
-	private static short desiredLivingSpaceRandomPct = 0;
-	private static short desiredLivingSpaceRangePct = 0;
+	private static float childrenWeight = 0;
+	private static byte childrenMaxAge = 0;
+	private static byte desiredLivingSpaceRandomPct = 0;
+	private static byte desiredLivingSpaceRangePct = 0;
 
 //	private short householdSize;
-	private long dwellingId;
+	private int dwellingId;
 	private ArrayList<PersonRow> members;
 	private DwellingRow dwelling;
-	private double residentialSatisfactionThreshMod;
+	private float residentialSatisfactionThreshMod;
 	private HouseholdType householdType;
-	private int movingDecisionYear = 0;
+	private short movingDecisionYear = 0;
 //	private ReasonForMoving movingDecisionReason;
-	private int aspirationRegionLivingSpaceMin;
-	private int aspirationRegionLivingSpaceMax;
-	private long aspirationRegionMaxCosts;
+	private short aspirationRegionLivingSpaceMin;
+	private short aspirationRegionLivingSpaceMax;
+	private int aspirationRegionMaxCosts;
 	private ArrayList<SpatialUnitScore> residentialSatisfactionEstimate;
-	private int currentResidentialSatisfaction;
+	private short currentResidentialSatisfaction;
 	
 	/**
 	 * 
@@ -91,9 +91,9 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		if (childrenWeight == 0) {
 			String sp = Common.getSysParam("ChildrenWeight");
 			if (sp.equals(null))
-				childrenWeight = 0.5;
+				childrenWeight = 0.5F;
 			else
-				childrenWeight = Double.parseDouble(sp);
+				childrenWeight = Float.parseFloat(sp);
 			
 		}
 		if (childrenMaxAge == 0) {
@@ -101,38 +101,38 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			if (sp.equals(null))
 				childrenWeight = 14;
 			else
-				childrenMaxAge = Short.parseShort(sp);
+				childrenMaxAge = Byte.parseByte(sp);
 		}
 		if (desiredLivingSpaceRandomPct == 0) {
 			String sp = Common.getSysParam("DesiredLivingSpaceRandomPct");
 			if (sp.equals(null))
 				desiredLivingSpaceRandomPct = 10;
 			else
-				desiredLivingSpaceRandomPct = Short.parseShort(sp);
+				desiredLivingSpaceRandomPct = Byte.parseByte(sp);
 		}
 		if (desiredLivingSpaceRangePct == 0) {
 			String sp = Common.getSysParam("DesiredLivingSpaceRangePct");
 			if (sp.equals(null))
 				desiredLivingSpaceRangePct = 10;
 			else
-				desiredLivingSpaceRangePct = Short.parseShort(sp);
+				desiredLivingSpaceRangePct = Byte.parseByte(sp);
 		}
 	}
 
 	/**
 	 * @return the householdId
 	 */
-	public long getHouseholdId() {
-		if (id == null)
-			return 0;
-		else
+	public int getHouseholdId() {
+//		if (id == null)
+//			return 0;
+//		else
 			return id;
 	}
 
 	/**
 	 * @param householdId the householdId to set
 	 */
-	public void setHouseholdId(long householdId) {
+	public void setHouseholdId(int householdId) {
 		this.id = householdId;
 	}
 
@@ -163,14 +163,14 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	/**
 	 * @return the dwellingId
 	 */
-	public long getDwellingId() {
+	public int getDwellingId() {
 		return dwellingId;
 	}
 
 	/**
 	 * @param dwellingId the dwellingId to set
 	 */
-	public void setDwellingId(long dwellingId) {
+	public void setDwellingId(int dwellingId) {
 		this.dwellingId = dwellingId;
 	}
 
@@ -229,7 +229,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	/**
 	 * @return the residentialSatisfactionThreshMod
 	 */
-	public double getResidentialSatisfactionThreshMod() {
+	public float getResidentialSatisfactionThreshMod() {
 		return residentialSatisfactionThreshMod;
 	}
 
@@ -237,14 +237,14 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @param residentialSatisfactionThreshMod the residentialSatisfactionThreshMod to set
 	 */
 	public void setResidentialSatisfactionThreshMod(
-			double residentialSatisfactionThreshMod) {
+			float residentialSatisfactionThreshMod) {
 		this.residentialSatisfactionThreshMod = residentialSatisfactionThreshMod;
 	}
 
 	/**
 	 * @param socialPrestigeThreshMod the socialPrestigeThreshMod to set
 	 */
-	public void setSocialPrestigeThreshMod(double socialPrestigeThreshMod) {
+	public void setSocialPrestigeThreshMod(float socialPrestigeThreshMod) {
 		this.residentialSatisfactionThreshMod = socialPrestigeThreshMod;
 	}
 
@@ -375,14 +375,14 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	/**
 	 * @return the movingDecisionYear
 	 */
-	public int getMovingDecisionYear() {
+	public short getMovingDecisionYear() {
 		return movingDecisionYear;
 	}
 
 	/**
 	 * @param movingDecisionYear the movingDecisionYear to set
 	 */
-	public void setMovingDecisionYear(int movingDecisionYear) {
+	public void setMovingDecisionYear(short movingDecisionYear) {
 		this.movingDecisionYear = movingDecisionYear;
 	}
 
@@ -403,7 +403,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	/**
 	 * @return the aspirationRegionLivingSpaceMin
 	 */
-	public int getAspirationRegionLivingSpaceMin() {
+	public short getAspirationRegionLivingSpaceMin() {
 		return aspirationRegionLivingSpaceMin;
 	}
 
@@ -411,14 +411,14 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @param aspirationRegionLivingSpaceMin the aspirationRegionLivingSpaceMin to set
 	 */
 	public void setAspirationRegionLivingSpaceMin(
-			int aspirationRegionLivingSpaceMin) {
+			short aspirationRegionLivingSpaceMin) {
 		this.aspirationRegionLivingSpaceMin = aspirationRegionLivingSpaceMin;
 	}
 
 	/**
 	 * @return the aspirationRegionLivingSpaceMax
 	 */
-	public int getAspirationRegionLivingSpaceMax() {
+	public short getAspirationRegionLivingSpaceMax() {
 		return aspirationRegionLivingSpaceMax;
 	}
 
@@ -426,21 +426,21 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @param aspirationRegionLivingSpaceMax the aspirationRegionLivingSpaceMax to set
 	 */
 	public void setAspirationRegionLivingSpaceMax(
-			int aspirationRegionLivingSpaceMax) {
+			short aspirationRegionLivingSpaceMax) {
 		this.aspirationRegionLivingSpaceMax = aspirationRegionLivingSpaceMax;
 	}
 
 	/**
 	 * @return the maximum yearly rent per m² that the household is willing/able to pay for a new dwelling
 	 */
-	public long getAspirationRegionMaxCosts() {
+	public int getAspirationRegionMaxCosts() {
 		return aspirationRegionMaxCosts;
 	}
 
 	/**
 	 * @param aspirationRegionMaxCosts the maximum yearly rent per m² that the household is willing/able to pay for a new dwelling to set
 	 */
-	public void setAspirationRegionMaxCosts(long aspirationRegionMaxCosts) {
+	public void setAspirationRegionMaxCosts(int aspirationRegionMaxCosts) {
 		this.aspirationRegionMaxCosts = aspirationRegionMaxCosts;
 	}
 
@@ -461,7 +461,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	/**
 	 * @return the livingSpace of the dwelling
 	 */
-	public int getLivingSpace() {
+	public short getLivingSpace() {
 		if (dwelling != null)
 			return dwelling.getDwellingSize();
 		else
@@ -471,7 +471,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	/**
 	 * @return the costOfResidence of the dwelling
 	 */
-	public long getCostOfResidence() {
+	public int getCostOfResidence() {
 		assert dwelling != null : "no dwelling for household " + getHouseholdId();
 		return dwelling.getTotalYearlyDwellingCosts();
 	}
@@ -498,13 +498,13 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	@Override
 	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
 		if (name.equals("HouseholdId")) {
-			setHouseholdId(rs.getLong(name));
+			setHouseholdId(rs.getInt(name));
 //		} else if (name.equals("SpatialunitId")) {
 //			setSpatialunitId(rs.getLong(name));
 //		} else if (name.equals("HouseholdSize")) {
 //			setHouseholdSize(rs.getShort(name));
 		} else if (name.equals("DwellingId")) {
-			setDwellingId(rs.getLong(name));
+			setDwellingId(rs.getInt(name));
 //		} else if (name.equals("LivingSpace")) {
 //			setDwellingId(rs.getInt(name));
 //		} else if (name.equals("CostOfResidence")) {
@@ -522,8 +522,8 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * Calculate and return the yearly household income
 	 * @return the yearly income
 	 */
-	public long getYearlyIncome() {
-		long yearlyIncome = 0;
+	public int getYearlyIncome() {
+		int yearlyIncome = 0;
 		for (PersonRow person : members) {
 			yearlyIncome += person.getYearlyIncome();
 		}
@@ -623,10 +623,10 @@ public class HouseholdRow extends RecordSetRow<Households> {
 //			desiredLivingSpaceSqm = Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			// calculate boundary 1
 			short desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRangePct * r.nextGaussian());
-			int desiredLivingSpaceSqm1 = Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
+			short desiredLivingSpaceSqm1 = (short) Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			// calculate boundary 2
 			desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRangePct * r.nextGaussian());
-			int desiredLivingSpaceSqm2 = Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
+			short desiredLivingSpaceSqm2 = (short) Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			if (desiredLivingSpaceSqm1 > desiredLivingSpaceSqm2) {
 				setAspirationRegionLivingSpaceMin(desiredLivingSpaceSqm2);
 				setAspirationRegionLivingSpaceMax(desiredLivingSpaceSqm1);
@@ -722,14 +722,14 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @param currentResidentialSatisfaction the currentResidentialSatisfaction to set
 	 */
 	public void setCurrentResidentialSatisfaction(
-			int currentResidentialSatisfaction) {
+			short currentResidentialSatisfaction) {
 		this.currentResidentialSatisfaction = currentResidentialSatisfaction;
 	}
 
 	/**
 	 * @return the currentResidentialSatisfaction
 	 */
-	public int getCurrentResidentialSatisfaction() {
+	public short getCurrentResidentialSatisfaction() {
 		return currentResidentialSatisfaction;
 	}
 	/**

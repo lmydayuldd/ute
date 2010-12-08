@@ -12,13 +12,13 @@ import at.sume.db.RecordSetRow;
  *
  */
 public class PersonRow extends RecordSetRow<Persons> {
-	private long householdId;
-	private short sex;
+	private int householdId;
+	private byte sex;
 //	private int yearBorn;
-	private short ageGroupId;
-	private short age;
+	private byte ageGroupId;
+	private byte age;
 //	private boolean householdRepresentative;
-	private long yearlyIncome;
+	private int yearlyIncome;
 	private HouseholdRow household;
 //	private short personNrInHousehold;
 	
@@ -29,42 +29,42 @@ public class PersonRow extends RecordSetRow<Persons> {
 	/**
 	 * @return the personId
 	 */
-	public long getPersonId() {
+	public int getPersonId() {
 		return id;
 	}
 
 	/**
 	 * @param personId the personId to set
 	 */
-	public void setPersonId(long personId) {
+	public void setPersonId(int personId) {
 		this.id = personId;
 	}
 
 	/**
 	 * @return the householdId
 	 */
-	public long getHouseholdId() {
+	public int getHouseholdId() {
 		return householdId;
 	}
 
 	/**
 	 * @param householdId the householdId to set
 	 */
-	public void setHouseholdId(long householdId) {
+	public void setHouseholdId(int householdId) {
 		this.householdId = householdId;
 	}
 
 	/**
 	 * @return the sex (1 = female, 2 = male)
 	 */
-	public short getSex() {
+	public byte getSex() {
 		return sex;
 	}
 
 	/**
 	 * @param sex the sex to set (1 = female, 2 = male)
 	 */
-	public void setSex(short sex) {
+	public void setSex(byte sex) {
 		this.sex = sex;
 	}
 
@@ -85,28 +85,28 @@ public class PersonRow extends RecordSetRow<Persons> {
 	/**
 	 * @return the ageGroupId
 	 */
-	public short getAgeGroupId() {
+	public byte getAgeGroupId() {
 		return ageGroupId;
 	}
 
 	/**
 	 * @param ageGroupId the ageGroupId to set
 	 */
-	public void setAgeGroupId(short ageGroupId) {
+	public void setAgeGroupId(byte ageGroupId) {
 		this.ageGroupId = ageGroupId;
 	}
 
 	/**
 	 * @param age the age to set
 	 */
-	public void setAge(short age) {
+	public void setAge(byte age) {
 		this.age = age;
 	}
 
 	/**
 	 * @return the age
 	 */
-	public short getAge() {
+	public byte getAge() {
 		return age;
 	}
 
@@ -127,14 +127,14 @@ public class PersonRow extends RecordSetRow<Persons> {
 	/**
 	 * @return the yearlyIncome
 	 */
-	public long getYearlyIncome() {
+	public int getYearlyIncome() {
 		return yearlyIncome;
 	}
 
 	/**
 	 * @param yearlyIncome the yearlyIncome to set
 	 */
-	public void setYearlyIncome(long yearlyIncome) {
+	public void setYearlyIncome(int yearlyIncome) {
 		this.yearlyIncome = yearlyIncome;
 	}
 
@@ -173,21 +173,21 @@ public class PersonRow extends RecordSetRow<Persons> {
 	@Override
 	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
 		if (name.equals("PersonId")) {
-			setPersonId(rs.getLong(name));
+			setPersonId(rs.getInt(name));
 		} else if (name.equals("HouseholdId")) {
-			setHouseholdId(rs.getLong(name));
+			setHouseholdId(rs.getInt(name));
 		} else if (name.equals("Sex")) {
-			setSex(rs.getShort(name));
+			setSex(rs.getByte(name));
 //		} else if (name.equals("YearBorn")) {
 //			setYearBorn(rs.getInt(name));
 		} else if (name.equals("Age")) {
-			setAge(rs.getShort(name));
+			setAge(rs.getByte(name));
 		} else if (name.equals("AgeGroupId")) {
-			setAgeGroupId(rs.getShort(name));
+			setAgeGroupId(rs.getByte(name));
 		} else if (name.equals("HouseholdRepresentative")) {
 //			setHouseholdRepresentative(rs.getBoolean(name));
 		} else if (name.equals("YearlyIncome")) {
-			setYearlyIncome(rs.getLong(name));
+			setYearlyIncome(rs.getInt(name));
 		} else if (name.equals("PersonNrInHousehold")) {
 //			setPersonNrInHousehold(rs.getShort(name));
 		} else {

@@ -79,10 +79,10 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	 * @param spatialUnitIds
 	 * @return
 	 */
-	public ArrayList<SpatialUnitRow> getSpatialUnits(ArrayList<Long> spatialUnitIds) {
+	public ArrayList<SpatialUnitRow> getSpatialUnits(ArrayList<Integer> spatialUnitIds) {
 		ArrayList<SpatialUnitRow> result = new ArrayList<SpatialUnitRow>();
 		SpatialUnitRow lookup = new SpatialUnitRow();
-		for (long spatialUnitId : spatialUnitIds) {
+		for (int spatialUnitId : spatialUnitIds) {
 			lookup.setSpatialUnitId(spatialUnitId);
 			int index = Collections.binarySearch(rowList, lookup);
 			if (index >= 0) {

@@ -16,17 +16,17 @@ import at.sume.dm.Common;
  */
 public class LivingSpaceGroup {
 	public static class LivingSpaceGroupRow implements Comparable<LivingSpaceGroupRow> {
-		public short livingSpaceGroupId;
+		public byte livingSpaceGroupId;
 		public String livingSpaceGroup;
-		public int minSpace;
-		public int maxSpace;
+		public short minSpace;
+		public short maxSpace;
 		
 		/* (non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
 		@Override
 		public int compareTo(LivingSpaceGroupRow arg0) {
-			return ((Short)livingSpaceGroupId).compareTo(arg0.livingSpaceGroupId);
+			return ((Byte)livingSpaceGroupId).compareTo(arg0.livingSpaceGroupId);
 		}
 		
 	}
@@ -50,7 +50,7 @@ public class LivingSpaceGroup {
 	 * @param livingSpace
 	 * @return
 	 */
-	public static short getLivingSpaceGroupId(double livingSpace) {
+	public static byte getLivingSpaceGroupId(short livingSpace) {
 		for (LivingSpaceGroupRow i : livingSpaceGroups) {
 			if ((i.minSpace <= livingSpace) && (livingSpace <= i.maxSpace)) {
 				return i.livingSpaceGroupId;
@@ -64,12 +64,12 @@ public class LivingSpaceGroup {
 	 * @param livingSpaceGroupId
 	 * @return
 	 */
-	public static String getLivingSpaceGroupName(short livingSpaceGroupId) {
+	public static String getLivingSpaceGroupName(byte livingSpaceGroupId) {
 		assert livingSpaceGroupId > 0 : "livingSpaceGroupId <= 0";
 		assert livingSpaceGroupId <= livingSpaceGroups.size() : "livingSpaceGroupId > " + livingSpaceGroups.size();
 		return livingSpaceGroups.get(livingSpaceGroupId - 1).livingSpaceGroup;
 	}
-	public static int sampleLivingSpace(short livingSpaceGroupId) {
+	public static short sampleLivingSpace(byte livingSpaceGroupId) {
 		assert livingSpaceGroupId > 0 : "livingSpaceGroupId <= 0";
 		assert livingSpaceGroupId <= livingSpaceGroups.size() : "livingSpaceGroupId > " + livingSpaceGroups.size();
 		Random r = new Random();

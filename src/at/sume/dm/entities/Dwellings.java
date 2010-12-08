@@ -127,7 +127,7 @@ public class Dwellings extends RecordSet<DwellingRow> {
 			long yearlyRentPer100Sqm = RentPerSpatialUnit.getYearlyAverageRentPer100Sqm(dwelling.getSpatialunitId()) / 100;
 			// TODO: 20% random deviance from the avg. rent price -> sysparam!
 			yearlyRentPer100Sqm = yearlyRentPer100Sqm + Math.round(yearlyRentPer100Sqm * (r.nextGaussian() - 0.5) * 0.1);
-			long dwellingCosts = Math.round(dwelling.getDwellingSize() * yearlyRentPer100Sqm / 100);
+			int dwellingCosts = Math.round(dwelling.getDwellingSize() * yearlyRentPer100Sqm / 100);
 			dwelling.setTotalYearlyDwellingCosts(dwellingCosts);
 		}
 	}

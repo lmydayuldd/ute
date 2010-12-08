@@ -17,16 +17,20 @@ import at.sume.dm.Common;
  */
 public class AgeGroup {
 	public static class AgeGroupRow implements Comparable<AgeGroupRow> {
-		public short ageGroupId;
+		public byte ageGroupId;
 		public String ageGroup;
-		public short minage;
-		public short maxage;
+		public byte minage;
+		public byte maxage;
+		
+		public String toString() {
+			return ageGroup;
+		}
 		/* (non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
 		@Override
 		public int compareTo(AgeGroupRow arg0) {
-			return ((Short)ageGroupId).compareTo(arg0.ageGroupId);
+			return ((Byte)ageGroupId).compareTo(arg0.ageGroupId);
 		}
 	}
 	static ArrayList<AgeGroupRow> ageGroups;
@@ -47,7 +51,7 @@ public class AgeGroup {
 	 * @param age
 	 * @return
 	 */
-	public static short getAgeGroupId(long age) {
+	public static byte getAgeGroupId(byte age) {
 		for (AgeGroupRow i : ageGroups) {
 			if ((i.minage <= age) && (age <= i.maxage)) {
 				return i.ageGroupId;
@@ -60,7 +64,7 @@ public class AgeGroup {
 	 * @param ageGroupId
 	 * @return
 	 */
-	public static String getAgeGroupName(short ageGroupId) {
+	public static String getAgeGroupName(byte ageGroupId) {
 //		assert ageGroupId > 0 : "ageGroupId <= 0";
 //		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
 //		AgeGroupRow lookup = new AgeGroupRow();
@@ -75,17 +79,17 @@ public class AgeGroup {
 	 * @param ageGroupId
 	 * @return
 	 */
-	public static String getAgeGroupNameDirect(short ageGroupId) {
+	public static String getAgeGroupNameDirect(byte ageGroupId) {
 		assert ageGroupId > 0 : "ageGroupId <= 0";
 		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
 		return ageGroups.get(ageGroupId - 1).ageGroup;
 	}
-	public static short sampleAge(short ageGroupId) {
+	public static byte sampleAge(byte ageGroupId) {
 		assert ageGroupId > 0 : "ageGroupId <= 0";
 		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
 		Random r = new Random();
 		AgeGroupRow sample = ageGroups.get(ageGroupId - 1);
 //		return (short) (ageGroup.minage + (r.nextDouble() * (ageGroup.maxage - ageGroup.minage)));
-		return (short) (sample.minage + r.nextInt(sample.maxage - sample.minage));
+		return (byte) (sample.minage + r.nextInt(sample.maxage - sample.minage));
 	}
 }

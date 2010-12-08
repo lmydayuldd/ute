@@ -15,14 +15,14 @@ import at.sume.db.RecordSetRow;
  * @author Alexander Remesch
  */
 public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
-	private long spatialUnitId;
+	private int spatialUnitId;
 	private double totalArea;
-	private short areaShareContinousAndDiscontinousUrbanFabric;
-	private short areaShareIndustrialCommercialConstructionInfrastructure;
-	private short areaShareArtificialVegetation;
-	private short areaShareAgricultural;
-	private short areaShareForest;
-	private short areaShareWater;
+	private byte areaShareContinousAndDiscontinousUrbanFabric;
+	private byte areaShareIndustrialCommercialConstructionInfrastructure;
+	private byte areaShareArtificialVegetation;
+	private byte areaShareAgricultural;
+	private byte areaShareForest;
+	private byte areaShareWater;
 	
 	/**
 	 * @param rowList
@@ -34,14 +34,14 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	/**
 	 * @return the spatialUnitId
 	 */
-	public long getSpatialUnitId() {
+	public int getSpatialUnitId() {
 		return spatialUnitId;
 	}
 
 	/**
 	 * @param spatialUnitId the spatialUnitId to set
 	 */
-	public void setSpatialUnitId(long spatialUnitId) {
+	public void setSpatialUnitId(int spatialUnitId) {
 		this.spatialUnitId = spatialUnitId;
 		this.id = spatialUnitId;
 	}
@@ -63,7 +63,7 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	/**
 	 * @return the areaShareContinousAndDiscontinousUrbanFabric
 	 */
-	public short getAreaShareContinousAndDiscontinousUrbanFabric() {
+	public byte getAreaShareContinousAndDiscontinousUrbanFabric() {
 		return areaShareContinousAndDiscontinousUrbanFabric;
 	}
 
@@ -71,14 +71,14 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	 * @param areaShareContinousAndDiscontinousUrbanFabric the areaShareContinousAndDiscontinousUrbanFabric to set
 	 */
 	public void setAreaShareContinousAndDiscontinousUrbanFabric(
-			short areaShareContinousAndDiscontinousUrbanFabric) {
+			byte areaShareContinousAndDiscontinousUrbanFabric) {
 		this.areaShareContinousAndDiscontinousUrbanFabric = areaShareContinousAndDiscontinousUrbanFabric;
 	}
 
 	/**
 	 * @return the areaShareIndustrialCommercialConstructionInfrastructure
 	 */
-	public short getAreaShareIndustrialCommercialConstructionInfrastructure() {
+	public byte getAreaShareIndustrialCommercialConstructionInfrastructure() {
 		return areaShareIndustrialCommercialConstructionInfrastructure;
 	}
 
@@ -86,63 +86,63 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	 * @param areaShareIndustrialCommercialConstructionInfrastructure the areaShareIndustrialCommercialConstructionInfrastructure to set
 	 */
 	public void setAreaShareIndustrialCommercialConstructionInfrastructure(
-			short areaShareIndustrialCommercialConstructionInfrastructure) {
+			byte areaShareIndustrialCommercialConstructionInfrastructure) {
 		this.areaShareIndustrialCommercialConstructionInfrastructure = areaShareIndustrialCommercialConstructionInfrastructure;
 	}
 
 	/**
 	 * @return the areaShareArtificialVegetation
 	 */
-	public short getAreaShareArtificialVegetation() {
+	public byte getAreaShareArtificialVegetation() {
 		return areaShareArtificialVegetation;
 	}
 
 	/**
 	 * @param areaShareArtificialVegetation the areaShareArtificialVegetation to set
 	 */
-	public void setAreaShareArtificialVegetation(short areaShareArtificialVegetation) {
+	public void setAreaShareArtificialVegetation(byte areaShareArtificialVegetation) {
 		this.areaShareArtificialVegetation = areaShareArtificialVegetation;
 	}
 
 	/**
 	 * @return the areaShareAgricultural
 	 */
-	public short getAreaShareAgricultural() {
+	public byte getAreaShareAgricultural() {
 		return areaShareAgricultural;
 	}
 
 	/**
 	 * @param areaShareAgricultural the areaShareAgricultural to set
 	 */
-	public void setAreaShareAgricultural(short areaShareAgricultural) {
+	public void setAreaShareAgricultural(byte areaShareAgricultural) {
 		this.areaShareAgricultural = areaShareAgricultural;
 	}
 
 	/**
 	 * @return the areaShareForest
 	 */
-	public short getAreaShareForest() {
+	public byte getAreaShareForest() {
 		return areaShareForest;
 	}
 
 	/**
 	 * @param areaShareForest the areaShareForest to set
 	 */
-	public void setAreaShareForest(short areaShareForest) {
+	public void setAreaShareForest(byte areaShareForest) {
 		this.areaShareForest = areaShareForest;
 	}
 
 	/**
 	 * @return the areaShareWater
 	 */
-	public short getAreaShareWater() {
+	public byte getAreaShareWater() {
 		return areaShareWater;
 	}
 
 	/**
 	 * @param areaShareWater the areaShareWater to set
 	 */
-	public void setAreaShareWater(short areaShareWater) {
+	public void setAreaShareWater(byte areaShareWater) {
 		this.areaShareWater = areaShareWater;
 	}
 
@@ -153,7 +153,7 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	@Deprecated
 	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
 		if (name.equals("SpatialUnitId")) {
-			setSpatialUnitId(rs.getLong(name));
+			setSpatialUnitId(rs.getInt(name));
 		} else {
 			throw new UnsupportedOperationException("Unknown field name " + name);
 		}

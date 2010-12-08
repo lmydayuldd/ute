@@ -18,30 +18,30 @@ import at.sume.dm.indicators.MoversIndicatorsPerSpatialUnit;
  */
 public class RentPerSpatialUnit {
 	public static class RentPerSpatialUnitRow implements Comparable<RentPerSpatialUnitRow> {
-		private long spatialUnitId;
-		private long yearlyRentPer100Sqm;
+		private int spatialUnitId;
+		private int yearlyRentPer100Sqm;
 		/**
 		 * @return the spatialUnitId
 		 */
-		public long getSpatialUnitId() {
+		public int getSpatialUnitId() {
 			return spatialUnitId;
 		}
 		/**
 		 * @param spatialUnitId the spatialUnitId to set
 		 */
-		public void setSpatialUnitId(long spatialUnitId) {
+		public void setSpatialUnitId(int spatialUnitId) {
 			this.spatialUnitId = spatialUnitId;
 		}
 		/**
 		 * @return the yearlyRentPerSqm
 		 */
-		public long getYearlyRentPer100Sqm() {
+		public int getYearlyRentPer100Sqm() {
 			return yearlyRentPer100Sqm;
 		}
 		/**
 		 * @param yearlyRentPer100Sqm the yearlyRentPerSqm to set
 		 */
-		public void setYearlyRentPer100Sqm(long yearlyRentPer100Sqm) {
+		public void setYearlyRentPer100Sqm(int yearlyRentPer100Sqm) {
 			this.yearlyRentPer100Sqm = yearlyRentPer100Sqm;
 		}
 		/* (non-Javadoc)
@@ -49,7 +49,7 @@ public class RentPerSpatialUnit {
 		 */
 		@Override
 		public int compareTo(RentPerSpatialUnitRow arg0) {
-			return ((Long)spatialUnitId).compareTo(arg0.spatialUnitId);
+			return ((Integer)spatialUnitId).compareTo(arg0.spatialUnitId);
 		}
 	}
 
@@ -63,7 +63,7 @@ public class RentPerSpatialUnit {
 		 */
 		@Override
 		public int compare(RentPerSpatialUnitRow arg0, RentPerSpatialUnitRow arg1) {
-			return ((Long)arg0.getYearlyRentPer100Sqm()).compareTo(arg1.getYearlyRentPer100Sqm());
+			return ((Integer)arg0.getYearlyRentPer100Sqm()).compareTo(arg1.getYearlyRentPer100Sqm());
 		}
 	}
 	
@@ -101,7 +101,7 @@ public class RentPerSpatialUnit {
 	 * @param spatialUnitId
 	 * @return
 	 */
-	public static int lookupSpatialUnitPos(long spatialUnitId) {
+	public static int lookupSpatialUnitPos(int spatialUnitId) {
 		RentPerSpatialUnitRow lookup = new RentPerSpatialUnitRow();
 		lookup.setSpatialUnitId(spatialUnitId);
 		return Collections.binarySearch(rentPerSpatialUnit, lookup);
@@ -111,7 +111,7 @@ public class RentPerSpatialUnit {
 	 * @param spatialUnitId
 	 * @return
 	 */
-	public static long getYearlyAverageRentPer100Sqm(long spatialUnitId) {
+	public static long getYearlyAverageRentPer100Sqm(int spatialUnitId) {
 		int pos = lookupSpatialUnitPos(spatialUnitId);
 		assert pos >= 0 : "Can't lookup a price for spatial unit id " + spatialUnitId;
 		return rentPerSpatialUnit.get(pos).getYearlyRentPer100Sqm();
@@ -122,8 +122,8 @@ public class RentPerSpatialUnit {
 	 * @param maxCostOfResidence Yearly maximum cost of residence (rent) per m²
 	 * @return
 	 */
-	public static ArrayList<Long> getSpatialUnitsBelowGivenPrice(long maxCostOfResidence) {
-		ArrayList<Long> result = new ArrayList<Long>();
+	public static ArrayList<Integer> getSpatialUnitsBelowGivenPrice(int maxCostOfResidence) {
+		ArrayList<Integer> result = new ArrayList<Integer>();
 		for(RentPerSpatialUnitRow r : rentPerSpatialUnit) {
 			if (r.getYearlyRentPer100Sqm() / 100 <= maxCostOfResidence)
 				result.add(r.getSpatialUnitId());

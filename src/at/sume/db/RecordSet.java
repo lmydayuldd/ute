@@ -162,7 +162,7 @@ public abstract class RecordSet<E extends RecordSetRow<?>> implements Iterable<E
 	 * @param id
 	 * @return
 	 */
-	public E lookup(Long id) {
+	public E lookup(Integer id) {
 		E lookupKey = createRecordSetRow();
 		lookupKey.setId(id);
 		int i = Collections.binarySearch(rowList, lookupKey);

@@ -11,50 +11,50 @@ import at.sume.dm.types.AgeGroup;
  *
  */
 public class PopulationPerAgeGroupRow extends IndicatorRow implements Comparable<PopulationPerAgeGroupRow> {
-	private long spatialUnitId;
-	private short ageGroupId;
-	private long personCount;
+	private int spatialUnitId;
+	private byte ageGroupId;
+	private int personCount;
 	/**
 	 * @return the spatialUnitId
 	 */
-	public long getSpatialUnitId() {
+	public int getSpatialUnitId() {
 		return spatialUnitId;
 	}
 	/**
 	 * @param spatialUnitId the spatialUnitId to set
 	 */
-	public void setSpatialUnitId(long spatialUnitId) {
+	public void setSpatialUnitId(int spatialUnitId) {
 		this.spatialUnitId = spatialUnitId;
 	}
 	/**
 	 * @param ageGroupId the ageGroupId to set
 	 */
-	public void setAgeGroupId(short ageGroupId) {
+	public void setAgeGroupId(byte ageGroupId) {
 		this.ageGroupId = ageGroupId;
 	}
 	/**
 	 * @return the ageGroupId
 	 */
-	public short getAgeGroupId() {
+	public byte getAgeGroupId() {
 		return ageGroupId;
 	}
 	/**
 	 * @return the personCount
 	 */
-	public long getPersonCount() {
+	public int getPersonCount() {
 		return personCount;
 	}
 	/**
 	 * @param personCount the personCount to set
 	 */
-	public void setPersonCount(long personCount) {
+	public void setPersonCount(int personCount) {
 		this.personCount = personCount;
 	}
 	@Override
 	public int compareTo(PopulationPerAgeGroupRow arg0) {
-		int result = ((Long)spatialUnitId).compareTo(arg0.getSpatialUnitId());
+		int result = ((Integer)spatialUnitId).compareTo(arg0.getSpatialUnitId());
 		if (result == 0)
-			result = ((Short)ageGroupId).compareTo(arg0.getAgeGroupId());
+			result = ((Byte)ageGroupId).compareTo(arg0.getAgeGroupId());
 		return result;
 	}
 	/* (non-Javadoc)

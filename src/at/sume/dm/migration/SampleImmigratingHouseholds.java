@@ -21,44 +21,44 @@ import at.sume.sampling.ExactDistribution;
  */
 public class SampleImmigratingHouseholds {
 	public static class MigrationsPerAgeSex implements Comparable<MigrationsPerAgeSex> {
-		private long id;
-		private short ageGroupId;
-		private short sex;
+		private int id;
+		private byte ageGroupId;
+		private byte sex;
 		public double share;
 		/**
 		 * @return the id
 		 */
-		public long getId() {
+		public int getId() {
 			return id;
 		}
 		/**
 		 * @param id the id to set
 		 */
-		public void setId(long id) {
+		public void setId(int id) {
 			this.id = id;
 		}
 		/**
 		 * @return the ageGroupId
 		 */
-		public short getAgeGroupId() {
+		public byte getAgeGroupId() {
 			return ageGroupId;
 		}
 		/**
 		 * @param ageGroupId the ageGroupId to set
 		 */
-		public void setAgeGroupId(short ageGroupId) {
+		public void setAgeGroupId(byte ageGroupId) {
 			this.ageGroupId = ageGroupId;
 		}
 		/**
 		 * @return the sex
 		 */
-		public short getSex() {
+		public byte getSex() {
 			return sex;
 		}
 		/**
 		 * @param sex the sex to set
 		 */
-		public void setSex(short sex) {
+		public void setSex(byte sex) {
 			this.sex = sex;
 		}
 		/**
@@ -78,48 +78,47 @@ public class SampleImmigratingHouseholds {
 		 */
 		@Override
 		public int compareTo(MigrationsPerAgeSex o) {
-			// TODO Auto-generated method stub
-			return 0;
+			return ((Integer)id).compareTo(o.id);
 		}
 	}
 	public static class MigrationHouseholdSize implements Comparable<MigrationHouseholdSize> {
-		private long id;
-		private short householdSize;
-		private int share;
+		private int id;
+		private byte householdSize;
+		private short share;
 		/**
 		 * @return the id
 		 */
-		public long getId() {
+		public int getId() {
 			return id;
 		}
 		/**
 		 * @param id the id to set
 		 */
-		public void setId(long id) {
+		public void setId(int id) {
 			this.id = id;
 		}
 		/**
 		 * @return the householdSize
 		 */
-		public short getHouseholdSize() {
+		public byte getHouseholdSize() {
 			return householdSize;
 		}
 		/**
 		 * @param householdSize the householdSize to set
 		 */
-		public void setHouseholdSize(short householdSize) {
+		public void setHouseholdSize(byte householdSize) {
 			this.householdSize = householdSize;
 		}
 		/**
 		 * @return the share
 		 */
-		public int getShare() {
+		public short getShare() {
 			return share;
 		}
 		/**
 		 * @param share the share to set
 		 */
-		public void setShare(int share) {
+		public void setShare(short share) {
 			this.share = share;
 		}
 		/* (non-Javadoc)
@@ -127,8 +126,7 @@ public class SampleImmigratingHouseholds {
 		 */
 		@Override
 		public int compareTo(MigrationHouseholdSize o) {
-			// TODO Auto-generated method stub
-			return 0;
+			return ((Integer)id).compareTo(o.id);
 		}
 	}
 	private TotalImmigrationPerYear totalImmigrationsPerYear;
@@ -201,7 +199,7 @@ public class SampleImmigratingHouseholds {
 	private HouseholdRow sampleHousehold(short householdSize, int modelYear) {
 //		ArrayList<PersonRow> persons = new ArrayList<PersonRow>(householdSize);
 		HouseholdRow result = new HouseholdRow();
-		result.setMovingDecisionYear(modelYear);
+		result.setMovingDecisionYear((short) modelYear);
 		for (int i = 0; i != householdSize; i++) {
 			PersonRow person = new PersonRow();
 			int index = migrationsPerAgeSex.randomSample();
@@ -209,7 +207,7 @@ public class SampleImmigratingHouseholds {
 			person.setAgeGroupId(m.getAgeGroupId());
 			person.setAge(AgeGroup.sampleAge(person.getAgeGroupId()));
 			person.setSex(m.getSex());
-			long yearlyIncome = 0;
+			int yearlyIncome = 0;
 			// TODO: put this data into the database (but how?)
 			// since Austria only seems to have statistics about origin, age, sex and destination of immigrants,
 			// all of the data here comes from Germany:
@@ -220,13 +218,13 @@ public class SampleImmigratingHouseholds {
 				if (r.nextInt(100) <= 48) {
 					// estimates: 33% from western europe have a high income, 66% from the rest of the world have a low income (we would need more data here)
 					// so: the 33% have a income in the range of the top 20% of the residents and the 66% have a income in the range of the lowest 20% of the residents
-					long maxIncome, minIncome;
+					int maxIncome, minIncome;
 					if (r.nextInt(100) <= 33) {
-						minIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((short) 80);
-						maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((short) 100);
+						minIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 80);
+						maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 100);
 					} else {
 						minIncome = 0;
-						maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((short) 20);
+						maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 20);
 					}
 					yearlyIncome = minIncome + r.nextInt((int) (maxIncome - minIncome));
 				}

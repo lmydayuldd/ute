@@ -108,7 +108,7 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 		 */
 		@Override
 		public int compare(HouseholdRow arg0, HouseholdRow arg1) {
-			return ((Long)arg0.getYearlyIncome()).compareTo(arg1.getYearlyIncome());
+			return ((Integer)arg0.getYearlyIncome()).compareTo(arg1.getYearlyIncome());
 		}
 	}
 	
@@ -121,8 +121,8 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 		// comparator version
 //		CompareYearlyIncome compareYearlyIncome = new CompareYearlyIncome();
 //		Collections.sort(rowList, compareYearlyIncome);
-		Long yearlyIncomes[];
-		yearlyIncomes = new Long[rowList.size()];
+		Integer yearlyIncomes[];
+		yearlyIncomes = new Integer[rowList.size()];
 		int i = 0;
 		for (HouseholdRow household : rowList) {
 			yearlyIncomes[i++] = household.getYearlyIncome();
@@ -136,8 +136,8 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	 * TODO: implement in indicators
 	 */
 	public long calcMedianIncomeLeftForLiving() {
-		Long yearlyIncomeLeftForLiving[];
-		yearlyIncomeLeftForLiving = new Long[rowList.size()];
+		Integer yearlyIncomeLeftForLiving[];
+		yearlyIncomeLeftForLiving = new Integer[rowList.size()];
 		int i = 0;
 		for (HouseholdRow household : rowList) {
 			yearlyIncomeLeftForLiving[i++] = household.getYearlyIncome() - household.getCostOfResidence();
@@ -151,10 +151,10 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	 * TODO: implement in indicators
 	 */
 	@SuppressWarnings("unchecked")
-	public void calcMedianIncomeLeftForLiving(Long[] medianIncomeLeftForLiving) {
-		ArrayList<Long> yearlyIncomeLeftForLiving[] = (ArrayList<Long>[])new ArrayList[medianIncomeLeftForLiving.length];
+	public void calcMedianIncomeLeftForLiving(Integer[] medianIncomeLeftForLiving) {
+		ArrayList<Integer> yearlyIncomeLeftForLiving[] = (ArrayList<Integer>[])new ArrayList[medianIncomeLeftForLiving.length];
 		for (int i = 0; i != medianIncomeLeftForLiving.length; i++) {
-			yearlyIncomeLeftForLiving[i] = new ArrayList<Long>();
+			yearlyIncomeLeftForLiving[i] = new ArrayList<Integer>();
 		}
 		for (HouseholdRow household : rowList) {
 			int householdSize = household.getMembers().size();
@@ -165,7 +165,7 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 			}
 		}
 		for (int i = 0; i != medianIncomeLeftForLiving.length; i++) {
-			Long a[] = yearlyIncomeLeftForLiving[i].toArray(new Long[yearlyIncomeLeftForLiving[i].size()]);
+			Integer a[] = yearlyIncomeLeftForLiving[i].toArray(new Integer[yearlyIncomeLeftForLiving[i].size()]);
 			medianIncomeLeftForLiving[i] = MathUtil.median(a);
 		}
 	}

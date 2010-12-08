@@ -16,8 +16,8 @@ import at.sume.dm.model.core.EntityDecisionManager;
  */
 public class MinimumIncome extends EntityDecision<HouseholdRow, Households> {
 	// store the median income left for living for each household-size in the model
-	private Long medianIncomeLeftForLiving[];
-	private long thresholdMinIncomeLeftForLiving;
+	private Integer medianIncomeLeftForLiving[];
+	private int thresholdMinIncomeLeftForLiving;
 	private final int householdSizeGroups = Integer.parseInt(Common.getSysParam("HouseholdSizeGroups"));
 	
 	/**
@@ -27,10 +27,10 @@ public class MinimumIncome extends EntityDecision<HouseholdRow, Households> {
 	public MinimumIncome(Database db,
 			EntityDecisionManager<HouseholdRow, Households> entityDecisionManager, Households households) {
 		super(db, entityDecisionManager);
-		medianIncomeLeftForLiving = new Long[householdSizeGroups];
+		medianIncomeLeftForLiving = new Integer[householdSizeGroups];
 		households.calcMedianIncomeLeftForLiving(medianIncomeLeftForLiving);
 		// TODO: this could be individualized for each household - but I don't believe this would be of much benefit here
-		thresholdMinIncomeLeftForLiving = Long.parseLong(Common.getSysParam("THR_MinIncomeLeftForLivingAvg"));
+		thresholdMinIncomeLeftForLiving = Integer.parseInt(Common.getSysParam("THR_MinIncomeLeftForLivingAvg"));
 	}
 
 	/* (non-Javadoc)
@@ -49,7 +49,7 @@ public class MinimumIncome extends EntityDecision<HouseholdRow, Households> {
 	 * @param entity
 	 * @return
 	 */
-	public long estimateMinIncomeLeftForLiving(HouseholdRow entity) {
+	public int estimateMinIncomeLeftForLiving(HouseholdRow entity) {
 		int householdSize = entity.getMembers().size();
 		assert householdSize > 0 : "MinimumIncome.decide(): Invalid household size: " + householdSize;
 		if (householdSize > householdSizeGroups)

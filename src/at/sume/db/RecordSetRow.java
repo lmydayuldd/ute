@@ -12,7 +12,7 @@ import java.sql.SQLException;
  * @author Alexander Remesch
  */
 public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable<RecordSetRow<T>> {
-	public Long id;
+	public int id;
 	protected T recordSet; // TODO: remove recordSet here and implement it as a static global variable (Common or Main)
 	
 	protected PreparedStatement psInsert;
@@ -21,14 +21,14 @@ public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable
 	/**
 	 * @return the id
 	 */
-	public long getId() {
+	public int getId() {
 		return id;
 	}
 
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -116,7 +116,7 @@ public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable
 	 * @return
 	 */
 	public int compareTo(RecordSetRow<T> row) {
-		return id.compareTo(row.getId());
+		return ((Integer)id).compareTo(row.getId());
 	}
 	
 	/**
@@ -124,8 +124,8 @@ public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable
 	 * @param id id to compare
 	 * @return
 	 */
-	public int compareTo(Long id) {
-		return this.id.compareTo(id);
+	public int compareTo(Integer id) {
+		return ((Integer)id).compareTo(id);
 	}
 
 	/**
@@ -158,6 +158,7 @@ public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable
 	/**
 	 * @param recordSet the recordSet to set
 	 */
+	@SuppressWarnings("unchecked")
 	public void setRecordSet(RecordSet<?> recordSet) {
 		this.recordSet = (T) recordSet;
 	}

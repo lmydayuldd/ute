@@ -15,8 +15,8 @@ import at.sume.dm.indicators.base.Indicator;
  *
  */
 public class IncomePercentiles implements Indicator<HouseholdRow> {
-	ArrayList<Long> householdIncomes = new ArrayList<Long>();
-	ArrayList<Long> personIncomes = new ArrayList<Long>();
+	ArrayList<Integer> householdIncomes = new ArrayList<Integer>();
+	ArrayList<Integer> personIncomes = new ArrayList<Integer>();
 	boolean householdIncomesSorted = false;
 	boolean personIncomesSorted = false;
 	
@@ -25,11 +25,11 @@ public class IncomePercentiles implements Indicator<HouseholdRow> {
 	 */
 	@Override
 	public void add(HouseholdRow household) {
-		Long householdIncome = household.getYearlyIncome();
+		Integer householdIncome = household.getYearlyIncome();
 		householdIncomes.add(householdIncome);
 		
 		for (PersonRow person : household.getMembers()) {
-			Long personIncome = person.getYearlyIncome();
+			Integer personIncome = person.getYearlyIncome();
 			personIncomes.add(personIncome);
 		}
 	}
@@ -53,7 +53,7 @@ public class IncomePercentiles implements Indicator<HouseholdRow> {
 	 * @param precentage
 	 * @return
 	 */
-	public long getHouseholdIncomePercentile(short percentage) {
+	public int getHouseholdIncomePercentile(byte percentage) {
 		assert percentage <= 100 : "Percentage is higher than 100 (" + percentage + ")";
 		assert percentage >= 0 : "Percentage is lower than 0 (" + percentage + ")";
 		if (!householdIncomesSorted) {
@@ -69,7 +69,7 @@ public class IncomePercentiles implements Indicator<HouseholdRow> {
 	 * @param precentage
 	 * @return
 	 */
-	public long getPersonIncomePercentile(short percentage) {
+	public int getPersonIncomePercentile(byte percentage) {
 		assert percentage <= 100 : "Percentage is higher than 100 (" + percentage + ")";
 		assert percentage >= 0 : "Percentage is lower than 0 (" + percentage + ")";
 		if (!personIncomesSorted) {
