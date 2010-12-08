@@ -4,11 +4,17 @@
 package net.remesch.db;
 
 import java.lang.reflect.Field;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.remesch.db.schema.DatabaseField;
-
 import net.remesch.util.Reflection;
 
 /**
@@ -227,6 +233,8 @@ public class Database {
 	}
 
 	/**
+	 * Select data from a database table into a List of objects based on the matching of table to object field
+	 * names
 	 * Based on a function taken from generics tutorial @ http://java.sun.com/j2se/1.5/pdf/generics-tutorial.pdf (p.17)
 	 * This function supports only static (= "nested") inner classes!
 	 * @param <T>
@@ -237,9 +245,9 @@ public class Database {
 	 * @throws InstantiationException 
 	 * @throws SQLException 
 	 */
-	public <T> ArrayList<T> select(Class<T> c, String sqlStatement) throws SQLException, InstantiationException, IllegalAccessException {
+	public <T> List<T> select(Class<T> c, String sqlStatement) throws SQLException, InstantiationException, IllegalAccessException {
 		boolean modifiedFieldAccessibility = false;
-		ArrayList<T> result = new ArrayList<T>();
+		List<T> result = new ArrayList<T>();
 		ResultSet rs = executeQuery(sqlStatement);
 		Field fields[] = Reflection.getFieldNames(c);
 		assert fields.length > 0 : "No fields in class " + c.getName() + " or in its superclasses";
@@ -288,5 +296,66 @@ public class Database {
 		rs.close();
 		return result;
 	}
-	
+	/**
+	 * Insert data from a list of objects into a database table based on the matching of table to object field names
+	 * @param <T>
+	 * @param rowList
+	 * @param sqlStatement
+	 * @throws SQLException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
+	public <T> void insert(List<T> rowList, String sqlStatement) throws SQLException, IllegalArgumentException, IllegalAccessException {
+		boolean modifiedFieldAccessibility = false;
+		assert rowList.size() > 0 : "No records in rowList";
+		Class<? extends Object> c = rowList.get(0).getClass();
+		Field fields[] = Reflection.getFieldNames(c);
+		assert fields.length > 0 : "No fields in class " + c.getName() + " or in its superclasses";
+		con.setAutoCommit(false); // if auto-commit is set to true, the connection has to be closed to really write the records into the table
+		Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+		ResultSet rs = stmt.executeQuery(sqlStatement);
+		for (T row : rowList) {
+			rs.moveToInsertRow();
+			for (Field field : fields) {
+				if (field.isAnnotationPresent(net.remesch.db.schema.Ignore.class))
+					continue;
+				String type = field.getType().getName();
+				String fieldName = field.getName();
+				if (!field.isAccessible()) {
+					field.setAccessible(true);
+					modifiedFieldAccessibility = true;
+				}
+				if (field.isAnnotationPresent(net.remesch.db.schema.DatabaseField.class)) {
+					DatabaseField dbf = field.getAnnotation(net.remesch.db.schema.DatabaseField.class);
+					fieldName = dbf.fieldName();
+				}
+				if (type.equals("java.lang.String")) {
+					rs.updateString(fieldName, field.get(row).toString());
+				} else if (type.equals("long") || type.equals("java.lang.Long")) {
+					rs.updateLong(fieldName, field.getLong(row));
+				} else if (type.equals("int") || type.equals("java.lang.Integer")) {
+					rs.updateInt(fieldName, field.getInt(row));
+				} else if (type.equals("short") || type.equals("java.lang.Short")) {
+					rs.updateShort(fieldName, field.getShort(row));
+				} else if (type.equals("byte") || type.equals("java.lang.Byte")) {
+					rs.updateByte(fieldName, field.getByte(row));
+				} else if (type.equals("double") || type.equals("java.lang.Double")) {
+					rs.updateDouble(fieldName, field.getDouble(row));
+				} else if (type.equals("float") || type.equals("java.lang.Float")) {
+					rs.updateFloat(fieldName, field.getFloat(row));
+				} else if (type.equals("boolean") || type.equals("java.lang.Boolean")) {
+					rs.updateBoolean(fieldName, field.getBoolean(row));
+				} else {
+					throw new AssertionError("fieldName = " + c.getName() + "." + fieldName + ", type = " + type);
+				}
+				if (modifiedFieldAccessibility)
+					field.setAccessible(false);
+			}
+			rs.insertRow();
+		}
+		con.commit();
+		rs.close();
+		stmt.close();
+//		con.close();
+	}
 }
