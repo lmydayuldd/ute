@@ -110,6 +110,27 @@ public class Common {
 		return(db);
 	}
 
+	/**
+	 * Get the location of the output database from the INI-file
+	 * @return pathname of the database
+	 */
+	public static String getOutputDbLocation() {
+	    try {
+	        Properties p = new Properties();
+	        p.load(new FileInputStream(INI_FILENAME));
+	        return(p.getProperty("OutputDbLocation"));
+	    } catch (Exception e) {
+	        System.out.println(e);
+	    }
+	
+		return null;
+	}
+	
+	public static Database openOutputDatabase() {
+		db = new Database(Common.getOutputDbLocation());
+		return(db);
+	}
+	
 	public static void init() {
 		scenarioId = Short.parseShort(getSysParam("DefaultScenario"));
 		residentialSatisfactionThreshold = Integer.parseInt(getSysParam("THR_ResSatisfaction"));
