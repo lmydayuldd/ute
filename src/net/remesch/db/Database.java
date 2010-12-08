@@ -245,9 +245,9 @@ public class Database {
 	 * @throws InstantiationException 
 	 * @throws SQLException 
 	 */
-	public <T> List<T> select(Class<T> c, String sqlStatement) throws SQLException, InstantiationException, IllegalAccessException {
+	public <T> ArrayList<T> select(Class<T> c, String sqlStatement) throws SQLException, InstantiationException, IllegalAccessException {
 		boolean modifiedFieldAccessibility = false;
-		List<T> result = new ArrayList<T>();
+		ArrayList<T> result = new ArrayList<T>();
 		ResultSet rs = executeQuery(sqlStatement);
 		Field fields[] = Reflection.getFieldNames(c);
 		assert fields.length > 0 : "No fields in class " + c.getName() + " or in its superclasses";
