@@ -268,8 +268,12 @@ public class Database {
 					field.set(item, rs.getInt(fieldName));
 				} else if (type.equals("short") || type.equals("java.lang.Short")) {
 					field.set(item, rs.getShort(fieldName));
+				} else if (type.equals("byte") || type.equals("java.lang.Byte")) {
+					field.set(item, rs.getByte(fieldName));
 				} else if (type.equals("double") || type.equals("java.lang.Double")) {
 					field.set(item, rs.getDouble(fieldName));
+				} else if (type.equals("float") || type.equals("java.lang.Float")) {
+					field.set(item, rs.getFloat(fieldName));
 				} else if (type.equals("boolean") || type.equals("java.lang.Boolean")) {
 					field.set(item, rs.getBoolean(fieldName));
 				} else {
