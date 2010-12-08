@@ -38,7 +38,7 @@ public class UDPClassificationTest {
 	  }
 
 	/**
-	 * Setup for unit test of {@link at.sume.dm.indicators.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
+	 * Setup for unit test of {@link at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 * @throws SQLException
 	 */
 	@Before
@@ -54,7 +54,7 @@ public class UDPClassificationTest {
 		DwellingRow dr = new DwellingRow();
 		hhr1.setDwelling(dr);
 		dr.setSpatialunitId(90101);
-		dr.setDwellingCosts(3000);
+		dr.setTotalYearlyDwellingCosts(3000);
 		dr.setDwellingSize(90);
 		Persons p;
 		p = new Persons();
@@ -86,7 +86,7 @@ public class UDPClassificationTest {
 		dr = new DwellingRow();
 		hhr1.setDwelling(dr);
 		dr.setSpatialunitId(90101);
-		dr.setDwellingCosts(5000);
+		dr.setTotalYearlyDwellingCosts(5000);
 		dr.setDwellingSize(120);
 		
 		pr = new PersonRow(p);

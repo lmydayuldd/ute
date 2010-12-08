@@ -4,6 +4,9 @@
 package at.sume.dm.entities;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+
 import at.sume.db.RecordSet;
 import net.remesch.db.Database;
 
@@ -70,5 +73,24 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	@Override
 	public String tablename() {
 		return "_DM_SpatialUnits";
+	}
+	/**
+	 * Convert a list of spatial unit ids into a list of spatial unit rows
+	 * @param spatialUnitIds
+	 * @return
+	 */
+	public ArrayList<SpatialUnitRow> getSpatialUnits(ArrayList<Long> spatialUnitIds) {
+		ArrayList<SpatialUnitRow> result = new ArrayList<SpatialUnitRow>();
+		SpatialUnitRow lookup = new SpatialUnitRow();
+		for (long spatialUnitId : spatialUnitIds) {
+			lookup.setSpatialUnitId(spatialUnitId);
+			int index = Collections.binarySearch(rowList, lookup);
+			if (index >= 0) {
+				result.add(rowList.get(index));
+			} else {
+				System.out.println("Can't find spatial unit id " + spatialUnitId + " in the list of spatial units");
+			}
+		}
+		return result;
 	}
 }

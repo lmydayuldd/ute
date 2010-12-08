@@ -26,24 +26,33 @@ public class ResidentialMobility {
 		//    b) maximum costs - by current costs, household income
 		// lower limit: commonly defined by the current dwelling; upper limit: set by the standards to
 		// which the household can reasonably aspire (Knox/Pinch 2010, p.263)
-		long maxCostOfResidence = household.getYearlyIncome() - minimumIncome.estimateMinIncomeLeftForLiving(household);
+		long maxCostOfResidence = Math.max(0, household.getYearlyIncome() - minimumIncome.estimateMinIncomeLeftForLiving(household));
 		if (household.getMovingDecisionYear() == modelYear) {
 			// Household just began searching - set initial values
 			household.estimateDesiredLivingSpace();
 			// lower value from income share and current dwelling costs (per m²)
 			long maxCostOfResidencePerSqm = maxCostOfResidence / household.getAspirationRegionLivingSpaceMin();
-			long currentCostOfResidencePerSqm = household.getCostOfResidence() / household.getLivingSpace();
+			long currentCostOfResidencePerSqm = 0;
+			if (household.hasDwelling()) {
+				currentCostOfResidencePerSqm = household.getCostOfResidence() / household.getLivingSpace();
+			} else {
+				currentCostOfResidencePerSqm = maxCostOfResidencePerSqm;
+			}
 			household.setAspirationRegionMaxCosts(Math.min(maxCostOfResidencePerSqm, currentCostOfResidencePerSqm));
 		} else {
 			// Household continues searching - modify values from previous year
 			// if maximum costs are already at the maximum for the household then reduce minimum
 			// living space
 			long maxCostOfResidencePerSqm = maxCostOfResidence / household.getAspirationRegionLivingSpaceMin();
+			int currentLivingSpace = 0;
+			if (household.hasDwelling()) {
+				currentLivingSpace = household.getLivingSpace();
+			}
 			if (maxCostOfResidencePerSqm <= household.getAspirationRegionMaxCosts()) {
 				// reduce aspired minimum living space until it drops below the current living space
 				// TODO: maybe do this over a configurable number of years
-				if (household.getAspirationRegionLivingSpaceMin() > household.getLivingSpace()) {
-					household.setAspirationRegionLivingSpaceMin(household.getLivingSpace());
+				if (household.getAspirationRegionLivingSpaceMin() > currentLivingSpace) {
+					household.setAspirationRegionLivingSpaceMin(currentLivingSpace);
 				}
 			} else {
 				// increase aspired max costs of residence
@@ -54,18 +63,25 @@ public class ResidentialMobility {
 	}
 	public boolean searchDwelling(HouseholdRow household, int modelYear, DwellingsOnMarket dwellingsOnMarket) {
 		ArrayList<Long> potentialTargetSpatialUnitIds = household.getPreferredSpatialUnits(Common.getSearchAreaSize());
-		dwellingsOnMarket.selectSuitableDwellingsOnMarket(potentialTargetSpatialUnitIds, household.getAspirationRegionLivingSpaceMin(), household.getAspirationRegionLivingSpaceMax(), household.getAspirationRegionMaxCosts());
-		DwellingRow suitableDwelling;
+		assert potentialTargetSpatialUnitIds.size() > 0 : "no potential target spatial units found";
+		int suitableDwellingCount = dwellingsOnMarket.selectSuitableDwellingsOnMarket(potentialTargetSpatialUnitIds, household.getAspirationRegionLivingSpaceMin(), household.getAspirationRegionLivingSpaceMax(), household.getAspirationRegionMaxCosts());
 		boolean householdMoved = false;
-		for (int i = 0; i != Common.getDwellingsConsideredPerYear(); i++) {
-			suitableDwelling = dwellingsOnMarket.pickRandomSuitableDwelling();
-			int potentialResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, suitableDwelling, modelYear);
-			if (potentialResidentialSatisfaction > household.getCurrentResidentialSatisfaction()) {
-				// we have the dwelling - move there!
-				household.relocate(suitableDwelling);
-				householdMoved = true;
-				break;
+		if (suitableDwellingCount > 0) {
+			DwellingRow suitableDwelling;
+			for (int i = 0; i != Common.getDwellingsConsideredPerYear(); i++) {
+				suitableDwelling = dwellingsOnMarket.pickRandomSuitableDwelling();
+				int potentialResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, suitableDwelling, modelYear);
+				if (potentialResidentialSatisfaction > household.getCurrentResidentialSatisfaction()) {
+					// we have the dwelling - move there!
+					household.relocate(dwellingsOnMarket,suitableDwelling);
+					householdMoved = true;
+					break;
+				}
 			}
+		} else {
+//			throw new AssertionError("No suitable dwelling found");
+			if (household.getAspirationRegionMaxCosts() > 0)
+				System.out.println("No suitable dwelling found - minSize = " + household.getAspirationRegionLivingSpaceMin() + ", maxSize = " + household.getAspirationRegionLivingSpaceMax() + ", max costs = " + household.getAspirationRegionMaxCosts());
 		}
 		return householdMoved;
 	}

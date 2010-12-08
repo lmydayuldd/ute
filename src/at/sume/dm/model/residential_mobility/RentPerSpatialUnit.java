@@ -19,7 +19,7 @@ import at.sume.dm.indicators.MoversIndicatorsPerSpatialUnit;
 public class RentPerSpatialUnit {
 	public static class RentPerSpatialUnitRow implements Comparable<RentPerSpatialUnitRow> {
 		private long spatialUnitId;
-		private long yearlyRentPerSqm;
+		private long yearlyRentPer100Sqm;
 		/**
 		 * @return the spatialUnitId
 		 */
@@ -35,14 +35,14 @@ public class RentPerSpatialUnit {
 		/**
 		 * @return the yearlyRentPerSqm
 		 */
-		public long getYearlyRentPerSqm() {
-			return yearlyRentPerSqm;
+		public long getYearlyRentPer100Sqm() {
+			return yearlyRentPer100Sqm;
 		}
 		/**
-		 * @param yearlyRentPerSqm the yearlyRentPerSqm to set
+		 * @param yearlyRentPer100Sqm the yearlyRentPerSqm to set
 		 */
-		public void setYearlyRentPerSqm(long yearlyRentPerSqm) {
-			this.yearlyRentPerSqm = yearlyRentPerSqm;
+		public void setYearlyRentPer100Sqm(long yearlyRentPer100Sqm) {
+			this.yearlyRentPer100Sqm = yearlyRentPer100Sqm;
 		}
 		/* (non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
@@ -63,7 +63,7 @@ public class RentPerSpatialUnit {
 		 */
 		@Override
 		public int compare(RentPerSpatialUnitRow arg0, RentPerSpatialUnitRow arg1) {
-			return ((Long)arg0.getYearlyRentPerSqm()).compareTo(arg1.getYearlyRentPerSqm());
+			return ((Long)arg0.getYearlyRentPer100Sqm()).compareTo(arg1.getYearlyRentPer100Sqm());
 		}
 	}
 	
@@ -74,12 +74,12 @@ public class RentPerSpatialUnit {
 	 */
 	static {
 		try {
-			String selectStatement = "SELECT sgt.SpatialUnitId_ZB AS SpatialUnitId, Round(Avg([Preis]) * 12,2) AS YearlyRentPerSqm " +
+			String selectStatement = "SELECT sgt.SpatialUnitId_ZB AS SpatialUnitId, Round(Avg([Preis]) * 12 * 100, 0) AS YearlyRentPer100Sqm " +
 			"FROM MA18_Stadtgebietstypen_Zählbezirke  AS sgt INNER JOIN WKO_Mietpreise AS wko ON sgt.SpatialUnitId_AD = wko.SpatialUnitId_AD " +
 			"GROUP BY sgt.SpatialUnitId_ZB;";
 			rentPerSpatialUnit = Common.db.select(RentPerSpatialUnitRow.class, selectStatement);
 			assert rentPerSpatialUnit.size() > 0 : "No rows selected from WKO_Mietpreise";
-			assert rentPerSpatialUnit.get(0).yearlyRentPerSqm > 0 : "Rent per spatial unit = " + rentPerSpatialUnit.get(0).yearlyRentPerSqm;
+			assert rentPerSpatialUnit.get(0).yearlyRentPer100Sqm > 0 : "Rent per spatial unit = " + rentPerSpatialUnit.get(0).yearlyRentPer100Sqm;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {
@@ -93,7 +93,7 @@ public class RentPerSpatialUnit {
 	 */
 	public static void updateRentPerSpatialUnit() {
 		for (RentPerSpatialUnitRow rpsu : rentPerSpatialUnit) {
-			rpsu.setYearlyRentPerSqm(MoversIndicatorsPerSpatialUnit.getAvgCostOfResidencePerSqm(rpsu.getSpatialUnitId()));
+			rpsu.setYearlyRentPer100Sqm(MoversIndicatorsPerSpatialUnit.getAvgCostOfResidencePer100Sqm(rpsu.getSpatialUnitId()));
 		}
 	}
 	/**
@@ -111,10 +111,10 @@ public class RentPerSpatialUnit {
 	 * @param spatialUnitId
 	 * @return
 	 */
-	public static long getYearlyAverageRent(long spatialUnitId) {
+	public static long getYearlyAverageRentPer100Sqm(long spatialUnitId) {
 		int pos = lookupSpatialUnitPos(spatialUnitId);
 		assert pos >= 0 : "Can't lookup a price for spatial unit id " + spatialUnitId;
-		return rentPerSpatialUnit.get(pos).getYearlyRentPerSqm();
+		return rentPerSpatialUnit.get(pos).getYearlyRentPer100Sqm();
 	}
 	/**
 	 * Return an array of all spatial units with a rent price level below the given yearly maximum
@@ -125,7 +125,7 @@ public class RentPerSpatialUnit {
 	public static ArrayList<Long> getSpatialUnitsBelowGivenPrice(long maxCostOfResidence) {
 		ArrayList<Long> result = new ArrayList<Long>();
 		for(RentPerSpatialUnitRow r : rentPerSpatialUnit) {
-			if (r.getYearlyRentPerSqm() <= maxCostOfResidence)
+			if (r.getYearlyRentPer100Sqm() / 100 <= maxCostOfResidence)
 				result.add(r.getSpatialUnitId());
 		}
 		return result;

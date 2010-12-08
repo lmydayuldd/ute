@@ -18,6 +18,7 @@ import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.Households;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
+import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
 
 /**
  * @author Alexander Remesch
@@ -26,7 +27,7 @@ import at.sume.dm.entities.Persons;
 public class IndicatorManagerTest {
 
 	/**
-	 * Setup for unit test of {@link at.sume.dm.indicators.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
+	 * Setup for unit test of {@link at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 * @throws SQLException
 	 */
 	@Before
@@ -42,7 +43,7 @@ public class IndicatorManagerTest {
 		DwellingRow dr = new DwellingRow();
 		hhr.setDwelling(dr);
 		dr.setSpatialunitId(90101);
-		dr.setDwellingCosts(3000);
+		dr.setTotalYearlyDwellingCosts(3000);
 		dr.setDwellingSize(90);
 		Persons p;
 		p = new Persons();
@@ -75,7 +76,7 @@ public class IndicatorManagerTest {
 		dr = new DwellingRow();
 		hhr.setDwelling(dr);
 		dr.setSpatialunitId(90101);
-		dr.setDwellingCosts(5000);
+		dr.setTotalYearlyDwellingCosts(5000);
 		dr.setDwellingSize(120);
 		
 		pr = new PersonRow(p);
@@ -109,7 +110,7 @@ public class IndicatorManagerTest {
 	}
 
 	/**
-	 * Test method for {@link at.sume.dm.indicators.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
+	 * Test method for {@link at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 */
 	@Test
 	public void testGetAvgHouseholdIncome() {
@@ -117,7 +118,7 @@ public class IndicatorManagerTest {
 	}
 
 	/**
-	 * Test method for {@link at.sume.dm.indicators.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
+	 * Test method for {@link at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 */
 	@Test
 	public void testGetAvgHouseholdIncomePerMember() {
@@ -125,7 +126,7 @@ public class IndicatorManagerTest {
 	}
 
 	/**
-	 * Test method for {@link at.sume.dm.indicators.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
+	 * Test method for {@link at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 */
 	@Test
 	public void testGetAvgHouseholdIncomePerMemberWeighted() {
@@ -133,7 +134,7 @@ public class IndicatorManagerTest {
 	}
 
 	/**
-	 * Test method for {@link at.sume.dm.indicators.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
+	 * Test method for {@link at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 */
 	@Test
 	public void testGetAvgPersonIncome() {

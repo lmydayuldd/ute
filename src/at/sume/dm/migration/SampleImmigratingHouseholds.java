@@ -134,6 +134,7 @@ public class SampleImmigratingHouseholds {
 	private TotalImmigrationPerYear totalImmigrationsPerYear;
 	private ExactDistribution<MigrationsPerAgeSex> migrationsPerAgeSex;
 	private ArrayList<MigrationHouseholdSize> migrationHouseholdSize;
+	private long migrationHouseholdSizeShareTotal = 0;
 	
 	public SampleImmigratingHouseholds(String scenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
@@ -152,7 +153,7 @@ public class SampleImmigratingHouseholds {
 			"ORDER BY householdSize";
 		migrationHouseholdSize = Common.db.select(MigrationHouseholdSize.class, selectStatement);
 		assert migrationHouseholdSize.size() > 0 : "No rows selected from _DM_MigrationHouseholdSize (scenarioName = " + scenarioName + ")";
-		
+		migrationHouseholdSizeShareTotal = Math.round((Double)Common.db.lookupSql("select sum(share) from _DM_MigrationHouseholdSize where scenarioName = 'NEUZUD'"));
 		totalImmigrationsPerYear = new TotalImmigrationPerYear(scenarioName);
 	}
 	
@@ -167,20 +168,25 @@ public class SampleImmigratingHouseholds {
 		
 		// 2) Calculate the number of households per household size
 		int numHouseholds = 0;
-		int remainingHouseholds = Math.round(numImmigrants * migrationHouseholdSize.get(migrationHouseholdSize.size() - 1).getShare());
+		// immigrants with household size >= migrationHouseholdSize.size()
+		int remainingNumImmigrants = Math.round(numImmigrants * migrationHouseholdSize.get(migrationHouseholdSize.size() - 1).getShare() / migrationHouseholdSizeShareTotal);
 		for (short householdSize = 1; householdSize != 10; householdSize++) {
 			if (householdSize < migrationHouseholdSize.size()) {
-				numHouseholds = Math.round(numImmigrants * migrationHouseholdSize.get(householdSize).getShare());
+				// calculate the share of households from the distribution migrationHouseholdSize
+				int actualNumImmigrants = Math.round(numImmigrants * migrationHouseholdSize.get(householdSize).getShare() / migrationHouseholdSizeShareTotal);
+				numHouseholds = Math.round(actualNumImmigrants / householdSize);
 			} else {
+				// distribute remainingNumImmigrants on all remaining household sizes
 				if (householdSize == 9) {
-					numHouseholds = remainingHouseholds;
+					numHouseholds = Math.round(remainingNumImmigrants / householdSize);
 				} else {
-					numHouseholds = Math.max(r.nextInt(remainingHouseholds), remainingHouseholds);
-					remainingHouseholds -= numHouseholds;
+					int actualNumImmigrants = r.nextInt(remainingNumImmigrants);
+					remainingNumImmigrants -= actualNumImmigrants;
+					numHouseholds = Math.round(actualNumImmigrants / householdSize);
 				}
 			}
 			for (int i = 0; i != numHouseholds; i++) {
-				result.add(sampleHousehold(householdSize));
+				result.add(sampleHousehold(householdSize, modelYear));
 			}
 		}
 		
@@ -192,9 +198,10 @@ public class SampleImmigratingHouseholds {
 	 * @param householdSize
 	 * @return
 	 */
-	private HouseholdRow sampleHousehold(short householdSize) {
-		ArrayList<PersonRow> persons = new ArrayList<PersonRow>(householdSize);
+	private HouseholdRow sampleHousehold(short householdSize, int modelYear) {
+//		ArrayList<PersonRow> persons = new ArrayList<PersonRow>(householdSize);
 		HouseholdRow result = new HouseholdRow();
+		result.setMovingDecisionYear(modelYear);
 		for (int i = 0; i != householdSize; i++) {
 			PersonRow person = new PersonRow();
 			int index = migrationsPerAgeSex.randomSample();
@@ -225,8 +232,10 @@ public class SampleImmigratingHouseholds {
 				}
 			}
 			person.setYearlyIncome(yearlyIncome);
-			persons.add(person);
+//			persons.add(person);
+			result.addMember(person);
 		}
+		result.determineInitialHouseholdType();
 		// TODO: each household requires at least one adult (is this a good idea? - maybe not for single households)
 		return result;
 	}

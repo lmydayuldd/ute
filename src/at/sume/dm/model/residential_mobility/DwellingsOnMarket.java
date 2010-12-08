@@ -62,7 +62,8 @@ public class DwellingsOnMarket {
 				int pos = spatialUnits.indexOf(row.getSpatialunit());
 				grossFreeDwellingCount[pos]++;
 				if (r.nextInt(100) <= Common.getDwellingsOnMarketShare()) {
-					dwellingsOnMarketList[pos].add(row);
+//					dwellingsOnMarketList[pos].add(row);
+					putDwellingOnMarket(row);
 				}
 			}
 		}
@@ -91,7 +92,7 @@ public class DwellingsOnMarket {
 		for (DwellingRow dwelling : allDwellingsPerArea) {
 			if ((minSize <= dwelling.getDwellingSize()) && 
 					(dwelling.getDwellingSize() <= maxSize) && 
-					(dwelling.getDwellingCosts() / dwelling.getDwellingSize() <= maxYearlyPricePerSqm)) {
+					((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= maxYearlyPricePerSqm)) {
 				suitableDwellings.add(dwelling);
 			}
 		}
@@ -104,19 +105,21 @@ public class DwellingsOnMarket {
 	 * @param minSize the minimum size of the dwellings
 	 * @param maxSize the maximum size of the dwellings
 	 * @param maxYearlyPricePerSqm the maximum yearly price per m² for the dwellings
+	 * @return Number of suitable dwellings found
 	 */
-	public void selectSuitableDwellingsOnMarket(ArrayList<Long> spatialUnitIdList, int minSize, int maxSize, long maxYearlyPricePerSqm) {
+	public int selectSuitableDwellingsOnMarket(ArrayList<Long> spatialUnitIdList, int minSize, int maxSize, long maxYearlyPricePerSqm) {
 		suitableDwellings = new ArrayList<DwellingRow>();
 		for (long spatialUnitId : spatialUnitIdList) {
 			ArrayList<DwellingRow> allDwellingsPerArea = getDwellingsOnMarket(spatialUnitId);
 			for (DwellingRow dwelling : allDwellingsPerArea) {
 				if ((minSize <= dwelling.getDwellingSize()) && 
 						(dwelling.getDwellingSize() <= maxSize) && 
-						(dwelling.getDwellingCosts() / dwelling.getDwellingSize() <= maxYearlyPricePerSqm)) {
+						((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= maxYearlyPricePerSqm)) {
 					suitableDwellings.add(dwelling);
 				}
 			}
 		}
+		return suitableDwellings.size();
 	}
 	/**
 	 * Randomly pick one dwelling of the list of suitable dwellings for a household created with
@@ -126,6 +129,15 @@ public class DwellingsOnMarket {
 	 */
 	public DwellingRow pickRandomSuitableDwelling() {
 		Random r = new Random();
+		assert suitableDwellings.size() > 0 : "no suitable dwellings";
 		return suitableDwellings.get(r.nextInt(suitableDwellings.size()));
+	}
+	public void putDwellingOnMarket(DwellingRow dwelling) {
+		int su = spatialUnits.indexOf(dwelling.getSpatialunit());
+		dwellingsOnMarketList[su].add(dwelling);
+	}
+	public void removeDwellingFromMarket(DwellingRow dwelling) {
+		int su = spatialUnits.indexOf(dwelling.getSpatialunit());
+		dwellingsOnMarketList[su].remove(dwelling);
 	}
 }

@@ -18,6 +18,7 @@ import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.Households;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
+import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
@@ -26,8 +27,8 @@ import at.sume.dm.migration.SampleImmigratingHouseholds;
 import at.sume.dm.model.core.EntityDecisionManager;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_mobility.MinimumIncome;
+import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.dm.model.residential_mobility.ResidentialMobility;
-import at.sume.dm.model.residential_satisfaction.CostEffectiveness;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 
 /**
@@ -167,7 +168,7 @@ public class Main {
 	        Households hh_helper = (Households) households.clone();
 			// Loop through all households to find potential movers, process demographic events
 			for (HouseholdRow household : hh_helper) {
-				if (j % 1000 == 0) {
+				if (j % 10000 == 0) {
 					System.out.println(DateUtil.now() + ": Processing household " + j + " of " + households.size() + ", nr. of persons: " + persons.size());
 				}
 				
@@ -211,9 +212,9 @@ public class Main {
 //			households = hh_helper;
 			// Update rent prices for each spatial unit from last years data (from the movers indicators)
 			// from the second year on
-			CostEffectiveness costEffectiveness = (CostEffectiveness)ResidentialSatisfactionManager.COSTEFFECTIVENESS.getComponent();
+//			CostEffectiveness costEffectiveness = (CostEffectiveness)ResidentialSatisfactionManager.COSTEFFECTIVENESS.getComponent();
 			if (modelYear > 0)
-				costEffectiveness.updateRentPerSpatialUnit();
+				RentPerSpatialUnit.updateRentPerSpatialUnit();
 			// Reset the movers indicators
 			MoversIndicatorManager.resetIndicators();
 			// Loop through potential movers
@@ -228,10 +229,11 @@ public class Main {
 				
 				// 2) define the search area
 				// a) get all spatial units with costs within the aspiration region of the household
-				ArrayList<Long> potentialTargetSpatialUnitIds = costEffectiveness.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
+				ArrayList<Long> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
 				// b) compare estimated residential satisfaction in these spatial units and select the highest scoring 
 				//    spatial units (random component for each unit, number of units selected as sysparam)
-				int maxResidentialSatisfactionEstimate = household.estimateResidentialSatisfaction(potentialTargetSpatialUnitIds, modelYear);
+				ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
+				int maxResidentialSatisfactionEstimate = household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
 				// c) look for a configurable number of randomly chosen dwellings in these units and compute residential satisfaction. take the first
 				//    dwelling with a higher result than the current dwelling (= satisfying). limit the number of dwellings
 				//    considered (sysparam)
@@ -244,6 +246,7 @@ public class Main {
 						//household.redefineAspirations();
 					}
 					// TODO: what happens if the household didn't find a new dwelling?
+					// depending on whether this was a forced move the household could stay at its current residence or vanish (= move outside)
 				} else {
 					// TODO: what to do if the estimated residential satisfaction is not higher than
 					// the current one - household stays (except on a forced move)
@@ -251,26 +254,38 @@ public class Main {
 			}
 			// Immigrating Households
 			ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(modelYear);
+			int hhFoundNoDwellings = 0;
 			for (HouseholdRow household : immigratingHouseholds) {
 				residentialMobility.estimateAspirationRegion(household, modelYear);
-				if (!residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket)) {
-					// household didn't find a suitable dwelling -> join another household
-					// TODO: update indicators
-					//household.redefineAspirations();
+				ArrayList<Long> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
+				if (potentialTargetSpatialUnitIds.size() > 0) {
+					ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
+					household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
+					if (!residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket)) {
+						// household didn't find a suitable dwelling -> join another household
+						// TODO: update indicators
+						//household.redefineAspirations();
+						hhFoundNoDwellings++;
+					} else {
+						// update indicators
+					}
 				} else {
-					// update indicators
+					// no spatial units below the max costs for the household -> join another household
+					// TODO: update indicators
+					hhFoundNoDwellings++;
 				}
 			}
+			System.out.println(DateUtil.now() + " " + hhFoundNoDwellings + " out of " + immigratingHouseholds.size() + " immigrating households found no dwelling");
 		} // model year
 	}
 	
 	public static void buildIndicators() {
-		int j = 0;
+//		int j = 0;
 		AllHouseholdsIndicatorManager.resetIndicators();
 		for (HouseholdRow household : households) {
-			if (++j % 10000 == 0) {
-				System.out.println(DateUtil.now() + ": Added household " + j + " of " + households.size() + " to indicators");
-			}
+//			if (++j % 10000 == 0) {
+//				System.out.println(DateUtil.now() + ": Added household " + j + " of " + households.size() + " to indicators");
+//			}
 			AllHouseholdsIndicatorManager.addHousehold(household);
 			PercentileIndicatorManager.addHousehold(household);
 		}

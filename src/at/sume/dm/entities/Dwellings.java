@@ -9,8 +9,9 @@ import java.util.Random;
 
 import net.remesch.db.Database;
 import at.sume.db.RecordSet;
-import at.sume.db.RecordSetRow;
 import at.sume.dm.Common;
+import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
+import at.sume.dm.types.LivingSpaceGroup;
 
 /**
  * @author Alexander Remesch
@@ -23,6 +24,10 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	public Dwellings(Database db) throws SQLException, InstantiationException, IllegalAccessException {
 		setDb(db);
 		rowList = db.select(DwellingRow.class, selectStatement());
+		// calc variables - TODO: define callback in db.select for that
+		for (DwellingRow dwelling : rowList) {
+			preAddRow(dwelling);
+		}
 	}
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSet#tablename()
@@ -37,7 +42,7 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	 */
 	@Override
 	public String selectStatement() {
-		return "select dwellingId AS id, dwellingId, spatialUnitId, dwellingSize, dwellingCosts, " +
+		return "select dwellingId AS id, dwellingId, spatialUnitId, dwellingSize, totalYearlyDwellingCosts, " +
 			"livingSpaceGroup6Id, costOfResidenceGroupId, constructionPeriod7Id from _DM_Dwellings order by dwellingId";
 	}
 
@@ -64,7 +69,7 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	 */
 	@Override
 	public DwellingRow createRecordSetRow() {
-		return new DwellingRow(this);
+		return new DwellingRow();
 	}
 
 	/**
@@ -72,8 +77,7 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	 * @param spatialunits Collection of spatial units
 	 */
 	public void linkSpatialUnits(SpatialUnits spatialunits) {
-		for (RecordSetRow<Dwellings> row : rowList) {
-			DwellingRow dwelling = (DwellingRow) row;
+		for (DwellingRow dwelling : rowList) {
 			dwelling.setSpatialunit(spatialunits.lookup(dwelling.getSpatialunitId()));
 		}
 	}
@@ -84,9 +88,9 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	 */
 	public ArrayList<DwellingRow> getFreeDwellings() {
 		ArrayList<DwellingRow> freeDwellings = new ArrayList<DwellingRow>();
-		for (DwellingRow row : rowList) {
-			if (row.getHousehold().equals(null)) {
-				freeDwellings.add(row);
+		for (DwellingRow dwelling : rowList) {
+			if (dwelling.getHousehold().equals(null)) {
+				freeDwellings.add(dwelling);
 			}
 		}
 		return freeDwellings;
@@ -100,13 +104,31 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	public ArrayList<DwellingRow> getDwellingsOnMarket() {
 		Random r = new Random();
 		ArrayList<DwellingRow> freeDwellings = new ArrayList<DwellingRow>();
-		for (DwellingRow row : rowList) {
-			if (row.getHousehold().equals(null)) {
+		for (DwellingRow dwelling : rowList) {
+			if (dwelling.getHousehold().equals(null)) {
 				if (r.nextInt() <= Common.getDwellingsOnMarketShare()) {
-					freeDwellings.add(row);
+					freeDwellings.add(dwelling);
 				}
 			}
 		}
 		return freeDwellings;
+	}
+	/* (non-Javadoc)
+	 * @see at.sume.db.RecordSet#preAddRow(at.sume.db.RecordSetRow)
+	 */
+	@Override
+	public void preAddRow(DwellingRow dwelling) {
+		// calculate dwelling size
+		if (dwelling.getDwellingSize() == 0)
+			dwelling.setDwellingSize(LivingSpaceGroup.sampleLivingSpace(dwelling.getLivingSpaceGroup6Id()));
+		// calculate dwelling costs
+		if (dwelling.getTotalYearlyDwellingCosts() == 0) {
+			Random r = new Random();
+			long yearlyRentPer100Sqm = RentPerSpatialUnit.getYearlyAverageRentPer100Sqm(dwelling.getSpatialunitId()) / 100;
+			// TODO: 20% random deviance from the avg. rent price -> sysparam!
+			yearlyRentPer100Sqm = yearlyRentPer100Sqm + Math.round(yearlyRentPer100Sqm * (r.nextGaussian() - 0.5) * 0.1);
+			long dwellingCosts = Math.round(dwelling.getDwellingSize() * yearlyRentPer100Sqm / 100);
+			dwelling.setTotalYearlyDwellingCosts(dwellingCosts);
+		}
 	}
 }

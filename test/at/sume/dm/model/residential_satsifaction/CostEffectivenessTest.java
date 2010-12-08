@@ -59,7 +59,7 @@ public class CostEffectivenessTest {
 		hhr1.setDwelling(dr);
 		dr.setSpatialunitId(90101);
 		dr.setSpatialunit(sur1);
-		dr.setDwellingCosts(12000);
+		dr.setTotalYearlyDwellingCosts(12000);
 		dr.setDwellingSize(90);
 		Persons p;
 		p = new Persons();
@@ -87,7 +87,7 @@ public class CostEffectivenessTest {
 		hhr2.setDwelling(dr);
 		dr.setSpatialunitId(90101);
 		dr.setSpatialunit(sur1);
-		dr.setDwellingCosts(15000);
+		dr.setTotalYearlyDwellingCosts(15000);
 		dr.setDwellingSize(120);
 		
 		pr = new PersonRow();

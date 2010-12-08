@@ -28,7 +28,7 @@ public class GeneratePopulation {
 	 */
 	private static void GenerateHouseholds(Database db) throws SQLException {
 		Households households = new Households(db);
-		HouseholdRow hh = new HouseholdRow(households);
+		HouseholdRow hh = new HouseholdRow();
 		hh.prepareStatement();
 		HouseholdsPerSpatialUnit hhpsu;
 		LivingSpaceDistributionRow livingSpaceDistributionRow = null;

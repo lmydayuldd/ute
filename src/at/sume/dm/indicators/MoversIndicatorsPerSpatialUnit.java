@@ -177,13 +177,13 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 	 * @param spatialUnitId
 	 * @return
 	 */
-	public static long getAvgCostOfResidencePerSqm(long spatialUnitId) {
+	public static long getAvgCostOfResidencePer100Sqm(long spatialUnitId) {
 		BaseIndicators lookup = new BaseIndicators();
 		lookup.setSpatialUnitId(spatialUnitId);
 		int pos = Collections.binarySearch(indicatorList, lookup);
 		if (pos >= 0) {
 			BaseIndicators b = indicatorList.get(pos);
-			return b.getCostOfResidencePerSqmSum() / b.getHouseholdCount();
+			return b.getCostOfResidencePerSqmSum() * 100 / b.getHouseholdCount();
 		} else {
 			return 0;
 		}

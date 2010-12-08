@@ -86,8 +86,17 @@ public class ExactDistribution<E> extends Distribution<E> {
 		int index = Collections.binarySearch(exactThresholdStore, rand);
 		if (index < 0)
 			index = (index + 1) * -1;
-		while (exactThresholdStore.get(index - 1) == exactThresholdStore.get(index))
+		// get to first element of the same threshold (that is avoid all elements that have already been fully created)
+		if (index > 0) {
 			index--;
+			while (exactThresholdStore.get(index) == exactThresholdStore.get(index + 1)) {
+				if (index <= 0)
+					break;
+				index--;
+			}
+			if (exactThresholdStore.get(index) != exactThresholdStore.get(index + 1))
+				index++;
+		}
 		assert (index >= 0) && (index < exactThresholdStore.size()) : "Array index too large; rand = " + rand + ", max exact threshold = " + maxExactThreshold + ", index = " + index + ", max index = " + exactThresholdStore.size();
 		return index;
 	}

@@ -20,15 +20,32 @@ public class DesiredLivingSpace extends ResidentialSatisfactionComponent {
 	 */
 	@Override
 	public long calc(HouseholdRow household, DwellingRow dwelling, SpatialUnitRow spatialUnit, int modelYear) {
+		long currentLivingSpace = 0;
+		long result = 0;
 		// TODO: add household-specific desiredLivingSpace modifier here
 		household.estimateDesiredLivingSpace();
 		long desiredLivingSpace = (household.getAspirationRegionLivingSpaceMin() + household.getAspirationRegionLivingSpaceMax()) / 2;
-		long currentLivingSpace = dwelling.getDwellingSize();
 		assert desiredLivingSpace > 0 : "Desired living space <= 0 (" + desiredLivingSpace + ") for household " + household.getId();
-		assert currentLivingSpace > 0 : "Current living space <= 0 (" + currentLivingSpace + ") for household " + household.getId();
-		if (desiredLivingSpace <= currentLivingSpace)
+		if (!household.hasDwelling()) {
+			if (dwelling == null) {
+				// Household has no dwelling and no alternative dwelling was given -> currentLivingSpace stays = 0
+			} else {
+				// Household has no dwelling but alternative dwelling was given that will be used for currentLivingSpace calculation
+				currentLivingSpace = dwelling.getDwellingSize();
+			}
+		} else {
+			if ((dwelling == null) || (dwelling == household.getDwelling())) {
+				// Calculate living space satisfaction for the household's own dwelling (no other dwelling was given)
+				// or for a dwelling with the current's size in another spatial unit
+				currentLivingSpace = household.getDwelling().getDwellingSize();
+			} else {
+				currentLivingSpace = dwelling.getDwellingSize();
+			}
+		}
+		assert currentLivingSpace >= 0 : "Current living space < 0 (" + currentLivingSpace + ") for household " + household.getId();
+		result = Math.round(currentLivingSpace * 1000 / desiredLivingSpace);
+		if (result > 1000)
 			return 1000;
-		else
-			return (desiredLivingSpace * 1000) / currentLivingSpace;
+		return result;
 	}
 }

@@ -14,6 +14,7 @@ import at.sume.db.RecordSetRow;
 import at.sume.dm.Common;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
+import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
@@ -122,7 +123,10 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @return the householdId
 	 */
 	public long getHouseholdId() {
-		return id;
+		if (id == null)
+			return 0;
+		else
+			return id;
 	}
 
 	/**
@@ -312,8 +316,8 @@ public class HouseholdRow extends RecordSetRow<Households> {
 				}
 			}
 			break;
-		case 3:
-		case 4:
+		default:
+			assert (getHouseholdSize() > 0) && (getHouseholdSize() <= 9) : "Invalid household size: " + getHouseholdSize();
 			// determine the number of children
 			int numChildren = 0;
 			for (PersonRow member : members) {
@@ -326,7 +330,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 				break;
 			case 1:
 				if (getHouseholdSize() == 3)
-					this.householdType = HouseholdType.SMALL_FAMILY;	// TODO: maybe we should look for mal/female relationships here?
+					this.householdType = HouseholdType.SMALL_FAMILY;	// TODO: maybe we should look for male/female relationships here?
 				else
 					this.householdType = HouseholdType.OTHER;
 				break;
@@ -342,13 +346,11 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			default:
 //				throw new AssertionError("Household with 4 children unexpected");
 				// TODO: do something about this in the synthetic population generation!
-				System.out.println("Household " + getHouseholdId() + " unexpectedly consists of " + numChildren + " children.");
+				System.out.println("Household " + getHouseholdId() + " unexpectedly consists of " + numChildren + " children (total of " + getHouseholdSize() + " persons).");
 				this.householdType = HouseholdType.OTHER;
 				break;
 			}
 			break;
-		default:
-			throw new AssertionError("Unexpeceted HouseholdSize = " + getHouseholdSize());
 		}
 		return this.householdType;
 	}
@@ -471,7 +473,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 */
 	public long getCostOfResidence() {
 		assert dwelling != null : "no dwelling for household " + getHouseholdId();
-		return dwelling.getDwellingCosts();
+		return dwelling.getTotalYearlyDwellingCosts();
 	}
 
 	/**
@@ -617,14 +619,14 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			Random r = new Random();
 			// calculate mean
 			long desiredLivingSpaceSqm = AllHouseholdsIndicatorsPerHouseholdTypeAndIncome.getAvgLivingSpacePerHousehold(getHouseholdType(), IncomeGroup.getIncomeGroupId(getYearlyIncome()));
-			short desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRandomPct * r.nextGaussian());
-			desiredLivingSpaceSqm = desiredLivingSpaceSqm + desiredLivingSpaceModifier;
+//			short desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRandomPct * r.nextGaussian());
+//			desiredLivingSpaceSqm = Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			// calculate boundary 1
-			desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRangePct * r.nextGaussian());
-			short desiredLivingSpaceSqm1 = (short) (desiredLivingSpaceSqm + desiredLivingSpaceModifier);
+			short desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRangePct * r.nextGaussian());
+			int desiredLivingSpaceSqm1 = Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			// calculate boundary 2
 			desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRangePct * r.nextGaussian());
-			short desiredLivingSpaceSqm2 = (short) (desiredLivingSpaceSqm + desiredLivingSpaceModifier);
+			int desiredLivingSpaceSqm2 = Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			if (desiredLivingSpaceSqm1 > desiredLivingSpaceSqm2) {
 				setAspirationRegionLivingSpaceMin(desiredLivingSpaceSqm2);
 				setAspirationRegionLivingSpaceMax(desiredLivingSpaceSqm1);
@@ -635,6 +637,29 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		}
 	}
 	
+//	/**
+//	 * Estimate residential satisfaction for the given spatial units and store results in array
+//	 * residentialSatisfactionEstimate
+//	 * 
+//	 * @param spatialUnitIdList
+//	 * @param modelYear
+//	 * @return highest residential satisfaction found
+//	 */
+//	public int estimateResidentialSatisfaction(ArrayList<Long> spatialUnitIdList, int modelYear) {
+//		SpatialUnits spatialUnits = recordSet.getSpatialunits();
+//		int result = 0;
+//		for (Long spatialUnitId : spatialUnitIdList) {
+//			SpatialUnitScore s = new SpatialUnitScore();
+//			s.setSpatialUnitId(spatialUnitId);
+//			// TODO: introduce random factor into score (sysparam ~10%?)
+//			int residentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(this, spatialUnits.lookup(spatialUnitId), modelYear); 
+//			s.setScore(residentialSatisfaction);
+//			residentialSatisfactionEstimate.add(s);
+//			if (residentialSatisfaction > result)
+//				result = residentialSatisfaction;
+//		}
+//		return result;
+//	}
 	/**
 	 * Estimate residential satisfaction for the given spatial units and store results in array
 	 * residentialSatisfactionEstimate
@@ -643,14 +668,15 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @param modelYear
 	 * @return highest residential satisfaction found
 	 */
-	public int estimateResidentialSatisfaction(ArrayList<Long> spatialUnitIdList, int modelYear) {
-		SpatialUnits spatialUnits = recordSet.getSpatialunits();
+	public int estimateResidentialSatisfaction(ArrayList<SpatialUnitRow> spatialUnitList, int modelYear) {
 		int result = 0;
-		for (Long spatialUnitId : spatialUnitIdList) {
+		assert spatialUnitList.size() > 0 : "spatialUnitList must be initialized (size > 0)";
+		residentialSatisfactionEstimate = new ArrayList<SpatialUnitScore>(spatialUnitList.size());
+		for (SpatialUnitRow spatialUnit : spatialUnitList) {
 			SpatialUnitScore s = new SpatialUnitScore();
-			s.setSpatialUnitId(spatialUnitId);
+			s.setSpatialUnitId(spatialUnit.getSpatialUnitId());
 			// TODO: introduce random factor into score (sysparam ~10%?)
-			int residentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(this, spatialUnits.lookup(spatialUnitId), modelYear); 
+			int residentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(this, spatialUnit, modelYear); 
 			s.setScore(residentialSatisfaction);
 			residentialSatisfactionEstimate.add(s);
 			if (residentialSatisfaction > result)
@@ -658,7 +684,6 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		}
 		return result;
 	}
-	
 	/**
 	 * Return the spatial units that are estimated to provide the highest residential satisfaction
 	 * for the household
@@ -669,12 +694,13 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 */
 	public ArrayList<Long> getPreferredSpatialUnits(int numSpatialUnits) {
 		// sort results descending according to residential satisfaction (find highest scoring spatial units)
-		Comparator<SpatialUnitScore> compareSpatialUnitScoresDesc = Collections.reverseOrder(new CompareSpatialUnitScore());
-		Collections.sort(residentialSatisfactionEstimate, compareSpatialUnitScoresDesc);
+		assert residentialSatisfactionEstimate.size() > 0 : "residentialSatisfactionEstimate must be initialized! (size = 0)";
+		Comparator<SpatialUnitScore> compareSpatialUnitScoreDesc = Collections.reverseOrder(new CompareSpatialUnitScore());
+		Collections.sort(residentialSatisfactionEstimate, compareSpatialUnitScoreDesc);
 		// build new array to return
 		ArrayList<Long> ret = new ArrayList<Long>(numSpatialUnits);
 		for (int i = 0; i != numSpatialUnits; i++) {
-			ret.set(i, residentialSatisfactionEstimate.get(i).getSpatialUnitId());
+			ret.add(residentialSatisfactionEstimate.get(i).getSpatialUnitId());
 		}
 		return ret;
 	}
@@ -683,7 +709,10 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * 
 	 * @param dwelling
 	 */
-	public void relocate(DwellingRow dwelling) {
+	public void relocate(DwellingsOnMarket dwellingsOnMarket, DwellingRow dwelling) {
+		if (hasDwelling())
+			dwellingsOnMarket.putDwellingOnMarket(getDwelling());
+		dwellingsOnMarket.removeDwellingFromMarket(dwelling);
 		setDwelling(dwelling);
 		// Update indicators
 		MoversIndicatorManager.addHousehold(this);
@@ -702,5 +731,12 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 */
 	public int getCurrentResidentialSatisfaction() {
 		return currentResidentialSatisfaction;
+	}
+	/**
+	 * Does the household have a dwelling?
+	 * @return
+	 */
+	public boolean hasDwelling() {
+		return (dwelling != null);
 	}
 }

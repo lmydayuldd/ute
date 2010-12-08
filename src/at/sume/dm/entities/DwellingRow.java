@@ -20,21 +20,21 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	@Ignore // Ignore is not really necessary here because spatialUnit is private anyway
 	private SpatialUnitRow spatialunit;
 	private int dwellingSize;
-	private long dwellingCosts;
+	private long totalYearlyDwellingCosts;
 	private short livingSpaceGroup6Id;
 	private short costOfResidenceGroupId;
 	private short constructionPeriod7Id;
 	@Ignore
 	private HouseholdRow household;
-	@Ignore
-	private Dwellings dwellings;
+//	@Ignore
+//	private Dwellings dwellings;
 	
 	public DwellingRow() {
 		
 	}
-	public DwellingRow(Dwellings dwellings) {
-		this.dwellings = dwellings;
-	}
+//	public DwellingRow(Dwellings dwellings) {
+//		this.rowList = dwellings;
+//	}
 	/**
 	 * @return the dwellingId
 	 */
@@ -95,15 +95,15 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	/**
 	 * @return the yearly total costs of the dwelling
 	 */
-	public long getDwellingCosts() {
-		return dwellingCosts;
+	public long getTotalYearlyDwellingCosts() {
+		return totalYearlyDwellingCosts;
 	}
 
 	/**
-	 * @param dwellingCosts the yearly total costs of the dwelling to set
+	 * @param totalYearlyDwellingCosts the yearly total costs of the dwelling to set
 	 */
-	public void setDwellingCosts(long dwellingCosts) {
-		this.dwellingCosts = dwellingCosts;
+	public void setTotalYearlyDwellingCosts(long totalYearlyDwellingCosts) {
+		this.totalYearlyDwellingCosts = totalYearlyDwellingCosts;
 	}
 
 	/**

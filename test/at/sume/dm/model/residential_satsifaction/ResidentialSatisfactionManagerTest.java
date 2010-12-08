@@ -19,7 +19,7 @@ import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
-import at.sume.dm.indicators.AllHouseholdsIndicatorManager;
+import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 
 /**
@@ -40,7 +40,7 @@ public class ResidentialSatisfactionManagerTest {
 	  }
 
 	/**
-	 * Setup for unit test of {@link at.sume.dm.indicators.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
+	 * Setup for unit test of {@link at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 * @throws SQLException
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
@@ -60,7 +60,7 @@ public class ResidentialSatisfactionManagerTest {
 		dr = new DwellingRow();
 		hhr1.setDwelling(dr);
 		dr.setSpatialunitId(90101);
-		dr.setDwellingCosts(12000);
+		dr.setTotalYearlyDwellingCosts(12000);
 		dr.setDwellingSize(90);
 		dw.add(dr);
 		Persons p;
@@ -94,7 +94,7 @@ public class ResidentialSatisfactionManagerTest {
 		dr = new DwellingRow();
 		hhr2.setDwelling(dr);
 		dr.setSpatialunitId(90101);
-		dr.setDwellingCosts(15000);
+		dr.setTotalYearlyDwellingCosts(15000);
 		dr.setDwellingSize(120);
 		dw.add(dr);
 		

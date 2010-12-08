@@ -39,8 +39,8 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 			} else {
 				// Household has no dwelling - CostEffectiveness must be calculated between cost of new dwelling considered and
 				// potential cost of residence in the target area
-				currentCostOfResidence = dwelling.getDwellingCosts();
-				potentialCostOfResidence = Math.round(dwelling.getDwellingSize() * RentPerSpatialUnit.getYearlyAverageRent(spatialUnitId.getSpatialUnitId()));
+				currentCostOfResidence = dwelling.getTotalYearlyDwellingCosts();
+				potentialCostOfResidence = Math.round(dwelling.getDwellingSize() * RentPerSpatialUnit.getYearlyAverageRentPer100Sqm(spatialUnitId.getSpatialUnitId()));
 				if (currentCostOfResidence <= 0)
 					result = 1000;
 				else
@@ -50,14 +50,14 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 			if ((dwelling == null) || (dwelling == household.getDwelling())) {
 				// Calculate cost effectiveness satisfaction for the household's own dwelling (no other dwelling was given)
 				// compared to a dwelling with the current's size in another spatial unit
-				currentCostOfResidence = household.getDwelling().getDwellingCosts();
-				potentialCostOfResidence = Math.round(dwelling.getDwellingSize() * RentPerSpatialUnit.getYearlyAverageRent(spatialUnitId.getSpatialUnitId()));
+				currentCostOfResidence = household.getDwelling().getTotalYearlyDwellingCosts();
+				potentialCostOfResidence = Math.round(dwelling.getDwellingSize() * RentPerSpatialUnit.getYearlyAverageRentPer100Sqm(spatialUnitId.getSpatialUnitId()));
 				if (currentCostOfResidence <= 0)
 					result = 1000;
 				else
 					result = Math.round(potentialCostOfResidence * 1000 / currentCostOfResidence);
 			} else {
-				long costOfNewDwelling = dwelling.getDwellingCosts();
+				long costOfNewDwelling = dwelling.getTotalYearlyDwellingCosts();
 				if (household.getDwelling() == null) {
 					// Calculate cost effectiveness satisfaction for a given dwelling without considering the households current dwelling
 					// There is no need to calculate this since new dwellings always get (about) the average price of the spatial unit
@@ -65,7 +65,7 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 					result = 1000;
 				} else {
 					// Calculate cost effectiveness satisfaction for a given dwelling with considering the households current dwelling
-					currentCostOfResidence = household.getDwelling().getDwellingCosts();
+					currentCostOfResidence = household.getDwelling().getTotalYearlyDwellingCosts();
 					result = Math.round(currentCostOfResidence * 1000 / costOfNewDwelling);
 				}
 			}

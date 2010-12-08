@@ -17,6 +17,8 @@ import at.sume.dm.indicators.base.Indicator;
 public class IncomePercentiles implements Indicator<HouseholdRow> {
 	ArrayList<Long> householdIncomes = new ArrayList<Long>();
 	ArrayList<Long> personIncomes = new ArrayList<Long>();
+	boolean householdIncomesSorted = false;
+	boolean personIncomesSorted = false;
 	
 	/* (non-Javadoc)
 	 * @see at.sume.dm.indicators.base.Indicator#add(at.sume.db.RecordSetRow)
@@ -24,21 +26,11 @@ public class IncomePercentiles implements Indicator<HouseholdRow> {
 	@Override
 	public void add(HouseholdRow household) {
 		Long householdIncome = household.getYearlyIncome();
-		int index = Collections.binarySearch(householdIncomes, householdIncome);
-		if (index < 0) {
-			// insert at position pos
-			index = (index + 1) * -1;
-		}
-		householdIncomes.add(index, householdIncome);
+		householdIncomes.add(householdIncome);
 		
 		for (PersonRow person : household.getMembers()) {
 			Long personIncome = person.getYearlyIncome();
-			index = Collections.binarySearch(personIncomes, personIncome);
-			if (index < 0) {
-				// insert at position pos
-				index = (index + 1) * -1;
-			}
-			personIncomes.add(index, personIncome);
+			personIncomes.add(personIncome);
 		}
 	}
 	/* (non-Javadoc)
@@ -64,7 +56,11 @@ public class IncomePercentiles implements Indicator<HouseholdRow> {
 	public long getHouseholdIncomePercentile(short percentage) {
 		assert percentage <= 100 : "Percentage is higher than 100 (" + percentage + ")";
 		assert percentage >= 0 : "Percentage is lower than 0 (" + percentage + ")";
-		int index = Math.round(householdIncomes.size() * percentage / percentage);
+		if (!householdIncomesSorted) {
+			Collections.sort(householdIncomes);
+			householdIncomesSorted = true;
+		}
+		int index = Math.round((householdIncomes.size() - 1) * percentage / 100);
 		return householdIncomes.get(index);
 	}
 	/**
@@ -76,7 +72,11 @@ public class IncomePercentiles implements Indicator<HouseholdRow> {
 	public long getPersonIncomePercentile(short percentage) {
 		assert percentage <= 100 : "Percentage is higher than 100 (" + percentage + ")";
 		assert percentage >= 0 : "Percentage is lower than 0 (" + percentage + ")";
-		int index = Math.round(personIncomes.size() * percentage / percentage);
+		if (!personIncomesSorted) {
+			Collections.sort(personIncomes);
+			personIncomesSorted = true;
+		}
+		int index = Math.round((personIncomes.size() - 1) * percentage / 100);
 		return personIncomes.get(index);
 	}
 }
