@@ -6,10 +6,8 @@ package net.remesch.db;
 import static org.junit.Assert.assertEquals;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
-
-
-import net.remesch.db.Database;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +20,12 @@ import at.sume.dm.model.residential_satisfaction.UDPClassification.SpatialUnitUd
  *
  */
 public class DatabaseTest {
-	private Database db;
+	private Database db, odb;
+	
+	public static class HouseholdTest {
+		private short modelYear;
+		private int householdId;
+	}
 	
 	/**
 	 * Setup for unit test of {@link at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
@@ -31,28 +34,33 @@ public class DatabaseTest {
 	@Before
 	public void setUp() throws SQLException {
 		db = Common.openDatabase();
+		odb = Common.openOutputDatabase();
 	}
 	
 	/**
 	 * Test method for {@link net.remesch.db.Database#select(java.lang.Class, java.lang.String)}.
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws SQLException 
 	 */
 	@Test
-	public void testSelect() {
+	public void testSelect() throws SQLException, InstantiationException, IllegalAccessException {
 		Collection<SpatialUnitUdp> spatialUnitUdp = null;
-		try {
-			spatialUnitUdp = db.select(SpatialUnitUdp.class, "select * from _DM_SpatialUnitUdp");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		spatialUnitUdp = db.select(SpatialUnitUdp.class, "select * from _DM_SpatialUnitUdp");
 		
 		assertEquals("Number of elements", 267, spatialUnitUdp.size());
 	}
 
+	@Test
+	public void testInsert() throws IllegalArgumentException, SQLException, IllegalAccessException {
+		ArrayList<HouseholdTest> hhTestList = new ArrayList<HouseholdTest>();
+		for (int i = 1; i != 100; i++) {
+			HouseholdTest hhTest = new HouseholdTest();
+			hhTest.householdId = i;
+			hhTest.modelYear = 2001;
+			hhTestList.add(hhTest);
+		}
+		String sqlStatement = "select * from _DM_Households";
+		odb.insert(hhTestList, sqlStatement);
+	}
 }
