@@ -5,7 +5,6 @@ package at.sume.dm.types;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Random;
 
 import at.sume.dm.Common;
@@ -36,13 +35,10 @@ public class AgeGroup {
 		try {
 			ageGroups = Common.db.select(AgeGroupRow.class, selectStatement);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -65,12 +61,13 @@ public class AgeGroup {
 	 * @return
 	 */
 	public static String getAgeGroupName(short ageGroupId) {
-		assert ageGroupId > 0 : "ageGroupId <= 0";
-		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
-		AgeGroupRow lookup = new AgeGroupRow();
-		lookup.ageGroupId = ageGroupId;
-		int pos = Collections.binarySearch(ageGroups, lookup);
-		return ageGroups.get(pos).ageGroup; 
+//		assert ageGroupId > 0 : "ageGroupId <= 0";
+//		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
+//		AgeGroupRow lookup = new AgeGroupRow();
+//		lookup.ageGroupId = ageGroupId;
+//		int pos = Collections.binarySearch(ageGroups, lookup);
+//		return ageGroups.get(pos).ageGroup;
+		return getAgeGroupNameDirect(ageGroupId);
 	}
 	/**
 	 * Get the printable name of a certain age group by direct access to ArrayList
@@ -87,8 +84,8 @@ public class AgeGroup {
 		assert ageGroupId > 0 : "ageGroupId <= 0";
 		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
 		Random r = new Random();
-		AgeGroupRow ageGroup = ageGroups.get(ageGroupId - 1);
+		AgeGroupRow sample = ageGroups.get(ageGroupId - 1);
 //		return (short) (ageGroup.minage + (r.nextDouble() * (ageGroup.maxage - ageGroup.minage)));
-		return (short) (ageGroup.minage + r.nextInt(ageGroup.maxage - ageGroup.minage));
+		return (short) (sample.minage + r.nextInt(sample.maxage - sample.minage));
 	}
 }
