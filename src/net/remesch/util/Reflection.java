@@ -6,7 +6,6 @@ package net.remesch.util;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import net.remesch.db.schema.DatabaseField;
 import net.remesch.db.schema.DatabaseFieldMap;
 
 /**
@@ -61,22 +60,9 @@ public class Reflection {
 					continue;
 				if (result.contains(field))
 					continue;
-				DatabaseFieldMap fieldMap = new DatabaseFieldMap();
-				fieldMap.setClassFieldName(field.getName());
-				fieldMap.setFieldType(field.getType().getName());
-				fieldMap.setField(field);
-				if (field.isAnnotationPresent(net.remesch.db.schema.DatabaseField.class)) {
-					DatabaseField dbf = field.getAnnotation(net.remesch.db.schema.DatabaseField.class);
-					fieldMap.setDbFieldName(dbf.fieldName());
-				} else {
-					fieldMap.setDbFieldName(fieldMap.getClassFieldName());
-				}
-				if (!field.isAccessible()) {
+				DatabaseFieldMap fieldMap = new DatabaseFieldMap(field);
+				if (fieldMap.isInacessible())
 					field.setAccessible(true);
-					fieldMap.setInacessible(true);
-				} else {
-					fieldMap.setInacessible(false);
-				}
 				result.add(fieldMap);
 			}
 		}

@@ -16,6 +16,23 @@ public class DatabaseFieldMap implements Comparable<DatabaseFieldMap> {
 	private boolean ignore;
 	private boolean inacessible;
 	private Field field;
+	
+	public DatabaseFieldMap(Field field) {
+		setClassFieldName(field.getName());
+		setFieldType(field.getType().getName());
+		setField(field);
+		if (field.isAnnotationPresent(net.remesch.db.schema.DatabaseField.class)) {
+			DatabaseField dbf = field.getAnnotation(net.remesch.db.schema.DatabaseField.class);
+			setDbFieldName(dbf.fieldName());
+		} else {
+			setDbFieldName(getClassFieldName());
+		}
+		if (!field.isAccessible()) {
+			setInacessible(true);
+		} else {
+			setInacessible(false);
+		}
+	}
 	/**
 	 * @return the classFieldName
 	 */
