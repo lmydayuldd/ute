@@ -5,6 +5,9 @@ package at.sume.dm.entities;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import net.remesch.db.Sequence;
+import net.remesch.db.schema.Ignore;
 import at.sume.db.RecordSetRow;
 
 /**
@@ -21,9 +24,14 @@ public class PersonRow extends RecordSetRow<Persons> {
 	private int yearlyIncome;
 	private HouseholdRow household;
 //	private short personNrInHousehold;
+	@Ignore
+	private static Sequence personIdSeq = null;
 	
 	public PersonRow() {
 		super();
+		if (personIdSeq != null) {
+			setPersonId(personIdSeq.getNext());
+		}
 	}
 
 	/**
@@ -239,5 +247,12 @@ public class PersonRow extends RecordSetRow<Persons> {
 			// UPDATE: WHERE
 			psUpdate.setString(8, Long.toString(id));
 		}
+	}
+
+	/**
+	 * @param personIdSeq the personIdSeq to set
+	 */
+	public static void setPersonIdSeq(Sequence personIdSeq) {
+		PersonRow.personIdSeq = personIdSeq;
 	}
 }

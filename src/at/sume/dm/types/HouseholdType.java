@@ -17,7 +17,7 @@ public enum HouseholdType {
 	COUPLE_OLD,
 	OTHER;
 	
-	public static int getId(HouseholdType householdType) {
+	public static byte getId(HouseholdType householdType) {
 		switch (householdType) {
 		case SINGLE_YOUNG:
 			return 1;

@@ -6,8 +6,8 @@ package at.sume.dm.entities;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import net.remesch.db.Sequence;
 import net.remesch.db.schema.Ignore;
-
 import at.sume.db.RecordSetRow;
 
 /**
@@ -17,7 +17,7 @@ import at.sume.db.RecordSetRow;
 public class DwellingRow extends RecordSetRow<Dwellings> {
 	private int dwellingId;
 	private int spatialunitId;
-	@Ignore // Ignore is not really necessary here because spatialUnit is private anyway
+	@Ignore
 	private SpatialUnitRow spatialunit;
 	private short dwellingSize;
 	private int totalYearlyDwellingCosts;
@@ -26,11 +26,13 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	private byte constructionPeriod7Id;
 	@Ignore
 	private HouseholdRow household;
-//	@Ignore
-//	private Dwellings dwellings;
+	@Ignore
+	private static Sequence dwellingIdSeq = null;
 	
 	public DwellingRow() {
-		
+		if (dwellingIdSeq != null) {
+			setDwellingId(dwellingIdSeq.getNext());
+		}
 	}
 //	public DwellingRow(Dwellings dwellings) {
 //		this.rowList = dwellings;
@@ -38,7 +40,7 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	/**
 	 * @return the dwellingId
 	 */
-	public long getDwellingId() {
+	public int getDwellingId() {
 		return dwellingId;
 	}
 
@@ -170,5 +172,11 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
 		// use Common.select() instead
 		throw new AssertionError("DwellingRow.loadFromDatabase is depreceated");
+	}
+	/**
+	 * @param dwellingIdSeq the dwellingIdSeq to set
+	 */
+	public static void setDwellingIdSeq(Sequence dwellingIdSeq) {
+		DwellingRow.dwellingIdSeq = dwellingIdSeq;
 	}
 }

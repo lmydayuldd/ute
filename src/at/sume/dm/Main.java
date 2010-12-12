@@ -9,10 +9,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.remesch.db.Database;
+import net.remesch.db.Sequence;
 import net.remesch.util.DateUtil;
 import at.sume.dm.demography.events.ChildBirth;
 import at.sume.dm.demography.events.EventManager;
 import at.sume.dm.demography.events.PersonDeath;
+import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.Dwellings;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.Households;
@@ -25,6 +27,7 @@ import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
 import at.sume.dm.migration.SampleImmigratingHouseholds;
 import at.sume.dm.model.core.EntityDecisionManager;
+import at.sume.dm.model.output.OutputManager;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_mobility.MinimumIncome;
 import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
@@ -40,9 +43,13 @@ public class Main {
 	//ArrayList<Person> personList;
 	private static SpatialUnits spatialUnits;
 	private static Households households;
+	private static Sequence householdSeq;
 	private static Persons persons;
+	private static Sequence personSeq;
 	private static Dwellings dwellings;
+	private static Sequence dwellingSeq;
 	private static DwellingsOnMarket dwellingsOnMarket;
+	private static OutputManager outputManager;
 
 	/**
 	 * @param args
@@ -50,6 +57,7 @@ public class Main {
 	public static void main(String[] args) {
         System.out.println(DateUtil.now() + ": start");
 		Database db = Common.openDatabase();
+		Database odb = Common.openOutputDatabase();
 		Common.init();
 
 		// Load entity sets from database
@@ -58,9 +66,16 @@ public class Main {
 	        System.out.println(DateUtil.now() + ": loaded " + spatialUnits.size() + " spatial units");
 			households = new Households(db);
 	        System.out.println(DateUtil.now() + ": loaded " + households.size() + " households");
+	        // TODO: sequence generation could be completely put into RecordSetRow class
+	        householdSeq = new Sequence(households.get(households.size() - 1).getHouseholdId() + 1);
+	        HouseholdRow.setHouseholdIdSeq(householdSeq);
 	        persons = new Persons(db);
+	        personSeq = new Sequence(persons.get(persons.size() - 1).getPersonId() + 1);
+	        PersonRow.setPersonIdSeq(personSeq);
 	        System.out.println(DateUtil.now() + ": loaded " + persons.size() + " persons");
 			dwellings = new Dwellings(db);
+			dwellingSeq = new Sequence(dwellings.get(dwellings.size() - 1).getDwellingId() + 1);
+			DwellingRow.setDwellingIdSeq(dwellingSeq);
 	        System.out.println(DateUtil.now() + ": loaded " + dwellings.size() + " dwellings");
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -91,6 +106,9 @@ public class Main {
         // Initial build of model indicators
 		buildIndicators();			
         System.out.println(DateUtil.now() + ": initial built of model indicators complete");
+        
+        // Prepare model output to the database
+        outputManager = new OutputManager(odb, households);
         
 		// Model main loop
 		// - Biographical events for all persons/households
@@ -160,6 +178,8 @@ public class Main {
 		int modelEndYear = modelStartYear + iterations;
 		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
 	        System.out.println(DateUtil.now() + ": running model year " + modelYear + " of " + modelEndYear);
+	        outputManager.dbOutput((short) modelYear);
+	        System.out.println(DateUtil.now() + ": model data output to database");
 	        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
 			ArrayList<HouseholdRow> potential_movers = new ArrayList<HouseholdRow>();
 	        int j = 0;

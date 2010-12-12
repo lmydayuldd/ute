@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
+import net.remesch.db.Sequence;
+import net.remesch.db.schema.Ignore;
 import at.sume.db.RecordSetRow;
 import at.sume.dm.Common;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
@@ -68,6 +70,8 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	private static byte childrenMaxAge = 0;
 	private static byte desiredLivingSpaceRandomPct = 0;
 	private static byte desiredLivingSpaceRangePct = 0;
+	@Ignore
+	private static Sequence householdIdSeq = null;
 
 //	private short householdSize;
 	private int dwellingId;
@@ -116,6 +120,9 @@ public class HouseholdRow extends RecordSetRow<Households> {
 				desiredLivingSpaceRangePct = 10;
 			else
 				desiredLivingSpaceRangePct = Byte.parseByte(sp);
+		}
+		if (householdIdSeq != null) {
+			setHouseholdId(householdIdSeq.getNext());
 		}
 	}
 
@@ -738,5 +745,12 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 */
 	public boolean hasDwelling() {
 		return (dwelling != null);
+	}
+
+	/**
+	 * @param householdIdSeq the householdIdSeq to set
+	 */
+	public static void setHouseholdIdSeq(Sequence householdIdSeq) {
+		HouseholdRow.householdIdSeq = householdIdSeq;
 	}
 }

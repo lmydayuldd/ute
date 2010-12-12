@@ -17,7 +17,7 @@ import net.remesch.db.Database;
  */
 public class Common {
 	public final static String INI_FILENAME = "sume_dm.ini";
-	public static Database db;
+	public static Database db, odb;
 	private static short scenarioId;
 	private static int residentialSatisfactionThreshold;
 	private static int searchAreaSize;
@@ -127,8 +127,8 @@ public class Common {
 	}
 	
 	public static Database openOutputDatabase() {
-		db = new Database(Common.getOutputDbLocation());
-		return(db);
+		odb = new Database(Common.getOutputDbLocation());
+		return(odb);
 	}
 	
 	public static void init() {
