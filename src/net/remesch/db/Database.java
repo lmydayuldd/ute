@@ -6,6 +6,7 @@ package net.remesch.db;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.remesch.db.schema.DatabaseField;
+import net.remesch.db.schema.DatabaseFieldMap;
+import net.remesch.util.DateUtil;
 import net.remesch.util.Reflection;
 
 /**
@@ -314,7 +317,11 @@ public class Database {
 		con.setAutoCommit(false); // if auto-commit is set to true, the connection has to be closed to really write the records into the table
 		Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 		ResultSet rs = stmt.executeQuery(sqlStatement);
+		int j = 0;
 		for (T row : rowList) {
+			if (j++ % 10000 == 0) {
+				System.out.println(DateUtil.now() + ": Processing row " + j + " of " + rowList.size());
+			}
 			rs.moveToInsertRow();
 			for (Field field : fields) {
 				if (field.isAnnotationPresent(net.remesch.db.schema.Ignore.class))
@@ -356,6 +363,80 @@ public class Database {
 		con.commit();
 		rs.close();
 		stmt.close();
+//		con.close();
+	}
+	public <T> String buildInsertStatement(ArrayList<DatabaseFieldMap> fieldMap, String tableName) {
+		int i = 0;
+		StringBuilder s = new StringBuilder();
+		s.append("INSERT INTO " + tableName + " (");
+		for (DatabaseFieldMap field : fieldMap) {
+			if (field.isIgnore())
+				continue;
+			if (i++ != 0)
+				s.append(", ");
+			s.append(field.getDbFieldName());
+		}
+		s.append(") VALUES (");
+		for (i = 0; i != fieldMap.size(); i++) {
+			if (fieldMap.get(i).isIgnore())
+				continue;
+			if (i != 0)
+				s.append(", ");
+			s.append("?");
+		}
+		s.append(")");
+		return s.toString();
+	}
+	/**
+	 * Insert data from a list of objects into a database table based on the matching of table to object field names
+	 * @param <T>
+	 * @param rowList
+	 * @param sqlStatement
+	 * @throws SQLException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
+	public <T> void insertSql(List<T> rowList, String tableName) throws SQLException, IllegalArgumentException, IllegalAccessException {
+		assert rowList.size() > 0 : "No records in rowList";
+		Class<? extends Object> c = rowList.get(0).getClass();
+		ArrayList<DatabaseFieldMap> fields = Reflection.getFields(c);
+		assert fields.size() > 0 : "No fields in class " + c.getName() + " or in its superclasses";
+		String insertStatement = buildInsertStatement(fields, tableName);
+		PreparedStatement ps = con.prepareStatement(insertStatement);
+		int j = 0;
+		// Prepare field accessibility
+		for (DatabaseFieldMap fieldMap : fields) {
+			Field field = fieldMap.getField();
+			if (fieldMap.isIgnore())
+				continue;
+			if (!field.isAccessible()) {
+				field.setAccessible(true);
+			}
+		}
+		for (T row : rowList) {
+			if (j++ % 10000 == 0) {
+				System.out.println(DateUtil.now() + ": Processing row " + j + " of " + rowList.size());
+			}
+			int i = 1;
+			for (DatabaseFieldMap fieldMap : fields) {
+				Field field = fieldMap.getField();
+				if (fieldMap.isIgnore())
+					continue;
+				ps.setString(i, field.get(row).toString());
+				i++;
+			}
+			ps.executeUpdate();
+		}
+		// Reset accessibility
+		for (DatabaseFieldMap fieldMap : fields) {
+			Field field = fieldMap.getField();
+			if (fieldMap.isIgnore())
+				continue;
+			if (!field.isAccessible()) {
+				field.setAccessible(false);
+			}
+		}
+//		con.commit();
 //		con.close();
 	}
 }
