@@ -26,15 +26,12 @@ public abstract class DbOutput<T extends RecordSetRow<?>, U extends OutputRow> {
 	
 	public void persistDb(short modelYear) throws IllegalArgumentException, SQLException, IllegalAccessException {
 		outputRowList = new ArrayList<U>();
-//		int i = 0;
 		for (T row : rowList) {
 			U orow = outputRowFactory(modelYear, row);
 			outputRowList.add(orow);
-//			if (i == 1000)
-//				break;
-//			i++;
 		}
 		db.insert(outputRowList, sqlStatement());
+//		db.insertFieldMap(outputRowList, sqlStatement());
 		// InsertSQL is slower...
 //		db.insertSql(outputRowList, sqlStatement());
 	}

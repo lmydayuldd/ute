@@ -34,4 +34,13 @@ public class OutputHouseholdRow implements OutputRow {
 		this.aspirationRegionLivingSpaceMax = household.getAspirationRegionLivingSpaceMax();
 		this.currentResidentialSatisfaction = household.getCurrentResidentialSatisfaction();
 	}
+	/* (non-Javadoc)
+	 * @see at.sume.dm.model.output.OutputRow#toCsv()
+	 */
+	@Override
+	public String toCsv() {
+		return modelYear + "," + householdId + "," + householdSize + "," + dwellingId + "," + 
+			householdType + "," + movingDecisionYear + "," + aspirationRegionLivingSpaceMin + "," +
+			aspirationRegionLivingSpaceMax + "," + currentResidentialSatisfaction;
+	}
 }
