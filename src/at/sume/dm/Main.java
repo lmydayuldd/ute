@@ -108,7 +108,13 @@ public class Main {
         System.out.println(DateUtil.now() + ": initial built of model indicators complete");
         
         // Prepare model output to the database
-        outputManager = new OutputManager(odb, households);
+//        outputManager = new OutputManager(odb, households, dwellings, persons);
+        try {
+			outputManager = new OutputManager("", households, dwellings, persons);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+			System.exit(100);
+		}
         
 		// Model main loop
 		// - Biographical events for all persons/households
@@ -178,7 +184,7 @@ public class Main {
 		int modelEndYear = modelStartYear + iterations;
 		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
 	        System.out.println(DateUtil.now() + ": running model year " + modelYear + " of " + modelEndYear);
-	        outputManager.dbOutput((short) modelYear);
+	        outputManager.output((short) modelYear);
 	        System.out.println(DateUtil.now() + ": model data output to database");
 	        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
 			ArrayList<HouseholdRow> potential_movers = new ArrayList<HouseholdRow>();
