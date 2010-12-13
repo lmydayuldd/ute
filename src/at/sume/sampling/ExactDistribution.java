@@ -19,7 +19,7 @@ import java.util.Random;
  * @author Alexander Remesch
  */
 public class ExactDistribution<E> extends Distribution<E> {
-	private ArrayList<Long> exactThresholdStore = new ArrayList<Long>();
+	private ArrayList<Long> exactThresholdStore;
 	private long maxExactThreshold;
 	/**
 	 * Construct an empty class
@@ -53,10 +53,12 @@ public class ExactDistribution<E> extends Distribution<E> {
 	 */
 	public void buildExactThresholds(long maxExactThreshold) {
 		assert maxExactThreshold > 0 : "maxExactThreshold = " + maxExactThreshold;
+		exactThresholdStore = new ArrayList<Long>();
 		for (int i = 0; i != thresholdStore.size(); i++) {
 			exactThresholdStore.add(i, (long) Math.round(thresholdStore.get(i) * maxExactThreshold / maxThreshold));
 		}
 		this.maxExactThreshold = maxExactThreshold;
+		assert exactThresholdStore.size() == objectStore.size() : "exactThresholdStore.size() != objectStore.size()";
 	}
 	/**
 	 * Decrease the number of elements in the distribution at position index by 1
