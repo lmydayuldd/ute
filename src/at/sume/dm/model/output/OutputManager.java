@@ -18,6 +18,8 @@ import at.sume.dm.entities.Persons;
 public class OutputManager {
 	DbOutputHouseholds dbOutputHouseholds;
 	FileOutputHouseholds fileOutputHouseholds;
+	FileOutputPersons fileOutputPersons;
+	FileOutputDwellings fileOutputDwellings;
 	
 	/**
 	 * 
@@ -39,6 +41,8 @@ public class OutputManager {
 	 */
 	public OutputManager(String pathName, Households households, Dwellings dwellings, Persons persons) throws FileNotFoundException {
 		fileOutputHouseholds = new FileOutputHouseholds(pathName + "households.csv", households);
+		fileOutputPersons = new FileOutputPersons(pathName + "persons.csv", persons);
+		fileOutputDwellings = new FileOutputDwellings(pathName + "dwellings.csv", dwellings);
 	}
 	/**
 	 * 
@@ -56,6 +60,8 @@ public class OutputManager {
 	 */
 	public void fileOutput(short modelYear) {
 		fileOutputHouseholds.persistDb(modelYear);
+		fileOutputPersons.persistDb(modelYear);
+		fileOutputDwellings.persistDb(modelYear);
 	}
 	/**
 	 * 

@@ -10,7 +10,6 @@ import at.sume.dm.types.HouseholdType;
  * @author Alexander Remesch
  *
  */
-@SuppressWarnings("unused")
 public class OutputHouseholdRow implements OutputRow {
 	private short modelYear;
 	private int householdId;
@@ -41,6 +40,6 @@ public class OutputHouseholdRow implements OutputRow {
 	public String toCsv() {
 		return modelYear + "," + householdId + "," + householdSize + "," + dwellingId + "," + 
 			householdType + "," + movingDecisionYear + "," + aspirationRegionLivingSpaceMin + "," +
-			aspirationRegionLivingSpaceMax + "," + currentResidentialSatisfaction;
+			aspirationRegionLivingSpaceMax + "," + aspirationRegionMaxCosts + "," + currentResidentialSatisfaction;
 	}
 }
