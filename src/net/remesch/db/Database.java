@@ -319,8 +319,8 @@ public class Database {
 		ResultSet rs = stmt.executeQuery(sqlStatement);
 		int j = 0;
 		for (T row : rowList) {
-			if (j++ % 10000 == 0) {
-				System.out.println(DateUtil.now() + ": Processing row " + j + " of " + rowList.size());
+			if (j % 10000 == 0) {
+				System.out.println(DateUtil.now() + ": Adding row " + j + " of " + rowList.size());
 			}
 			rs.moveToInsertRow();
 			for (Field field : fields) {
@@ -359,8 +359,84 @@ public class Database {
 					field.setAccessible(false);
 			}
 			rs.insertRow();
+			j++;
 		}
 		con.commit();
+		rs.close();
+		stmt.close();
+//		con.close();
+	}
+	/**
+	 * Insert data from a list of objects into a database table based on the matching of table to object field names
+	 * @param <T>
+	 * @param rowList
+	 * @param sqlStatement
+	 * @throws SQLException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
+	public <T> void insertFieldMap(List<T> rowList, String sqlStatement) throws SQLException, IllegalArgumentException, IllegalAccessException {
+		assert rowList.size() > 0 : "No records in rowList";
+		Class<? extends Object> c = rowList.get(0).getClass();
+		ArrayList<DatabaseFieldMap> fields = Reflection.getFields(c);
+		assert fields.size() > 0 : "No fields in class " + c.getName() + " or in its superclasses";
+		con.setAutoCommit(false); // if auto-commit is set to true, the connection has to be closed to really write the records into the table
+		Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+		ResultSet rs = stmt.executeQuery(sqlStatement);
+		// Prepare field accessibility
+		for (DatabaseFieldMap fieldMap : fields) {
+			Field field = fieldMap.getField();
+			if (fieldMap.isIgnore())
+				continue;
+			if (!field.isAccessible()) {
+				field.setAccessible(true);
+			}
+		}
+		int j = 0;
+		for (T row : rowList) {
+			if (j % 10000 == 0) {
+				System.out.println(DateUtil.now() + ": Adding row " + j + " of " + rowList.size());
+			}
+			rs.moveToInsertRow();
+			for (DatabaseFieldMap fieldMap : fields) {
+				Field field = fieldMap.getField();
+				if (fieldMap.isIgnore())
+					continue;
+				String type = fieldMap.getFieldType();
+				String fieldName = fieldMap.getDbFieldName();
+				if (type.equals("java.lang.String")) {
+					rs.updateString(fieldName, field.get(row).toString());
+				} else if (type.equals("long") || type.equals("java.lang.Long")) {
+					rs.updateLong(fieldName, field.getLong(row));
+				} else if (type.equals("int") || type.equals("java.lang.Integer")) {
+					rs.updateInt(fieldName, field.getInt(row));
+				} else if (type.equals("short") || type.equals("java.lang.Short")) {
+					rs.updateShort(fieldName, field.getShort(row));
+				} else if (type.equals("byte") || type.equals("java.lang.Byte")) {
+					rs.updateByte(fieldName, field.getByte(row));
+				} else if (type.equals("double") || type.equals("java.lang.Double")) {
+					rs.updateDouble(fieldName, field.getDouble(row));
+				} else if (type.equals("float") || type.equals("java.lang.Float")) {
+					rs.updateFloat(fieldName, field.getFloat(row));
+				} else if (type.equals("boolean") || type.equals("java.lang.Boolean")) {
+					rs.updateBoolean(fieldName, field.getBoolean(row));
+				} else {
+					throw new AssertionError("fieldName = " + c.getName() + "." + fieldName + ", type = " + type);
+				}
+			}
+			rs.insertRow();
+			j++;
+		}
+		con.commit();
+		// Reset accessibility
+		for (DatabaseFieldMap fieldMap : fields) {
+			Field field = fieldMap.getField();
+			if (fieldMap.isIgnore())
+				continue;
+			if (!field.isAccessible()) {
+				field.setAccessible(false);
+			}
+		}
 		rs.close();
 		stmt.close();
 //		con.close();
@@ -403,7 +479,6 @@ public class Database {
 		assert fields.size() > 0 : "No fields in class " + c.getName() + " or in its superclasses";
 		String insertStatement = buildInsertStatement(fields, tableName);
 		PreparedStatement ps = con.prepareStatement(insertStatement);
-		int j = 0;
 		// Prepare field accessibility
 		for (DatabaseFieldMap fieldMap : fields) {
 			Field field = fieldMap.getField();
@@ -413,9 +488,10 @@ public class Database {
 				field.setAccessible(true);
 			}
 		}
+		int j = 0;
 		for (T row : rowList) {
 			if (j++ % 10000 == 0) {
-				System.out.println(DateUtil.now() + ": Processing row " + j + " of " + rowList.size());
+				System.out.println(DateUtil.now() + ": Inserting row " + j + " of " + rowList.size());
 			}
 			int i = 1;
 			for (DatabaseFieldMap fieldMap : fields) {
