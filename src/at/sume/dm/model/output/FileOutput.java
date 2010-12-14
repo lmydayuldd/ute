@@ -28,6 +28,7 @@ public abstract class FileOutput<T extends RecordSetRow<?>> {
 		this.rowList = rowList;
 		FileOutputStream householdsFile = new FileOutputStream(pathName, false);
 		psOut = new PrintStream(householdsFile);
+		psOut.println(toCsvHeadline());
 	}
 	/**
 	 * 
@@ -35,7 +36,6 @@ public abstract class FileOutput<T extends RecordSetRow<?>> {
 	 */
 	public void persistDb(short modelYear) {
 		OutputRow orow;
-		psOut.println(toCsvHeadline());
 		for (T row : rowList) {
 			orow = createOutputRow(modelYear, row);
 			psOut.println(orow.toCsv());
