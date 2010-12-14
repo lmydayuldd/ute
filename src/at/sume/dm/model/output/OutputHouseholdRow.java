@@ -38,8 +38,8 @@ public class OutputHouseholdRow implements OutputRow {
 	 */
 	@Override
 	public String toCsv() {
-		return modelYear + "," + householdId + "," + householdSize + "," + dwellingId + "," + 
-			householdType + "," + movingDecisionYear + "," + aspirationRegionLivingSpaceMin + "," +
-			aspirationRegionLivingSpaceMax + "," + aspirationRegionMaxCosts + "," + currentResidentialSatisfaction;
+		return modelYear + ";" + householdId + ";" + householdSize + ";" + dwellingId + ";" + 
+			householdType + ";" + movingDecisionYear + ";" + aspirationRegionLivingSpaceMin + ";" +
+			aspirationRegionLivingSpaceMax + ";" + aspirationRegionMaxCosts + ";" + currentResidentialSatisfaction;
 	}
 }

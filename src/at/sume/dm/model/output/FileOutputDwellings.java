@@ -27,7 +27,7 @@ public class FileOutputDwellings extends FileOutput<DwellingRow> {
 	 */
 	@Override
 	public String toCsvHeadline() {
-		return "ModelYear,DwellingId,SpatialunitId,DwellingSize,TotalYearlyDwellingCosts,HouseholdId";
+		return "ModelYear;DwellingId;SpatialunitId;DwellingSize;TotalYearlyDwellingCosts;HouseholdId";
 	}
 	/* (non-Javadoc)
 	 * @see at.sume.dm.model.output.FileOutput#createOutputRow(short, at.sume.db.RecordSetRow)

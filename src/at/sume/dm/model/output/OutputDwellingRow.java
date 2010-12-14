@@ -33,8 +33,8 @@ public class OutputDwellingRow implements OutputRow {
 	 */
 	@Override
 	public String toCsv() {
-		return modelYear + "," + dwellingId + "," + spatialunitId + "," + dwellingSize + "," + 
-			totalYearlyDwellingCosts + "," + householdId;
+		return modelYear + ";" + dwellingId + ";" + spatialunitId + ";" + dwellingSize + ";" + 
+			totalYearlyDwellingCosts + ";" + householdId;
 	}
 
 }

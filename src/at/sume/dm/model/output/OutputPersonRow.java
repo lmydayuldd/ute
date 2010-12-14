@@ -30,6 +30,6 @@ public class OutputPersonRow implements OutputRow {
 	 */
 	@Override
 	public String toCsv() {
-		return modelYear + "," + personId + "," + householdId + "," + sex + "," + age + "," + yearlyIncome;
+		return modelYear + ";" + personId + ";" + householdId + ";" + sex + ";" + age + ";" + yearlyIncome;
 	}
 }

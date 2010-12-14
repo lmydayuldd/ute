@@ -27,7 +27,7 @@ public class FileOutputPersons extends FileOutput<PersonRow> {
 	 */
 	@Override
 	public String toCsvHeadline() {
-		return "ModelYear,PersonId,HouseholdId,Sex,Age,>earlyIncome";
+		return "ModelYear;PersonId;HouseholdId;Sex;Age;YearlyIncome";
 	}
 	/* (non-Javadoc)
 	 * @see at.sume.dm.model.output.FileOutput#createOutputRow(short, at.sume.db.RecordSetRow)
