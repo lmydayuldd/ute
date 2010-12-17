@@ -88,10 +88,10 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	}
 
 	/**
-	 * @param dwellingSize the total living space of the dwelling to set
+	 * @param i the total living space of the dwelling to set
 	 */
-	public void setDwellingSize(short dwellingSize) {
-		this.dwellingSize = dwellingSize;
+	public void setDwellingSize(short i) {
+		this.dwellingSize = i;
 	}
 
 	/**

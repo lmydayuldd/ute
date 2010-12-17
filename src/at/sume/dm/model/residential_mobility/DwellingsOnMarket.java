@@ -135,6 +135,7 @@ public class DwellingsOnMarket {
 	public void putDwellingOnMarket(DwellingRow dwelling) {
 		int su = spatialUnits.indexOf(dwelling.getSpatialunit());
 		dwellingsOnMarketList[su].add(dwelling);
+		dwelling.setHousehold(null);
 	}
 	public void removeDwellingFromMarket(DwellingRow dwelling) {
 		int su = spatialUnits.indexOf(dwelling.getSpatialunit());

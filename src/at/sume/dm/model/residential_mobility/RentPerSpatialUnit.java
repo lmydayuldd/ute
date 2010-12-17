@@ -74,7 +74,7 @@ public class RentPerSpatialUnit {
 	 */
 	static {
 		try {
-			String selectStatement = "SELECT sgt.SpatialUnitId_ZB AS SpatialUnitId, Round(Avg([Preis]) * 12 * 100, 0) AS YearlyRentPer100Sqm " +
+			String selectStatement = "SELECT sgt.SpatialUnitId_ZB AS SpatialUnitId, Round(Avg([PreisJahr]) * 100, 0) AS YearlyRentPer100Sqm " +
 			"FROM MA18_Stadtgebietstypen_Zählbezirke  AS sgt INNER JOIN WKO_Mietpreise AS wko ON sgt.SpatialUnitId_AD = wko.SpatialUnitId_AD " +
 			"GROUP BY sgt.SpatialUnitId_ZB;";
 			rentPerSpatialUnit = Common.db.select(RentPerSpatialUnitRow.class, selectStatement);
@@ -111,7 +111,7 @@ public class RentPerSpatialUnit {
 	 * @param spatialUnitId
 	 * @return
 	 */
-	public static long getYearlyAverageRentPer100Sqm(int spatialUnitId) {
+	public static int getYearlyAverageRentPer100Sqm(int spatialUnitId) {
 		int pos = lookupSpatialUnitPos(spatialUnitId);
 		assert pos >= 0 : "Can't lookup a price for spatial unit id " + spatialUnitId;
 		return rentPerSpatialUnit.get(pos).getYearlyRentPer100Sqm();

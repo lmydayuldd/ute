@@ -61,11 +61,19 @@ public class ResidentialMobility {
 			}
 		}
 	}
-	public boolean searchDwelling(HouseholdRow household, int modelYear, DwellingsOnMarket dwellingsOnMarket) {
+	/**
+	 * Search a dwelling for a given household in the list of the dwellings on the market
+	 * 
+	 * @param household
+	 * @param modelYear
+	 * @param dwellingsOnMarket
+	 * @return the first suitable dwelling for the given household
+	 */
+	public DwellingRow searchDwelling(HouseholdRow household, int modelYear, DwellingsOnMarket dwellingsOnMarket) {
 		ArrayList<Long> potentialTargetSpatialUnitIds = household.getPreferredSpatialUnits(Common.getSearchAreaSize());
 		assert potentialTargetSpatialUnitIds.size() > 0 : "no potential target spatial units found";
 		int suitableDwellingCount = dwellingsOnMarket.selectSuitableDwellingsOnMarket(potentialTargetSpatialUnitIds, household.getAspirationRegionLivingSpaceMin(), household.getAspirationRegionLivingSpaceMax(), household.getAspirationRegionMaxCosts());
-		boolean householdMoved = false;
+//		boolean householdMoved = false;
 		if (suitableDwellingCount > 0) {
 			DwellingRow suitableDwelling;
 			for (int i = 0; i != Common.getDwellingsConsideredPerYear(); i++) {
@@ -73,16 +81,18 @@ public class ResidentialMobility {
 				int potentialResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, suitableDwelling, modelYear);
 				if (potentialResidentialSatisfaction > household.getCurrentResidentialSatisfaction()) {
 					// we have the dwelling - move there!
-					household.relocate(dwellingsOnMarket,suitableDwelling);
-					householdMoved = true;
-					break;
+					return suitableDwelling;
+//					household.relocate(dwellingsOnMarket, suitableDwelling);
+//					householdMoved = true;
+//					break;
 				}
 			}
 		} else {
 //			throw new AssertionError("No suitable dwelling found");
-			if (household.getAspirationRegionMaxCosts() > 0)
-				System.out.println("No suitable dwelling found - minSize = " + household.getAspirationRegionLivingSpaceMin() + ", maxSize = " + household.getAspirationRegionLivingSpaceMax() + ", max costs = " + household.getAspirationRegionMaxCosts());
+//			if (household.getAspirationRegionMaxCosts() > 0)
+//				System.out.println("No suitable dwelling found - minSize = " + household.getAspirationRegionLivingSpaceMin() + ", maxSize = " + household.getAspirationRegionLivingSpaceMax() + ", max costs = " + household.getAspirationRegionMaxCosts());
 		}
-		return householdMoved;
+//		return householdMoved;
+		return null;
 	}
 }

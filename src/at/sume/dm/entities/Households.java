@@ -42,8 +42,8 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 		for (RecordSetRow<Households> row : rowList) {
 			HouseholdRow hh = (HouseholdRow) row;
 			// TODO: dwellingId == 0 should eventually be impossible - put an assertion here!
-			if (hh.getDwellingId() != 0) {
-				hh.setDwelling(dwellings.lookup(hh.getDwellingId()));
+			if (hh.getDwellingIdInp() != 0) {
+				hh.setDwelling(dwellings.lookup(hh.getDwellingIdInp()));
 				// link dwellings back to households
 				hh.getDwelling().setHousehold(hh);
 			}

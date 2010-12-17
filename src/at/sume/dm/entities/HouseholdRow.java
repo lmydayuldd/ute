@@ -74,7 +74,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	private static Sequence householdIdSeq = null;
 
 //	private short householdSize;
-	private int dwellingId;
+	private int dwellingIdInp;
 	private ArrayList<PersonRow> members;
 	private DwellingRow dwelling;
 	private float residentialSatisfactionThreshMod;
@@ -171,14 +171,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 * @return the dwellingId
 	 */
 	public int getDwellingId() {
-		return dwellingId;
-	}
-
-	/**
-	 * @param dwellingId the dwellingId to set
-	 */
-	public void setDwellingId(int dwellingId) {
-		this.dwellingId = dwellingId;
+		return getDwelling().getDwellingId();
 	}
 
 	public void addMembers(ArrayList<PersonRow> members){
@@ -231,6 +224,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 */
 	public void setDwelling(DwellingRow dwelling) {
 		this.dwelling = dwelling;
+		setMovingDecisionYear((short) 0);
 	}
 
 	/**
@@ -511,7 +505,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 //		} else if (name.equals("HouseholdSize")) {
 //			setHouseholdSize(rs.getShort(name));
 		} else if (name.equals("DwellingId")) {
-			setDwellingId(rs.getInt(name));
+			setDwellingIdInp(rs.getInt(name));
 //		} else if (name.equals("LivingSpace")) {
 //			setDwellingId(rs.getInt(name));
 //		} else if (name.equals("CostOfResidence")) {
@@ -597,7 +591,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			psInsert.setString(1, Long.toString(getHouseholdId()));
 //			psInsert.setString(2, Long.toString(spatialunitId));
 //			psInsert.setString(3, Long.toString(householdSize));
-			psInsert.setString(4, Long.toString(dwellingId));
+//			psInsert.setString(4, Long.toString(dwellingId));
 //			psInsert.setString(5, Integer.toString(livingSpace));
 //			psInsert.setString(6, Long.toString(costOfResidence));
 //			psInsert.setString(7, Integer.toString(livingSpaceGroupId));
@@ -607,7 +601,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 		if (psUpdate != null) {
 //			psUpdate.setString(1, Long.toString(spatialunitId));
 //			psUpdate.setString(2, Long.toString(householdSize));
-			psUpdate.setString(3, Long.toString(dwellingId));
+//			psUpdate.setString(3, Long.toString(dwellingId));
 //			psUpdate.setString(4, Integer.toString(livingSpace));
 //			psUpdate.setString(5, Long.toString(costOfResidence));
 //			psUpdate.setString(6, Integer.toString(livingSpaceGroupId));
@@ -721,6 +715,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			dwellingsOnMarket.putDwellingOnMarket(getDwelling());
 		dwellingsOnMarket.removeDwellingFromMarket(dwelling);
 		setDwelling(dwelling);
+		dwelling.setHousehold(this);
 		// Update indicators
 		MoversIndicatorManager.addHousehold(this);
 	}
@@ -752,5 +747,19 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 */
 	public static void setHouseholdIdSeq(Sequence householdIdSeq) {
 		HouseholdRow.householdIdSeq = householdIdSeq;
+	}
+
+	/**
+	 * @param dwellingIdInp the dwellingIdInp to set
+	 */
+	public void setDwellingIdInp(int dwellingIdInp) {
+		this.dwellingIdInp = dwellingIdInp;
+	}
+
+	/**
+	 * @return the dwellingIdInp
+	 */
+	public int getDwellingIdInp() {
+		return dwellingIdInp;
 	}
 }

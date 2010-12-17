@@ -57,13 +57,17 @@ public class Main {
 	public static void main(String[] args) {
         System.out.println(DateUtil.now() + ": start");
 		Database db = Common.openDatabase();
-		Database odb = Common.openOutputDatabase();
+//		Database odb = Common.openOutputDatabase();
 		Common.init();
 
 		// Load entity sets from database
 		try {
 			spatialUnits = new SpatialUnits(db);
 	        System.out.println(DateUtil.now() + ": loaded " + spatialUnits.size() + " spatial units");
+			dwellings = new Dwellings(db);
+			dwellingSeq = new Sequence(dwellings.get(dwellings.size() - 1).getDwellingId() + 1);
+			DwellingRow.setDwellingIdSeq(dwellingSeq);
+	        System.out.println(DateUtil.now() + ": loaded " + dwellings.size() + " dwellings");
 			households = new Households(db);
 	        System.out.println(DateUtil.now() + ": loaded " + households.size() + " households");
 	        // TODO: sequence generation could be completely put into RecordSetRow class
@@ -73,10 +77,6 @@ public class Main {
 	        personSeq = new Sequence(persons.get(persons.size() - 1).getPersonId() + 1);
 	        PersonRow.setPersonIdSeq(personSeq);
 	        System.out.println(DateUtil.now() + ": loaded " + persons.size() + " persons");
-			dwellings = new Dwellings(db);
-			dwellingSeq = new Sequence(dwellings.get(dwellings.size() - 1).getDwellingId() + 1);
-			DwellingRow.setDwellingIdSeq(dwellingSeq);
-	        System.out.println(DateUtil.now() + ": loaded " + dwellings.size() + " dwellings");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {
@@ -187,15 +187,15 @@ public class Main {
 	        outputManager.output((short) modelYear);
 	        System.out.println(DateUtil.now() + ": model data output to database");
 	        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
-			ArrayList<HouseholdRow> potential_movers = new ArrayList<HouseholdRow>();
+			ArrayList<HouseholdRow> potentialMovers = new ArrayList<HouseholdRow>();
 	        int j = 0;
 	        // the following clone() is necessary because otherwise it wouldn't be possible to remove households from
 	        // the original list while iterating through it
 	        Households hh_helper = (Households) households.clone();
 			// Loop through all households to find potential movers, process demographic events
 			for (HouseholdRow household : hh_helper) {
-				if (j % 10000 == 0) {
-					System.out.println(DateUtil.now() + ": Processing household " + j + " of " + households.size() + ", nr. of persons: " + persons.size());
+				if (j % 100000 == 0) {
+					System.out.println(DateUtil.now() + ": Processing household " + j + " of " + households.size() + " in year " + modelYear + ", nr. of persons: " + persons.size());
 				}
 				
 				// Remove household from all indicators in its original state
@@ -220,10 +220,12 @@ public class Main {
 
 				// Calculate residential mobility depending on previous decisions
 				// TODO: save residential satisfaction result for later use
-				int residential_satisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, household.getSpatialunit(), modelYear);
+				short residential_satisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, modelYear);
+				assert (residential_satisfaction >= 0) && (residential_satisfaction <= 1000) : "residential satisfaction out of range (" + residential_satisfaction + ")";
+				household.setCurrentResidentialSatisfaction(residential_satisfaction);
 				if (residential_satisfaction + household.getResidentialSatisfactionThreshMod() < Common.getResidentialSatisfactionThreshold()) {
 					// TODO: add the household to a random position in the ArrayList
-					potential_movers.add(household);
+					potentialMovers.add(household);
 					if (household.getMovingDecisionYear() == 0)
 						household.setMovingDecisionYear((short) modelYear);
 					// TODO: add potential mover to the indicators
@@ -239,13 +241,14 @@ public class Main {
 			// Update rent prices for each spatial unit from last years data (from the movers indicators)
 			// from the second year on
 //			CostEffectiveness costEffectiveness = (CostEffectiveness)ResidentialSatisfactionManager.COSTEFFECTIVENESS.getComponent();
-			if (modelYear > 0)
+			// TODO: shouldn't this be done after the movings??? But we need fresh movers indicators...
+			if (modelYear > modelStartYear)
 				RentPerSpatialUnit.updateRentPerSpatialUnit();
 			// Reset the movers indicators
 			MoversIndicatorManager.resetIndicators();
 			// Loop through potential movers
-			for (HouseholdRow household : potential_movers) {
-				household.setCurrentResidentialSatisfaction(ResidentialSatisfactionManager.calcResidentialSatisfaction(household, modelYear));
+			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0;
+			for (HouseholdRow household : potentialMovers) {
 				// 1) estimate the aspiration region: 
 				//    a) needed living space - by household size 
 				//    b) maximum costs - by current costs, household income
@@ -256,38 +259,52 @@ public class Main {
 				// 2) define the search area
 				// a) get all spatial units with costs within the aspiration region of the household
 				ArrayList<Integer> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
-				// b) compare estimated residential satisfaction in these spatial units and select the highest scoring 
-				//    spatial units (random component for each unit, number of units selected as sysparam)
-				ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
-				int maxResidentialSatisfactionEstimate = household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
-				// c) look for a configurable number of randomly chosen dwellings in these units and compute residential satisfaction. take the first
-				//    dwelling with a higher result than the current dwelling (= satisfying). limit the number of dwellings
-				//    considered (sysparam)
-				// do this only, if the potential residential satisfaction is higher than the current
-				// residential satisfaction - otherwise save computing time! (depending on a sysparam)
-				if ((maxResidentialSatisfactionEstimate > household.getCurrentResidentialSatisfaction()) || (Common.getAlwaysLookForDwellings() != 0)) {
-					// do the extra mile and look for a dwelling
-					if (!residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket)) {
-						// if number of maximum search years reached - stop searching
-						//household.redefineAspirations();
-					}
-					// TODO: what happens if the household didn't find a new dwelling?
-					// depending on whether this was a forced move the household could stay at its current residence or vanish (= move outside)
+				if (potentialTargetSpatialUnitIds.size() == 0) {
+					hhNoAspiration++;
 				} else {
-					// TODO: what to do if the estimated residential satisfaction is not higher than
-					// the current one - household stays (except on a forced move)
+					// b) compare estimated residential satisfaction in these spatial units and select the highest scoring 
+					//    spatial units (random component for each unit, number of units selected as sysparam)
+					ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
+					int maxResidentialSatisfactionEstimate = household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
+					// c) look for a configurable number of randomly chosen dwellings in these units and compute residential satisfaction. take the first
+					//    dwelling with a higher result than the current dwelling (= satisfying). limit the number of dwellings
+					//    considered (sysparam)
+					// do this only, if the potential residential satisfaction is higher than the current
+					// residential satisfaction - otherwise save computing time! (depending on a sysparam)
+					if ((maxResidentialSatisfactionEstimate > household.getCurrentResidentialSatisfaction()) || (Common.getAlwaysLookForDwellings() != 0)) {
+						// do the extra mile and look for a dwelling
+						DwellingRow suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
+						if (suitableDwelling != null) {
+							household.relocate(dwellingsOnMarket, suitableDwelling);
+						} else {
+	//						if (!residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket)) {
+							// if number of maximum search years reached - stop searching
+							//household.redefineAspirations();
+							hhFoundNoDwellings++;
+						}
+						// TODO: what happens if the household didn't find a new dwelling?
+						// depending on whether this was a forced move the household could stay at its current residence or vanish (= move outside)
+					} else {
+						// TODO: what to do if the estimated residential satisfaction is not higher than
+						// the current one - household stays (except on a forced move)
+						hhNoSatisfaction++;
+					}
 				}
 			}
+			System.out.println(DateUtil.now() + " " + hhFoundNoDwellings + " out of " + potentialMovers.size() + " potential moving households found no dwelling");
+			System.out.println(DateUtil.now() + " " + hhNoSatisfaction + " out of " + potentialMovers.size() + " potential moving households would not improve their estimated residential satisfaction");
+			System.out.println(DateUtil.now() + " " + hhNoAspiration + " out of " + potentialMovers.size() + " potential moving households found no spatial unit within their aspiration region");
 			// Immigrating Households
 			ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(modelYear);
-			int hhFoundNoDwellings = 0;
+			hhFoundNoDwellings = 0; hhNoSatisfaction = 0;
 			for (HouseholdRow household : immigratingHouseholds) {
 				residentialMobility.estimateAspirationRegion(household, modelYear);
 				ArrayList<Integer> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
 				if (potentialTargetSpatialUnitIds.size() > 0) {
 					ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
 					household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
-					if (!residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket)) {
+					DwellingRow dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
+					if (dwelling == null) {
 						// household didn't find a suitable dwelling -> join another household
 						// TODO: update indicators
 						//household.redefineAspirations();
@@ -298,10 +315,11 @@ public class Main {
 				} else {
 					// no spatial units below the max costs for the household -> join another household
 					// TODO: update indicators
-					hhFoundNoDwellings++;
+					hhNoSatisfaction++;
 				}
 			}
 			System.out.println(DateUtil.now() + " " + hhFoundNoDwellings + " out of " + immigratingHouseholds.size() + " immigrating households found no dwelling");
+			System.out.println(DateUtil.now() + " " + hhNoSatisfaction + " out of " + immigratingHouseholds.size() + " potential moving households could not find spatial units matching their aspirations");
 		} // model year
 	}
 	
