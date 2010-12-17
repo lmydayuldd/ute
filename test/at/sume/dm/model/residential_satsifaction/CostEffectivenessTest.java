@@ -30,7 +30,7 @@ public class CostEffectivenessTest {
 	CostEffectiveness costEffectiveness;
 	Database db;
 //	Households hh;
-	HouseholdRow hhr1, hhr2, hhr3;
+	HouseholdRow hhr1, hhr2, hhr3, hhr4;
 	SpatialUnitRow sur1, sur2;
 
 	@Test(expected=AssertionError.class)
@@ -132,6 +132,26 @@ public class CostEffectivenessTest {
 		pr.setYearlyIncome(4000);
 		hhr3.addMember(pr);
 		hhr3.determineInitialHouseholdType();
+
+		// Household 3: immigration household - no current dwelling, 2 persons + 1 child, 4000 + 4000
+		hhr4 = new HouseholdRow();
+		hhr4.setId(4);
+		p = new Persons();
+		p.setDb(db);
+		
+		pr = new PersonRow();
+		pr.setId(7);
+		pr.setAge((byte)80);
+		pr.setSex((byte)1);
+		pr.setYearlyIncome(32063);
+		hhr4.addMember(pr);
+		hhr4.determineInitialHouseholdType();
+		dr = new DwellingRow();
+		hhr4.setDwelling(dr);
+		dr.setSpatialunitId(90101);
+		dr.setSpatialunit(sur1);
+		dr.setTotalYearlyDwellingCosts(120);
+		dr.setDwellingSize((short) 156);
 	}
 
 	/**
@@ -159,5 +179,7 @@ public class CostEffectivenessTest {
 		long residentialSatisfaction4 = costEffectiveness.calc(hhr3, hhr1.getDwelling(), 2001);
 		assertEquals("Residential satisfaction hh3/4", 1000, residentialSatisfaction4);
 //		System.out.println(residentialSatisfaction4);
+		long residentialSatisfaction5 = costEffectiveness.calc(hhr4, sur, 2001);
+		assertEquals("Residential satisfaction hh5", 1000, residentialSatisfaction5);
 	}
 }
