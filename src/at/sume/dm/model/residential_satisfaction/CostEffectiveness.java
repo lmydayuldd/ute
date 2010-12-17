@@ -23,13 +23,13 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 	 * @see at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionComponent#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.DwellingRow, at.sume.dm.entities.SpatialUnitRow, int)
 	 */
 	@Override
-	public long calc(HouseholdRow household, DwellingRow dwelling,
+	public short calc(HouseholdRow household, DwellingRow dwelling,
 			SpatialUnitRow spatialUnitId, int ModelYear) {
 		// TODO: add household-specific rentPerceptionModifier here, that may also increase over the years if the household
 		// is unable to find a new residence for a long time (?)
 		long potentialCostOfResidence = 0;
 		long currentCostOfResidence = 0;
-		long result = 0;
+		short result = 0;
 		if (!household.hasDwelling()) {
 //			assert dwelling != null : "Household has no dwelling and no other dwelling was given for cost effectiveness calculation";
 			if (dwelling == null) {
@@ -44,7 +44,7 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 				if (currentCostOfResidence <= 0)
 					result = 1000;
 				else
-					result = Math.round(potentialCostOfResidence * 1000 / currentCostOfResidence);
+					result = (short) Math.round(potentialCostOfResidence * 1000 / currentCostOfResidence);
 			}
 		} else {
 			if ((dwelling == null) || (dwelling == household.getDwelling())) {
@@ -55,7 +55,7 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 				if (currentCostOfResidence <= 0)
 					result = 1000;
 				else
-					result = Math.round(potentialCostOfResidence * 1000 / currentCostOfResidence);
+					result = (short) Math.round(potentialCostOfResidence * 1000 / currentCostOfResidence);
 			} else {
 				long costOfNewDwelling = dwelling.getTotalYearlyDwellingCosts();
 				if (household.getDwelling() == null) {
@@ -66,7 +66,7 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 				} else {
 					// Calculate cost effectiveness satisfaction for a given dwelling with considering the households current dwelling
 					currentCostOfResidence = household.getDwelling().getTotalYearlyDwellingCosts();
-					result = Math.round(currentCostOfResidence * 1000 / costOfNewDwelling);
+					result = (short) Math.round(currentCostOfResidence * 1000 / costOfNewDwelling);
 				}
 			}
 		}

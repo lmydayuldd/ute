@@ -304,7 +304,7 @@ public class UDPClassification extends ResidentialSatisfactionComponent {
 	 * @see at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionComponent#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow)
 	 */
 	@Override
-	public long calc(HouseholdRow household, DwellingRow dwelling, SpatialUnitRow spatialUnit, int modelYear) {
+	public short calc(HouseholdRow household, DwellingRow dwelling, SpatialUnitRow spatialUnit, int modelYear) {
 		// Lookup the UDP-indicators for the given spatial unit
 		SpatialUnitUdp lookupSpatialUnitUdp = new SpatialUnitUdp();
 		lookupSpatialUnitUdp.setSpatialUnitId(spatialUnit.getSpatialUnitId());
@@ -337,6 +337,6 @@ public class UDPClassification extends ResidentialSatisfactionComponent {
 		// Calculate the score
 		int hhScore = lookupHouseholdPrefs.getPrefDiversity() * lookupSpatialUnitUdp.getDiversityIndicator() + lookupHouseholdPrefs.getPrefTransportAccess() * lookupSpatialUnitUdp.getPublicTransportIndicator();
 		int hhScoreMax = lookupHouseholdPrefs.getPrefDiversity() * 4 + lookupHouseholdPrefs.getPrefTransportAccess() * 4;
-		return (hhScore * 1000) / hhScoreMax;
+		return (short) ((hhScore * 1000) / hhScoreMax);
 	}
 }

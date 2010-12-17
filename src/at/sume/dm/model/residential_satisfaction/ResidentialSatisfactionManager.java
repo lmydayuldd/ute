@@ -51,12 +51,12 @@ public enum ResidentialSatisfactionManager {
 	 * @param dwelling
 	 * @return Overall residential satisfaction in thousandth part
 	 */
-	public static int calcResidentialSatisfaction(HouseholdRow household, SpatialUnitRow spatialUnit, int modelYear) {
-		int rv = 0;
+	public static short calcResidentialSatisfaction(HouseholdRow household, SpatialUnitRow spatialUnit, int modelYear) {
+		short rv = 0;
 		for (ResidentialSatisfactionManager rs : values()) {
 			rv += rs.component.calc(household, spatialUnit, modelYear) * (rs.weight / 1000);
 		}
-		return rv / values().length;
+		return (short) (rv / values().length);
 	}
 	/**
 	 * Calculate the residential satisfaction level for a household in an arbitrary dwelling
