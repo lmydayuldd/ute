@@ -12,8 +12,12 @@ import at.sume.sampling.distributions.CostOfResidenceDistributionRow;
 import net.remesch.db.Database;
 
 /**
- * @author Alexander Remesch
+ * Sample household cost of residence from the table _DM_Cost of residence per living space based on the
+ * living space of the household
+ * 
+ * TODO: migrate this to Distribution class
  *
+ * @author Alexander Remesch
  */
 public class SampleHouseholdCostOfResidence extends SamplingDistribution<CostOfResidenceDistributionRow> {
 	private short householdLivingSpaceGroupId;
@@ -35,7 +39,7 @@ public class SampleHouseholdCostOfResidence extends SamplingDistribution<CostOfR
 	 */
 	@Override
 	public CostOfResidenceDistributionRow createRecordSetRow() {
-		return new CostOfResidenceDistributionRow(this);
+		return new CostOfResidenceDistributionRow();
 	}
 
 	/* (non-Javadoc)

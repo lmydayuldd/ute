@@ -11,9 +11,9 @@ import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
 
 /**
  * Monte Carlo sampling for household locations and household sizes
+ * Base table is vz_2001_haushalte (zb)
  * 
  * @author Alexander Remesch
- *
  */
 public class SampleHouseholds {
 	private static Distribution<HouseholdsPerSpatialUnit> spatialUnits;
@@ -25,7 +25,7 @@ public class SampleHouseholds {
 	public static void LoadDistribution(Database db) throws SQLException
 	{
 		int rowcount = 0;
-		ResultSet rs = db.executeQuery("select val(oestat) as gkz, hh_gesamt, hh_p1, hh_p2, hh_p3, hh_p4, hh_p5, hh_p6, hh_einrichtungen" +
+		ResultSet rs = db.executeQuery("select val(oestat) as gkz, hh_gesamt, hh_p1, hh_p2, hh_p3, hh_p4, hh_p5, hh_p6, personen_hh_p6, hh_einrichtungen" +
 				" from [vz_2001_haushalte (zb)] where len(oestat) = 6 order by oestat");
 //		try {
 //			rs.last();
@@ -42,13 +42,16 @@ public class SampleHouseholds {
 		while (rs.next())
 		{
 			HouseholdsPerSpatialUnit h = new HouseholdsPerSpatialUnit();
-			h.setSpatialUnitId(rs.getLong("gkz"));
+			h.setSpatialUnitId(rs.getInt("gkz"));
 			// TODO: Was sind die Einrichtungen und was tun wir damit?
-			h.setNrHouseholdsTotal(rs.getLong("hh_gesamt") - rs.getLong("hh_einrichtungen"));
-			h.setNrHouseholds_1P(rs.getLong("hh_p1"));
-			h.setNrHouseholds_2P(rs.getLong("hh_p2"));
-			h.setNrHouseholds_3P(rs.getLong("hh_p3"));
-			h.setNrHouseholds_4Pmore(rs.getLong("hh_p4") + rs.getLong("hh_p5") + rs.getLong("hh_p6"));
+			h.setNrHouseholdsTotal(rs.getInt("hh_gesamt") - rs.getInt("hh_einrichtungen"));
+			h.setNrHouseholds_1P(rs.getInt("hh_p1"));
+			h.setNrHouseholds_2P(rs.getInt("hh_p2"));
+			h.setNrHouseholds_3P(rs.getInt("hh_p3"));
+			h.setNrHouseholds_4P(rs.getInt("hh_p4"));
+			h.setNrHouseholds_5P(rs.getInt("hh_p5"));
+			h.setNrHouseholds_6Pplus(rs.getInt("hh_p6"));
+			h.setNrPersons_P6plus(rs.getInt("personen_hh_p6"));
 			spatialUnits.add(h.getNrHouseholdsTotal(), h);
 		}
 		rs.close();
@@ -88,13 +91,19 @@ public class SampleHouseholds {
 		hh_threshold += hhpsu.getNrHouseholds_3P();
 		if (random_household <= hh_threshold)
 			return 3;
-//		hh_threshold += hhpsu.getNrHouseholds_4Pmore();
+		hh_threshold += hhpsu.getNrHouseholds_4P();
+		if (random_household <= hh_threshold)
+			return 4;
+		hh_threshold += hhpsu.getNrHouseholds_5P();
+		if (random_household <= hh_threshold)
+			return 5;
+//		hh_threshold += hhpsu.getNrHouseholds_6Pplus();
 //		if (random_household <= hh_threshold)
-//			return 4;
+//			return 6;
 //		System.out.println("Problem: random_household (" + random_household + ") > hh_threshold (" + hh_threshold + ") bei GKZ " + hhpsu.getSpatialUnitId());
 //		return 0;
-		// TODO: we should be able to make households larger than 4 persons as well!!!
-		return 4;
+		// TODO: implement larger than 6 person households here
+		return 6;
 	}
 	
 	public static HouseholdsPerSpatialUnit GetSpatialUnitData(int index)
@@ -104,5 +113,9 @@ public class SampleHouseholds {
 	
 	public static long getNrHouseholdsTotalSum() {
 		return spatialUnits.getMaxThreshold();
+	}
+	
+	public static Distribution<HouseholdsPerSpatialUnit> getDistribution() {
+		return spatialUnits;
 	}
 }

@@ -12,8 +12,12 @@ import net.remesch.db.Database;
 import at.sume.sampling.distributions.LivingSpaceDistributionRow;
 
 /**
+ * Sample living space for a household from the table _DM_Living space per household size based on
+ * the household size
+ * 
+ * TODO: migrate this to Distribution class
+ *  
  * @author Alexander Remesch
- *
  */
 public class SampleHouseholdLivingSpace extends SamplingDistribution<LivingSpaceDistributionRow> {
 	private short householdSize;
@@ -35,7 +39,7 @@ public class SampleHouseholdLivingSpace extends SamplingDistribution<LivingSpace
 	 */
 	@Override
 	public LivingSpaceDistributionRow createRecordSetRow() {
-		return new LivingSpaceDistributionRow(this);
+		return new LivingSpaceDistributionRow();
 	}
 
 	/* (non-Javadoc)
