@@ -60,22 +60,22 @@ public class CostEffectivenessTest {
 		dr.setSpatialunitId(90101);
 		dr.setSpatialunit(sur1);
 		dr.setTotalYearlyDwellingCosts(12000);
-		dr.setDwellingSize(90);
+		dr.setDwellingSize((short) 90);
 		Persons p;
 		p = new Persons();
 		p.setDb(db);
 		
 		PersonRow pr = new PersonRow();
 		pr.setId(1);
-		pr.setAge((short)45);
-		pr.setSex((short)2);
+		pr.setAge((byte)45);
+		pr.setSex((byte)2);
 		pr.setYearlyIncome(30000);
 		hhr1.addMember(pr);
 		
 		pr = new PersonRow();
 		pr.setId(2);
-		pr.setAge((short)40);
-		pr.setSex((short)1);
+		pr.setAge((byte)40);
+		pr.setSex((byte)1);
 		pr.setYearlyIncome(20000);
 		hhr1.addMember(pr);
 		hhr1.determineInitialHouseholdType();
@@ -88,26 +88,26 @@ public class CostEffectivenessTest {
 		dr.setSpatialunitId(90101);
 		dr.setSpatialunit(sur1);
 		dr.setTotalYearlyDwellingCosts(15000);
-		dr.setDwellingSize(120);
+		dr.setDwellingSize((short) 120);
 		
 		pr = new PersonRow();
 		pr.setId(3);
-		pr.setAge((short)35);
-		pr.setSex((short)2);
+		pr.setAge((byte)35);
+		pr.setSex((byte)2);
 		pr.setYearlyIncome(30000);
 		hhr2.addMember(pr);
 		
 		pr = new PersonRow();
 		pr.setId(4);
-		pr.setAge((short)37);
-		pr.setSex((short)1);
+		pr.setAge((byte)37);
+		pr.setSex((byte)1);
 		pr.setYearlyIncome(0);
 		hhr2.addMember(pr);
 		
 		pr = new PersonRow();
 		pr.setId(5);
-		pr.setAge((short)6);
-		pr.setSex((short)1);
+		pr.setAge((byte)6);
+		pr.setSex((byte)1);
 		pr.setYearlyIncome(0);
 		hhr2.addMember(pr);
 		hhr2.determineInitialHouseholdType();
@@ -120,15 +120,15 @@ public class CostEffectivenessTest {
 		
 		pr = new PersonRow();
 		pr.setId(5);
-		pr.setAge((short)28);
-		pr.setSex((short)2);
+		pr.setAge((byte)28);
+		pr.setSex((byte)2);
 		pr.setYearlyIncome(4000);
 		hhr3.addMember(pr);
 		
 		pr = new PersonRow();
 		pr.setId(6);
-		pr.setAge((short)26);
-		pr.setSex((short)1);
+		pr.setAge((byte)26);
+		pr.setSex((byte)1);
 		pr.setYearlyIncome(4000);
 		hhr3.addMember(pr);
 		hhr3.determineInitialHouseholdType();
