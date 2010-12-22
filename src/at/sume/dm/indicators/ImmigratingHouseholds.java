@@ -24,7 +24,7 @@ public class ImmigratingHouseholds extends IndicatorBase<ImmigratingHouseholdsRo
 		ImmigratingHouseholdsRow lookup = new ImmigratingHouseholdsRow();
 		lookup.setSpatialUnitId(household.getDwelling().getSpatialunitId());
 		lookup.setIncomeGroupId(IncomeGroup.getIncomeGroupId(household.getYearlyIncome()));
-		lookup.setHouseholdSize((short) Math.max(4, household.getMembers().size()));
+		lookup.setHouseholdSize((byte) Math.max(4, household.getMembers().size()));
 		return Collections.binarySearch(indicatorList, lookup);
 	}
 
@@ -36,7 +36,7 @@ public class ImmigratingHouseholds extends IndicatorBase<ImmigratingHouseholdsRo
 		ImmigratingHouseholdsRow b = new ImmigratingHouseholdsRow();
 		b.setSpatialUnitId(household.getDwelling().getSpatialunitId());
 		b.setIncomeGroupId(IncomeGroup.getIncomeGroupId(household.getYearlyIncome()));
-		b.setHouseholdSize((short) Math.max(4, household.getMembers().size()));
+		b.setHouseholdSize((byte) Math.max(4, household.getMembers().size()));
 		b.setHouseholdCount(1);
 		b.setPersonCount(household.getMembers().size());
 		indicatorList.add(pos, b);

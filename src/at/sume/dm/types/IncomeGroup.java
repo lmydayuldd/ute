@@ -16,10 +16,10 @@ import at.sume.dm.Common;
  */
 public class IncomeGroup {
 	public static class IncomeGroupRow {
-		public short id;
+		public byte id;
 		public String incomeGroup;
-		public long minincome;
-		public long maxincome;
+		public int minincome;
+		public int maxincome;
 	}
 	static ArrayList<IncomeGroupRow> incomeGroups;
 	static {
@@ -43,7 +43,7 @@ public class IncomeGroup {
 	 * @param income
 	 * @return
 	 */
-	public static short getIncomeGroupId(long income) {
+	public static byte getIncomeGroupId(int income) {
 		for (IncomeGroupRow i : incomeGroups) {
 			if ((i.minincome <= income) && (income <= i.maxincome)) {
 				return i.id;
@@ -57,7 +57,7 @@ public class IncomeGroup {
 	 * @param incomeGroupId
 	 * @return
 	 */
-	public static String getIncomeGroupNameDirect(short incomeGroupId) {
+	public static String getIncomeGroupNameDirect(byte incomeGroupId) {
 		assert incomeGroupId > 0 : "incomeGroupId <= 0";
 		assert incomeGroupId <= incomeGroups.size() : "incomeGroupId > " + incomeGroups.size();
 		return incomeGroups.get(incomeGroupId - 1).incomeGroup;
