@@ -17,8 +17,8 @@ public enum HouseholdType {
 	COUPLE_OLD,
 	OTHER;
 	
-	public static byte getId(HouseholdType householdType) {
-		switch (householdType) {
+	public byte getId() {
+		switch (this) {
 		case SINGLE_YOUNG:
 			return 1;
 		case COUPLE_YOUNG:
@@ -35,6 +35,32 @@ public enum HouseholdType {
 			return 7;
 		case OTHER:
 			return 8;
+		default:
+			throw new AssertionError("Unknown householdType");
+		}
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Enum#toString()
+	 */
+	@Override
+	public String toString() {
+		switch (this) {
+		case SINGLE_YOUNG:
+			return "single young";
+		case COUPLE_YOUNG:
+			return "couple young";
+		case SINGLE_PARENT:
+			return "single parent";
+		case SMALL_FAMILY:
+			return "small family";
+		case LARGE_FAMILY:
+			return "large family";
+		case SINGLE_OLD:
+			return "single old";
+		case COUPLE_OLD:
+			return "couple old";
+		case OTHER:
+			return "other";
 		default:
 			throw new AssertionError("Unknown householdType");
 		}

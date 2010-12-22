@@ -4,7 +4,6 @@
 package at.sume.dm.model.output;
 
 import at.sume.dm.entities.HouseholdRow;
-import at.sume.dm.types.HouseholdType;
 
 /**
  * @author Alexander Remesch
@@ -21,7 +20,8 @@ public class OutputHouseholdRow implements OutputRow {
 	private short aspirationRegionLivingSpaceMax;
 	private int aspirationRegionMaxCosts;
 	private short currentResidentialSatisfaction;
-	private short rsUdp;
+	private short rsUdpCentrality;
+	private short rsUdpPublicTransportAccessibility;
 	private short rsCostEffectiveness;
 	private short rsEnvironmentalAmenities;
 	private short rsSocialPrestige;
@@ -32,12 +32,13 @@ public class OutputHouseholdRow implements OutputRow {
 		this.householdId = household.getHouseholdId();
 		this.householdSize = (byte) household.getMemberCount();
 		this.dwellingId = household.getDwelling().getDwellingId();
-		this.householdType = HouseholdType.getId(household.getHouseholdType());
+		this.householdType = household.getHouseholdType().getId();
 		this.movingDecisionYear = household.getMovingDecisionYear();
 		this.aspirationRegionLivingSpaceMin = household.getAspirationRegionLivingSpaceMin();
 		this.aspirationRegionLivingSpaceMax = household.getAspirationRegionLivingSpaceMax();
 		this.currentResidentialSatisfaction = household.getCurrentResidentialSatisfaction();
-		this.rsUdp = household.rsUdp;
+		this.rsUdpCentrality = household.rsUdpCentrality;
+		this.rsUdpPublicTransportAccessibility = household.rsUdpPublicTransportAccessibility;
 		this.rsCostEffectiveness = household.rsCostEffectiveness;
 		this.rsEnvironmentalAmenities = household.rsEnvironmentalAmenities;
 		this.rsSocialPrestige = household.rsSocialPrestige;
@@ -51,6 +52,6 @@ public class OutputHouseholdRow implements OutputRow {
 		return modelYear + ";" + householdId + ";" + householdSize + ";" + dwellingId + ";" + 
 			householdType + ";" + movingDecisionYear + ";" + aspirationRegionLivingSpaceMin + ";" +
 			aspirationRegionLivingSpaceMax + ";" + aspirationRegionMaxCosts + ";" + currentResidentialSatisfaction + ";" +
-			rsUdp + ";" + rsCostEffectiveness + ";" + rsEnvironmentalAmenities + ";" + rsSocialPrestige + ";" + rsDesiredLivingSpace;
+			rsUdpCentrality + ";" + rsUdpPublicTransportAccessibility + ";" + rsCostEffectiveness + ";" + rsEnvironmentalAmenities + ";" + rsSocialPrestige + ";" + rsDesiredLivingSpace;
 	}
 }

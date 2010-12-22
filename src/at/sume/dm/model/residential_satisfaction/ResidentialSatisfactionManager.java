@@ -3,6 +3,8 @@
  */
 package at.sume.dm.model.residential_satisfaction;
 
+import java.util.ArrayList;
+
 import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.SpatialUnitRow;
@@ -13,25 +15,32 @@ import at.sume.dm.entities.SpatialUnitRow;
  */
 public enum ResidentialSatisfactionManager {
 	SOCIALPRESTIGE(new SocialPrestige()),
-	COSTEFFECTIVENESS(new CostEffectiveness()),
-	DESIREDLIVINGSPACE(new DesiredLivingSpace()),
-	ENVIRONMENTALAMENITIES(new EnvironmentalAmenities()),
-	UDPCLASSIFICATION(new UDPClassification());
-	
+	COSTEFFECTIVENESS(new CostEffectiveness(), ResidentialSatisfactionWeight.getPrefCosts()),
+	DESIREDLIVINGSPACE(new DesiredLivingSpace(), ResidentialSatisfactionWeight.getPrefLivingSpace()),
+	ENVIRONMENTALAMENITIES(new EnvironmentalAmenities(), ResidentialSatisfactionWeight.getPrefEnvAmen()),
+	UDPCENTRALITY(new UDPCentrality(), ResidentialSatisfactionWeight.getPrefCentrality()),
+	UDPTRANSPORT(new UDPPublicTransportAccessibility(), ResidentialSatisfactionWeight.getPrefTransportAccess());
+
 	private ResidentialSatisfactionComponent component;
-	private int weight;
+	private ArrayList<Short> weightList;
+	private static short maxWeight = 4;
 
 	ResidentialSatisfactionManager(ResidentialSatisfactionComponent component) {
 		this.component = component;
-		this.weight = 1000;
+		this.weightList = null;
+	}
+	
+	ResidentialSatisfactionManager(ResidentialSatisfactionComponent component, ArrayList<Short> weightList) {
+		this.component = component;
+		this.weightList = weightList;
 	}
 	
 	/**
 	 * Set the weight for each component of residential satisfaction
-	 * @param weight
+	 * @param weightList
 	 */
-	public void setWeight(int weight) {
-		this.weight = weight;
+	public void setWeight(ArrayList<Short> weightList) {
+		this.weightList = weightList;
 	}
 	
 	/**
@@ -52,26 +61,21 @@ public enum ResidentialSatisfactionManager {
 	 * @return Overall residential satisfaction in thousandth part
 	 */
 	public static short calcResidentialSatisfaction(HouseholdRow household, SpatialUnitRow spatialUnit, int modelYear) {
-		int rv = 0;
+		long rv = 0;
+		short weight = maxWeight;
+		int weightSum = 0;
 		for (ResidentialSatisfactionManager rs : values()) {
-			int value = rs.component.calc(household, spatialUnit, modelYear) * (rs.weight / 1000);
-			String componentName = rs.component.getClass().getName();
-			if (componentName.equals("at.sume.dm.model.residential_satisfaction.SocialPrestige")) {
-				household.rsSocialPrestige = (short) value;
-			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.CostEffectiveness")) {
-				household.rsCostEffectiveness = (short) value;
-			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.DesiredLivingSpace")) {
-				household.rsDesiredLivingSpace = (short) value;
-			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.EnvironmentalAmenities")) {
-				household.rsEnvironmentalAmenities = (short) value;
-			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.UDPClassification")) {
-				household.rsUdp = (short) value;
-			} else {
-				throw new AssertionError("Invalid component " + componentName);
-			}
+			if (rs.weightList != null)
+				weight = rs.weightList.get(household.getHouseholdType().getId() - 1);
+			if (weight == 0)
+				continue;
+			int value = rs.component.calc(household, spatialUnit, modelYear) * weight;
 			rv += value;
+			weightSum += weight;
 		}
-		return (short) (rv / values().length);
+		long result = rv / weightSum;
+		assert (result >= 0) && (result <= 32767) : "Residential satisfaction out of range (" + result + ")";
+		return (short) result;
 	}
 	/**
 	 * Calculate the residential satisfaction level for a household in an arbitrary dwelling
@@ -81,26 +85,21 @@ public enum ResidentialSatisfactionManager {
 	 * @return Overall residential satisfaction in thousandth part
 	 */
 	public static short calcResidentialSatisfaction(HouseholdRow household, DwellingRow dwelling, int modelYear) {
-		int rv = 0;
+		long rv = 0;
+		short weight = maxWeight;
+		int weightSum = 0;
 		for (ResidentialSatisfactionManager rs : values()) {
-			int value = rs.component.calc(household, dwelling, modelYear) * (rs.weight / 1000);
-			String componentName = rs.component.getClass().getName();
-			if (componentName.equals("at.sume.dm.model.residential_satisfaction.SocialPrestige")) {
-				household.rsSocialPrestige = (short) value;
-			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.CostEffectiveness")) {
-				household.rsCostEffectiveness = (short) value;
-			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.DesiredLivingSpace")) {
-				household.rsDesiredLivingSpace = (short) value;
-			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.EnvironmentalAmenities")) {
-				household.rsEnvironmentalAmenities = (short) value;
-			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.UDPClassification")) {
-				household.rsUdp = (short) value;
-			} else {
-				throw new AssertionError("Invalid component " + componentName);
-			}
+			if (rs.weightList != null)
+				weight = rs.weightList.get(household.getHouseholdType().getId() - 1);
+			if (weight == 0)
+				continue;
+			int value = rs.component.calc(household, dwelling, modelYear) * weight;
 			rv += value;
+			weightSum += weight;
 		}
-		return (short) (rv / values().length);
+		long result = rv / weightSum;
+		assert (result >= 0) && (result <= 32767) : "Residential satisfaction out of range (" + result + ")";
+		return (short) result;
 	}
 	public ResidentialSatisfactionComponent getComponent() {
 		return component;

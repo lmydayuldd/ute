@@ -74,6 +74,8 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 		}
 		if (result > 1000)
 			return 1000;
+		assert result >= 0 : "rsCostEffectiveness out of range (" + result + ")";
+		household.rsCostEffectiveness = (short) result;
 		return (short) result;
 	}
 }

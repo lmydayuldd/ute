@@ -87,7 +87,8 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	private ArrayList<SpatialUnitScore> residentialSatisfactionEstimate;
 	private short currentResidentialSatisfaction;
 	// residential satisfaction components
-	public short rsUdp;
+	public short rsUdpCentrality;
+	public short rsUdpPublicTransportAccessibility;
 	public short rsCostEffectiveness;
 	public short rsEnvironmentalAmenities;
 	public short rsSocialPrestige;

@@ -29,12 +29,18 @@ public class SocialPrestige extends ResidentialSatisfactionComponent {
 		
 		// income only influences residential satisfaction if the neighborhood income is lower
 		// TODO: individual threshold for this comparison?!?
+		long result;
 		if ((hhIncome > avgIncome) && (hhIncome > 0)) {
 			// satisfaction = percentage of avg. income to household income
-			return (short) ((avgIncome * 1000) / hhIncome);
+			result = (avgIncome * 1000) / hhIncome;
 		} else {
 			// 100% satisfaction here
-			return 1000;
+			result = 1000;
 		}
+		if (result > 1000)
+			result = 1000;
+		assert result >= 0 : "rsSocialPrestige out of range (" + result + ")";
+		household.rsSocialPrestige = (short) result;
+		return (short) result;
 	}
 }

@@ -46,6 +46,8 @@ public class DesiredLivingSpace extends ResidentialSatisfactionComponent {
 		result = (short) Math.round(currentLivingSpace * 1000 / desiredLivingSpace);
 		if (result > 1000)
 			return 1000;
+		assert result >= 0 : "rsDesiredLivingSpace out of range (" + result + ")";
+		household.rsDesiredLivingSpace = result;
 		return result;
 	}
 }
