@@ -15,75 +15,75 @@ import at.sume.dm.indicators.base.Indicator;
  */
 public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 	private static class BaseIndicators implements Comparable<BaseIndicators> {
-		private long spatialUnitId;
-		private long householdCount;
-		private long personCount;
-		private long costOfResidenceSum;
-		private long costOfResidencePerSqmSum;
+		private int spatialUnitId;
+		private int householdCount;
+		private int personCount;
+		private long yearlyRentSum;
+		private long yearlyRentPer100SqmSum;
 		
 		/**
 		 * @return the spatialUnitId
 		 */
-		public long getSpatialUnitId() {
+		public int getSpatialUnitId() {
 			return spatialUnitId;
 		}
 		/**
 		 * @param spatialUnitId the spatialUnitId to set
 		 */
-		public void setSpatialUnitId(long spatialUnitId) {
+		public void setSpatialUnitId(int spatialUnitId) {
 			this.spatialUnitId = spatialUnitId;
 		}
-		public long getHouseholdCount() {
+		public int getHouseholdCount() {
 			return householdCount;
 		}
 		/**
 		 * @param householdCount the householdCount to set
 		 */
-		public void setHouseholdCount(long householdCount) {
+		public void setHouseholdCount(int householdCount) {
 			this.householdCount = householdCount;
 		}
 		/**
 		 * @return the personCount
 		 */
-		public long getPersonCount() {
+		public int getPersonCount() {
 			return personCount;
 		}
 		/**
 		 * @param personCount the personCount to set
 		 */
-		public void setPersonCount(long personCount) {
+		public void setPersonCount(int personCount) {
 			this.personCount = personCount;
 		}
 		/**
 		 * @return the costOfResidenceSum
 		 */
-		public long getCostOfResidenceSum() {
-			return costOfResidenceSum;
+		public long getYearlyRentSum() {
+			return yearlyRentSum;
 		}
 		/**
 		 * @param costOfResidenceSum the costOfResidenceSum to set
 		 */
-		public void setCostOfResidenceSum(long costOfResidenceSum) {
-			this.costOfResidenceSum = costOfResidenceSum;
+		public void setYearlyRentSum(long yearlyRentSum) {
+			this.yearlyRentSum = yearlyRentSum;
 		}
 		/**
 		 * @return the costOfResidencePerSqmSum
 		 */
-		public long getCostOfResidencePerSqmSum() {
-			return costOfResidencePerSqmSum;
+		public long getYearlyRentPer100SqmSum() {
+			return yearlyRentPer100SqmSum;
 		}
 		/**
 		 * @param costOfResidencePerSqmSum the costOfResidencePerSqmSum to set
 		 */
-		public void setCostOfResidencePerSqmSum(long costOfResidencePerSqmSum) {
-			this.costOfResidencePerSqmSum = costOfResidencePerSqmSum;
+		public void setYearlyRentPer100SqmSum(long yearlyRentPer100SqmSum) {
+			this.yearlyRentPer100SqmSum = yearlyRentPer100SqmSum;
 		}
 		/* (non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
 		@Override
 		public int compareTo(BaseIndicators arg0) {
-			return ((Long)spatialUnitId).compareTo(arg0.getSpatialUnitId());
+			return ((Integer)spatialUnitId).compareTo(arg0.getSpatialUnitId());
 		}
 	}
 
@@ -104,16 +104,16 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 			b.setSpatialUnitId(hh.getSpatialunitId());
 			b.setHouseholdCount(1);
 			b.setPersonCount(hh.getMemberCount());
-			b.setCostOfResidenceSum(hh.getCostOfResidence());
-			b.setCostOfResidencePerSqmSum(hh.getCostOfResidence() / hh.getLivingSpace());
+			b.setYearlyRentSum(hh.getCostOfResidence());
+			b.setYearlyRentPer100SqmSum(hh.getCostOfResidence() * 100 / hh.getLivingSpace());
 			indicatorList.add(pos, b);
 		} else {
 			// available at position pos
 			BaseIndicators b = indicatorList.get(pos);
 			b.setHouseholdCount(b.getHouseholdCount() + 1);
 			b.setPersonCount(b.getPersonCount() + hh.getMemberCount());
-			b.setCostOfResidenceSum(b.getCostOfResidenceSum() + hh.getCostOfResidence());
-			b.setCostOfResidencePerSqmSum(b.getCostOfResidencePerSqmSum() + hh.getCostOfResidence() / hh.getLivingSpace());
+			b.setYearlyRentSum(b.getYearlyRentSum() + hh.getCostOfResidence());
+			b.setYearlyRentPer100SqmSum(b.getYearlyRentPer100SqmSum() + (hh.getCostOfResidence() * 100) / hh.getLivingSpace());
 			indicatorList.set(pos, b);
 		}
 	}
@@ -134,8 +134,8 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 			BaseIndicators b = indicatorList.get(pos);
 			b.setHouseholdCount(b.getHouseholdCount() - 1);
 			b.setPersonCount(b.getPersonCount() - hh.getMemberCount());
-			b.setCostOfResidenceSum(b.getCostOfResidenceSum() - hh.getCostOfResidence());
-			b.setCostOfResidencePerSqmSum(b.getCostOfResidencePerSqmSum() - hh.getCostOfResidence() / hh.getLivingSpace());
+			b.setYearlyRentSum(b.getYearlyRentSum() - hh.getCostOfResidence());
+			b.setYearlyRentPer100SqmSum(b.getYearlyRentPer100SqmSum() - (hh.getCostOfResidence() * 100) / hh.getLivingSpace());
 			indicatorList.set(pos, b);
 			
 			assert b.getHouseholdCount() >= 0 : "MoversIndicatorsPerSpatialUnit.remove() - " + hh.getSpatialunitId() + ": householdCount < 0";
@@ -158,13 +158,13 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 	 * @param spatialUnitId
 	 * @return
 	 */
-	public static long getAvgCostOfResidence(long spatialUnitId) {
+	public static long getAvgYearlyTotalRent(int spatialUnitId) {
 		BaseIndicators lookup = new BaseIndicators();
 		lookup.setSpatialUnitId(spatialUnitId);
 		int pos = Collections.binarySearch(indicatorList, lookup);
 		if (pos >= 0) {
 			BaseIndicators b = indicatorList.get(pos);
-			return b.getCostOfResidenceSum() / b.getHouseholdCount();
+			return b.getYearlyRentSum() / b.getHouseholdCount();
 		} else {
 			return 0;
 		}
@@ -177,13 +177,13 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 	 * @param spatialUnitId
 	 * @return
 	 */
-	public static int getAvgCostOfResidencePer100Sqm(int spatialUnitId) {
+	public static int getAvgYearlyRentPer100Sqm(int spatialUnitId) {
 		BaseIndicators lookup = new BaseIndicators();
 		lookup.setSpatialUnitId(spatialUnitId);
 		int pos = Collections.binarySearch(indicatorList, lookup);
 		if (pos >= 0) {
 			BaseIndicators b = indicatorList.get(pos);
-			return (int) (b.getCostOfResidencePerSqmSum() * 100 / b.getHouseholdCount());
+			return (int) (b.getYearlyRentPer100SqmSum() / b.getHouseholdCount());
 		} else {
 			return 0;
 		}

@@ -8,6 +8,7 @@ import java.util.Random;
 
 import net.remesch.db.Database;
 import at.sume.dm.demography.Fertility;
+import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
 
 /**
@@ -47,8 +48,9 @@ public class ChildBirth extends Event<PersonRow> {
 	@Override
 	public void action(PersonRow entity) {
 		// if a child is born, it will be added to the household of the mother
+		HouseholdRow household = entity.getHousehold();
 		PersonRow child = new PersonRow();
-		child.setHousehold(entity.getHousehold());
+		child.setHousehold(household);
 		child.setAgeGroupId((byte) 1);
 //		child.setAge((short) 0);
 //		child.setHouseholdRepresentative(false);

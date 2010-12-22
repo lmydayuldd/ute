@@ -21,6 +21,11 @@ public class OutputHouseholdRow implements OutputRow {
 	private short aspirationRegionLivingSpaceMax;
 	private int aspirationRegionMaxCosts;
 	private short currentResidentialSatisfaction;
+	private short rsUdp;
+	private short rsCostEffectiveness;
+	private short rsEnvironmentalAmenities;
+	private short rsSocialPrestige;
+	private short rsDesiredLivingSpace;
 	
 	public OutputHouseholdRow(short modelYear, HouseholdRow household) {
 		this.modelYear = modelYear;
@@ -32,6 +37,11 @@ public class OutputHouseholdRow implements OutputRow {
 		this.aspirationRegionLivingSpaceMin = household.getAspirationRegionLivingSpaceMin();
 		this.aspirationRegionLivingSpaceMax = household.getAspirationRegionLivingSpaceMax();
 		this.currentResidentialSatisfaction = household.getCurrentResidentialSatisfaction();
+		this.rsUdp = household.rsUdp;
+		this.rsCostEffectiveness = household.rsCostEffectiveness;
+		this.rsEnvironmentalAmenities = household.rsEnvironmentalAmenities;
+		this.rsSocialPrestige = household.rsSocialPrestige;
+		this.rsDesiredLivingSpace = household.rsDesiredLivingSpace;
 	}
 	/* (non-Javadoc)
 	 * @see at.sume.dm.model.output.OutputRow#toCsv()
@@ -40,6 +50,7 @@ public class OutputHouseholdRow implements OutputRow {
 	public String toCsv() {
 		return modelYear + ";" + householdId + ";" + householdSize + ";" + dwellingId + ";" + 
 			householdType + ";" + movingDecisionYear + ";" + aspirationRegionLivingSpaceMin + ";" +
-			aspirationRegionLivingSpaceMax + ";" + aspirationRegionMaxCosts + ";" + currentResidentialSatisfaction;
+			aspirationRegionLivingSpaceMax + ";" + aspirationRegionMaxCosts + ";" + currentResidentialSatisfaction + ";" +
+			rsUdp + ";" + rsCostEffectiveness + ";" + rsEnvironmentalAmenities + ";" + rsSocialPrestige + ";" + rsDesiredLivingSpace;
 	}
 }

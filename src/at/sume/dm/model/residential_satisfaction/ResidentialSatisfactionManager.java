@@ -52,9 +52,24 @@ public enum ResidentialSatisfactionManager {
 	 * @return Overall residential satisfaction in thousandth part
 	 */
 	public static short calcResidentialSatisfaction(HouseholdRow household, SpatialUnitRow spatialUnit, int modelYear) {
-		short rv = 0;
+		int rv = 0;
 		for (ResidentialSatisfactionManager rs : values()) {
-			rv += rs.component.calc(household, spatialUnit, modelYear) * (rs.weight / 1000);
+			int value = rs.component.calc(household, spatialUnit, modelYear) * (rs.weight / 1000);
+			String componentName = rs.component.getClass().getName();
+			if (componentName.equals("at.sume.dm.model.residential_satisfaction.SocialPrestige")) {
+				household.rsSocialPrestige = (short) value;
+			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.CostEffectiveness")) {
+				household.rsCostEffectiveness = (short) value;
+			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.DesiredLivingSpace")) {
+				household.rsDesiredLivingSpace = (short) value;
+			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.EnvironmentalAmenities")) {
+				household.rsEnvironmentalAmenities = (short) value;
+			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.UDPClassification")) {
+				household.rsUdp = (short) value;
+			} else {
+				throw new AssertionError("Invalid component " + componentName);
+			}
+			rv += value;
 		}
 		return (short) (rv / values().length);
 	}
@@ -68,7 +83,22 @@ public enum ResidentialSatisfactionManager {
 	public static short calcResidentialSatisfaction(HouseholdRow household, DwellingRow dwelling, int modelYear) {
 		int rv = 0;
 		for (ResidentialSatisfactionManager rs : values()) {
-			rv += rs.component.calc(household, dwelling, modelYear) * (rs.weight / 1000);
+			int value = rs.component.calc(household, dwelling, modelYear) * (rs.weight / 1000);
+			String componentName = rs.component.getClass().getName();
+			if (componentName.equals("at.sume.dm.model.residential_satisfaction.SocialPrestige")) {
+				household.rsSocialPrestige = (short) value;
+			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.CostEffectiveness")) {
+				household.rsCostEffectiveness = (short) value;
+			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.DesiredLivingSpace")) {
+				household.rsDesiredLivingSpace = (short) value;
+			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.EnvironmentalAmenities")) {
+				household.rsEnvironmentalAmenities = (short) value;
+			} else if (componentName.equals("at.sume.dm.model.residential_satisfaction.UDPClassification")) {
+				household.rsUdp = (short) value;
+			} else {
+				throw new AssertionError("Invalid component " + componentName);
+			}
+			rv += value;
 		}
 		return (short) (rv / values().length);
 	}

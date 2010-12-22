@@ -32,13 +32,16 @@ public class ResidentialMobility {
 			household.estimateDesiredLivingSpace();
 			// lower value from income share and current dwelling costs (per m²)
 			int maxCostOfResidencePerSqm = maxCostOfResidence / household.getAspirationRegionLivingSpaceMin();
-			int currentCostOfResidencePerSqm = 0;
-			if (household.hasDwelling()) {
-				currentCostOfResidencePerSqm = household.getCostOfResidence() / household.getLivingSpace();
-			} else {
-				currentCostOfResidencePerSqm = maxCostOfResidencePerSqm;
-			}
-			household.setAspirationRegionMaxCosts(Math.min(maxCostOfResidencePerSqm, currentCostOfResidencePerSqm));
+			// AR 201221 - don't consider current cost of residence here because otherwise a household
+			// will never look for a more expensive dwelling than the current one
+//			int currentCostOfResidencePerSqm = 0;
+//			if (household.hasDwelling()) {
+//				currentCostOfResidencePerSqm = household.getCostOfResidence() / household.getLivingSpace();
+//			} else {
+//				currentCostOfResidencePerSqm = maxCostOfResidencePerSqm;
+//			}
+//			household.setAspirationRegionMaxCosts(Math.min(maxCostOfResidencePerSqm, currentCostOfResidencePerSqm));
+			household.setAspirationRegionMaxCosts(maxCostOfResidencePerSqm);
 		} else {
 			// Household continues searching - modify values from previous year
 			// if maximum costs are already at the maximum for the household then reduce minimum
@@ -78,13 +81,17 @@ public class ResidentialMobility {
 			DwellingRow suitableDwelling;
 			for (int i = 0; i != Common.getDwellingsConsideredPerYear(); i++) {
 				suitableDwelling = dwellingsOnMarket.pickRandomSuitableDwelling();
-				int potentialResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, suitableDwelling, modelYear);
-				if (potentialResidentialSatisfaction > household.getCurrentResidentialSatisfaction()) {
-					// we have the dwelling - move there!
+				if (!household.hasDwelling()) {
 					return suitableDwelling;
-//					household.relocate(dwellingsOnMarket, suitableDwelling);
-//					householdMoved = true;
-//					break;
+				} else {
+					int potentialResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, suitableDwelling, modelYear);
+					if (potentialResidentialSatisfaction > household.getCurrentResidentialSatisfaction()) {
+						// we have the dwelling - move there!
+						return suitableDwelling;
+	//					household.relocate(dwellingsOnMarket, suitableDwelling);
+	//					householdMoved = true;
+	//					break;
+					}
 				}
 			}
 		} else {

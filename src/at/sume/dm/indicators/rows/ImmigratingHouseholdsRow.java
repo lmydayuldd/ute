@@ -11,79 +11,79 @@ import at.sume.dm.types.IncomeGroup;
  *
  */
 public class ImmigratingHouseholdsRow extends IndicatorRow implements Comparable<ImmigratingHouseholdsRow> {
-	private long spatialUnitId;
-	private short incomeGroupId;
-	private short householdSize;
-	private long householdCount;
-	private long personCount;
+	private int spatialUnitId;
+	private byte incomeGroupId;
+	private byte householdSize;
+	private int householdCount;
+	private int personCount;
 
 	/**
 	 * @return the spatialUnitId
 	 */
-	public long getSpatialUnitId() {
+	public int getSpatialUnitId() {
 		return spatialUnitId;
 	}
 
 	/**
 	 * @param spatialUnitId the spatialUnitId to set
 	 */
-	public void setSpatialUnitId(long spatialUnitId) {
+	public void setSpatialUnitId(int spatialUnitId) {
 		this.spatialUnitId = spatialUnitId;
 	}
 
 	/**
 	 * @return the incomeGroup
 	 */
-	public short getIncomeGroupId() {
+	public byte getIncomeGroupId() {
 		return incomeGroupId;
 	}
 
 	/**
 	 * @param incomeGroup the incomeGroup to set
 	 */
-	public void setIncomeGroupId(short incomeGroupId) {
+	public void setIncomeGroupId(byte incomeGroupId) {
 		this.incomeGroupId = incomeGroupId;
 	}
 
 	/**
 	 * @return the householdSize
 	 */
-	public short getHouseholdSize() {
+	public byte getHouseholdSize() {
 		return householdSize;
 	}
 
 	/**
 	 * @param householdSize the householdSize to set
 	 */
-	public void setHouseholdSize(short householdSize) {
+	public void setHouseholdSize(byte householdSize) {
 		this.householdSize = householdSize;
 	}
 
 	/**
 	 * @return the householdCount
 	 */
-	public long getHouseholdCount() {
+	public int getHouseholdCount() {
 		return householdCount;
 	}
 
 	/**
 	 * @param householdCount the householdCount to set
 	 */
-	public void setHouseholdCount(long householdCount) {
+	public void setHouseholdCount(int householdCount) {
 		this.householdCount = householdCount;
 	}
 
 	/**
 	 * @return the personCount
 	 */
-	public long getPersonCount() {
+	public int getPersonCount() {
 		return personCount;
 	}
 
 	/**
 	 * @param personCount the personCount to set
 	 */
-	public void setPersonCount(long personCount) {
+	public void setPersonCount(int personCount) {
 		this.personCount = personCount;
 	}
 
@@ -92,11 +92,11 @@ public class ImmigratingHouseholdsRow extends IndicatorRow implements Comparable
 	 */
 	@Override
 	public int compareTo(ImmigratingHouseholdsRow arg0) {
-		int result = ((Long)spatialUnitId).compareTo(arg0.getSpatialUnitId());
+		int result = ((Integer)spatialUnitId).compareTo(arg0.getSpatialUnitId());
 		if (result == 0)
-			result = ((Short)householdSize).compareTo(arg0.getHouseholdSize());
+			result = ((Byte)householdSize).compareTo(arg0.getHouseholdSize());
 		if (result == 0)
-			result = ((Short)incomeGroupId).compareTo(arg0.getIncomeGroupId());
+			result = ((Byte)incomeGroupId).compareTo(arg0.getIncomeGroupId());
 		return result;
 	}
 	/* (non-Javadoc)

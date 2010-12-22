@@ -25,7 +25,8 @@ public class FileOutputHouseholds extends FileOutput<HouseholdRow> {
 
 	public String toCsvHeadline() {
 		return "ModelYear;HouseholdId;HouseholdSize;DwellingId;HouseholdType;MovingDecisionYear;" +
-			"AspirationRegionLivingSpaceMin;AspirationRegionLivingSpaceMax;AspirationRegionMaxCosts;CurrentResidentialSatisfaction";
+			"AspirationRegionLivingSpaceMin;AspirationRegionLivingSpaceMax;AspirationRegionMaxCosts;" + 
+			"CurrentResidentialSatisfaction;rsUdp;rsCostEffectiveness;rsEnvironmentalAmenities;rsSocialPrestige;rsDesiredLivingSpace";
 	}
 
 	/* (non-Javadoc)

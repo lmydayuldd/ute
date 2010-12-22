@@ -207,6 +207,7 @@ public class SampleImmigratingHouseholds {
 			person.setAgeGroupId(m.getAgeGroupId());
 			person.setAge(AgeGroup.sampleAge(person.getAgeGroupId()));
 			person.setSex(m.getSex());
+			person.setHousehold(result);
 			int yearlyIncome = 0;
 			// TODO: put this data into the database (but how?)
 			// since Austria only seems to have statistics about origin, age, sex and destination of immigrants,
@@ -224,8 +225,10 @@ public class SampleImmigratingHouseholds {
 						maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 100);
 					} else {
 						minIncome = 0;
-						maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 20);
+						maxIncome = Math.max(0, ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 20));
 					}
+					if (maxIncome - minIncome <= 0)
+						System.out.println("SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome);
 					yearlyIncome = minIncome + r.nextInt((int) (maxIncome - minIncome));
 				}
 			}

@@ -4,7 +4,9 @@
 package at.sume.dm;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -51,11 +53,14 @@ public class Main {
 	private static DwellingsOnMarket dwellingsOnMarket;
 	private static OutputManager outputManager;
 
+	private static String printInfo() {
+		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)";
+	}
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-        System.out.println(DateUtil.now() + ": start");
+        System.out.println(printInfo() + ": start");
 		Database db = Common.openDatabase();
 //		Database odb = Common.openOutputDatabase();
 		Common.init();
@@ -63,20 +68,20 @@ public class Main {
 		// Load entity sets from database
 		try {
 			spatialUnits = new SpatialUnits(db);
-	        System.out.println(DateUtil.now() + ": loaded " + spatialUnits.size() + " spatial units");
+	        System.out.println(printInfo() + ": loaded " + spatialUnits.size() + " spatial units");
 			dwellings = new Dwellings(db);
 			dwellingSeq = new Sequence(dwellings.get(dwellings.size() - 1).getDwellingId() + 1);
 			DwellingRow.setDwellingIdSeq(dwellingSeq);
-	        System.out.println(DateUtil.now() + ": loaded " + dwellings.size() + " dwellings");
+	        System.out.println(printInfo() + ": loaded " + dwellings.size() + " dwellings");
 			households = new Households(db);
-	        System.out.println(DateUtil.now() + ": loaded " + households.size() + " households");
+	        System.out.println(printInfo() + ": loaded " + households.size() + " households");
 	        // TODO: sequence generation could be completely put into RecordSetRow class
 	        householdSeq = new Sequence(households.get(households.size() - 1).getHouseholdId() + 1);
 	        HouseholdRow.setHouseholdIdSeq(householdSeq);
 	        persons = new Persons(db);
 	        personSeq = new Sequence(persons.get(persons.size() - 1).getPersonId() + 1);
 	        PersonRow.setPersonIdSeq(personSeq);
-	        System.out.println(DateUtil.now() + ": loaded " + persons.size() + " persons");
+	        System.out.println(printInfo() + ": loaded " + persons.size() + " persons");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {
@@ -87,25 +92,21 @@ public class Main {
 
 		// Link dwellings to spatial units
 		dwellings.linkSpatialUnits(spatialUnits);
-        System.out.println(DateUtil.now() + ": linked households + spatial units");
+        System.out.println(printInfo() + ": linked households + spatial units");
         // Link households to dwellings
         households.linkDwellings(dwellings);
-        System.out.println(DateUtil.now() + ": linked households + dwellings");
+        System.out.println(printInfo() + ": linked households + dwellings");
         households.setSpatialunits(spatialUnits);
         // Inter-link persons and households
         persons.linkHouseholds(households);
-        System.out.println(DateUtil.now() + ": linked households + persons");
+        System.out.println(printInfo() + ": linked households + persons");
 		
         // get all dwellings on the housing market
         dwellingsOnMarket = new DwellingsOnMarket(dwellings, spatialUnits);
-        System.out.println(DateUtil.now() + ": determined all available dwellings on the housing market");
+        System.out.println(printInfo() + ": determined all available dwellings on the housing market");
         // determine household-types
         households.determineHouseholdTypes();
-        System.out.println(DateUtil.now() + ": determined all household types");
-        
-        // Initial build of model indicators
-		buildIndicators();			
-        System.out.println(DateUtil.now() + ": initial built of model indicators complete");
+        System.out.println(printInfo() + ": determined all household types");
         
         // Prepare model output to the database
 //        outputManager = new OutputManager(odb, households, dwellings, persons);
@@ -148,7 +149,7 @@ public class Main {
 			e.printStackTrace();
 		}
 		
-        System.out.println(DateUtil.now() + ": end");
+        System.out.println(printInfo() + ": end");
         System.exit(0);
     }
 
@@ -183,9 +184,11 @@ public class Main {
 		int modelStartYear = Common.getModelStartYear();
 		int modelEndYear = modelStartYear + iterations;
 		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
-	        System.out.println(DateUtil.now() + ": running model year " + modelYear + " of " + modelEndYear);
+	        // this must be done each model year because with add/remove it is a problem when the age of a person changes
+			buildIndicators();			
+	        System.out.println(printInfo() + ": build of model indicators complete");
 	        outputManager.output((short) modelYear);
-	        System.out.println(DateUtil.now() + ": model data output to database");
+	        System.out.println(printInfo() + ": model data output to database");
 	        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
 			ArrayList<HouseholdRow> potentialMovers = new ArrayList<HouseholdRow>();
 	        int j = 0;
@@ -195,14 +198,14 @@ public class Main {
 			// Loop through all households to find potential movers, process demographic events
 			for (HouseholdRow household : hh_helper) {
 				if (j % 100000 == 0) {
-					System.out.println(DateUtil.now() + ": Processing household " + j + " of " + households.size() + " in year " + modelYear + ", nr. of persons: " + persons.size());
+					System.out.println(printInfo() + ": Processing household " + j + " of " + households.size() + " in year " + modelYear + ", nr. of persons: " + persons.size());
 				}
 				
 				// Remove household from all indicators in its original state
 				// the disadvantage of this solution is that the currently processed household
 				// is missing in the indicators while it is processed - the up side is we don't need a clone-method
 				// maybe its more realistic anyway but the effect of this should be limited
-				AllHouseholdsIndicatorManager.removeHousehold(household);
+//				AllHouseholdsIndicatorManager.removeHousehold(household);
 				
 				// Process demographic events for all household members
 				ArrayList<PersonRow> p_helper = (ArrayList<PersonRow>) ((ArrayList<PersonRow>) household.getMembers()).clone();
@@ -232,7 +235,7 @@ public class Main {
 				}
 				
 				// Add potentially changed household to the indicators
-				AllHouseholdsIndicatorManager.addHousehold(household);
+//				AllHouseholdsIndicatorManager.addHousehold(household);
 				
 				j++;
 			}
@@ -246,9 +249,14 @@ public class Main {
 				RentPerSpatialUnit.updateRentPerSpatialUnit();
 			// Reset the movers indicators
 			MoversIndicatorManager.resetIndicators();
+			outputFreeDwellings(modelYear, "before moving households");
 			// Loop through potential movers
-			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0;
+			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0, hhZeroIncome = 0, hhLowIncome = 0;
+			j = 0;
 			for (HouseholdRow household : potentialMovers) {
+				if (j % 10000 == 0) {
+					System.out.println(printInfo() + ": Processing potential mover " + j + " of " + potentialMovers.size() + " in year " + modelYear);
+				}
 				// 1) estimate the aspiration region: 
 				//    a) needed living space - by household size 
 				//    b) maximum costs - by current costs, household income
@@ -261,6 +269,10 @@ public class Main {
 				ArrayList<Integer> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
 				if (potentialTargetSpatialUnitIds.size() == 0) {
 					hhNoAspiration++;
+					if (household.getAspirationRegionMaxCosts() <= 0)
+						hhZeroIncome++;
+					if (household.getAspirationRegionMaxCosts() <= 63)
+						hhLowIncome++;
 				} else {
 					// b) compare estimated residential satisfaction in these spatial units and select the highest scoring 
 					//    spatial units (random component for each unit, number of units selected as sysparam)
@@ -274,6 +286,7 @@ public class Main {
 					if ((maxResidentialSatisfactionEstimate > household.getCurrentResidentialSatisfaction()) || (Common.getAlwaysLookForDwellings() != 0)) {
 						// do the extra mile and look for a dwelling
 						DwellingRow suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
+						household.clearResidentialSatisfactionEstimate();
 						if (suitableDwelling != null) {
 							household.relocate(dwellingsOnMarket, suitableDwelling);
 						} else {
@@ -290,10 +303,14 @@ public class Main {
 						hhNoSatisfaction++;
 					}
 				}
+				j++;
 			}
-			System.out.println(DateUtil.now() + " " + hhFoundNoDwellings + " out of " + potentialMovers.size() + " potential moving households found no dwelling");
-			System.out.println(DateUtil.now() + " " + hhNoSatisfaction + " out of " + potentialMovers.size() + " potential moving households would not improve their estimated residential satisfaction");
-			System.out.println(DateUtil.now() + " " + hhNoAspiration + " out of " + potentialMovers.size() + " potential moving households found no spatial unit within their aspiration region");
+			System.out.println(printInfo() + " " + hhNoAspiration + " out of " + potentialMovers.size() + " potential moving households found no spatial unit within their aspiration region. " + 
+					"Out of these " + hhZeroIncome + " households can afford a dwelling with costs <= 0 " +
+					"and " + hhLowIncome + " households can afford a dwelling with costs <= 63 per m²/year only");
+			System.out.println(printInfo() + " " + hhNoSatisfaction + " out of " + potentialMovers.size() + " potential moving households would not improve their estimated residential satisfaction");
+			System.out.println(printInfo() + " " + hhFoundNoDwellings + " out of " + potentialMovers.size() + " potential moving households found no dwelling");
+			outputFreeDwellings(modelYear, "after moving households, before immigration");
 			// Immigrating Households
 			ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(modelYear);
 			hhFoundNoDwellings = 0; hhNoSatisfaction = 0;
@@ -304,13 +321,21 @@ public class Main {
 					ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
 					household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
 					DwellingRow dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
+					household.clearResidentialSatisfactionEstimate();
 					if (dwelling == null) {
 						// household didn't find a suitable dwelling -> join another household
 						// TODO: update indicators
 						//household.redefineAspirations();
 						hhFoundNoDwellings++;
 					} else {
-						// update indicators
+						// 1) add household to common lists
+						households.add(household);
+						for (PersonRow member : household.getMembers()) {
+							persons.add(member);
+						}
+						// 2 move household
+						household.relocate(dwellingsOnMarket, dwelling);
+						// TODO: update indicators
 					}
 				} else {
 					// no spatial units below the max costs for the household -> join another household
@@ -318,8 +343,9 @@ public class Main {
 					hhNoSatisfaction++;
 				}
 			}
-			System.out.println(DateUtil.now() + " " + hhFoundNoDwellings + " out of " + immigratingHouseholds.size() + " immigrating households found no dwelling");
-			System.out.println(DateUtil.now() + " " + hhNoSatisfaction + " out of " + immigratingHouseholds.size() + " potential moving households could not find spatial units matching their aspirations");
+			System.out.println(printInfo() + " " + hhFoundNoDwellings + " out of " + immigratingHouseholds.size() + " immigrating households found no dwelling");
+			System.out.println(printInfo() + " " + hhNoSatisfaction + " out of " + immigratingHouseholds.size() + " immigrating households could not find spatial units matching their aspirations");
+			outputFreeDwellings(modelYear, "after immigration");
 		} // model year
 	}
 	
@@ -328,10 +354,18 @@ public class Main {
 		AllHouseholdsIndicatorManager.resetIndicators();
 		for (HouseholdRow household : households) {
 //			if (++j % 10000 == 0) {
-//				System.out.println(DateUtil.now() + ": Added household " + j + " of " + households.size() + " to indicators");
+//				System.out.println(printInfo() + ": Added household " + j + " of " + households.size() + " to indicators");
 //			}
 			AllHouseholdsIndicatorManager.addHousehold(household);
 			PercentileIndicatorManager.addHousehold(household);
 		}
+	}
+	
+	public static void outputFreeDwellings(int modelYear, String label) throws FileNotFoundException {
+		// TODO: put this in an extra class and delete the file once per model run
+		FileOutputStream freeDwellingsFile = new FileOutputStream("FreeDwellings.txt", true);
+		PrintStream ps = new PrintStream(freeDwellingsFile);
+		ps.println("======= " + label + "=======");
+		dwellingsOnMarket.outputDwellingsPerSize(ps, modelYear);
 	}
 }

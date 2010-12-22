@@ -86,6 +86,12 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	private int aspirationRegionMaxCosts;
 	private ArrayList<SpatialUnitScore> residentialSatisfactionEstimate;
 	private short currentResidentialSatisfaction;
+	// residential satisfaction components
+	public short rsUdp;
+	public short rsCostEffectiveness;
+	public short rsEnvironmentalAmenities;
+	public short rsSocialPrestige;
+	public short rsDesiredLivingSpace;
 	
 	/**
 	 * 
@@ -146,7 +152,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	/**
 	 * @return the spatialunitId of the dwelling
 	 */
-	public long getSpatialunitId() {
+	public int getSpatialunitId() {
 		assert dwelling != null : "no dwelling for household " + getHouseholdId();
 		return dwelling.getSpatialunitId();
 	}
@@ -180,6 +186,8 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	
 	public void addMember(PersonRow person) {
 		this.members.add(person);
+		setAspirationRegionLivingSpaceMax((short) 0);
+		setAspirationRegionLivingSpaceMin((short) 0);
 	}
 	
 	public void removeMember(PersonRow person) {
@@ -198,6 +206,8 @@ public class HouseholdRow extends RecordSetRow<Households> {
 //				// - but currently this information is not used within the model...
 //			}
 		}
+		setAspirationRegionLivingSpaceMax((short) 0);
+		setAspirationRegionLivingSpaceMin((short) 0);
 	}
 	
 	public ArrayList<PersonRow> getMembers() {
@@ -470,7 +480,7 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	}
 
 	/**
-	 * @return the costOfResidence of the dwelling
+	 * @return the yearly total rent for the dwelling
 	 */
 	public int getCostOfResidence() {
 		assert dwelling != null : "no dwelling for household " + getHouseholdId();
@@ -623,10 +633,10 @@ public class HouseholdRow extends RecordSetRow<Households> {
 //			short desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRandomPct * r.nextGaussian());
 //			desiredLivingSpaceSqm = Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			// calculate boundary 1
-			short desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRangePct * r.nextGaussian());
+			short desiredLivingSpaceModifier = (short) (110 + desiredLivingSpaceRangePct * r.nextGaussian());
 			short desiredLivingSpaceSqm1 = (short) Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			// calculate boundary 2
-			desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRangePct * r.nextGaussian());
+			desiredLivingSpaceModifier = (short) (90 - desiredLivingSpaceRangePct * r.nextGaussian());
 			short desiredLivingSpaceSqm2 = (short) Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			if (desiredLivingSpaceSqm1 > desiredLivingSpaceSqm2) {
 				setAspirationRegionLivingSpaceMin(desiredLivingSpaceSqm2);
@@ -696,6 +706,8 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	public ArrayList<Long> getPreferredSpatialUnits(int numSpatialUnits) {
 		// sort results descending according to residential satisfaction (find highest scoring spatial units)
 		assert residentialSatisfactionEstimate.size() > 0 : "residentialSatisfactionEstimate must be initialized! (size = 0)";
+		if (residentialSatisfactionEstimate.size() < numSpatialUnits)
+			numSpatialUnits = residentialSatisfactionEstimate.size();
 		Comparator<SpatialUnitScore> compareSpatialUnitScoreDesc = Collections.reverseOrder(new CompareSpatialUnitScore());
 		Collections.sort(residentialSatisfactionEstimate, compareSpatialUnitScoreDesc);
 		// build new array to return
@@ -704,6 +716,10 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			ret.add(residentialSatisfactionEstimate.get(i).getSpatialUnitId());
 		}
 		return ret;
+	}
+	public void clearResidentialSatisfactionEstimate() {
+		residentialSatisfactionEstimate.clear();
+		residentialSatisfactionEstimate = null;
 	}
 	/**
 	 * Relocate the household to the given dwelling

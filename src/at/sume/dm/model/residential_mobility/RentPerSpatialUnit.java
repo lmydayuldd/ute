@@ -93,7 +93,11 @@ public class RentPerSpatialUnit {
 	 */
 	public static void updateRentPerSpatialUnit() {
 		for (RentPerSpatialUnitRow rpsu : rentPerSpatialUnit) {
-			rpsu.setYearlyRentPer100Sqm(MoversIndicatorsPerSpatialUnit.getAvgCostOfResidencePer100Sqm(rpsu.getSpatialUnitId()));
+			int avgYearlyRentPer100Sqm = MoversIndicatorsPerSpatialUnit.getAvgYearlyRentPer100Sqm(rpsu.getSpatialUnitId());
+			assert avgYearlyRentPer100Sqm >= 0 : "Average yearly rent per 100m² < 0 (" + avgYearlyRentPer100Sqm + ")";
+			if (avgYearlyRentPer100Sqm != 0) {
+				rpsu.setYearlyRentPer100Sqm(avgYearlyRentPer100Sqm);
+			}
 		}
 	}
 	/**
@@ -125,7 +129,8 @@ public class RentPerSpatialUnit {
 	public static ArrayList<Integer> getSpatialUnitsBelowGivenPrice(int maxCostOfResidence) {
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		for(RentPerSpatialUnitRow r : rentPerSpatialUnit) {
-			if (r.getYearlyRentPer100Sqm() / 100 <= maxCostOfResidence)
+			int yearlyRentPerSqm = r.getYearlyRentPer100Sqm() / 100;
+			if (yearlyRentPerSqm <= maxCostOfResidence)
 				result.add(r.getSpatialUnitId());
 		}
 		return result;

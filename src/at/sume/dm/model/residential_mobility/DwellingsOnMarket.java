@@ -3,6 +3,7 @@
  */
 package at.sume.dm.model.residential_mobility;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -10,6 +11,7 @@ import at.sume.dm.Common;
 import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.Dwellings;
 import at.sume.dm.entities.SpatialUnits;
+import at.sume.dm.types.LivingSpaceGroup;
 
 /**
  * This class contains all dwellings that currently are available on the housing market.
@@ -45,7 +47,7 @@ import at.sume.dm.entities.SpatialUnits;
 public class DwellingsOnMarket {
 	// Dwellings on the market per spatial unit
 	private ArrayList<DwellingRow> dwellingsOnMarketList[];
-	private int grossFreeDwellingCount[];
+	private int grossFreeDwellingCount[];	// Total number of free dwellings available, only a fraction of this number is put on the market
 	private SpatialUnits spatialUnits;
 	private ArrayList<DwellingRow> suitableDwellings;
 
@@ -140,5 +142,27 @@ public class DwellingsOnMarket {
 	public void removeDwellingFromMarket(DwellingRow dwelling) {
 		int su = spatialUnits.indexOf(dwelling.getSpatialunit());
 		dwellingsOnMarketList[su].remove(dwelling);
+	}
+	public void outputDwellingsPerSize(PrintStream ps, int modelYear) {
+		int dwellingSizeCount[] = new int[LivingSpaceGroup.getLivingSpaceGroupCount()];
+		StringBuffer output = new StringBuffer();
+		// Headline
+		output.append("ModelYear, SpatialUnit");
+		for (byte i = 0; i != LivingSpaceGroup.getLivingSpaceGroupCount(); i++) {
+			output.append(", " + LivingSpaceGroup.getLivingSpaceGroupName((byte) (i + 1)));
+		}
+		ps.println(output);
+		for (int i = 0; i != spatialUnits.size(); i++) {
+			output = new StringBuffer(modelYear + ", " + spatialUnits.get(i).getSpatialUnitId());
+			// Count dwellings per living space group
+			for (DwellingRow dwelling : dwellingsOnMarketList[i]) {
+				dwellingSizeCount[LivingSpaceGroup.getLivingSpaceGroupId(dwelling.getDwellingSize()) - 1]++;
+			}
+			// Output dwelling count per living space group
+			for (byte j = 0; j != LivingSpaceGroup.getLivingSpaceGroupCount(); j++) {
+				output.append(", " + dwellingSizeCount[j]);
+			}
+			ps.println(output);
+		}
 	}
 }

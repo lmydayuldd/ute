@@ -44,6 +44,7 @@ public class LivingSpaceGroup {
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
+		assert livingSpaceGroups.size() <= 255 : "LivingSpaceGrousp too large (" + livingSpaceGroups.size() + ")";
 	}
 	/**
 	 * Get the living space group for a certain living space 
@@ -75,5 +76,9 @@ public class LivingSpaceGroup {
 		Random r = new Random();
 		LivingSpaceGroupRow sample = livingSpaceGroups.get(livingSpaceGroupId - 1);
 		return (short) (sample.minSpace + r.nextInt(sample.maxSpace - sample.minSpace));
+	}
+	public static byte getLivingSpaceGroupCount() {
+		assert livingSpaceGroups.size() <= 255 : "LivingSpaceGrousp too large (" + livingSpaceGroups.size() + ")";
+		return (byte) livingSpaceGroups.size();
 	}
 }
