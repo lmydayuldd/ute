@@ -25,7 +25,7 @@ public class ResidentialSatisfactionComponent {
 	 * @param ModelYear
 	 * @return
 	 */
-	public short calc(HouseholdRow household, DwellingRow dwelling, SpatialUnitRow spatialUnitId, int ModelYear) {
+	public short calc(HouseholdRow household, DwellingRow dwelling, SpatialUnitRow spatialUnit, int ModelYear) {
 		return (short)1000;
 	}
 	/**
@@ -34,11 +34,11 @@ public class ResidentialSatisfactionComponent {
 	 * the households current dwelling)
 	 * 
 	 * @param household
-	 * @param spatialUnitId
+	 * @param spatialUnit
 	 * @return Residential satisfaction in thousandth part
 	 */
-	public final short calc(HouseholdRow household, SpatialUnitRow spatialUnitId, int modelYear) {
-		short result = calc(household, household.getDwelling(), spatialUnitId, modelYear);
+	public final short calc(HouseholdRow household, SpatialUnitRow spatialUnit, int modelYear) {
+		short result = calc(household, household.getDwelling(), spatialUnit, modelYear);
 		assert (result >= 0) && (result <= 1000) : "residential satisfaction out of range (" + result + ")";
 		return result;
 	}
