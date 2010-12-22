@@ -21,15 +21,15 @@ import at.sume.sampling.distributions.IncomeDistributionRow;
  * @author Alexander Remesch
  */
 public class SamplePersonIncome extends SamplingDistribution<IncomeDistributionRow> {
-	private Long spatialUnitId;
-	private short sex;
-	private short ageGroupId;
+	private Integer spatialUnitId;
+	private byte sex;
+	private byte ageGroupId;
 	
 	public SamplePersonIncome(Database db) throws SQLException {
 		super(db);
 	}
 	
-	public void loadDistribution(long spatialUnitId, short sex, short ageGroupId) throws SQLException {
+	public void loadDistribution(int spatialUnitId, byte sex, byte ageGroupId) throws SQLException {
 		this.spatialUnitId = spatialUnitId;
 		this.sex = sex;
 		this.ageGroupId = ageGroupId;
@@ -45,7 +45,7 @@ public class SamplePersonIncome extends SamplingDistribution<IncomeDistributionR
 	 */
 	@Override
 	public IncomeDistributionRow createRecordSetRow() {
-		return new IncomeDistributionRow(this);
+		return new IncomeDistributionRow();
 	}
 
 	/* (non-Javadoc)
