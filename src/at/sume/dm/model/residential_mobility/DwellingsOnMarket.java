@@ -52,7 +52,7 @@ public class DwellingsOnMarket {
 	private ArrayList<DwellingRow> suitableDwellings;
 
 	@SuppressWarnings("unchecked")
-	public DwellingsOnMarket(Dwellings dwellings, SpatialUnits spatialUnits) {
+	public DwellingsOnMarket(Dwellings dwellings, SpatialUnits spatialUnits, int dwellingsOnMarketShare) {
 		Random r = new Random();
 		this.spatialUnits = spatialUnits;
 		dwellingsOnMarketList = (ArrayList<DwellingRow>[])new ArrayList[spatialUnits.size()];
@@ -63,12 +63,15 @@ public class DwellingsOnMarket {
 			if (row.getHousehold() == null) {
 				int pos = spatialUnits.indexOf(row.getSpatialunit());
 				grossFreeDwellingCount[pos]++;
-				if (r.nextInt(100) <= Common.getDwellingsOnMarketShare()) {
+				if (r.nextInt(100) <= dwellingsOnMarketShare) {
 //					dwellingsOnMarketList[pos].add(row);
 					putDwellingOnMarket(row);
 				}
 			}
 		}
+	}
+	public DwellingsOnMarket(Dwellings dwellings, SpatialUnits spatialUnits) {
+		this(dwellings, spatialUnits, Common.getDwellingsOnMarketShare());
 	}
 	private int spatialUnitArrayPosition(long spatialUnitId) {
 		return spatialUnits.indexOf(spatialUnits.lookup(spatialUnitId));
