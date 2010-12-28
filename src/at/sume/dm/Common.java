@@ -142,7 +142,7 @@ public class Common {
 	}
 	
 	/**
-	 * Retrieve the value of a system parameter (from the table Systemparameter)
+	 * Retrieve the value of a system parameter (from the table SysParamsRuntime)
 	 * @param paramName
 	 * @return
 	 */
@@ -150,6 +150,24 @@ public class Common {
 		Object rv = null;
 		try {
 			rv = db.lookupSql("select wert from SysParamsRuntime where name='" + paramName + "'");
+			if (rv != null)
+				return (String)rv;
+		} catch (SQLException e) {
+			System.err.println("getSysParam: error looking up parameter " + paramName);
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * Retrieve the value of a system parameter (from the table SysParamsDataPreparation)
+	 * @param paramName
+	 * @return
+	 */
+	public static String getSysParamDataPreparation(String paramName) {
+		Object rv = null;
+		try {
+			rv = db.lookupSql("select wert from SysParamsDataPreparation where name='" + paramName + "'");
 			if (rv != null)
 				return (String)rv;
 		} catch (SQLException e) {
