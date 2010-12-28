@@ -84,6 +84,11 @@ public class AgeGroup {
 		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
 		return ageGroups.get(ageGroupId - 1).ageGroup;
 	}
+	/**
+	 * Sample an actual age for a given age group by random
+	 * @param ageGroupId
+	 * @return
+	 */
 	public static byte sampleAge(byte ageGroupId) {
 		assert ageGroupId > 0 : "ageGroupId <= 0";
 		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
