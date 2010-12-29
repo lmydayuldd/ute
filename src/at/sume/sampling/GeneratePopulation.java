@@ -1,179 +1,64 @@
 package at.sume.sampling;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
 import net.remesch.db.Database;
-import net.remesch.util.DateUtil;
 import at.sume.dm.Common;
-import at.sume.dm.entities.HouseholdRow;
-import at.sume.dm.entities.Households;
-import at.sume.dm.entities.PersonRow;
-import at.sume.dm.entities.Persons;
-import at.sume.sampling.distributions.CostOfResidenceDistributionRow;
 import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
-import at.sume.sampling.distributions.LivingSpaceDistributionRow;
-import at.sume.sampling.distributions.PersonsPerAgeSexHouseholdsizePersonnr;
+import at.sume.sampling.entities.DbHouseholdRow;
+import at.sume.sampling.entities.DbPersonRow;
+import at.sume.sampling.entities.SampleDbHouseholds;
 
 /**
  * Class for generation of synthetic population
+ * 
  * @author Alexander Remesch
  */
 public class GeneratePopulation {
+	private static ArrayList<DbHouseholdRow> households;
+	private static ArrayList<DbPersonRow> persons;
+	
 	/**
 	 * Generate synthetic households and persons for the SUME decision model
 	 * @throws SQLException 
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
+	 * @throws NoSuchFieldException 
+	 * @throws InstantiationException 
+	 * @throws SecurityException 
 	 */
-	private static void GenerateHouseholds(Database db) throws SQLException {
-		Households households = new Households(db);
-		HouseholdRow hh = new HouseholdRow();
-		hh.prepareStatement();
-		HouseholdsPerSpatialUnit hhpsu;
-		LivingSpaceDistributionRow livingSpaceDistributionRow = null;
-		SampleHouseholdLivingSpace livingSpace1 = new SampleHouseholdLivingSpace(db);
-		SampleHouseholdLivingSpace livingSpace2 = new SampleHouseholdLivingSpace(db);
-		SampleHouseholdLivingSpace livingSpace3 = new SampleHouseholdLivingSpace(db);
-		SampleHouseholdLivingSpace livingSpace4 = new SampleHouseholdLivingSpace(db);
-		SampleHouseholdCostOfResidence householdCostOfResidence = new SampleHouseholdCostOfResidence(db);
-		livingSpace1.loadDistribution((short) 1);
-		livingSpace2.loadDistribution((short) 2);
-		livingSpace3.loadDistribution((short) 3);
-		livingSpace4.loadDistribution((short) 4);
+	private static void GenerateHouseholds(Database db) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
+		byte householdSizeGroups = Byte.parseByte(Common.getSysParam("HouseholdSizeGroups"));
+		int residentialSatisfactionThresholdRange = Integer.parseInt(Common.getSysParamDataPreparation("THR_ResSatisfactionRange"));
+		byte dwellingsOnMarketShare = Byte.parseByte(Common.getSysParamDataPreparation("DwellingsOnMarketShare"));
 		
-		SampleHouseholds.LoadDistribution(db);
+		households = new ArrayList<DbHouseholdRow>();
+		persons = new ArrayList<DbPersonRow>();
 		
-		long total_households = SampleHouseholds.getNrHouseholdsTotalSum();
-		short hh_size;
+		SampleHouseholds sampleHouseholds = new SampleHouseholds(db);
+		SampleDbHouseholds sampleDbHouseholds = new SampleDbHouseholds(db, householdSizeGroups, dwellingsOnMarketShare);
+		if (residentialSatisfactionThresholdRange != 0)
+			sampleDbHouseholds.setResidentialSatisfactionThresholdRange(residentialSatisfactionThresholdRange);
+		
 		// Sample households including persons
-		for (long i = 0; i != total_households; i++) {
-			// Household number
-			hh.setHouseholdId(i + 1);
-			// Household spatial unit
-			int index = SampleHouseholds.determineLocationIndex();
-			hhpsu = SampleHouseholds.GetSpatialUnitData(index);
-			hh.setSpatialunitId(hhpsu.getSpatialUnitId());
-			// Household size
-			hh_size = SampleHouseholds.determineSize(index);
-			hh.setHouseholdSize(hh_size);
-			switch(hh_size) {
-			case 1:
-				livingSpaceDistributionRow = livingSpace1.determineLivingSpaceDistributionRow();
-				hh.setLivingSpace(livingSpace1.determineLivingSpace(livingSpaceDistributionRow));
-				break;
-			case 2:
-				livingSpaceDistributionRow = livingSpace2.determineLivingSpaceDistributionRow();
-				hh.setLivingSpace(livingSpace2.determineLivingSpace(livingSpaceDistributionRow));
-				break;
-			case 3:
-				livingSpaceDistributionRow = livingSpace3.determineLivingSpaceDistributionRow();
-				hh.setLivingSpace(livingSpace3.determineLivingSpace(livingSpaceDistributionRow));
-				break;
-			case 4:
-				livingSpaceDistributionRow = livingSpace4.determineLivingSpaceDistributionRow();
-				hh.setLivingSpace(livingSpace4.determineLivingSpace(livingSpaceDistributionRow));
-				break;
+		for (HouseholdsPerSpatialUnit householdsPerSpatialUnit : sampleHouseholds) {
+			if (householdsPerSpatialUnit.householdSize > householdSizeGroups)
+				System.out.println(Common.printInfo() + ": creating " + householdsPerSpatialUnit.householdCount + " households for spatial unit " + householdsPerSpatialUnit.spatialUnitId + " (institutional households)");
+			else
+				System.out.println(Common.printInfo() + ": creating " + householdsPerSpatialUnit.householdCount + " households for spatial unit " + householdsPerSpatialUnit.spatialUnitId + ", size " + householdsPerSpatialUnit.householdSize);
+			sampleDbHouseholds.setSpatialUnit(householdsPerSpatialUnit.spatialUnitId);
+			for (int i = 0; i != householdsPerSpatialUnit.householdCount; i++) {
+				DbHouseholdRow household = sampleDbHouseholds.randomSample(householdsPerSpatialUnit, i);
+				households.add(household);
+				ArrayList<DbPersonRow> members = sampleDbHouseholds.getSampledMembers();
+				persons.addAll(members);
+//				if ((i % 1000 == 0) && (i > 0)) {
+//					System.out.println(Common.printInfo() + ": creating household " + i + " of " + householdsPerSpatialUnit.householdCount);
+//				}
 			}
-			hh.setLivingSpaceGroupId(livingSpaceDistributionRow.getLivingSpaceGroup());
-			householdCostOfResidence.loadDistribution(livingSpaceDistributionRow.getLivingSpaceGroup());
-			CostOfResidenceDistributionRow costOfResidenceDistributionRow = householdCostOfResidence.determineCostOfResidenceDistributionRow();
-			hh.setCostOfResidence(householdCostOfResidence.determineCostOfResidence(costOfResidenceDistributionRow) * hh.getLivingSpace() * 12);
-			hh.setCostOfResidenceGroupId(costOfResidenceDistributionRow.getCostOfResidenceGroupId());
-			hh.executeInsert();
-			if ((i % 1000) == 0)
-				System.out.println("Household i = " + i + " @ " + DateUtil.now());
-		}
-		SampleHouseholds.FreeDistribution();
-	}
-	
-	/**
-	 * Generate synthetic persons for a household
-	 * 
-	 * Do this in an extra run because we may process all persons in a certain spatial unit and with a certain
-	 * household size in one pass thus having to load the distribution only once for each group of persons.
-	 *
-	 * Runtime: ~3,5 hrs. for household-representatives only (AMD Turion 64 X2 2,1GHz in VirtualBox/XP)
-	 * @throws SQLException 
-	 */
-	private static void GeneratePersonsPerHousehold(Database db) throws SQLException {
-		Persons persons = new Persons(db);
-		PersonRow pers = new PersonRow(persons);
-		pers.prepareStatement();
-		SamplePersonIncome income = new SamplePersonIncome(db);
-		SamplePersons samplePersons1 = new SamplePersons();
-		SamplePersons samplePersons2 = new SamplePersons();
-		SamplePersons samplePersons3 = new SamplePersons();
-		SamplePersons samplePersons4 = new SamplePersons();
-		PersonsPerAgeSexHouseholdsizePersonnr pc = null;
-		ResultSet rs = db.executeQuery("SELECT HouseholdId, SpatialunitId, HouseholdSize FROM _DM_Households " +
-										"ORDER BY SpatialunitId, HouseholdSize;");
-		long personId = 1;
-		long spatialUnitId_prev = 0, spatialUnitId_curr = 0;
-		short householdSize_prev = 0, householdSize_curr = 0;
-		while (rs.next()) {
-			householdSize_curr = rs.getShort("HouseholdSize");
-			spatialUnitId_curr = rs.getLong("SpatialunitId");
-			if ((spatialUnitId_curr != spatialUnitId_prev) || (householdSize_curr != householdSize_prev)) {
-				// new spatial unit or household size -> different person sex/age distribution necessary
-				samplePersons1.FreeDistribution();
-				samplePersons2.FreeDistribution();
-				samplePersons3.FreeDistribution();
-				samplePersons4.FreeDistribution();
-				samplePersons1.LoadDistribution(db, (short) 1, householdSize_curr, spatialUnitId_curr);
-				samplePersons2.LoadDistribution(db, (short) 2, householdSize_curr, spatialUnitId_curr);
-				samplePersons3.LoadDistribution(db, (short) 3, householdSize_curr, spatialUnitId_curr);
-				samplePersons4.LoadDistribution(db, (short) 4, householdSize_curr, spatialUnitId_curr);
-			}
-			long householdId = rs.getLong("HouseholdId");
-			for (short i = 0; i != householdSize_curr; i++, personId++) {
-				// TODO: create 2nd person age & sex dependent on 1st person 
-				// Person number
-				pers.setPersonId(personId);
-				// Household representative if first person
-				if (i == 0)
-					pers.setHouseholdRepresentative(true);
-				else
-					pers.setHouseholdRepresentative(false);
-				pers.setPersonNrInHousehold((short)(i + 1));
-				// Person sex & age: load distribution
-				// Person sex
-				switch (i) {
-				case 0:
-					pc = samplePersons1.getPersonData(samplePersons1.determinePersonDataIndex());
-					break;
-				case 1:
-					pc = samplePersons2.getPersonData(samplePersons2.determinePersonDataIndex());
-					break;
-				case 2:
-					pc = samplePersons3.getPersonData(samplePersons3.determinePersonDataIndex());
-					break;
-				default:
-					if (i >= 3) {
-						pc = samplePersons4.getPersonData(samplePersons4.determinePersonDataIndex());
-					} else {
-						throw new IllegalArgumentException("Illegal person number " + i);
-					}
-					break;
-				}
-				pers.setSex(pc.getSex());
-				// Person age
-				pers.setAgeGroupId(pc.getAgeGroupId());
-				pers.setAge(pc.getAge());
-				// Household-Id
-				pers.setHouseholdId(householdId);
-				// Yearly income
-				income.loadDistribution(spatialUnitId_curr, pers.getSex(), pers.getAgeGroupId());
-				pers.setYearlyIncome(income.determineIncome());
-				
-				pers.executeInsert();
-				// Sample dwelling of the current household
-				// TODO: vacant dwellings must be sampled somewhere else
-				if ((personId % 1000) == 0)
-					System.out.println("Person personId = " + personId + " @ " + DateUtil.now());
-			}
-			spatialUnitId_prev = spatialUnitId_curr;
-			householdSize_prev = householdSize_curr;
 		}
 	}
 	
@@ -187,21 +72,72 @@ public class GeneratePopulation {
 		if (ret != 0)
 			return;
 		
-		System.out.println("Start @ " + DateUtil.now());
-		Database db = new Database(Common.getDbLocation());
+        System.out.println(Common.printInfo() + ": start");
+		Database db = Common.openDatabase();
+		try {
+			db.con.setAutoCommit(false);
+		} catch (SQLException e2) {
+			e2.printStackTrace();
+			System.exit(101);
+		}
+		Common.init();
 
 		// TODO: put into a table-class, method truncate
 		db.execute("delete * from _DM_Households");
 		db.execute("delete * from _DM_Persons");
+		try {
+//			db.con.setAutoCommit(false);
+			db.con.commit();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			System.exit(102);
+		}
 		
 		try {
 			GenerateHouseholds(db);
-			GeneratePersonsPerHousehold(db);
 		} catch (SQLException e) {
 			e.printStackTrace();
+			System.exit(103);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			System.exit(103);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+			System.exit(103);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+			System.exit(103);
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+			System.exit(103);
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+			System.exit(103);
+		}
+		System.out.println(Common.printInfo() + ": created " + households.size() + " households and " + persons.size() + " persons");
+		try {
+//			db.insertFieldMap(households, "select HouseholdId, DwellingId, CostOfResidence, ResidentialSatisfactionThreshMod from _DM_Households");
+			db.insertFieldMap(households, "select HouseholdId, SpatialUnitId, DwellingId, LivingSpace, CostOfResidence, ResidentialSatisfactionThreshMod from _DM_Households", true);
+			db.con.commit();
+//			db.insert(households, "select HouseholdId, SpatialUnitId, DwellingId, LivingSpace, CostOfResidence, ResidentialSatisfactionThreshMod from _DM_Households");
+//			db.insertSql(households, "_DM_Households");
+			db.insertFieldMap(persons, "select PersonId, HouseholdId, Sex, Age, YearlyIncome from _DM_Persons", true);
+			db.con.commit();
+//			db.insert(persons, "select PersonId, HouseholdId, Sex, Age, YearlyIncome from _DM_Persons");
+//			db.insertSql(persons, "_DM_Persons");
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			System.exit(104);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.exit(104);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+			System.exit(104);
 		}
 		
-        System.out.println("End @ " + DateUtil.now());
+        System.out.println(Common.printInfo() + ": end");
+        System.exit(0);
 	}
 
 }

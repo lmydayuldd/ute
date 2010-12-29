@@ -11,7 +11,7 @@ import net.remesch.db.Database;
 import at.sume.db.RecordSet;
 import at.sume.dm.Common;
 import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
-import at.sume.dm.types.LivingSpaceGroup;
+import at.sume.dm.types.LivingSpaceGroup6;
 
 /**
  * @author Alexander Remesch
@@ -120,7 +120,7 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	public void preAddRow(DwellingRow dwelling) {
 		// calculate dwelling size
 		if (dwelling.getDwellingSize() == 0)
-			dwelling.setDwellingSize(LivingSpaceGroup.sampleLivingSpace(dwelling.getLivingSpaceGroup6Id()));
+			dwelling.setDwellingSize(LivingSpaceGroup6.sampleLivingSpace(dwelling.getLivingSpaceGroup6Id()));
 		// calculate dwelling costs
 		if (dwelling.getTotalYearlyDwellingCosts() == 0) {
 			Random r = new Random();

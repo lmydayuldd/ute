@@ -101,11 +101,11 @@ public class SamplePersonIncome extends SamplingDistribution<IncomeDistributionR
 		}
 	}
 	
-	public long determineIncome() {
+	public int determineIncome() {
 		if (rowList.size() > 0) {
 			IncomeDistributionRow row = rowList.get(randomSample());
 			Random r = new Random();
-			return (long) (row.getMinIncome() + (r.nextDouble() * (row.getMaxIncome() - row.getMinIncome())));
+			return (int) (row.getMinIncome() + (r.nextDouble() * (row.getMaxIncome() - row.getMinIncome())));
 		} else {
 			return 0;
 		}

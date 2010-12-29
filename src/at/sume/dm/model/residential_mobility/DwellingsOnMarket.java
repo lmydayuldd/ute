@@ -11,7 +11,7 @@ import at.sume.dm.Common;
 import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.Dwellings;
 import at.sume.dm.entities.SpatialUnits;
-import at.sume.dm.types.LivingSpaceGroup;
+import at.sume.dm.types.LivingSpaceGroup6;
 
 /**
  * This class contains all dwellings that currently are available on the housing market.
@@ -137,6 +137,15 @@ public class DwellingsOnMarket {
 		assert suitableDwellings.size() > 0 : "no suitable dwellings";
 		return suitableDwellings.get(r.nextInt(suitableDwellings.size()));
 	}
+	public DwellingRow getDwelling(int spatialUnitId, byte livingSpaceGroup6Id) {
+		ArrayList<DwellingRow> dwellings =  dwellingsOnMarketList[spatialUnitArrayPosition(spatialUnitId)];
+		for (DwellingRow dwelling : dwellings) {
+			if (dwelling.getLivingSpaceGroup6Id() == livingSpaceGroup6Id)
+				return dwelling;
+		}
+		return null;
+	}
+	
 	public void putDwellingOnMarket(DwellingRow dwelling) {
 		int su = spatialUnits.indexOf(dwelling.getSpatialunit());
 		dwellingsOnMarketList[su].add(dwelling);
@@ -147,22 +156,22 @@ public class DwellingsOnMarket {
 		dwellingsOnMarketList[su].remove(dwelling);
 	}
 	public void outputDwellingsPerSize(PrintStream ps, int modelYear) {
-		int dwellingSizeCount[] = new int[LivingSpaceGroup.getLivingSpaceGroupCount()];
+		int dwellingSizeCount[] = new int[LivingSpaceGroup6.getLivingSpaceGroupCount()];
 		StringBuffer output = new StringBuffer();
 		// Headline
 		output.append("ModelYear, SpatialUnit");
-		for (byte i = 0; i != LivingSpaceGroup.getLivingSpaceGroupCount(); i++) {
-			output.append(", " + LivingSpaceGroup.getLivingSpaceGroupName((byte) (i + 1)));
+		for (byte i = 0; i != LivingSpaceGroup6.getLivingSpaceGroupCount(); i++) {
+			output.append(", " + LivingSpaceGroup6.getLivingSpaceGroupName((byte) (i + 1)));
 		}
 		ps.println(output);
 		for (int i = 0; i != spatialUnits.size(); i++) {
 			output = new StringBuffer(modelYear + ", " + spatialUnits.get(i).getSpatialUnitId());
 			// Count dwellings per living space group
 			for (DwellingRow dwelling : dwellingsOnMarketList[i]) {
-				dwellingSizeCount[LivingSpaceGroup.getLivingSpaceGroupId(dwelling.getDwellingSize()) - 1]++;
+				dwellingSizeCount[LivingSpaceGroup6.getLivingSpaceGroupId(dwelling.getDwellingSize()) - 1]++;
 			}
 			// Output dwelling count per living space group
-			for (byte j = 0; j != LivingSpaceGroup.getLivingSpaceGroupCount(); j++) {
+			for (byte j = 0; j != LivingSpaceGroup6.getLivingSpaceGroupCount(); j++) {
 				output.append(", " + dwellingSizeCount[j]);
 			}
 			ps.println(output);

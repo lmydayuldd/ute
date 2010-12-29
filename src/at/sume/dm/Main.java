@@ -92,7 +92,7 @@ public class Main {
 
 		// Link dwellings to spatial units
 		dwellings.linkSpatialUnits(spatialUnits);
-        System.out.println(printInfo() + ": linked households + spatial units");
+        System.out.println(printInfo() + ": linked dwellings + spatial units");
         // Link households to dwellings
         households.linkDwellings(dwellings);
         System.out.println(printInfo() + ": linked households + dwellings");

@@ -63,6 +63,14 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 				maxThreshold += field.getLong(objectStore.get(i));
 			} else if (type.equals("double") || type.equals("java.lang.Double")) {
 				maxThreshold += Math.round(field.getDouble(objectStore.get(i)) * 1000);
+			} else if (type.equals("int") || type.equals("java.lang.Integer")) {
+				maxThreshold += field.getInt(objectStore.get(i));
+			} else if (type.equals("short") || type.equals("java.lang.Short")) {
+				maxThreshold += field.getShort(objectStore.get(i));
+			} else if (type.equals("byte") || type.equals("java.lang.Byte")) {
+				maxThreshold += field.getByte(objectStore.get(i));
+			} else if (type.equals("float") || type.equals("java.lang.Float")) {
+				maxThreshold += field.getFloat(objectStore.get(i));
 			} else {
 				throw new AssertionError("fieldName = " + c.getName() + "." + sourceFieldName + ", type = " + type);
 			}

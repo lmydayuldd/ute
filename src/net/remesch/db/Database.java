@@ -375,12 +375,13 @@ public class Database {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 */
-	public <T> void insertFieldMap(List<T> rowList, String sqlStatement) throws SQLException, IllegalArgumentException, IllegalAccessException {
+	public <T> void insertFieldMap(List<T> rowList, String sqlStatement, boolean autoCommit) throws SQLException, IllegalArgumentException, IllegalAccessException {
 		assert rowList.size() > 0 : "No records in rowList";
 		Class<? extends Object> c = rowList.get(0).getClass();
 		ArrayList<DatabaseFieldMap> fields = Reflection.getFields(c);
 		assert fields.size() > 0 : "No fields in class " + c.getName() + " or in its superclasses";
-		con.setAutoCommit(false); // if auto-commit is set to true, the connection has to be closed to really write the records into the table
+		if (!autoCommit)
+			con.setAutoCommit(false); // if auto-commit is set to true, the connection has to be closed to really write the records into the table
 		Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 		ResultSet rs = stmt.executeQuery(sqlStatement);
 		// Prepare field accessibility
@@ -427,7 +428,8 @@ public class Database {
 			rs.insertRow();
 			j++;
 		}
-		con.commit();
+		if (!autoCommit)
+			con.commit();
 		// Reset accessibility
 		for (DatabaseFieldMap fieldMap : fields) {
 			Field field = fieldMap.getField();

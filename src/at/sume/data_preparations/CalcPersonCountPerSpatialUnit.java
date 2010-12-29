@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import net.remesch.db.Database;
+import net.remesch.obsolete.PersonsPerAgeSexHouseholdsizePersonnr;
 import net.remesch.util.LeastSquareAdjustment;
 
 import at.sume.dm.Common;
 import at.sume.sampling.Distribution;
-import at.sume.sampling.distributions.PersonsPerAgeSexHouseholdsizePersonnr;
 
 public class CalcPersonCountPerSpatialUnit {
 

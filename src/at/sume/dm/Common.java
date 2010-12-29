@@ -8,6 +8,7 @@ import java.util.*;
 import java.io.*;
 
 import net.remesch.db.Database;
+import net.remesch.util.DateUtil;
 
 /**
  * Global functions, variables and parameters
@@ -175,5 +176,9 @@ public class Common {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static String printInfo() {
+		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)";
 	}
 }

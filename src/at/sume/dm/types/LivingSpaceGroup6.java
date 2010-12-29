@@ -14,7 +14,7 @@ import at.sume.dm.Common;
  * @author Alexander Remesch
  *
  */
-public class LivingSpaceGroup {
+public class LivingSpaceGroup6 {
 	public static class LivingSpaceGroupRow implements Comparable<LivingSpaceGroupRow> {
 		public byte livingSpaceGroupId;
 		public String livingSpaceGroup;

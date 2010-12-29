@@ -1,0 +1,181 @@
+/**
+ * 
+ */
+package at.sume.sampling.entities;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Random;
+
+import net.remesch.db.Database;
+import net.remesch.db.Sequence;
+import at.sume.dm.Common;
+import at.sume.dm.entities.DwellingRow;
+import at.sume.dm.entities.Dwellings;
+import at.sume.dm.entities.SpatialUnits;
+import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
+import at.sume.dm.types.LivingSpaceGroup6;
+import at.sume.sampling.SampleHouseholdLivingSpace;
+import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
+
+/**
+ * This class includes the complete household sampling.
+ * 
+ * @author Alexander Remesch
+ */
+public class SampleDbHouseholds {
+	private SampleDbPersons sampleDbPersons;
+	private Sequence householdNr = new Sequence();
+	private int spatialUnitId;
+	private ArrayList<DbPersonRow> members;
+	private SampleHouseholdLivingSpace sampleLivingSpace;
+//	private Database db;
+	private SpatialUnits spatialUnits;
+	private Dwellings dwellings;
+	private DwellingsOnMarket dwellingsOnMarket;
+	private int residentialSatisfactionThresholdRange = 100;
+	private byte householdSizeGroups;
+	
+	/**
+	 * Constructor - loads the spatial units, the dwellings, links them and creates a list of free
+	 * dwellings. Also prepares distributions for sampling the household living space from the number of
+	 * household members. All that will be used later on in the household sampling process.
+	 * 
+	 * TODO: this class should be better separated from GeneratePopulation
+	 * 
+	 * @param db
+	 * @param householdSizeGroups Number of household-size groups used in the database (usually a system parameter)
+	 * @throws SecurityException
+	 * @throws IllegalArgumentException
+	 * @throws SQLException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws NoSuchFieldException
+	 */
+	public SampleDbHouseholds(Database db, byte householdSizeGroups, int dwellingsOnMarketShare) throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException  {
+//		this.db = db;
+		this.householdSizeGroups = householdSizeGroups;
+		// Load spatial units - these are not sampled
+		spatialUnits = new SpatialUnits(db);
+        System.out.println(Common.printInfo() + ": loaded " + spatialUnits.size() + " spatial units");
+		// Load dwellings - these are not sampled because we have real data from 2001
+		dwellings = new Dwellings(db);
+        System.out.println(Common.printInfo() + ": loaded " + dwellings.size() + " dwellings");
+		// Link dwellings to spatial units
+		dwellings.linkSpatialUnits(spatialUnits);
+        System.out.println(Common.printInfo() + ": linked dwellings + spatial units");
+		// Determine all dwellings on the market
+        // TODO: it would be better to use the absolute number of households in a spatial unit as a guide for how many dwellings to put on the market (instead of dwellingsOnMarketShare)
+        dwellingsOnMarket = new DwellingsOnMarket(dwellings, spatialUnits, dwellingsOnMarketShare);
+        System.out.println(Common.printInfo() + ": determined all available dwellings on the housing market");
+		
+		sampleLivingSpace = new SampleHouseholdLivingSpace(db, householdSizeGroups);
+		sampleDbPersons = new SampleDbPersons(db);
+
+		// Preparation of sampling of cost of residence from the living space
+//		SampleHouseholdCostOfResidence householdCostOfResidence = new SampleHouseholdCostOfResidence(db);
+	}
+	/**
+	 * Set spatial unit specific parameters for household/person sampling
+	 * @param spatialUnitId
+	 * @throws SecurityException
+	 * @throws IllegalArgumentException
+	 * @throws SQLException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws NoSuchFieldException
+	 */
+	public void setSpatialUnit(int spatialUnitId) throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+		this.spatialUnitId = spatialUnitId;
+		sampleDbPersons.setSpatialUnit(spatialUnitId);
+	}
+	/**
+	 * Set the range for the sampling of the residential satisfaction threshold modifier that 
+	 * attempts to include individual deviations and unknown variance in the residential satisfaction
+	 * calculation
+	 * @param residentialSatisfactionThresholdRange
+	 */
+	public void setResidentialSatisfactionThresholdRange(int residentialSatisfactionThresholdRange) {
+		this.residentialSatisfactionThresholdRange = residentialSatisfactionThresholdRange;
+	}
+	/**
+	 * Return a sampled household (excluding the household members)
+	 * @param householdSize
+	 * @return
+	 * @throws SQLException
+	 */
+	public DbHouseholdRow randomSample(HouseholdsPerSpatialUnit householdsPerSpatialUnit, int alreadySampledHouseholdsCount) throws SQLException {
+		DbHouseholdRow result = new DbHouseholdRow();
+		// Household number
+		result.setHouseholdId(householdNr.getNext());
+		// Household spatial unit
+		result.setSpatialUnitId(spatialUnitId);
+		// Persons: age, sex & income
+		members = new ArrayList<DbPersonRow>();
+		int memberCount = 1;
+		if (householdsPerSpatialUnit.householdSize < householdSizeGroups) {
+			// sample given household size
+			memberCount = householdsPerSpatialUnit.householdSize;
+		} else if (householdsPerSpatialUnit.householdSize >= householdSizeGroups) {
+			// sample a household size that might be larger or an institutional household
+			int surplusPersonCount = householdsPerSpatialUnit.personCount % ((householdsPerSpatialUnit.householdCount - alreadySampledHouseholdsCount) * householdsPerSpatialUnit.householdSize);
+			if (surplusPersonCount <= 0) {
+				// No households larger than householdSizeGroups persons left
+				memberCount = householdsPerSpatialUnit.householdSize;
+			} else {
+				// Larger households still available
+				Random r = new Random();
+				memberCount = householdsPerSpatialUnit.householdSize;
+				// TODO: maximum number of household members: 10 - put into system parameters
+				for (int i = householdsPerSpatialUnit.householdSize; i != 11; i++) {
+					memberCount += r.nextInt(2);
+				}
+				if (memberCount > surplusPersonCount) {
+					memberCount = surplusPersonCount;
+				}
+			}
+			householdsPerSpatialUnit.personCount -= memberCount;
+		}
+		for (byte j = 0; j != memberCount; j++) {
+			DbPersonRow person = sampleDbPersons.randomSample(result.getHouseholdId(), (j == 0));
+			members.add(person);
+		}
+		// Living space - find a suitable dwelling
+		DwellingRow dwelling = null;
+		byte livingSpaceGroupCount = LivingSpaceGroup6.getLivingSpaceGroupCount();
+		while (dwelling == null) {
+			short livingSpace = sampleLivingSpace.randomSample(householdsPerSpatialUnit.householdSize);
+			byte livingSpaceGroup6Id = LivingSpaceGroup6.getLivingSpaceGroupId(livingSpace);
+			while ((dwelling == null) && (livingSpaceGroup6Id <= livingSpaceGroupCount)) {
+				dwelling = dwellingsOnMarket.getDwelling(spatialUnitId, livingSpaceGroup6Id);
+				if (dwelling == null) {
+//					System.out.println(Common.printInfo() + ": no dwelling with " + livingSpace + "m² (class: " + LivingSpaceGroup6.getLivingSpaceGroupName(livingSpaceGroup6Id) + ") in spatial unit " + spatialUnitId + " anymore");
+					livingSpaceGroup6Id++;
+				}
+//				assert livingSpaceGroup6Id <= LivingSpaceGroup6.getLivingSpaceGroupCount() : "Living space group " + livingSpaceGroup6Id + " out of range";
+			}
+			if (dwelling == null) {
+				System.out.println(Common.printInfo() + ": no dwelling with " + livingSpace + "m² in spatial unit " + spatialUnitId + " anymore");
+			}
+		}
+		result.setDwellingId(dwelling.getDwellingId());
+		dwellingsOnMarket.removeDwellingFromMarket(dwelling);
+		// Residential satisfaction threshold modifier
+		Random r = new Random();
+		result.setResidentialSatisfactionThreshMod((short) Math.round(r.nextGaussian() * residentialSatisfactionThresholdRange));
+		// TODO: Cost of residence
+//		householdCostOfResidence.loadDistribution(livingSpaceDistributionRow.getLivingSpaceGroup());
+//		CostOfResidenceDistributionRow costOfResidenceDistributionRow = householdCostOfResidence.determineCostOfResidenceDistributionRow();
+//		households.setCostOfResidence(householdCostOfResidence.determineCostOfResidence(costOfResidenceDistributionRow) * households.getLivingSpace() * 12);
+//		households.setCostOfResidenceGroupId(costOfResidenceDistributionRow.getCostOfResidenceGroupId());
+		
+		return result;
+	}
+	/**
+	 * Return the members of the previously sampled household
+	 * @return
+	 */
+	public ArrayList<DbPersonRow> getSampledMembers() {
+		return members;
+	}
+}

@@ -1,4 +1,4 @@
-package at.sume.sampling.distributions;
+package net.remesch.obsolete;
 
 import java.util.Random;
 

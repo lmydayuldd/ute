@@ -97,4 +97,10 @@ public class AgeGroup {
 //		return (short) (ageGroup.minage + (r.nextDouble() * (ageGroup.maxage - ageGroup.minage)));
 		return (byte) (sample.minage + r.nextInt(sample.maxage - sample.minage));
 	}
+	public static byte getMinAge(byte ageGroupId) {
+		return ageGroups.get(ageGroupId - 1).minage;
+	}
+	public static byte getMaxAge(byte ageGroupId) {
+		return ageGroups.get(ageGroupId - 1).maxage;
+	}
 }
