@@ -76,6 +76,11 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 			}
 			thresholdStore.add(maxThreshold);
 		}
+		// TODO: is this a good workaround?
+//		if (maxThreshold == 0) {
+//			System.out.println(Common.printInfo() + ": maxThreshold = 0");
+//			maxThreshold++;
+//		}
 	}
 	/**
 	 * Add a record to the sample
@@ -108,7 +113,17 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 	{
 		Random r = new Random();
 		// generate random number for sampling
-		long rand = (long) r.nextInt((int) maxThreshold);
+		int sampleThreshold = 1;
+		if (maxThreshold == 0) {
+			// TODO: need a good workaround for this or an assert
+			// This occurs when all thresholds = 0 because of rounding. Usually this disappears
+			// when the distribution (thresholds) are multiplied by 100 or 1000.
+			System.out.println("Problem: maxThreshold = 0");
+//			return 0;
+		} else {
+			sampleThreshold = (int) maxThreshold;
+		}
+		long rand = (long) r.nextInt(sampleThreshold);
 		// lookup index of element where random number falls within the boundaries
 		int index = Collections.binarySearch(thresholdStore, rand);
 		if (index < 0)
