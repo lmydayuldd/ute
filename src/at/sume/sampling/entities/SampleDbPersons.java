@@ -34,6 +34,7 @@ public class SampleDbPersons {
 	public DbPersonRow randomSample(int householdId, boolean householdRepresentative) throws SQLException {
 		DbPersonRow result = new DbPersonRow();
 		result.setPersonId(personNr.getNext());
+		result.setHouseholdId(householdId);
 		distributionPersonAgeSex.randomSample(householdRepresentative);
 		result.setAge(distributionPersonAgeSex.getSampledAge());
 		result.setSex(distributionPersonAgeSex.getSampledSex());

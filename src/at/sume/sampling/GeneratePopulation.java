@@ -18,8 +18,10 @@ import at.sume.sampling.entities.SampleDbHouseholds;
  * @author Alexander Remesch
  */
 public class GeneratePopulation {
-	private static ArrayList<DbHouseholdRow> households;
-	private static ArrayList<DbPersonRow> persons;
+//	private static ArrayList<DbHouseholdRow> households;
+//	private static ArrayList<DbPersonRow> persons;
+	private static int householdCount = 0;
+	private static int personCount = 0;
 	
 	/**
 	 * Generate synthetic households and persons for the SUME decision model
@@ -35,9 +37,7 @@ public class GeneratePopulation {
 		int residentialSatisfactionThresholdRange = Integer.parseInt(Common.getSysParamDataPreparation("THR_ResSatisfactionRange"));
 		byte dwellingsOnMarketShare = Byte.parseByte(Common.getSysParamDataPreparation("DwellingsOnMarketShare"));
 		
-		households = new ArrayList<DbHouseholdRow>();
-		persons = new ArrayList<DbPersonRow>();
-		
+//		SampleHouseholds sampleHouseholds = new SampleHouseholds(db, "SpatialUnitId = 91101 or SpatialUnitId = 91001");
 		SampleHouseholds sampleHouseholds = new SampleHouseholds(db);
 		SampleDbHouseholds sampleDbHouseholds = new SampleDbHouseholds(db, householdSizeGroups, dwellingsOnMarketShare);
 		if (residentialSatisfactionThresholdRange != 0)
@@ -45,6 +45,9 @@ public class GeneratePopulation {
 		
 		// Sample households including persons
 		for (HouseholdsPerSpatialUnit householdsPerSpatialUnit : sampleHouseholds) {
+			ArrayList<DbHouseholdRow> households = new ArrayList<DbHouseholdRow>();
+			ArrayList<DbPersonRow> persons = new ArrayList<DbPersonRow>();
+			
 			if (householdsPerSpatialUnit.householdSize > householdSizeGroups)
 				System.out.println(Common.printInfo() + ": creating " + householdsPerSpatialUnit.householdCount + " households for spatial unit " + householdsPerSpatialUnit.spatialUnitId + " (institutional households)");
 			else
@@ -58,6 +61,15 @@ public class GeneratePopulation {
 //				if ((i % 1000 == 0) && (i > 0)) {
 //					System.out.println(Common.printInfo() + ": creating household " + i + " of " + householdsPerSpatialUnit.householdCount);
 //				}
+			}
+			householdCount += households.size();
+			personCount += persons.size();
+			if (households.size() > 0) {
+//				System.out.println(Common.printInfo() + ": writing " + households.size() + " households and " + persons.size() + " persons to the db");
+				db.insertFieldMap(households, "select HouseholdId, HouseholdSize, SpatialUnitId, DwellingId, LivingSpace, CostOfResidence, ResidentialSatisfactionThreshMod from _DM_Households", true);
+				db.con.commit();
+				db.insertFieldMap(persons, "select PersonId, HouseholdId, Sex, Age, YearlyIncome from _DM_Persons", true);
+				db.con.commit();
 			}
 		}
 	}
@@ -114,27 +126,8 @@ public class GeneratePopulation {
 			e.printStackTrace();
 			System.exit(103);
 		}
-		System.out.println(Common.printInfo() + ": created " + households.size() + " households and " + persons.size() + " persons");
-		try {
-//			db.insertFieldMap(households, "select HouseholdId, DwellingId, CostOfResidence, ResidentialSatisfactionThreshMod from _DM_Households");
-			db.insertFieldMap(households, "select HouseholdId, SpatialUnitId, DwellingId, LivingSpace, CostOfResidence, ResidentialSatisfactionThreshMod from _DM_Households", true);
-			db.con.commit();
-//			db.insert(households, "select HouseholdId, SpatialUnitId, DwellingId, LivingSpace, CostOfResidence, ResidentialSatisfactionThreshMod from _DM_Households");
-//			db.insertSql(households, "_DM_Households");
-			db.insertFieldMap(persons, "select PersonId, HouseholdId, Sex, Age, YearlyIncome from _DM_Persons", true);
-			db.con.commit();
-//			db.insert(persons, "select PersonId, HouseholdId, Sex, Age, YearlyIncome from _DM_Persons");
-//			db.insertSql(persons, "_DM_Persons");
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			System.exit(104);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(104);
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			System.exit(104);
-		}
+		
+		System.out.println(Common.printInfo() + ": created " + householdCount + " households and " + personCount + " persons");
 		
         System.out.println(Common.printInfo() + ": end");
         System.exit(0);

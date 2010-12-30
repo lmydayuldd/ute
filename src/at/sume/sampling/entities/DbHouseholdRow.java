@@ -16,6 +16,7 @@ public class DbHouseholdRow {
 	private int costOfResidence;	// sample this here, put last cost of residence in DwellingRow to be able
 									// to calculate costs of dwelling for the next household
 	private short residentialSatisfactionThreshMod;
+	private byte householdSize;		// only for ease-of-use, not really needed
 	
 	/**
 	 * @param householdId the householdId to set
@@ -100,5 +101,19 @@ public class DbHouseholdRow {
 	public void setResidentialSatisfactionThreshMod(
 			short residentialSatisfactionThreshMod) {
 		this.residentialSatisfactionThreshMod = residentialSatisfactionThreshMod;
+	}
+
+	/**
+	 * @return the householdSize
+	 */
+	public byte getHouseholdSize() {
+		return householdSize;
+	}
+
+	/**
+	 * @param householdSize the householdSize to set
+	 */
+	public void setHouseholdSize(byte householdSize) {
+		this.householdSize = householdSize;
 	}
 }

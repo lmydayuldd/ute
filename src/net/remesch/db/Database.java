@@ -319,7 +319,7 @@ public class Database {
 		ResultSet rs = stmt.executeQuery(sqlStatement);
 		int j = 0;
 		for (T row : rowList) {
-			if (j % 10000 == 0) {
+			if ((j % 10000 == 0) && (j != 0)) {
 				System.out.println(DateUtil.now() + ": Adding row " + j + " of " + rowList.size());
 			}
 			rs.moveToInsertRow();
@@ -395,7 +395,7 @@ public class Database {
 		}
 		int j = 0;
 		for (T row : rowList) {
-			if (j % 10000 == 0) {
+			if ((j % 10000 == 0) && (j != 0)) {
 				System.out.println(DateUtil.now() + ": Adding row " + j + " of " + rowList.size());
 			}
 			rs.moveToInsertRow();
@@ -492,7 +492,7 @@ public class Database {
 		}
 		int j = 0;
 		for (T row : rowList) {
-			if (j++ % 10000 == 0) {
+			if ((j % 1000 == 0) && (j != 0)) {
 				System.out.println(DateUtil.now() + ": Inserting row " + j + " of " + rowList.size());
 			}
 			int i = 1;

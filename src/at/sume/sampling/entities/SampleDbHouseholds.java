@@ -29,7 +29,7 @@ public class SampleDbHouseholds {
 	private int spatialUnitId;
 	private ArrayList<DbPersonRow> members;
 	private SampleHouseholdLivingSpace sampleLivingSpace;
-//	private Database db;
+	private Database db;
 	private SpatialUnits spatialUnits;
 	private Dwellings dwellings;
 	private DwellingsOnMarket dwellingsOnMarket;
@@ -53,7 +53,7 @@ public class SampleDbHouseholds {
 	 * @throws NoSuchFieldException
 	 */
 	public SampleDbHouseholds(Database db, byte householdSizeGroups, int dwellingsOnMarketShare) throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException  {
-//		this.db = db;
+		this.db = db;
 		this.householdSizeGroups = householdSizeGroups;
 		// Load spatial units - these are not sampled
 		spatialUnits = new SpatialUnits(db);
@@ -69,7 +69,6 @@ public class SampleDbHouseholds {
         dwellingsOnMarket = new DwellingsOnMarket(dwellings, spatialUnits, dwellingsOnMarketShare);
         System.out.println(Common.printInfo() + ": determined all available dwellings on the housing market");
 		
-		sampleLivingSpace = new SampleHouseholdLivingSpace(db, householdSizeGroups);
 		sampleDbPersons = new SampleDbPersons(db);
 
 		// Preparation of sampling of cost of residence from the living space
@@ -88,6 +87,7 @@ public class SampleDbHouseholds {
 	public void setSpatialUnit(int spatialUnitId) throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException {
 		this.spatialUnitId = spatialUnitId;
 		sampleDbPersons.setSpatialUnit(spatialUnitId);
+		sampleLivingSpace = new SampleHouseholdLivingSpace(db, spatialUnitId, householdSizeGroups);
 	}
 	/**
 	 * Set the range for the sampling of the residential satisfaction threshold modifier that 
@@ -136,6 +136,8 @@ public class SampleDbHouseholds {
 			}
 			householdsPerSpatialUnit.personCount -= memberCount;
 		}
+		assert (memberCount > 0) && (memberCount <= 255) : "Household member count out of range (" + memberCount + ")";
+		result.setHouseholdSize((byte)memberCount);
 		for (byte j = 0; j != memberCount; j++) {
 			DbPersonRow person = sampleDbPersons.randomSample(result.getHouseholdId(), (j == 0));
 			members.add(person);
@@ -143,8 +145,9 @@ public class SampleDbHouseholds {
 		// Living space - find a suitable dwelling
 		DwellingRow dwelling = null;
 		byte livingSpaceGroupCount = LivingSpaceGroup6.getLivingSpaceGroupCount();
+		short livingSpace = 0;
 		while (dwelling == null) {
-			short livingSpace = sampleLivingSpace.randomSample(householdsPerSpatialUnit.householdSize);
+			livingSpace = sampleLivingSpace.randomSample(householdsPerSpatialUnit.householdSize);
 			byte livingSpaceGroup6Id = LivingSpaceGroup6.getLivingSpaceGroupId(livingSpace);
 			while ((dwelling == null) && (livingSpaceGroup6Id <= livingSpaceGroupCount)) {
 				dwelling = dwellingsOnMarket.getDwelling(spatialUnitId, livingSpaceGroup6Id);
@@ -159,6 +162,7 @@ public class SampleDbHouseholds {
 			}
 		}
 		result.setDwellingId(dwelling.getDwellingId());
+		result.setLivingSpace(livingSpace);
 		dwellingsOnMarket.removeDwellingFromMarket(dwelling);
 		// Residential satisfaction threshold modifier
 		Random r = new Random();
