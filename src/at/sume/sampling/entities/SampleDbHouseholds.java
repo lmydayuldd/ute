@@ -15,6 +15,7 @@ import at.sume.dm.entities.Dwellings;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.types.LivingSpaceGroup6;
+import at.sume.sampling.SampleHouseholdCostOfResidence;
 import at.sume.sampling.SampleHouseholdLivingSpace;
 import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
 
@@ -35,6 +36,7 @@ public class SampleDbHouseholds {
 	private DwellingsOnMarket dwellingsOnMarket;
 	private int residentialSatisfactionThresholdRange = 100;
 	private byte householdSizeGroups;
+	private SampleHouseholdCostOfResidence householdCostOfResidence;
 	
 	/**
 	 * Constructor - loads the spatial units, the dwellings, links them and creates a list of free
@@ -72,7 +74,7 @@ public class SampleDbHouseholds {
 		sampleDbPersons = new SampleDbPersons(db);
 
 		// Preparation of sampling of cost of residence from the living space
-//		SampleHouseholdCostOfResidence householdCostOfResidence = new SampleHouseholdCostOfResidence(db);
+		householdCostOfResidence = new SampleHouseholdCostOfResidence(db);
 	}
 	/**
 	 * Set spatial unit specific parameters for household/person sampling
@@ -138,9 +140,11 @@ public class SampleDbHouseholds {
 		}
 		assert (memberCount > 0) && (memberCount <= 255) : "Household member count out of range (" + memberCount + ")";
 		result.setHouseholdSize((byte)memberCount);
+		int yearlyHouseholdIncome = 0;
 		for (byte j = 0; j != memberCount; j++) {
 			DbPersonRow person = sampleDbPersons.randomSample(result.getHouseholdId(), (j == 0));
 			members.add(person);
+			yearlyHouseholdIncome += person.getYearlyIncome();
 		}
 		// Living space - find a suitable dwelling
 		DwellingRow dwelling = null;
@@ -167,11 +171,8 @@ public class SampleDbHouseholds {
 		// Residential satisfaction threshold modifier
 		Random r = new Random();
 		result.setResidentialSatisfactionThreshMod((short) Math.round(r.nextGaussian() * residentialSatisfactionThresholdRange));
-		// TODO: Cost of residence
-//		householdCostOfResidence.loadDistribution(livingSpaceDistributionRow.getLivingSpaceGroup());
-//		CostOfResidenceDistributionRow costOfResidenceDistributionRow = householdCostOfResidence.determineCostOfResidenceDistributionRow();
-//		households.setCostOfResidence(householdCostOfResidence.determineCostOfResidence(costOfResidenceDistributionRow) * households.getLivingSpace() * 12);
-//		households.setCostOfResidenceGroupId(costOfResidenceDistributionRow.getCostOfResidenceGroupId());
+		// Cost of residence
+		result.setCostOfResidence(householdCostOfResidence.randomSample(yearlyHouseholdIncome));
 		
 		return result;
 	}

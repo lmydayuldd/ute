@@ -3,121 +3,74 @@
  */
 package at.sume.sampling;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Random;
+import java.util.ArrayList;
 
-import at.sume.sampling.distributions.CostOfResidenceDistributionRow;
 import net.remesch.db.Database;
+import at.sume.dm.types.CostOfResidenceGroup;
+import at.sume.sampling.distributions.CostOfResidenceDistributionRow;
 
 /**
- * Sample household cost of residence from the table _DM_Cost of residence per living space based on the
- * living space of the household
+ * Sample household cost of residence from the view [_DM_Cost of residence per income group] based on the
+ * household income
  * 
- * TODO: migrate this to Distribution class
- *
  * @author Alexander Remesch
  */
-public class SampleHouseholdCostOfResidence extends SamplingDistribution<CostOfResidenceDistributionRow> {
-	private short householdLivingSpaceGroupId;
+public class SampleHouseholdCostOfResidence {
+	ArrayList<Distribution<CostOfResidenceDistributionRow>> costOfResidencePerIncomeGroup = new ArrayList<Distribution<CostOfResidenceDistributionRow>>();
 	
 	/**
 	 * @param db
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws SQLException 
+	 * @throws NoSuchFieldException 
+	 * @throws IllegalArgumentException 
+	 * @throws SecurityException 
 	 */
-	public SampleHouseholdCostOfResidence(Database db) {
-		super(db);
+	public SampleHouseholdCostOfResidence(Database db) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
+		String sqlStatement = "SELECT * FROM [_DM_Cost of residence per income group] ORDER BY IncomeGroupId, CostOfResidenceGroupId";
+		ArrayList<CostOfResidenceDistributionRow> costOfResidenceDistribution = db.select(CostOfResidenceDistributionRow.class, sqlStatement); 
+		assert costOfResidenceDistribution.size() > 0 : "No records found from '" + sqlStatement + "'";
+		int prevIncomeGroupId = 0, startSubList = 0;
+		// Split into separate distributions by incomeGroupId
+		for (int i = 0; i != costOfResidenceDistribution.size(); i++) {
+			CostOfResidenceDistributionRow row = costOfResidenceDistribution.get(i);
+			if (prevIncomeGroupId != row.incomeGroupId) {
+				if (i != 0) 
+					costOfResidencePerIncomeGroup.add(new Distribution<CostOfResidenceDistributionRow>(costOfResidenceDistribution.subList(startSubList, i), "countWeighted"));
+				startSubList = i;
+				prevIncomeGroupId = row.incomeGroupId;
+			}
+		}
 	}
-
-	public void loadDistribution(short householdLivingSpaceGroupId) throws SQLException {
-		this.householdLivingSpaceGroupId = householdLivingSpaceGroupId;
-		super.loadDistribution();
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSet#createRecordSetRow()
-	 */
-	@Override
-	public CostOfResidenceDistributionRow createRecordSetRow() {
-		return new CostOfResidenceDistributionRow();
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSet#fieldnames()
-	 */
-	@Override
-	public String[] fieldnames() {
-		String s[] = { "LivingSpaceGroupId", "CostOfResidenceGroupId", "MinCosts", "MaxCosts" };
-		return s;
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSet#primaryKeyFieldnames()
-	 */
-	@Override
-	public String[] primaryKeyFieldnames() {
-		String s[] = { "LivingSpaceGroupId", "CostOfResidenceGroupId" };
-		return s;
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSet#tablename()
-	 */
-	@Override
-	public String tablename() {
-		return "_DM_Cost of residence per living space";
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSet#selectStatement()
-	 */
-	@Override
-	public String selectStatement() {
-		// LivingSpaceGroupId wouldn't be necessary here in the SELECT part, but when it is included in primaryKeyFields()
-		// we need to supply it here...
-		return "SELECT LivingSpaceGroupId, distr.CostOfResidenceGroupId, MinCosts, MaxCosts, DwellingCount FROM [_DM_Cost of residence per living space] AS distr INNER JOIN ISIS_CostOfResidenceGroups AS crg ON (distr.CostOfResidenceGroupId = crg.ID) " + 
-			"WHERE LivingSpaceGroupId = ? " +
-			"ORDER BY distr.CostOfResidenceGroupId"; 
-	}
-	
-	@Override
-	public ResultSet getResultSet(PreparedStatement ps) throws SQLException {
-		ps.setString(1, Short.toString(householdLivingSpaceGroupId));
-		return ps.executeQuery();
-	}
-	
-	public CostOfResidenceDistributionRow determineCostOfResidenceDistributionRow() {
-		return rowList.get(randomSample());
-	}
-	
-	public short determineCostOfResidenceGroupId() {
-		return determineCostOfResidenceDistributionRow().getCostOfResidenceGroupId();
-	}
-	
+// Removed this, because we work with a shortened income group list in this class that is incompatible with the
+// standard IncomeGroupList used otherwise in this project
+//	/**
+//	 * Sample household cost of residence based on a given income group id
+//	 * @param incomeGroupId Income group (yearly household income)
+//	 * @return The sampled cost of residence in € per 100 m² and year
+//	 */
+//	public int randomSample(byte incomeGroupId) {
+//		assert incomeGroupId >= 1 : "Invalid incomeGroupId = " + incomeGroupId;
+//		if (incomeGroupId > costOfResidencePerIncomeGroup.size())
+//			incomeGroupId = (byte) costOfResidencePerIncomeGroup.size();
+//		CostOfResidenceDistributionRow result = costOfResidencePerIncomeGroup.get(incomeGroupId - 1).get(costOfResidencePerIncomeGroup.get(incomeGroupId - 1).randomSample());
+//		return (int) Math.round(CostOfResidenceGroup.sampleCostOfResidence(result.costOfResidenceGroupId) * 1200);
+//	}
 	/**
-	 * Determine cost of residence per m²
-	 * @return
+	 * Sample household cost of residence based on a given household income
+	 * @param yearlyHouseholdIncome Yearly household income
+	 * @return The sampled cost of residence in € per 100 m² and year
 	 */
-	public int determineCostOfResidence() {
-		CostOfResidenceDistributionRow row = determineCostOfResidenceDistributionRow();
-		Random r = new Random();
-		return (int) (row.getMinCostOfResidence() + (r.nextDouble() * (row.getMaxCostOfResidence() - row.getMinCostOfResidence())));
-	}
-
-	/**
-	 * Determine cost of residence per m²
-	 * @return
-	 */
-	public int determineCostOfResidence(CostOfResidenceDistributionRow row) {
-		Random r = new Random();
-		return (int) (row.getMinCostOfResidence() + (r.nextDouble() * (row.getMaxCostOfResidence() - row.getMinCostOfResidence())));
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.sampling.SamplingDistribution#valueField()
-	 */
-	@Override
-	public String valueField() {
-		return "DwellingCount";
+	public int randomSample(int yearlyHouseholdIncome) {
+		assert yearlyHouseholdIncome >= 0 : "Invalid yearlyHouseholdIncome = " + yearlyHouseholdIncome;
+		for (Distribution<CostOfResidenceDistributionRow> distribution : costOfResidencePerIncomeGroup) {
+			if ((distribution.get(0).minIncome >= yearlyHouseholdIncome) && (distribution.get(0).maxIncome <= yearlyHouseholdIncome)) {
+				CostOfResidenceDistributionRow result = distribution.get(distribution.randomSample());
+				return (int) Math.round(CostOfResidenceGroup.sampleCostOfResidence(result.costOfResidenceGroupId) * 1200);
+			}
+		}
+		return 0;
 	}
 }

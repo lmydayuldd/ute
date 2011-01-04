@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -19,7 +20,7 @@ import java.util.Random;
 public class Distribution<E> implements Collection<E>, Iterable<E> {
 //	private ArrayList<Long> idStore; // TODO: do we really need the idstore???
 	protected ArrayList<Long> thresholdStore;
-	protected ArrayList<E> objectStore;
+	protected List<E> objectStore;
 	protected long maxThreshold;
 
 	/**
@@ -39,10 +40,10 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 		thresholdStore = new ArrayList<Long>(recordCount);
 		objectStore = new ArrayList<E>(recordCount);
 	}
-	public Distribution(ArrayList<E> objectStore, String sourceFieldName) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
+	public Distribution(List<E> list, String sourceFieldName) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
 //		idStore = new ArrayList<Long>();
 		thresholdStore = new ArrayList<Long>();
-		this.objectStore = objectStore;
+		this.objectStore = list;
 		buildThresholds(sourceFieldName);
 	}
 	/**
