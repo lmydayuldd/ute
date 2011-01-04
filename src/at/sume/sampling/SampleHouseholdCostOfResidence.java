@@ -32,17 +32,24 @@ public class SampleHouseholdCostOfResidence {
 		String sqlStatement = "SELECT * FROM [_DM_Cost of residence per income group] ORDER BY IncomeGroupId, CostOfResidenceGroupId";
 		ArrayList<CostOfResidenceDistributionRow> costOfResidenceDistribution = db.select(CostOfResidenceDistributionRow.class, sqlStatement); 
 		assert costOfResidenceDistribution.size() > 0 : "No records found from '" + sqlStatement + "'";
-		int prevIncomeGroupId = 0, startSubList = 0;
+		int prevIncomeGroupId = 0;
 		// Split into separate distributions by incomeGroupId
+		ArrayList<CostOfResidenceDistributionRow> e = null;
 		for (int i = 0; i != costOfResidenceDistribution.size(); i++) {
 			CostOfResidenceDistributionRow row = costOfResidenceDistribution.get(i);
 			if (prevIncomeGroupId != row.incomeGroupId) {
-				if (i != 0) 
-					costOfResidencePerIncomeGroup.add(new Distribution<CostOfResidenceDistributionRow>(costOfResidenceDistribution.subList(startSubList, i), "countWeighted"));
-				startSubList = i;
+				if (i != 0) {
+					costOfResidencePerIncomeGroup.add(new Distribution<CostOfResidenceDistributionRow>(e, "countWeighted"));
+				}
+				e = new ArrayList<CostOfResidenceDistributionRow>();
+				e.add(row);
 				prevIncomeGroupId = row.incomeGroupId;
+			} else {
+				e.add(row);
 			}
 		}
+		if (e != null)
+			costOfResidencePerIncomeGroup.add(new Distribution<CostOfResidenceDistributionRow>(e, "countWeighted"));
 	}
 // Removed this, because we work with a shortened income group list in this class that is incompatible with the
 // standard IncomeGroupList used otherwise in this project
@@ -66,7 +73,7 @@ public class SampleHouseholdCostOfResidence {
 	public int randomSample(int yearlyHouseholdIncome) {
 		assert yearlyHouseholdIncome >= 0 : "Invalid yearlyHouseholdIncome = " + yearlyHouseholdIncome;
 		for (Distribution<CostOfResidenceDistributionRow> distribution : costOfResidencePerIncomeGroup) {
-			if ((distribution.get(0).minIncome >= yearlyHouseholdIncome) && (distribution.get(0).maxIncome <= yearlyHouseholdIncome)) {
+			if ((distribution.get(0).minIncome <= yearlyHouseholdIncome) && (distribution.get(0).maxIncome >= yearlyHouseholdIncome)) {
 				CostOfResidenceDistributionRow result = distribution.get(distribution.randomSample());
 				return (int) Math.round(CostOfResidenceGroup.sampleCostOfResidence(result.costOfResidenceGroupId) * 1200);
 			}

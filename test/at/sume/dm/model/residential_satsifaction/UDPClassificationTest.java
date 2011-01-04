@@ -20,14 +20,14 @@ import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
-import at.sume.dm.model.residential_satisfaction.UDPClassification;
+import at.sume.dm.model.residential_satisfaction.UDPCentrality;
 
 /**
  * @author Alexander Remesch
  *
  */
 public class UDPClassificationTest {
-	UDPClassification udpClassification;
+	UDPCentrality udpClassification;
 	Database db;
 	Households hh;
 	HouseholdRow hhr1, hhr2;
@@ -107,11 +107,11 @@ public class UDPClassificationTest {
 	}
 
 	/**
-	 * Test method for {@link at.sume.dm.model.residential_satisfaction.UDPClassification#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow, int)}.
+	 * Test method for {@link at.sume.dm.model.residential_satisfaction.UDPCentrality#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow, int)}.
 	 */
 	@Test
 	public void testCalc() {
-		udpClassification = new UDPClassification();
+		udpClassification = new UDPCentrality();
 
 		SpatialUnits su = new SpatialUnits();
 		su.setDb(db);

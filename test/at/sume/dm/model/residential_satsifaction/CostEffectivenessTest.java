@@ -155,7 +155,7 @@ public class CostEffectivenessTest {
 	}
 
 	/**
-	 * Test method for {@link at.sume.dm.model.residential_satisfaction.UDPClassification#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow, int)}.
+	 * Test method for {@link at.sume.dm.model.residential_satisfaction.UDPCentrality#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow, int)}.
 	 */
 	@Test
 	public void testCalc() {

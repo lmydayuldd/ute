@@ -172,7 +172,7 @@ public class SampleDbHouseholds {
 		Random r = new Random();
 		result.setResidentialSatisfactionThreshMod((short) Math.round(r.nextGaussian() * residentialSatisfactionThresholdRange));
 		// Cost of residence
-		result.setCostOfResidence(householdCostOfResidence.randomSample(yearlyHouseholdIncome));
+		result.setCostOfResidence(householdCostOfResidence.randomSample(yearlyHouseholdIncome) * result.getLivingSpace() / 100);
 		
 		return result;
 	}
