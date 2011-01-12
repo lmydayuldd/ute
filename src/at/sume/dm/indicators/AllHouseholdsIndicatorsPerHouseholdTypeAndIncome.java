@@ -213,7 +213,9 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 		int pos = lookupIndicator(householdType, incomeGroup);
 		if (pos >= 0) {
 			BaseIndicators b = indicatorList.get(pos);
-			return b.getLivingSpaceSum() / b.getHouseholdCount();
+			long avgLivingSpace = b.getLivingSpaceSum() / b.getHouseholdCount();
+			assert avgLivingSpace > 0 : "Avg. living space for household type " + householdType.toString() + ", income group " + incomeGroup + " is <= 0!";
+			return avgLivingSpace;
 		} else {
 			throw new AssertionError("IndicatorsPerHouseholdTypeAndIncome.remove() - incomeGroup " + incomeGroup + ", householdType " + householdType + " is not in the list of spatial units");
 		}

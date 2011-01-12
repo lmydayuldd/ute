@@ -27,8 +27,8 @@ public class ResidentialMobility {
 		// lower limit: commonly defined by the current dwelling; upper limit: set by the standards to
 		// which the household can reasonably aspire (Knox/Pinch 2010, p.263)
 		int maxCostOfResidence = Math.max(0, household.getYearlyIncome() - minimumIncome.estimateMinIncomeLeftForLiving(household));
-		if (household.getMovingDecisionYear() == modelYear) {
-			// Household just began searching - set initial values
+		if ((household.getMovingDecisionYear() == modelYear) || (household.getAspirationRegionLivingSpaceMin() == 0) || (household.getAspirationRegionLivingSpaceMax() == 0)) {
+			// Household just began searching (or the number of household members changed since the household began searching) - set initial values
 			household.estimateDesiredLivingSpace();
 			// lower value from income share and current dwelling costs (per m²)
 			int maxCostOfResidencePerSqm = maxCostOfResidence / household.getAspirationRegionLivingSpaceMin();

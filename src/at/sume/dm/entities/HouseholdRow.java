@@ -329,7 +329,8 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			}
 			break;
 		default:
-			assert (getHouseholdSize() > 0) && (getHouseholdSize() <= 9) : "Invalid household size: " + getHouseholdSize();
+//			assert (getHouseholdSize() > 0) && (getHouseholdSize() <= 9) : "Invalid household size: " + getHouseholdSize();
+			assert (getHouseholdSize() > 0) : "Invalid household size: " + getHouseholdSize();
 			// determine the number of children
 			int numChildren = 0;
 			for (PersonRow member : members) {
@@ -636,9 +637,11 @@ public class HouseholdRow extends RecordSetRow<Households> {
 			// calculate boundary 1
 			short desiredLivingSpaceModifier = (short) (110 + desiredLivingSpaceRangePct * r.nextGaussian());
 			short desiredLivingSpaceSqm1 = (short) Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
+			assert desiredLivingSpaceSqm1 > 0 : "Desired living space 1 <= 0 - " + desiredLivingSpaceSqm1;
 			// calculate boundary 2
 			desiredLivingSpaceModifier = (short) (90 - desiredLivingSpaceRangePct * r.nextGaussian());
 			short desiredLivingSpaceSqm2 = (short) Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
+			assert desiredLivingSpaceSqm2 > 0 : "Desired living space 2 <= 0 - " + desiredLivingSpaceSqm2;
 			if (desiredLivingSpaceSqm1 > desiredLivingSpaceSqm2) {
 				setAspirationRegionLivingSpaceMin(desiredLivingSpaceSqm2);
 				setAspirationRegionLivingSpaceMax(desiredLivingSpaceSqm1);

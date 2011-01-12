@@ -32,6 +32,8 @@ public class IncomePercentiles implements Indicator<HouseholdRow> {
 			Integer personIncome = person.getYearlyIncome();
 			personIncomes.add(personIncome);
 		}
+		householdIncomesSorted = false;
+		personIncomesSorted = false;
 	}
 	/* (non-Javadoc)
 	 * @see at.sume.dm.indicators.base.Indicator#remove(at.sume.db.RecordSetRow)
@@ -46,6 +48,9 @@ public class IncomePercentiles implements Indicator<HouseholdRow> {
 	@Override
 	public void clear() {
 		householdIncomes.clear();
+		personIncomes.clear();
+		householdIncomesSorted = false;
+		personIncomesSorted = false;
 	}
 	/**
 	 * Get the lowest household income that is higher than the lowest given percentage of all household incomes
