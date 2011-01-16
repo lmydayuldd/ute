@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import net.remesch.db.Database;
 import net.remesch.db.Sequence;
@@ -59,7 +60,7 @@ public class Main {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
         System.out.println(printInfo() + ": start");
 		Database db = Common.openDatabase();
 //		Database odb = Common.openOutputDatabase();
@@ -108,14 +109,7 @@ public class Main {
         households.determineHouseholdTypes();
         System.out.println(printInfo() + ": determined all household types");
         
-        // Prepare model output to the database
-//        outputManager = new OutputManager(odb, households, dwellings, persons);
-        try {
-			outputManager = new OutputManager("", households, dwellings, persons);
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-			System.exit(100);
-		}
+        outputManager = new OutputManager(Common.getPathOutput(), households, dwellings, persons);
         
 		// Model main loop
 		// - Biographical events for all persons/households
@@ -216,9 +210,15 @@ public class Main {
 				if (household.getMembers().size() == 0)
 					continue;
 				
+				// Add household if it already made a moving decision previously
+				if (household.getMovingDecisionYear() != 0) {
+					potentialMovers.add(household);
+					continue;
+				}
+				
 				// Process household decisions
 				// (minimum income, minimum living space, calculation of residential satisfaction)
-				householdDecisionManager.process(household);
+//				householdDecisionManager.process(household);
 				// TODO: add to potential_movers if this is the result of householdDecisionManager
 
 				// Calculate residential mobility depending on previous decisions
@@ -229,8 +229,16 @@ public class Main {
 				if (residential_satisfaction + household.getResidentialSatisfactionThreshMod() < Common.getResidentialSatisfactionThreshold()) {
 					// TODO: add the household to a random position in the ArrayList
 					potentialMovers.add(household);
-					if (household.getMovingDecisionYear() == 0)
-						household.setMovingDecisionYear((short) modelYear);
+					if (household.getMovingDecisionYear() == 0) {
+						if (modelYear == modelStartYear) {
+							// In first model year, household may already have decided earlier
+							Random r = new Random();
+							int movingDecisionYear = Common.getMovingDecisionMin() + r.nextInt(modelYear - Common.getMovingDecisionMin() + 1);
+							household.setMovingDecisionYear((short) movingDecisionYear);
+						} else {
+							household.setMovingDecisionYear((short) modelYear);
+						}
+					}
 					// TODO: add potential mover to the indicators
 				}
 				
@@ -345,7 +353,11 @@ public class Main {
 			}
 			System.out.println(printInfo() + " " + hhFoundNoDwellings + " out of " + immigratingHouseholds.size() + " immigrating households found no dwelling");
 			System.out.println(printInfo() + " " + hhNoSatisfaction + " out of " + immigratingHouseholds.size() + " immigrating households could not find spatial units matching their aspirations");
-			outputFreeDwellings(modelYear, "after immigration");
+			if (modelYear == modelEndYear - 1)
+				outputFreeDwellings(modelYear, "after immigration");
+			
+			// Aging of persons
+			persons.aging();
 		} // model year
 	}
 	
@@ -363,9 +375,16 @@ public class Main {
 	
 	public static void outputFreeDwellings(int modelYear, String label) throws FileNotFoundException {
 		// TODO: put this in an extra class and delete the file once per model run
-		FileOutputStream freeDwellingsFile = new FileOutputStream("FreeDwellings.txt", true);
+		String path = Common.getPathOutput();
+		if (path == null) path = "";
+		String pathName;
+		if (path.endsWith("\\") || (path == ""))
+			pathName = path + "FreeDwellings.csv";
+		else
+			pathName = path + "\\" + "FreeDwellings.csv";
+		FileOutputStream freeDwellingsFile = new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(freeDwellingsFile);
-		ps.println("======= " + label + "=======");
+//		ps.println("======= " + label + "=======" + modelYear + "=======");
 		dwellingsOnMarket.outputDwellingsPerSize(ps, modelYear);
 	}
 }

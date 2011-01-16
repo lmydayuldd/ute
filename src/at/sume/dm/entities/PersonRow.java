@@ -118,6 +118,10 @@ public class PersonRow extends RecordSetRow<Persons> {
 		return age;
 	}
 
+	public void aging() {
+		age++;
+	}
+	
 //	/**
 //	 * @return the householdRepresentative
 //	 */

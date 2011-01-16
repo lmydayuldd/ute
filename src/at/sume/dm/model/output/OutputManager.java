@@ -4,6 +4,7 @@
 package at.sume.dm.model.output;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 
 import net.remesch.db.Database;
@@ -33,16 +34,16 @@ public class OutputManager {
 	}
 	/**
 	 * 
-	 * @param pathName
+	 * @param path
 	 * @param households
 	 * @param dwellings
 	 * @param persons
 	 * @throws FileNotFoundException 
 	 */
-	public OutputManager(String pathName, Households households, Dwellings dwellings, Persons persons) throws FileNotFoundException {
-		fileOutputHouseholds = new FileOutputHouseholds(pathName + "households.csv", households);
-		fileOutputPersons = new FileOutputPersons(pathName + "persons.csv", persons);
-		fileOutputDwellings = new FileOutputDwellings(pathName + "dwellings.csv", dwellings);
+	public OutputManager(String path, Households households, Dwellings dwellings, Persons persons) {
+		fileOutputHouseholds = new FileOutputHouseholds(path, households);
+		fileOutputPersons = new FileOutputPersons(path, persons);
+		fileOutputDwellings = new FileOutputDwellings(path, dwellings);
 	}
 	/**
 	 * 
@@ -57,8 +58,9 @@ public class OutputManager {
 	/**
 	 * 
 	 * @param modelYear
+	 * @throws IOException 
 	 */
-	public void fileOutput(short modelYear) {
+	public void fileOutput(short modelYear) throws IOException {
 		fileOutputHouseholds.persistDb(modelYear);
 		fileOutputPersons.persistDb(modelYear);
 		fileOutputDwellings.persistDb(modelYear);
@@ -69,8 +71,9 @@ public class OutputManager {
 	 * @throws IllegalArgumentException
 	 * @throws SQLException
 	 * @throws IllegalAccessException
+	 * @throws IOException 
 	 */
-	public void output(short modelYear) throws IllegalArgumentException, SQLException, IllegalAccessException {
+	public void output(short modelYear) throws IllegalArgumentException, SQLException, IllegalAccessException, IOException {
 		if (dbOutputHouseholds != null)
 			dbOutput(modelYear);
 		else

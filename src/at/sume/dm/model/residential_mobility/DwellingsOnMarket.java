@@ -50,6 +50,7 @@ public class DwellingsOnMarket {
 	private int grossFreeDwellingCount[];	// Total number of free dwellings available, only a fraction of this number is put on the market
 	private SpatialUnits spatialUnits;
 	private ArrayList<DwellingRow> suitableDwellings;
+	private boolean headLineWritten = false;
 
 	@SuppressWarnings("unchecked")
 	public DwellingsOnMarket(Dwellings dwellings, SpatialUnits spatialUnits, int dwellingsOnMarketShare) {
@@ -158,12 +159,15 @@ public class DwellingsOnMarket {
 	public void outputDwellingsPerSize(PrintStream ps, int modelYear) {
 		int dwellingSizeCount[] = new int[LivingSpaceGroup6.getLivingSpaceGroupCount()];
 		StringBuffer output = new StringBuffer();
-		// Headline
-		output.append("ModelYear, SpatialUnit");
-		for (byte i = 0; i != LivingSpaceGroup6.getLivingSpaceGroupCount(); i++) {
-			output.append(", " + LivingSpaceGroup6.getLivingSpaceGroupName((byte) (i + 1)));
+		// Headline - written only once per model run
+		if (!headLineWritten) {
+			output.append("ModelYear, SpatialUnit");
+			for (byte i = 0; i != LivingSpaceGroup6.getLivingSpaceGroupCount(); i++) {
+				output.append(", " + LivingSpaceGroup6.getLivingSpaceGroupName((byte) (i + 1)));
+			}
+			ps.println(output);
+			headLineWritten = true;
 		}
-		ps.println(output);
 		for (int i = 0; i != spatialUnits.size(); i++) {
 			output = new StringBuffer(modelYear + ", " + spatialUnits.get(i).getSpatialUnitId());
 			// Count dwellings per living space group

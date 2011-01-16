@@ -18,8 +18,7 @@ public class FileOutputDwellings extends FileOutput<DwellingRow> {
 	 * @param rowList
 	 * @throws FileNotFoundException
 	 */
-	public FileOutputDwellings(String pathName, RecordSet<DwellingRow> rowList)
-			throws FileNotFoundException {
+	public FileOutputDwellings(String pathName, RecordSet<DwellingRow> rowList) {
 		super(pathName, rowList);
 	}
 	/* (non-Javadoc)

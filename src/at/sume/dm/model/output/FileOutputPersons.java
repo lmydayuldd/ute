@@ -18,8 +18,7 @@ public class FileOutputPersons extends FileOutput<PersonRow> {
 	 * @param rowList
 	 * @throws FileNotFoundException
 	 */
-	public FileOutputPersons(String pathName, RecordSet<PersonRow> rowList)
-			throws FileNotFoundException {
+	public FileOutputPersons(String pathName, RecordSet<PersonRow> rowList) {
 		super(pathName, rowList);
 	}
 	/* (non-Javadoc)

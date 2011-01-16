@@ -18,8 +18,7 @@ public class FileOutputHouseholds extends FileOutput<HouseholdRow> {
 	 * @param rowList
 	 * @throws FileNotFoundException
 	 */
-	public FileOutputHouseholds(String pathName, RecordSet<HouseholdRow> rowList)
-			throws FileNotFoundException {
+	public FileOutputHouseholds(String pathName, RecordSet<HouseholdRow> rowList) {
 		super(pathName, rowList);
 	}
 

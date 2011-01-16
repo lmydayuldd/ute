@@ -22,10 +22,13 @@ public class Common {
 	private static short scenarioId;
 	private static int residentialSatisfactionThreshold;
 	private static int searchAreaSize;
+	private static int searchAreaSizeIncrement;
 	private static int dwellingsConsideredPerYear;
 	private static int dwellingsOnMarketShare;
 	private static int alwaysLookForDwellings = 0;
 	private static short modelStartYear;
+	private static short movingDecisionMin;
+	private static String pathOutput;
 	
 	/**
 	 * @return the iniFilename
@@ -62,6 +65,10 @@ public class Common {
 		return searchAreaSize;
 	}
 
+	public static int getSearchAreaSizeIncement() {
+		return searchAreaSizeIncrement;
+	}
+	
 	/**
 	 * @return the dwellingsConsideredPerYear
 	 */
@@ -90,6 +97,14 @@ public class Common {
 		return modelStartYear;
 	}
 
+	public static short getMovingDecisionMin() {
+		return movingDecisionMin;
+	}
+	
+	public static String getPathOutput() {
+		return pathOutput;
+	}
+	
 	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
@@ -136,10 +151,13 @@ public class Common {
 		scenarioId = Short.parseShort(getSysParam("DefaultScenario"));
 		residentialSatisfactionThreshold = Integer.parseInt(getSysParam("THR_ResSatisfaction"));
 		searchAreaSize = Integer.parseInt(getSysParam("HouseholdSearchAreaSize"));
+		searchAreaSizeIncrement = Integer.parseInt(getSysParam("HouseholdSearchAreaSizeIncrement"));
 		dwellingsConsideredPerYear = Integer.parseInt(getSysParam("HouseholdDwellingsConsideredPerYear"));
 		dwellingsOnMarketShare = Integer.parseInt(getSysParam("DwellingsOnMarketShare"));
 		alwaysLookForDwellings = Integer.parseInt(getSysParam("AlwaysLookForDwellings"));
 		modelStartYear = Short.parseShort(getSysParam("ModelStartYear"));
+		movingDecisionMin = Short.parseShort(getSysParam("HouseholdMovingDecisionMin"));
+		pathOutput = getSysParam("PathOutput");
 	}
 	
 	/**

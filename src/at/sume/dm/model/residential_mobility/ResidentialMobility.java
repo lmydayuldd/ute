@@ -73,7 +73,9 @@ public class ResidentialMobility {
 	 * @return the first suitable dwelling for the given household
 	 */
 	public DwellingRow searchDwelling(HouseholdRow household, int modelYear, DwellingsOnMarket dwellingsOnMarket) {
-		ArrayList<Long> potentialTargetSpatialUnitIds = household.getPreferredSpatialUnits(Common.getSearchAreaSize());
+		// Adjust the search area size to the number of years the household has been looking for a new dwelling
+		int searchAreaSize = Common.getSearchAreaSize() + (modelYear - household.getMovingDecisionYear()) * Common.getSearchAreaSizeIncement();
+		ArrayList<Long> potentialTargetSpatialUnitIds = household.getPreferredSpatialUnits(searchAreaSize);
 		assert potentialTargetSpatialUnitIds.size() > 0 : "no potential target spatial units found";
 		int suitableDwellingCount = dwellingsOnMarket.selectSuitableDwellingsOnMarket(potentialTargetSpatialUnitIds, household.getAspirationRegionLivingSpaceMin(), household.getAspirationRegionLivingSpaceMax(), household.getAspirationRegionMaxCosts());
 //		boolean householdMoved = false;
