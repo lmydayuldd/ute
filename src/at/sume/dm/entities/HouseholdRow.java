@@ -275,36 +275,55 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 	 * @param householdType the householdType to set
 	 */
 	public HouseholdType determineInitialHouseholdType() {
-		short age1, age2, sex1, sex2;
-		switch (getHouseholdSize()) {
-		case 1:
-			if (members.get(0).getAge() <= 45)
-				this.householdType = HouseholdType.SINGLE_YOUNG;
-			else
-				this.householdType = HouseholdType.SINGLE_OLD;
-			break;
-		case 2:
-			age1 = members.get(0).getAge();
-			age2 = members.get(1).getAge();
-			sex1 = members.get(0).getSex();
-			sex2 = members.get(1).getSex();
-			if (Math.abs(age1 - age2) > 15) {
-				// this could be either parent-child, a couple or a flat-sharing community
-				// the most common case is parent with a young child so we ignore the other cases for now
-				// - no change if the household type is already set
-				if (this.householdType == null) {
-					if ((Math.min(age1, age2) > 25) && (sex1 != sex2)) {
-						this.householdType = HouseholdType.COUPLE_YOUNG;
-					} else {
-						this.householdType = HouseholdType.SINGLE_PARENT;
-					}
+		assert (getHouseholdSize() > 0) : "Invalid household size: " + getHouseholdSize();
+		// determine the number of adults, whether it is a mixed household, etc.
+		int numAdults = 0, adultMaxAge = 0, adultMinAge = 255, femAdultMaxAge = 0, femAdultMinAge = 255;
+		boolean adultMale = false, adultFemale = false;
+		for (PersonRow member : members) {
+			if (member.getAge() >= 19) {
+				numAdults++;
+				if (member.getAge() > adultMaxAge)
+					adultMaxAge = member.getAge();
+				if (member.getAge() < adultMinAge)
+					adultMinAge = member.getAge();
+				if (member.getSex() == 1) {
+					adultFemale = true;
+					if (member.getAge() > femAdultMaxAge)
+						femAdultMaxAge = member.getAge();
+					if (member.getAge() < femAdultMinAge)
+						femAdultMinAge = member.getAge();
 				}
+				if (member.getSex() == 2)
+					adultMale = true;
+			}
+		}
+		boolean mixedHousehold = adultMale && adultFemale;
+		switch (numAdults) {
+		case 0:
+			System.out.println("Household " + getHouseholdId() + " unexpectedly consisting only of children (" + getHouseholdSize() + " persons).");
+			this.householdType = HouseholdType.OTHER;
+			break;
+		case 1:
+			assert getHouseholdSize() >= numAdults : "Counted " + numAdults + " adult(s) but household size = " + getHouseholdSize();
+			if (getHouseholdSize() > 1) {
+				this.householdType = HouseholdType.SINGLE_PARENT;
 			} else {
-				if (sex1 == sex2) {
+				// TODO: make this threshold (45) configurable
+				if (adultMaxAge <= 45)
+					this.householdType = HouseholdType.SINGLE_YOUNG;
+				else
+					this.householdType = HouseholdType.SINGLE_OLD;
+				break;
+			}
+		case 2:
+			assert getHouseholdSize() >= numAdults : "Counted " + numAdults + " adult(s) but household size = " + getHouseholdSize();
+			if (getHouseholdSize() == 2) {
+				if (!mixedHousehold) {
 					// heterosexuality is not seen as necessity for being a couple here - a flat-sharing
 					// community might be more common in that case, but don't have data to decide that
 					// currently
-					if ((age1 > 45) || (age2 > 45)) {
+					// TODO: make this threshold (45) configurable
+					if (adultMaxAge > 45) {
 						this.householdType = HouseholdType.COUPLE_OLD;
 					} else {
 						this.householdType = HouseholdType.COUPLE_YOUNG;
@@ -312,57 +331,35 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 				} else {
 					// the age of the female determines whether it is a "young" or "old" couple, i.e. whether
 					// it can become a family or not
-					if (sex1 == 1) {	// person 1 is the female
-						if (age1 > 45) {
-							this.householdType = HouseholdType.COUPLE_OLD;
-						} else {
-							this.householdType = HouseholdType.COUPLE_YOUNG;
-						}
-					} else {			// person 2 is the female 
-						if (age2 > 45) {
-							this.householdType = HouseholdType.COUPLE_OLD;
-						} else {
-							this.householdType = HouseholdType.COUPLE_YOUNG;
-						}
+					if (femAdultMaxAge > 45) {
+						this.householdType = HouseholdType.COUPLE_OLD;
+					} else {
+						this.householdType = HouseholdType.COUPLE_YOUNG;
 					}
 				}
+			} else {
+				if (getHouseholdSize() == 3)
+					this.householdType = HouseholdType.SMALL_FAMILY;
+				else
+					this.householdType = HouseholdType.LARGE_FAMILY;
+			}
+			break;
+		case 3:
+			assert getHouseholdSize() >= numAdults : "Counted " + numAdults + " adult(s) but household size = " + getHouseholdSize();
+			if (getHouseholdSize() == 3) {
+				// 3 adults
+				this.householdType = HouseholdType.OTHER;
+			} else {
+				// children in household
+				if (getHouseholdSize() == 4)
+					this.householdType = HouseholdType.SMALL_FAMILY;
+				else
+					this.householdType = HouseholdType.LARGE_FAMILY;
 			}
 			break;
 		default:
-//			assert (getHouseholdSize() > 0) && (getHouseholdSize() <= 9) : "Invalid household size: " + getHouseholdSize();
-			assert (getHouseholdSize() > 0) : "Invalid household size: " + getHouseholdSize();
-			// determine the number of children
-			int numChildren = 0;
-			for (PersonRow member : members) {
-				if (member.getAge() < 19)
-					numChildren++;
-			}
-			switch (numChildren) {
-			case 0:
-				this.householdType = HouseholdType.OTHER;
-				break;
-			case 1:
-				if (getHouseholdSize() == 3)
-					this.householdType = HouseholdType.SMALL_FAMILY;	// TODO: maybe we should look for male/female relationships here?
-				else
-					this.householdType = HouseholdType.OTHER;
-				break;
-			case 2:
-				if (getHouseholdSize() == 3)
-					this.householdType = HouseholdType.SINGLE_PARENT;
-				else
-					this.householdType = HouseholdType.LARGE_FAMILY;
-				break;
-			case 3:
-				this.householdType = HouseholdType.SINGLE_PARENT;
-				break;
-			default:
-//				throw new AssertionError("Household with 4 children unexpected");
-				// TODO: do something about this in the synthetic population generation!
-				System.out.println("Household " + getHouseholdId() + " unexpectedly consists of " + numChildren + " children (total of " + getHouseholdSize() + " persons).");
-				this.householdType = HouseholdType.OTHER;
-				break;
-			}
+			assert getHouseholdSize() >= numAdults : "Counted " + numAdults + " adult(s) but household size = " + getHouseholdSize();
+			this.householdType = HouseholdType.OTHER;
 			break;
 		}
 		return this.householdType;
