@@ -10,6 +10,7 @@ import java.util.Comparator;
 
 import at.sume.dm.Common;
 import at.sume.dm.indicators.MoversIndicatorsPerSpatialUnit;
+import at.sume.dm.model.output.Fileable;
 
 
 /**
@@ -17,7 +18,7 @@ import at.sume.dm.indicators.MoversIndicatorsPerSpatialUnit;
  *
  */
 public class RentPerSpatialUnit {
-	public static class RentPerSpatialUnitRow implements Comparable<RentPerSpatialUnitRow> {
+	public static class RentPerSpatialUnitRow implements Comparable<RentPerSpatialUnitRow>, Fileable {
 		private int spatialUnitId;
 		private int yearlyRentPer100Sqm;
 		/**
@@ -50,6 +51,15 @@ public class RentPerSpatialUnit {
 		@Override
 		public int compareTo(RentPerSpatialUnitRow arg0) {
 			return ((Integer)spatialUnitId).compareTo(arg0.spatialUnitId);
+		}
+		@Override
+		public String toCsvHeadline(String delimiter) {
+			return "SpatialUnitId" + delimiter + "YearlyRentPer100Sqm" + delimiter + "MonthlyRentPerSqm";
+		}
+		@Override
+		public String toString(String delimiter) {
+			double monthlyRentPerSqm = ((double) Math.round(yearlyRentPer100Sqm / 12)) / 100.0;
+			return spatialUnitId + delimiter + yearlyRentPer100Sqm + delimiter + monthlyRentPerSqm;
 		}
 	}
 
@@ -134,5 +144,8 @@ public class RentPerSpatialUnit {
 				result.add(r.getSpatialUnitId());
 		}
 		return result;
+	}
+	public static ArrayList<RentPerSpatialUnitRow> getRentPerSpatialUnit() {
+		return rentPerSpatialUnit;
 	}
 }

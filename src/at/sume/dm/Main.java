@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.remesch.db.Database;
@@ -30,6 +31,7 @@ import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
 import at.sume.dm.migration.SampleImmigratingHouseholds;
 import at.sume.dm.model.core.EntityDecisionManager;
+import at.sume.dm.model.output.Fileable;
 import at.sume.dm.model.output.OutputManager;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_mobility.MinimumIncome;
@@ -108,8 +110,13 @@ public class Main {
         // determine household-types
         households.determineHouseholdTypes();
         System.out.println(printInfo() + ": determined all household types");
-        
-        outputManager = new OutputManager(Common.getPathOutput(), households, dwellings, persons);
+
+        List<List<? extends Fileable>> fileableList = new ArrayList<List<? extends Fileable>>();
+        fileableList.add((List<? extends Fileable>) households.getRowList());
+        fileableList.add((List<? extends Fileable>) dwellings.getRowList());
+        fileableList.add((List<? extends Fileable>) persons.getRowList());
+        fileableList.add((List<? extends Fileable>) RentPerSpatialUnit.getRentPerSpatialUnit());
+        outputManager = new OutputManager(Common.getPathOutput(), fileableList);
         
 		// Model main loop
 		// - Biographical events for all persons/households

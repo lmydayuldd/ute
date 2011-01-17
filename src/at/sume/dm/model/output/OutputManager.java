@@ -6,6 +6,8 @@ package at.sume.dm.model.output;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.remesch.db.Database;
 import at.sume.dm.entities.Dwellings;
@@ -18,9 +20,10 @@ import at.sume.dm.entities.Persons;
  */
 public class OutputManager {
 	DbOutputHouseholds dbOutputHouseholds;
-	FileOutputHouseholds fileOutputHouseholds;
-	FileOutputPersons fileOutputPersons;
-	FileOutputDwellings fileOutputDwellings;
+	ArrayList<FileOutput> fileOutputList;
+//	FileOutput fileOutputHouseholds;
+//	FileOutput fileOutputPersons;
+//	FileOutput fileOutputDwellings;
 	
 	/**
 	 * 
@@ -40,10 +43,26 @@ public class OutputManager {
 	 * @param persons
 	 * @throws FileNotFoundException 
 	 */
-	public OutputManager(String path, Households households, Dwellings dwellings, Persons persons) {
-		fileOutputHouseholds = new FileOutputHouseholds(path, households);
-		fileOutputPersons = new FileOutputPersons(path, persons);
-		fileOutputDwellings = new FileOutputDwellings(path, dwellings);
+	public OutputManager(String path, List<List<? extends Fileable>> fileableList) {
+		fileOutputList = new ArrayList<FileOutput>();
+		for (List<? extends Fileable> fileable : fileableList) {
+			add(path, fileable);
+		}
+//		fileOutputHouseholds = new FileOutput(path, "households", households.getRowList());
+//		fileOutputPersons = new FileOutput(path, "persons", persons.getRowList());
+//		fileOutputDwellings = new FileOutput(path, "dwellings", dwellings.getRowList());
+//		fileOutputRentPerSpatialUnit = new FileOutput(path, "rent_prices", )
+	}
+	/**
+	 * Add a new fileable output entity
+	 * @param path
+	 * @param fileable
+	 */
+	public void add(String path, List<? extends Fileable> fileable) {
+		assert fileable.size() > 0 : "List fileable is empty!";
+		String entityName = fileable.get(0).getClass().getSimpleName();
+		FileOutput fileoutput = new FileOutput(path, entityName, fileable);
+		fileOutputList.add(fileoutput);
 	}
 	/**
 	 * 
@@ -61,9 +80,12 @@ public class OutputManager {
 	 * @throws IOException 
 	 */
 	public void fileOutput(short modelYear) throws IOException {
-		fileOutputHouseholds.persistDb(modelYear);
-		fileOutputPersons.persistDb(modelYear);
-		fileOutputDwellings.persistDb(modelYear);
+		for (FileOutput fileOutput : fileOutputList) {
+			fileOutput.persistDb(modelYear);
+		}
+//		fileOutputHouseholds.persistDb(modelYear);
+//		fileOutputPersons.persistDb(modelYear);
+//		fileOutputDwellings.persistDb(modelYear);
 	}
 	/**
 	 * 

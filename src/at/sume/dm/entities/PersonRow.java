@@ -8,13 +8,13 @@ import java.sql.SQLException;
 
 import net.remesch.db.Sequence;
 import net.remesch.db.schema.Ignore;
-import at.sume.db.RecordSetRow;
+import at.sume.db.RecordSetRowFileable;
 
 /**
  * @author Alexander Remesch
  *
  */
-public class PersonRow extends RecordSetRow<Persons> {
+public class PersonRow extends RecordSetRowFileable<Persons> {
 	private int householdId;
 	private byte sex;
 //	private int yearBorn;
@@ -258,5 +258,15 @@ public class PersonRow extends RecordSetRow<Persons> {
 	 */
 	public static void setPersonIdSeq(Sequence personIdSeq) {
 		PersonRow.personIdSeq = personIdSeq;
+	}
+
+	@Override
+	public String toCsvHeadline(String delimiter) {
+		return "PersonId" + delimiter + "HouseholdId" + delimiter + "Sex" + delimiter + "Age" + delimiter + "YearlyIncome";
+	}
+
+	@Override
+	public String toString(String delimiter) {
+		return getPersonId() + delimiter + getHousehold().getHouseholdId() + delimiter + getSex() + delimiter + getAge() + delimiter + getYearlyIncome();
 	}
 }

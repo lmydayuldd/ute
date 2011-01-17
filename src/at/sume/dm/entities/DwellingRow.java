@@ -8,13 +8,13 @@ import java.sql.SQLException;
 
 import net.remesch.db.Sequence;
 import net.remesch.db.schema.Ignore;
-import at.sume.db.RecordSetRow;
+import at.sume.db.RecordSetRowFileable;
 
 /**
  * @author Alexander Remesch
  *
  */
-public class DwellingRow extends RecordSetRow<Dwellings> {
+public class DwellingRow extends RecordSetRowFileable<Dwellings> {
 	private int dwellingId;
 	private int spatialunitId;
 	@Ignore
@@ -178,5 +178,18 @@ public class DwellingRow extends RecordSetRow<Dwellings> {
 	 */
 	public static void setDwellingIdSeq(Sequence dwellingIdSeq) {
 		DwellingRow.dwellingIdSeq = dwellingIdSeq;
+	}
+	@Override
+	public String toCsvHeadline(String delimiter) {
+		return "DwellingId" + delimiter + "SpatialunitId" + delimiter + "DwellingSize" + delimiter + "TotalYearlyDwellingCosts" + delimiter + "HouseholdId";
+	}
+	@Override
+	public String toString(String delimiter) {
+		if (getHousehold() != null) 
+			return getDwellingId() + delimiter + getSpatialunit().getSpatialUnitId() + delimiter + getDwellingSize() + delimiter + 
+				getTotalYearlyDwellingCosts() + delimiter + getHousehold().getHouseholdId();
+		else
+			return getDwellingId() + delimiter + getSpatialunit().getSpatialUnitId() + delimiter + getDwellingSize() + delimiter + 
+			getTotalYearlyDwellingCosts() + delimiter + "0";
 	}
 }

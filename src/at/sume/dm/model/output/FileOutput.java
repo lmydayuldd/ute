@@ -7,18 +7,19 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-
-import at.sume.db.RecordSet;
-import at.sume.db.RecordSetRow;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Alexander Remesch
  *
  */
-public abstract class FileOutput<T extends RecordSetRow<?>> {
-	PrintStream psOut;
-	RecordSet<T> rowList;
-	String path = "";
+public class FileOutput {
+	private PrintStream psOut;
+	private ArrayList<Fileable> rowList;
+	private String path = "";
+	private String fileName;
+	private final static String delimiter = ";";
 	
 	/**
 	 * 
@@ -26,13 +27,16 @@ public abstract class FileOutput<T extends RecordSetRow<?>> {
 	 * @param rowList
 	 * @throws FileNotFoundException
 	 */
-	public FileOutput(String path, RecordSet<T> rowList) {
-		this.rowList = rowList;
+	@SuppressWarnings("unchecked")
+	public FileOutput(String path, String fileName, List<? extends Fileable> rowList) {
+		assert rowList.size() > 0 : "rowList cannot be empty!";
+		this.rowList = (ArrayList<Fileable>) rowList;
 		if (path != null)
 			if (path.endsWith("\\"))
 				this.path = path;
 			else
 				this.path = path + "\\";
+		this.fileName = fileName;
 	}
 	/**
 	 * 
@@ -40,28 +44,16 @@ public abstract class FileOutput<T extends RecordSetRow<?>> {
 	 * @throws IOException 
 	 */
 	public void persistDb(short modelYear) throws IOException {
-		String pathName = path + rowList.get(0).getClass().getName() + "_" + modelYear + ".csv";
-		OutputRow orow;
-		FileOutputStream fileOutputStream = new FileOutputStream(pathName, false);
+		String pathName = path + fileName + "_" + modelYear + ".csv";
+		// TODO: manage existing files (rename old files and start a new one) here
+		FileOutputStream fileOutputStream = new FileOutputStream(pathName, true);
 		psOut = new PrintStream(fileOutputStream);
-		psOut.println(toCsvHeadline());
-		for (T row : rowList) {
-			orow = createOutputRow(modelYear, row);
-			psOut.println(orow.toCsv());
+		psOut.println("ModelYear" + delimiter + rowList.get(0).toCsvHeadline(delimiter));
+		for (Fileable row : rowList) {
+			String orow = modelYear + delimiter + row.toString(delimiter);
+			psOut.println(orow);
 		}
 		psOut.close();
 		fileOutputStream.close();
 	}
-	/**
-	 * 
-	 * @return
-	 */
-	public abstract String toCsvHeadline();
-	/**
-	 * 
-	 * @param modelYear
-	 * @param row
-	 * @return
-	 */
-	public abstract OutputRow createOutputRow(short modelYear, T row);
 }

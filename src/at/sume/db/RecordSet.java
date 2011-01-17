@@ -66,7 +66,7 @@ public abstract class RecordSet<E extends RecordSetRow<?>> implements Iterable<E
 	/**
 	 * @return the rowList
 	 */
-	protected ArrayList<E> getRowList() {
+	public ArrayList<E> getRowList() {
 		return rowList;
 	}
 

@@ -12,7 +12,7 @@ import java.util.Random;
 
 import net.remesch.db.Sequence;
 import net.remesch.db.schema.Ignore;
-import at.sume.db.RecordSetRow;
+import at.sume.db.RecordSetRowFileable;
 import at.sume.dm.Common;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
@@ -26,7 +26,7 @@ import at.sume.dm.types.IncomeGroup;
  * @author Alexander Remesch
  *
  */
-public class HouseholdRow extends RecordSetRow<Households> {
+public class HouseholdRow extends RecordSetRowFileable<Households> {
 	private class SpatialUnitScore {
 		private long spatialUnitId;
 		private long score;
@@ -781,5 +781,21 @@ public class HouseholdRow extends RecordSetRow<Households> {
 	 */
 	public int getDwellingIdInp() {
 		return dwellingIdInp;
+	}
+
+	@Override
+	public String toCsvHeadline(String delimiter) {
+		return "HouseholdId" + delimiter + "HouseholdSize" + delimiter + "DwellingId" + delimiter + "HouseholdType" + delimiter + "MovingDecisionYear" + delimiter + "" +
+			"AspirationRegionLivingSpaceMin" + delimiter + "AspirationRegionLivingSpaceMax" + delimiter + "AspirationRegionMaxCosts" + delimiter + "" + 
+			"CurrentResidentialSatisfaction" + delimiter + "rsUdpCentrality" + delimiter + "rsUdpPublicTransportAccessibility" + delimiter + "" +
+			"rsCostEffectiveness" + delimiter + "rsEnvironmentalAmenities" + delimiter + "rsSocialPrestige" + delimiter + "rsDesiredLivingSpace";
+	}
+
+	@Override
+	public String toString(String delimiter) {
+		return getHouseholdId() + delimiter + (byte) getMemberCount() + delimiter + getDwelling().getDwellingId() + delimiter + 
+			householdType + delimiter + movingDecisionYear + delimiter + aspirationRegionLivingSpaceMin + delimiter +
+			aspirationRegionLivingSpaceMax + delimiter + aspirationRegionMaxCosts + delimiter + currentResidentialSatisfaction + delimiter +
+			rsUdpCentrality + delimiter + rsUdpPublicTransportAccessibility + delimiter + rsCostEffectiveness + delimiter + rsEnvironmentalAmenities + delimiter + rsSocialPrestige + delimiter + rsDesiredLivingSpace;
 	}
 }
