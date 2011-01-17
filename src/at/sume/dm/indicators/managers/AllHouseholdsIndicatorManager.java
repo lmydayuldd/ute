@@ -6,6 +6,7 @@ package at.sume.dm.indicators.managers;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerSpatialUnit;
@@ -23,19 +24,19 @@ public enum AllHouseholdsIndicatorManager {
 	//       to be able to build menus directly from the indicator classes
 	INDICATORS_PER_SPATIALUNIT("Indicators per spatial unit", new AllHouseholdsIndicatorsPerSpatialUnit()),
 	INDICATORS_PER_HOUSEHOLDTYPE_AND_INCOME("Indicators per household type and income class", new AllHouseholdsIndicatorsPerHouseholdTypeAndIncome()),
-	POPULATION_PER_AGEGROUP("Population per age group and spatial unit", new PopulationPerAgeGroup(), "population.txt");
+	POPULATION_PER_AGEGROUP("Population per age group and spatial unit", new PopulationPerAgeGroup(), Common.getPathOutput() + "population.txt");
 	
-	private String label;
+//	private String label;
 	private Indicator<HouseholdRow> indicator;
 	private IndicatorBase<?> indicatorBase;
 
 	AllHouseholdsIndicatorManager(String label, Indicator<HouseholdRow> indicator) {
-		this.label = label;
+//		this.label = label;
 		this.indicator = indicator;
 	}
 	
 	AllHouseholdsIndicatorManager(String label, IndicatorBase<?> indicatorBase, String outputFileName) {
-		this.label = label;
+//		this.label = label;
 		this.indicator = null;
 		this.indicatorBase = indicatorBase;
 		indicatorBase.setOutputFileName(outputFileName);
