@@ -70,9 +70,9 @@ public class Main {
 
 		// Load entity sets from database
 		try {
-			spatialUnits = new SpatialUnits(db);
+			spatialUnits = new SpatialUnits(db, Common.getSpatialUnitLevel());
 	        System.out.println(printInfo() + ": loaded " + spatialUnits.size() + " spatial units");
-			dwellings = new Dwellings(db);
+			dwellings = new Dwellings(db, Common.getSpatialUnitLevel());
 			dwellingSeq = new Sequence(dwellings.get(dwellings.size() - 1).getDwellingId() + 1);
 			DwellingRow.setDwellingIdSeq(dwellingSeq);
 	        System.out.println(printInfo() + ": loaded " + dwellings.size() + " dwellings");
@@ -116,6 +116,8 @@ public class Main {
         fileableList.add((List<? extends Fileable>) dwellings.getRowList());
         fileableList.add((List<? extends Fileable>) persons.getRowList());
         fileableList.add((List<? extends Fileable>) RentPerSpatialUnit.getRentPerSpatialUnit());
+        // TODO: change AllHouseholdsIndicatorManager from enum to class to use FileOutput
+//        fileableList.add((List<? extends Fileable>) AllHouseholdsIndicatorManager.INDICATORS_PER_HOUSEHOLDTYPE_AND_INCOME.getIndicator().getIndicatorList());
         outputManager = new OutputManager(Common.getPathOutput(), fileableList);
         
 		// Model main loop
@@ -262,6 +264,11 @@ public class Main {
 			// TODO: shouldn't this be done after the movings??? But we need fresh movers indicators...
 			if (modelYear > modelStartYear)
 				RentPerSpatialUnit.updateRentPerSpatialUnit();
+			// TODO: configurable number of units
+			ArrayList<Integer> cheapestSpatialUnits = RentPerSpatialUnit.getCheapestSpatialUnits(10);
+			int lowestYearlyRentPer100Sqm = RentPerSpatialUnit.getLowestYearlyRentPer100Sqm();
+			int highestYearlyRentPer100Sqm = RentPerSpatialUnit.getHighestYearlyRentPer100Sqm();
+			System.out.println(printInfo() + ": lowest rent (€/100m²/yr.): " + lowestYearlyRentPer100Sqm + ", highest rent: " + highestYearlyRentPer100Sqm);
 			// Reset the movers indicators
 			MoversIndicatorManager.resetIndicators();
 			outputFreeDwellings(modelYear, "before moving households");
@@ -277,7 +284,7 @@ public class Main {
 				//    b) maximum costs - by current costs, household income
 				// lower limit: commonly defined by the current dwelling; upper limit: set by the standards to
 				// which the household can reasonably aspire (Knox/Pinch 2010, p.263)
-				residentialMobility.estimateAspirationRegion(household, modelYear);
+				residentialMobility.estimateAspirationRegion(household, modelYear, modelStartYear, highestYearlyRentPer100Sqm);
 				
 				// 2) define the search area
 				// a) get all spatial units with costs within the aspiration region of the household
@@ -301,6 +308,9 @@ public class Main {
 					if ((maxResidentialSatisfactionEstimate > household.getCurrentResidentialSatisfaction()) || (Common.getAlwaysLookForDwellings() != 0)) {
 						// do the extra mile and look for a dwelling
 						DwellingRow suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
+						if (suitableDwelling == null) {
+							suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
+						}
 						household.clearResidentialSatisfactionEstimate();
 						if (suitableDwelling != null) {
 							household.relocate(dwellingsOnMarket, suitableDwelling);
@@ -329,37 +339,60 @@ public class Main {
 			// Immigrating Households
 			ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(modelYear);
 			hhFoundNoDwellings = 0; hhNoSatisfaction = 0;
+			int hhMovedToCheapest = 0;
 			for (HouseholdRow household : immigratingHouseholds) {
-				residentialMobility.estimateAspirationRegion(household, modelYear);
-				ArrayList<Integer> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
-				if (potentialTargetSpatialUnitIds.size() > 0) {
-					ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
-					household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
+				residentialMobility.estimateAspirationRegion(household, modelYear, modelStartYear, highestYearlyRentPer100Sqm);
+				if (household.getAspirationRegionMaxCosts() * 100 < lowestYearlyRentPer100Sqm) {
+					// Household can't afford even the lowest rent -> we choose a dwelling in one of the cheapest spatial units available
+					ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(cheapestSpatialUnits);
+					household.setResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
 					DwellingRow dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
-					household.clearResidentialSatisfactionEstimate();
 					if (dwelling == null) {
-						// household didn't find a suitable dwelling -> join another household
-						// TODO: update indicators
-						//household.redefineAspirations();
-						hhFoundNoDwellings++;
-					} else {
-						// 1) add household to common lists
-						households.add(household);
-						for (PersonRow member : household.getMembers()) {
-							persons.add(member);
-						}
-						// 2 move household
-						household.relocate(dwellingsOnMarket, dwelling);
-						// TODO: update indicators
+						dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
 					}
-				} else {
-					// no spatial units below the max costs for the household -> join another household
+					household.clearResidentialSatisfactionEstimate();
+					assert dwelling != null : "No dwelling found";
+					// 1) add household to common lists
+					households.add(household);
+					for (PersonRow member : household.getMembers()) {
+						persons.add(member);
+					}
+					// 2 move household
+					household.relocate(dwellingsOnMarket, dwelling);
+					hhMovedToCheapest++;
 					// TODO: update indicators
-					hhNoSatisfaction++;
+				} else {
+					ArrayList<Integer> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
+					if (potentialTargetSpatialUnitIds.size() > 0) {
+						ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
+						household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
+						DwellingRow dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
+						household.clearResidentialSatisfactionEstimate();
+						if (dwelling == null) {
+							// household didn't find a suitable dwelling -> join another household
+							// TODO: update indicators
+							//household.redefineAspirations();
+							hhFoundNoDwellings++;
+						} else {
+							// 1) add household to common lists
+							households.add(household);
+							for (PersonRow member : household.getMembers()) {
+								persons.add(member);
+							}
+							// 2 move household
+							household.relocate(dwellingsOnMarket, dwelling);
+							// TODO: update indicators
+						}
+					} else {
+						// no spatial units below the max costs for the household -> join another household
+						// TODO: update indicators
+						hhNoSatisfaction++;
+					}
 				}
 			}
 			System.out.println(printInfo() + " " + hhFoundNoDwellings + " out of " + immigratingHouseholds.size() + " immigrating households found no dwelling");
 			System.out.println(printInfo() + " " + hhNoSatisfaction + " out of " + immigratingHouseholds.size() + " immigrating households could not find spatial units matching their aspirations");
+			System.out.println(printInfo() + " " + hhMovedToCheapest + " out of " + immigratingHouseholds.size() + " immigrating households moved to the cheapest possible spatial units");
 			if (modelYear == modelEndYear - 1)
 				outputFreeDwellings(modelYear, "after immigration");
 			

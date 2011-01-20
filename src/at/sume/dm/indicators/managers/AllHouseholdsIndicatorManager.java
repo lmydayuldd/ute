@@ -18,6 +18,10 @@ import at.sume.dm.indicators.base.IndicatorBase;
  * This class represents indicators that include all households in the model 
  *  
  * @author Alexander Remesch
+ * 
+ * TODO:Change from enum to class
+ * Pros:
+ * + will be able to use FileOutput then very easily
  */
 public enum AllHouseholdsIndicatorManager {
 	// TODO: implement a means to list the indicator-getters included in one of the Indicator implementations

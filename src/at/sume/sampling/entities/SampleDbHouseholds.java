@@ -58,10 +58,10 @@ public class SampleDbHouseholds {
 		this.db = db;
 		this.householdSizeGroups = householdSizeGroups;
 		// Load spatial units - these are not sampled
-		spatialUnits = new SpatialUnits(db);
+		spatialUnits = new SpatialUnits(db, Common.getSpatialUnitLevel());
         System.out.println(Common.printInfo() + ": loaded " + spatialUnits.size() + " spatial units");
 		// Load dwellings - these are not sampled because we have real data from 2001
-		dwellings = new Dwellings(db);
+		dwellings = new Dwellings(db, Common.getSpatialUnitLevel());
         System.out.println(Common.printInfo() + ": loaded " + dwellings.size() + " dwellings");
 		// Link dwellings to spatial units
 		dwellings.linkSpatialUnits(spatialUnits);

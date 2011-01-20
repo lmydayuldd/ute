@@ -15,15 +15,17 @@ import net.remesch.db.Database;
  *
  */
 public class SpatialUnits extends RecordSet<SpatialUnitRow> {
-
+	private SpatialUnitLevel spatialUnitLevel;
+	
 	/**
 	 * @param db
 	 * @throws SQLException
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 */
-	public SpatialUnits(Database db) throws SQLException, InstantiationException, IllegalAccessException {
+	public SpatialUnits(Database db, SpatialUnitLevel spatialUnitLevel) throws SQLException, InstantiationException, IllegalAccessException {
 		setDb(db);
+		this.spatialUnitLevel = spatialUnitLevel;
 		rowList = db.select(SpatialUnitRow.class, selectStatement());
 	}
 
@@ -36,9 +38,17 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	 */
 	@Override
 	public String selectStatement() {
-		return "select spatialUnitId AS id, spatialUnitId, totalarea, areaShareContinousAndDiscontinousUrbanFabric, " +
-			"areaShareIndustrialCommercialConstructionInfrastructure, areaShareArtificialVegetation, " +
-			"areaShareAgricultural, areaShareForest, areaShareWater from _DM_SpatialUnits order by spatialunitId";
+		switch (spatialUnitLevel) {
+		case ZB:
+			return "select spatialUnitId AS id, spatialUnitId, totalarea, areaShareContinousAndDiscontinousUrbanFabric, " +
+				"areaShareIndustrialCommercialConstructionInfrastructure, areaShareArtificialVegetation, " +
+				"areaShareAgricultural, areaShareForest, areaShareWater from _DM_SpatialUnits order by spatialunitId";
+		case SGT:
+			return "select spatialUnitId AS id, spatialUnitId, totalarea, areaShareContinousAndDiscontinousUrbanFabric, " +
+				"areaShareIndustrialCommercialConstructionInfrastructure, areaShareArtificialVegetation, " +
+				"areaShareAgricultural, areaShareForest, areaShareWater from _DM_SpatialUnits_SGT order by spatialunitId";
+		}
+		throw new AssertionError("Unknown spatial unit level (not ZB or SGT)");
 	}
 
 	/* (non-Javadoc)

@@ -8,6 +8,7 @@ import java.util.Collections;
 
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.indicators.base.Indicator;
+import at.sume.dm.model.output.Fileable;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
 
@@ -16,9 +17,9 @@ import at.sume.dm.types.IncomeGroup;
  *
  */
 public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicator<HouseholdRow> {
-	private static class BaseIndicators implements Comparable<BaseIndicators> {
+	private static class BaseIndicators implements Comparable<BaseIndicators>, Fileable {
 		private HouseholdType householdType;
-		private short incomeGroup;
+		private byte incomeGroup;
 		private long householdCount;
 		private long personCount;
 		private long livingSpaceSum;
@@ -40,13 +41,13 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 		/**
 		 * @return the incomeGroup
 		 */
-		public short getIncomeGroup() {
+		public byte getIncomeGroup() {
 			return incomeGroup;
 		}
 		/**
 		 * @param incomeGroup the incomeGroup to set
 		 */
-		public void setIncomeGroup(short incomeGroup) {
+		public void setIncomeGroup(byte incomeGroup) {
 			this.incomeGroup = incomeGroup;
 		}
 		/**
@@ -117,13 +118,24 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 		@Override
 		public int compareTo(BaseIndicators arg0) {
 			int comp1 = householdType.compareTo(arg0.getHouseholdType());
-			int comp2 = ((Short)incomeGroup).compareTo(arg0.getIncomeGroup());
+			int comp2 = ((Byte)incomeGroup).compareTo(arg0.getIncomeGroup());
 			if (comp1 != 0)
 				return comp1;
 			else
 				if (comp1 != 0)
 					return comp2;
 			return 0;
+		}
+		@Override
+		public String toCsvHeadline(String delimiter) {
+			return "HouseholdType" + delimiter + "IncomeGroup" + delimiter + "HouseholdCount" + delimiter + "PersonCount" + delimiter + "LivingSpaceSum" + delimiter +
+				"LivingSpacePerHouseholdMemberSum" + delimiter + "LivingSpacePerWeightedHouseholdMemberSum";
+		}
+		@Override
+		public String toString(String delimiter) {
+			return householdType.toString() + delimiter + IncomeGroup.getIncomeGroupNameDirect(incomeGroup) + delimiter + householdCount +
+				delimiter + personCount + delimiter + livingSpaceSum + delimiter + livingSpacePerHouseholdMemberSum + delimiter +
+				livingSpacePerWeightedHouseholdMemberSum;
 		}
 	}
 
@@ -139,7 +151,7 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 	@Override
 	public void add(HouseholdRow household) {
 		HouseholdType householdType = household.getHouseholdType();
-		short incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
+		byte incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
 		int pos = lookupIndicator(householdType, incomeGroup);
 		if (pos < 0) {
 			// insert at position pos
@@ -179,7 +191,7 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 	@Override
 	public void remove(HouseholdRow household) {
 		HouseholdType householdType = household.getHouseholdType();
-		short incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
+		byte incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
 		int pos = lookupIndicator(householdType, incomeGroup);
 		if (pos < 0) {
 			// not there, unable to remove - throw exception
@@ -202,14 +214,14 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 		}
 	}
 
-	private static int lookupIndicator(HouseholdType householdType, short incomeGroup) {
+	private static int lookupIndicator(HouseholdType householdType, byte incomeGroup) {
 		BaseIndicators lookup = new BaseIndicators();
 		lookup.setHouseholdType(householdType);
 		lookup.setIncomeGroup(incomeGroup);
 		return Collections.binarySearch(indicatorList, lookup);
 	}
 	
-	public static long getAvgLivingSpacePerHousehold(HouseholdType householdType, short incomeGroup) {
+	public static long getAvgLivingSpacePerHousehold(HouseholdType householdType, byte incomeGroup) {
 		int pos = lookupIndicator(householdType, incomeGroup);
 		if (pos >= 0) {
 			BaseIndicators b = indicatorList.get(pos);
@@ -219,5 +231,9 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 		} else {
 			throw new AssertionError("IndicatorsPerHouseholdTypeAndIncome.remove() - incomeGroup " + incomeGroup + ", householdType " + householdType + " is not in the list of spatial units");
 		}
+	}
+	
+	public static ArrayList<BaseIndicators> getIndicatorList() {
+		return indicatorList;
 	}
 }

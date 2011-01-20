@@ -115,7 +115,7 @@ public class ResidentialSatisfactionManagerTest {
 		hhr2.determineInitialHouseholdType();
 		hh.add(hhr2);
 		
-		spatialUnits = new SpatialUnits(db);
+		spatialUnits = new SpatialUnits(db, Common.getSpatialUnitLevel());
 		dw.linkSpatialUnits(spatialUnits);
 
 		AllHouseholdsIndicatorManager.resetIndicators();

@@ -18,11 +18,13 @@ import at.sume.dm.types.LivingSpaceGroup6;
  *
  */
 public class Dwellings extends RecordSet<DwellingRow> {
+	SpatialUnitLevel spatialUnitLevel;
 	public Dwellings() {
 		
 	}
-	public Dwellings(Database db) throws SQLException, InstantiationException, IllegalAccessException {
+	public Dwellings(Database db, SpatialUnitLevel spatialUnitLevel) throws SQLException, InstantiationException, IllegalAccessException {
 		setDb(db);
+		this.spatialUnitLevel = spatialUnitLevel;
 		rowList = db.select(DwellingRow.class, selectStatement());
 		// calc variables - TODO: define callback in db.select for that
 		for (DwellingRow dwelling : rowList) {
@@ -42,8 +44,15 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	 */
 	@Override
 	public String selectStatement() {
-		return "select dwellingId AS id, dwellingId, spatialUnitId, dwellingSize, totalYearlyDwellingCosts, " +
-			"livingSpaceGroup6Id, costOfResidenceGroupId, constructionPeriod7Id from _DM_Dwellings order by dwellingId";
+		switch (spatialUnitLevel) {
+		case ZB:
+			return "select dwellingId AS id, dwellingId, spatialUnitId, dwellingSize, totalYearlyDwellingCosts, " +
+				"livingSpaceGroup6Id, costOfResidenceGroupId, constructionPeriod7Id from _DM_Dwellings order by dwellingId";
+		case SGT:
+			return "select dwellingId AS id, dwellingId, spatialUnitId_SGT AS spatialUnitId, dwellingSize, totalYearlyDwellingCosts, " +
+				"livingSpaceGroup6Id, costOfResidenceGroupId, constructionPeriod7Id from _DM_Dwellings order by dwellingId";
+		}
+		throw new AssertionError("Unknown spatial unit level (not ZB or SGT)");
 	}
 
 	/* (non-Javadoc)

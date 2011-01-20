@@ -20,7 +20,6 @@ import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
-//import at.sume.dm.types.ReasonForMoving;
 
 /**
  * @author Alexander Remesch
@@ -68,7 +67,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 	
 	private static float childrenWeight = 0;
 	private static byte childrenMaxAge = 0;
-	private static byte desiredLivingSpaceRandomPct = 0;
+//	private static byte desiredLivingSpaceRandomPct = 0;
 	private static byte desiredLivingSpaceRangePct = 0;
 	@Ignore
 	private static Sequence householdIdSeq = null;
@@ -114,13 +113,13 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 			else
 				childrenMaxAge = Byte.parseByte(sp);
 		}
-		if (desiredLivingSpaceRandomPct == 0) {
-			String sp = Common.getSysParam("DesiredLivingSpaceRandomPct");
-			if (sp.equals(null))
-				desiredLivingSpaceRandomPct = 10;
-			else
-				desiredLivingSpaceRandomPct = Byte.parseByte(sp);
-		}
+//		if (desiredLivingSpaceRandomPct == 0) {
+//			String sp = Common.getSysParam("DesiredLivingSpaceRandomPct");
+//			if (sp.equals(null))
+//				desiredLivingSpaceRandomPct = 10;
+//			else
+//				desiredLivingSpaceRandomPct = Byte.parseByte(sp);
+//		}
 		if (desiredLivingSpaceRangePct == 0) {
 			String sp = Common.getSysParam("DesiredLivingSpaceRangePct");
 			if (sp.equals(null))
@@ -300,7 +299,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 		boolean mixedHousehold = adultMale && adultFemale;
 		switch (numAdults) {
 		case 0:
-			System.out.println("Household " + getHouseholdId() + " unexpectedly consisting only of children (" + getHouseholdSize() + " persons).");
+//			System.out.println("Household " + getHouseholdId() + " unexpectedly consisting only of children (" + getHouseholdSize() + " persons).");
 			this.householdType = HouseholdType.OTHER;
 			break;
 		case 1:
@@ -631,11 +630,11 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 			long desiredLivingSpaceSqm = AllHouseholdsIndicatorsPerHouseholdTypeAndIncome.getAvgLivingSpacePerHousehold(getHouseholdType(), IncomeGroup.getIncomeGroupId(getYearlyIncome()));
 //			short desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRandomPct * r.nextGaussian());
 //			desiredLivingSpaceSqm = Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
-			// calculate boundary 1
+			// calculate (usually upper) boundary 1
 			short desiredLivingSpaceModifier = (short) (110 + desiredLivingSpaceRangePct * r.nextGaussian());
 			short desiredLivingSpaceSqm1 = (short) Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			assert desiredLivingSpaceSqm1 > 0 : "Desired living space 1 <= 0 - " + desiredLivingSpaceSqm1;
-			// calculate boundary 2
+			// calculate (usually lower) boundary 2
 			desiredLivingSpaceModifier = (short) (90 - desiredLivingSpaceRangePct * r.nextGaussian());
 			short desiredLivingSpaceSqm2 = (short) Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			assert desiredLivingSpaceSqm2 > 0 : "Desired living space 2 <= 0 - " + desiredLivingSpaceSqm2;
@@ -695,6 +694,26 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 				result = residentialSatisfaction;
 		}
 		return result;
+	}
+	/**
+	 * Build the array of residential satisfaction estimates for a household (sam as in function
+	 * estimateResidentialSatisfaction()) but set all residential satisfactions to the same value.
+	 * This is useful for getting a dwelling for a household that can't afford and will take any
+	 * dwelling (like an immigrant household).
+	 * @param spatialUnitList
+	 * @param modelYear
+	 * @return
+	 */
+	public int setResidentialSatisfaction(ArrayList<SpatialUnitRow> spatialUnitList, int modelYear) {
+		assert spatialUnitList.size() > 0 : "spatialUnitList must be initialized (size > 0)";
+		residentialSatisfactionEstimate = new ArrayList<SpatialUnitScore>(spatialUnitList.size());
+		for (SpatialUnitRow spatialUnit : spatialUnitList) {
+			SpatialUnitScore s = new SpatialUnitScore();
+			s.setSpatialUnitId(spatialUnit.getSpatialUnitId());
+			s.setScore(100);
+			residentialSatisfactionEstimate.add(s);
+		}
+		return 100;
 	}
 	/**
 	 * Return the spatial units that are estimated to provide the highest residential satisfaction

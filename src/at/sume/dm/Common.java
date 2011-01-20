@@ -3,12 +3,13 @@
  */
 package at.sume.dm;
 
+import java.io.FileInputStream;
 import java.sql.SQLException;
-import java.util.*;
-import java.io.*;
+import java.util.Properties;
 
 import net.remesch.db.Database;
 import net.remesch.util.DateUtil;
+import at.sume.dm.entities.SpatialUnitLevel;
 
 /**
  * Global functions, variables and parameters
@@ -29,6 +30,7 @@ public class Common {
 	private static short modelStartYear;
 	private static short movingDecisionMin;
 	private static String pathOutput;
+	private static SpatialUnitLevel spatialUnitLevel;
 	
 	/**
 	 * @return the iniFilename
@@ -105,6 +107,10 @@ public class Common {
 		return pathOutput;
 	}
 	
+	public static SpatialUnitLevel getSpatialUnitLevel() {
+		return spatialUnitLevel;
+	}
+	
 	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
@@ -158,6 +164,14 @@ public class Common {
 		modelStartYear = Short.parseShort(getSysParam("ModelStartYear"));
 		movingDecisionMin = Short.parseShort(getSysParam("HouseholdMovingDecisionMin"));
 		pathOutput = getSysParam("PathOutput");
+		String sysParam = getSysParam("SpatialUnitLevel");
+		if (SpatialUnitLevel.ZB.compareTo(sysParam) == 0) {
+			spatialUnitLevel = SpatialUnitLevel.ZB;
+		} else if (SpatialUnitLevel.SGT.compareTo(sysParam) == 0) {
+			spatialUnitLevel = SpatialUnitLevel.SGT;
+		} else {
+			throw new AssertionError("Systemparameter SpatialUnitLevel must be ZB or SGT (is " + sysParam);
+		}
 	}
 	
 	/**

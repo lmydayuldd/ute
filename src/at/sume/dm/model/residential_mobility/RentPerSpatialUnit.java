@@ -15,7 +15,7 @@ import at.sume.dm.model.output.Fileable;
 
 /**
  * @author Alexander Remesch
- *
+ * TODO: better with Singleton?
  */
 public class RentPerSpatialUnit {
 	public static class RentPerSpatialUnitRow implements Comparable<RentPerSpatialUnitRow>, Fileable {
@@ -59,7 +59,7 @@ public class RentPerSpatialUnit {
 		@Override
 		public String toString(String delimiter) {
 			double monthlyRentPerSqm = ((double) Math.round(yearlyRentPer100Sqm / 12)) / 100.0;
-			return spatialUnitId + delimiter + yearlyRentPer100Sqm + delimiter + monthlyRentPerSqm;
+			return spatialUnitId + delimiter + yearlyRentPer100Sqm + delimiter + ((Double)monthlyRentPerSqm).toString();
 		}
 	}
 
@@ -78,15 +78,29 @@ public class RentPerSpatialUnit {
 	}
 	
 	private static ArrayList<RentPerSpatialUnitRow> rentPerSpatialUnit;
+	private static int lowestYearlyRentPer100Sqm;
+	private static int highestYearlyRentPer100Sqm;
 	
 	/**
 	 * Set initial values from table WKO_Mietpreise
 	 */
 	static {
 		try {
-			String selectStatement = "SELECT sgt.SpatialUnitId_ZB AS SpatialUnitId, Round(Avg([PreisJahr]) * 100, 0) AS YearlyRentPer100Sqm " +
-			"FROM MA18_Stadtgebietstypen_Zählbezirke  AS sgt INNER JOIN WKO_Mietpreise AS wko ON sgt.SpatialUnitId_AD = wko.SpatialUnitId_AD " +
-			"GROUP BY sgt.SpatialUnitId_ZB;";
+			String selectStatement = "";
+			switch (Common.getSpatialUnitLevel()) {
+			case ZB:
+				selectStatement = "SELECT sgt.SpatialUnitId_ZB AS SpatialUnitId, Round(Avg([PreisJahr]) * 100, 0) AS YearlyRentPer100Sqm " +
+					"FROM MA18_Stadtgebietstypen_Zählbezirke  AS sgt INNER JOIN WKO_Mietpreise AS wko ON sgt.SpatialUnitId_AD = wko.SpatialUnitId_AD " +
+					"GROUP BY sgt.SpatialUnitId_ZB;";
+				break;
+			case SGT:
+				selectStatement = "SELECT sgt.SpatialUnitId_SGT AS SpatialUnitId, Round(Avg([PreisJahr]) * 100, 0) AS YearlyRentPer100Sqm " +
+					"FROM MA18_Stadtgebietstypen_Zählbezirke  AS sgt INNER JOIN WKO_Mietpreise AS wko ON sgt.SpatialUnitId_AD = wko.SpatialUnitId_AD " +
+					"GROUP BY sgt.SpatialUnitId_SGT;";
+				break;
+			default:
+				throw new AssertionError("Unknown spatial unit level (not ZB or SGT)");
+			}
 			rentPerSpatialUnit = Common.db.select(RentPerSpatialUnitRow.class, selectStatement);
 			assert rentPerSpatialUnit.size() > 0 : "No rows selected from WKO_Mietpreise";
 			assert rentPerSpatialUnit.get(0).yearlyRentPer100Sqm > 0 : "Rent per spatial unit = " + rentPerSpatialUnit.get(0).yearlyRentPer100Sqm;
@@ -145,7 +159,42 @@ public class RentPerSpatialUnit {
 		}
 		return result;
 	}
+	/**
+	 * Return the currently cheapest spatial units
+	 * @param numUnits Number of spatial units to return
+	 * @return
+	 * TODO: speed this up by remembering the list?
+	 */
+	public static ArrayList<Integer> getCheapestSpatialUnits(int numUnits) {
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		ArrayList<RentPerSpatialUnitRow> cheapestRents = (ArrayList<RentPerSpatialUnitRow>) rentPerSpatialUnit.clone();
+		Collections.sort(cheapestRents,new CompareYearlyRentPerSqm());
+		for (int i = 0; i != numUnits; i++) {
+			result.add(cheapestRents.get(i).getSpatialUnitId());
+		}
+		lowestYearlyRentPer100Sqm = cheapestRents.get(0).getYearlyRentPer100Sqm();
+		highestYearlyRentPer100Sqm = cheapestRents.get(cheapestRents.size() - 1).getYearlyRentPer100Sqm();
+		return result;
+	}
 	public static ArrayList<RentPerSpatialUnitRow> getRentPerSpatialUnit() {
 		return rentPerSpatialUnit;
+	}
+	/***
+	 * Get lowest yearly rent per 100 m² in the whole model area.
+	 * Function getCheapestSpatialUnits() must be called first to determine the value returned by this function.
+	 * @return
+	 */
+	public static int getLowestYearlyRentPer100Sqm() {
+		assert lowestYearlyRentPer100Sqm > 0 : "Lowest rent <= 0. Probably getCheapestSpatialUnits() wasn't called to initialize this value.";
+		return lowestYearlyRentPer100Sqm;
+	}
+	/**
+	 * Get highest yearly rent per 100 m² in the whole model area
+	 * Function getCheapestSpatialUnits() must be called first to determine the value returned by this function.
+	 * @return
+	 */
+	public static int getHighestYearlyRentPer100Sqm() {
+		assert highestYearlyRentPer100Sqm > 0 : "Highest rent <= 0. Probably getCheapestSpatialUnits() wasn't called to initialize this value.";
+		return highestYearlyRentPer100Sqm;
 	}
 }

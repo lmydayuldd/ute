@@ -32,7 +32,7 @@ public class DwellingsTest {
 	public void testDwellings() {
 		Dwellings dwellings = null;
 		try {
-			dwellings = new Dwellings(db);
+			dwellings = new Dwellings(db, Common.getSpatialUnitLevel());
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
