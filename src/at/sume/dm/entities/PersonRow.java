@@ -19,7 +19,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> {
 	private byte sex;
 //	private int yearBorn;
 	private byte ageGroupId;
-	private byte age;
+	private short age;
 //	private boolean householdRepresentative;
 	private int yearlyIncome;
 	private HouseholdRow household;
@@ -107,19 +107,21 @@ public class PersonRow extends RecordSetRowFileable<Persons> {
 	/**
 	 * @param age the age to set
 	 */
-	public void setAge(byte age) {
+	public void setAge(short age) {
+		assert age >= 0 : "Age < 0 (" + age + ")";
 		this.age = age;
 	}
 
 	/**
 	 * @return the age
 	 */
-	public byte getAge() {
+	public short getAge() {
 		return age;
 	}
 
 	public void aging() {
 		age++;
+		assert age >= 0 : "Age < 0 (" + age + ")";
 	}
 	
 //	/**

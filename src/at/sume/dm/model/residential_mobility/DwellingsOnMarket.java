@@ -104,7 +104,7 @@ public class DwellingsOnMarket {
 		}
 	}
 	/**
-	 * Select a list of available dwellings fronm a list of spatial units within a defined size range and
+	 * Select a list of available dwellings from a list of spatial units within a defined size range and
 	 * below a given yearly price per m²
 	 * 
 	 * @param spatialUnitIdList the spatial units that the dwelling should be in
@@ -121,6 +121,28 @@ public class DwellingsOnMarket {
 				if ((minSize <= dwelling.getDwellingSize()) && 
 						(dwelling.getDwellingSize() <= maxSize) && 
 						((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= maxYearlyPricePerSqm)) {
+					suitableDwellings.add(dwelling);
+				}
+			}
+		}
+		return suitableDwellings.size();
+	}
+	/**
+	 * Select a list of available dwellings from a list of spatial units within a defined size range and
+	 * without any recognition of the price of the dwelling
+	 * 
+	 * @param spatialUnitIdList the spatial units that the dwelling should be in
+	 * @param minSize the minimum size of the dwellings
+	 * @param maxSize the maximum size of the dwellings
+	 * @return Number of suitable dwellings found
+	 */
+	public int selectSuitableDwellingsOnMarket(ArrayList<Long> spatialUnitIdList, int minSize, int maxSize) {
+		suitableDwellings = new ArrayList<DwellingRow>();
+		for (long spatialUnitId : spatialUnitIdList) {
+			ArrayList<DwellingRow> allDwellingsPerArea = getDwellingsOnMarket(spatialUnitId);
+			for (DwellingRow dwelling : allDwellingsPerArea) {
+				if ((minSize <= dwelling.getDwellingSize()) && 
+						(dwelling.getDwellingSize() <= maxSize)) {
 					suitableDwellings.add(dwelling);
 				}
 			}
@@ -161,22 +183,22 @@ public class DwellingsOnMarket {
 		StringBuffer output = new StringBuffer();
 		// Headline - written only once per model run
 		if (!headLineWritten) {
-			output.append("ModelYear, SpatialUnit");
+			output.append("ModelYear;SpatialUnit");
 			for (byte i = 0; i != LivingSpaceGroup6.getLivingSpaceGroupCount(); i++) {
-				output.append(", " + LivingSpaceGroup6.getLivingSpaceGroupName((byte) (i + 1)));
+				output.append(";" + LivingSpaceGroup6.getLivingSpaceGroupName((byte) (i + 1)));
 			}
 			ps.println(output);
 			headLineWritten = true;
 		}
 		for (int i = 0; i != spatialUnits.size(); i++) {
-			output = new StringBuffer(modelYear + ", " + spatialUnits.get(i).getSpatialUnitId());
+			output = new StringBuffer(modelYear + ";" + spatialUnits.get(i).getSpatialUnitId());
 			// Count dwellings per living space group
 			for (DwellingRow dwelling : dwellingsOnMarketList[i]) {
 				dwellingSizeCount[LivingSpaceGroup6.getLivingSpaceGroupId(dwelling.getDwellingSize()) - 1]++;
 			}
 			// Output dwelling count per living space group
 			for (byte j = 0; j != LivingSpaceGroup6.getLivingSpaceGroupCount(); j++) {
-				output.append(", " + dwellingSizeCount[j]);
+				output.append(";" + dwellingSizeCount[j]);
 			}
 			ps.println(output);
 		}

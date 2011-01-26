@@ -71,19 +71,25 @@ public class ResidentialMobility {
 		}
 	}
 	/**
-	 * Search a dwelling for a given household in the list of the dwellings on the market
+	 * Search a dwelling for a given household in the list of the dwellings on the market.
 	 * 
 	 * @param household
 	 * @param modelYear
 	 * @param dwellingsOnMarket
+	 * @param considerDwellingCosts True, if the dwellings costs shall be considered to decide whether a dwelling is suitable or not
 	 * @return the first suitable dwelling for the given household
 	 */
-	public DwellingRow searchDwelling(HouseholdRow household, int modelYear, DwellingsOnMarket dwellingsOnMarket) {
+	public DwellingRow searchDwelling(HouseholdRow household, int modelYear, DwellingsOnMarket dwellingsOnMarket, boolean considerDwellingCosts) {
 		// Adjust the search area size to the number of years the household has been looking for a new dwelling
 		int searchAreaSize = Common.getSearchAreaSize() + (modelYear - household.getMovingDecisionYear()) * Common.getSearchAreaSizeIncement();
 		ArrayList<Long> potentialTargetSpatialUnitIds = household.getPreferredSpatialUnits(searchAreaSize);
 		assert potentialTargetSpatialUnitIds.size() > 0 : "no potential target spatial units found";
-		int suitableDwellingCount = dwellingsOnMarket.selectSuitableDwellingsOnMarket(potentialTargetSpatialUnitIds, household.getAspirationRegionLivingSpaceMin(), household.getAspirationRegionLivingSpaceMax(), household.getAspirationRegionMaxCosts());
+		int suitableDwellingCount = 0;
+		if (considerDwellingCosts) {
+			suitableDwellingCount = dwellingsOnMarket.selectSuitableDwellingsOnMarket(potentialTargetSpatialUnitIds, household.getAspirationRegionLivingSpaceMin(), household.getAspirationRegionLivingSpaceMax(), household.getAspirationRegionMaxCosts());
+		} else {
+			suitableDwellingCount = dwellingsOnMarket.selectSuitableDwellingsOnMarket(potentialTargetSpatialUnitIds, household.getAspirationRegionLivingSpaceMin(), household.getAspirationRegionLivingSpaceMax());
+		}
 //		boolean householdMoved = false;
 		if (suitableDwellingCount > 0) {
 			DwellingRow suitableDwelling;

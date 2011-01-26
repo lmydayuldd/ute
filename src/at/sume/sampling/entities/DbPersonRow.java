@@ -12,7 +12,7 @@ public class DbPersonRow {
 	private int personId;
 	private int householdId;
 	private byte sex;
-	private byte age;
+	private short age;
 	private int yearlyIncome;
 	
 	/**
@@ -54,13 +54,13 @@ public class DbPersonRow {
 	/**
 	 * @return the age
 	 */
-	public byte getAge() {
+	public short getAge() {
 		return age;
 	}
 	/**
 	 * @param age the age to set
 	 */
-	public void setAge(byte age) {
+	public void setAge(short age) {
 		this.age = age;
 	}
 	/**

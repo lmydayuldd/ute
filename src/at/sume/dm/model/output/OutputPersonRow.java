@@ -14,7 +14,7 @@ public class OutputPersonRow implements OutputRow {
 	private int personId;
 	private int householdId;
 	private byte sex;
-	private byte age;
+	private short age;
 	private int yearlyIncome;
 
 	public OutputPersonRow(short modelYear, PersonRow person) {

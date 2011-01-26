@@ -631,11 +631,11 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 //			short desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRandomPct * r.nextGaussian());
 //			desiredLivingSpaceSqm = Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			// calculate (usually upper) boundary 1
-			short desiredLivingSpaceModifier = (short) (110 + desiredLivingSpaceRangePct * r.nextGaussian());
+			short desiredLivingSpaceModifier = (short) (110 + desiredLivingSpaceRangePct * Math.abs(r.nextGaussian()));
 			short desiredLivingSpaceSqm1 = (short) Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			assert desiredLivingSpaceSqm1 > 0 : "Desired living space 1 <= 0 - " + desiredLivingSpaceSqm1;
 			// calculate (usually lower) boundary 2
-			desiredLivingSpaceModifier = (short) (90 - desiredLivingSpaceRangePct * r.nextGaussian());
+			desiredLivingSpaceModifier = (short) (90 - desiredLivingSpaceRangePct * Math.abs(r.nextGaussian()));
 			short desiredLivingSpaceSqm2 = (short) Math.round(desiredLivingSpaceSqm * desiredLivingSpaceModifier / 100);
 			assert desiredLivingSpaceSqm2 > 0 : "Desired living space 2 <= 0 - " + desiredLivingSpaceSqm2;
 			if (desiredLivingSpaceSqm1 > desiredLivingSpaceSqm2) {

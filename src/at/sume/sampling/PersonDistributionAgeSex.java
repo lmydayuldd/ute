@@ -11,7 +11,7 @@ import at.sume.sampling.distributions.PersonsPerAgeSex;
 public class PersonDistributionAgeSex {
 	private Distribution<PersonsPerAgeSex> personsPerAgeSexRepr, personsPerAgeSexNonRepr;
 	private PersonsPerAgeSex result;
-	private byte resultAge;
+	private short resultAge;
 	
 	/**
 	 * Load distribution of households per spatial unit from database
@@ -50,7 +50,7 @@ public class PersonDistributionAgeSex {
 		resultAge = AgeGroup.sampleAge(result.ageGroupId);
 	}
 	
-	public byte getSampledAge() {
+	public short getSampledAge() {
 		return resultAge;
 	}
 	public byte getSampledAgeGroupId() {

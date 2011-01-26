@@ -111,6 +111,7 @@ public class Common {
 		return spatialUnitLevel;
 	}
 	
+	
 	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
@@ -156,8 +157,6 @@ public class Common {
 	public static void init() {
 		scenarioId = Short.parseShort(getSysParam("DefaultScenario"));
 		residentialSatisfactionThreshold = Integer.parseInt(getSysParam("THR_ResSatisfaction"));
-		searchAreaSize = Integer.parseInt(getSysParam("HouseholdSearchAreaSize"));
-		searchAreaSizeIncrement = Integer.parseInt(getSysParam("HouseholdSearchAreaSizeIncrement"));
 		dwellingsConsideredPerYear = Integer.parseInt(getSysParam("HouseholdDwellingsConsideredPerYear"));
 		dwellingsOnMarketShare = Integer.parseInt(getSysParam("DwellingsOnMarketShare"));
 		alwaysLookForDwellings = Integer.parseInt(getSysParam("AlwaysLookForDwellings"));
@@ -167,8 +166,12 @@ public class Common {
 		String sysParam = getSysParam("SpatialUnitLevel");
 		if (SpatialUnitLevel.ZB.compareTo(sysParam) == 0) {
 			spatialUnitLevel = SpatialUnitLevel.ZB;
+			searchAreaSize = Integer.parseInt(getSysParam("HouseholdSearchAreaSizeZB"));
+			searchAreaSizeIncrement = Integer.parseInt(getSysParam("HouseholdSearchAreaSizeIncrementZB"));
 		} else if (SpatialUnitLevel.SGT.compareTo(sysParam) == 0) {
 			spatialUnitLevel = SpatialUnitLevel.SGT;
+			searchAreaSize = Integer.parseInt(getSysParam("HouseholdSearchAreaSizeSGT"));
+			searchAreaSizeIncrement = Integer.parseInt(getSysParam("HouseholdSearchAreaSizeIncrementSGT"));
 		} else {
 			throw new AssertionError("Systemparameter SpatialUnitLevel must be ZB or SGT (is " + sysParam);
 		}

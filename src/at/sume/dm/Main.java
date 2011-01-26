@@ -307,9 +307,9 @@ public class Main {
 					// residential satisfaction - otherwise save computing time! (depending on a sysparam)
 					if ((maxResidentialSatisfactionEstimate > household.getCurrentResidentialSatisfaction()) || (Common.getAlwaysLookForDwellings() != 0)) {
 						// do the extra mile and look for a dwelling
-						DwellingRow suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
+						DwellingRow suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, true);
 						if (suitableDwelling == null) {
-							suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
+							suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, true);
 						}
 						household.clearResidentialSatisfactionEstimate();
 						if (suitableDwelling != null) {
@@ -346,27 +346,31 @@ public class Main {
 					// Household can't afford even the lowest rent -> we choose a dwelling in one of the cheapest spatial units available
 					ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(cheapestSpatialUnits);
 					household.setResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
-					DwellingRow dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
+					DwellingRow dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, false);
 					if (dwelling == null) {
-						dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
+						dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, false);
 					}
 					household.clearResidentialSatisfactionEstimate();
-					assert dwelling != null : "No dwelling found";
-					// 1) add household to common lists
-					households.add(household);
-					for (PersonRow member : household.getMembers()) {
-						persons.add(member);
+//					assert dwelling != null : "No dwelling found";
+					if (dwelling == null) {
+						hhFoundNoDwellings++;
+					} else {
+						// 1) add household to common lists
+						households.add(household);
+						for (PersonRow member : household.getMembers()) {
+							persons.add(member);
+						}
+						// 2 move household
+						household.relocate(dwellingsOnMarket, dwelling);
+						hhMovedToCheapest++;
+						// TODO: update indicators
 					}
-					// 2 move household
-					household.relocate(dwellingsOnMarket, dwelling);
-					hhMovedToCheapest++;
-					// TODO: update indicators
 				} else {
 					ArrayList<Integer> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
 					if (potentialTargetSpatialUnitIds.size() > 0) {
 						ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
 						household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
-						DwellingRow dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket);
+						DwellingRow dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, true);
 						household.clearResidentialSatisfactionEstimate();
 						if (dwelling == null) {
 							// household didn't find a suitable dwelling -> join another household
@@ -393,7 +397,7 @@ public class Main {
 			System.out.println(printInfo() + " " + hhFoundNoDwellings + " out of " + immigratingHouseholds.size() + " immigrating households found no dwelling");
 			System.out.println(printInfo() + " " + hhNoSatisfaction + " out of " + immigratingHouseholds.size() + " immigrating households could not find spatial units matching their aspirations");
 			System.out.println(printInfo() + " " + hhMovedToCheapest + " out of " + immigratingHouseholds.size() + " immigrating households moved to the cheapest possible spatial units");
-			if (modelYear == modelEndYear - 1)
+			//if (modelYear == modelEndYear - 1)
 				outputFreeDwellings(modelYear, "after immigration");
 			
 			// Aging of persons

@@ -19,8 +19,8 @@ public class AgeGroup {
 	public static class AgeGroupRow implements Comparable<AgeGroupRow> {
 		public byte ageGroupId;
 		public String ageGroup;
-		public byte minage;
-		public byte maxage;
+		public short minage;
+		public short maxage;
 		
 		public String toString() {
 			return ageGroup;
@@ -51,13 +51,13 @@ public class AgeGroup {
 	 * @param age
 	 * @return
 	 */
-	public static byte getAgeGroupId(byte age) {
+	public static byte getAgeGroupId(short age) {
 		for (AgeGroupRow i : ageGroups) {
 			if ((i.minage <= age) && (age <= i.maxage)) {
 				return i.ageGroupId;
 			}
 		}
-		return 0;
+		throw new AssertionError("Unable to find age group for age " + age);
 	}
 	/**
 	 * Get the printable name of a certain age group by binarySearch
@@ -89,18 +89,18 @@ public class AgeGroup {
 	 * @param ageGroupId
 	 * @return
 	 */
-	public static byte sampleAge(byte ageGroupId) {
+	public static short sampleAge(byte ageGroupId) {
 		assert ageGroupId > 0 : "ageGroupId <= 0";
 		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
 		Random r = new Random();
 		AgeGroupRow sample = ageGroups.get(ageGroupId - 1);
 //		return (short) (ageGroup.minage + (r.nextDouble() * (ageGroup.maxage - ageGroup.minage)));
-		return (byte) (sample.minage + r.nextInt(sample.maxage - sample.minage));
+		return (short) (sample.minage + r.nextInt(sample.maxage - sample.minage));
 	}
-	public static byte getMinAge(byte ageGroupId) {
+	public static short getMinAge(byte ageGroupId) {
 		return ageGroups.get(ageGroupId - 1).minage;
 	}
-	public static byte getMaxAge(byte ageGroupId) {
+	public static short getMaxAge(byte ageGroupId) {
 		return ageGroups.get(ageGroupId - 1).maxage;
 	}
 }

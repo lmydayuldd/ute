@@ -30,6 +30,7 @@ public class PopulationPerAgeGroupRow extends IndicatorRow implements Comparable
 	 * @param ageGroupId the ageGroupId to set
 	 */
 	public void setAgeGroupId(byte ageGroupId) {
+		assert ageGroupId > 0 : "Age group <= 0 (" + ageGroupId + ")";
 		this.ageGroupId = ageGroupId;
 	}
 	/**
