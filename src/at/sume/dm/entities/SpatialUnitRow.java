@@ -23,6 +23,7 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	private byte areaShareAgricultural;
 	private byte areaShareForest;
 	private byte areaShareWater;
+	private boolean freeDwellingsAlwaysAvailable;
 	
 	/**
 	 * @param rowList
@@ -144,6 +145,20 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	 */
 	public void setAreaShareWater(byte areaShareWater) {
 		this.areaShareWater = areaShareWater;
+	}
+
+	/**
+	 * @param freeDwellingsAlwaysAvailable the freeDwellingsAlwaysAvailable to set
+	 */
+	public void setFreeDwellingsAlwaysAvailable(boolean freeDwellingsAlwaysAvailable) {
+		this.freeDwellingsAlwaysAvailable = freeDwellingsAlwaysAvailable;
+	}
+
+	/**
+	 * @return the freeDwellingsAlwaysAvailable
+	 */
+	public boolean isFreeDwellingsAlwaysAvailable() {
+		return freeDwellingsAlwaysAvailable;
 	}
 
 	/* (non-Javadoc)

@@ -113,16 +113,12 @@ public class DwellingsOnMarket {
 	 * @param maxYearlyPricePerSqm the maximum yearly price per m² for the dwellings
 	 * @return Number of suitable dwellings found
 	 */
-	public int selectSuitableDwellingsOnMarket(ArrayList<Long> spatialUnitIdList, int minSize, int maxSize, long maxYearlyPricePerSqm) {
+	public int selectSuitableDwellingsOnMarket(ArrayList<Long> spatialUnitIdList, short minSize, short maxSize, long maxYearlyPricePerSqm) {
 		suitableDwellings = new ArrayList<DwellingRow>();
 		for (long spatialUnitId : spatialUnitIdList) {
-			ArrayList<DwellingRow> allDwellingsPerArea = getDwellingsOnMarket(spatialUnitId);
-			for (DwellingRow dwelling : allDwellingsPerArea) {
-				if ((minSize <= dwelling.getDwellingSize()) && 
-						(dwelling.getDwellingSize() <= maxSize) && 
-						((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= maxYearlyPricePerSqm)) {
-					suitableDwellings.add(dwelling);
-				}
+			DwellingRow dwelling = getDwelling(spatialUnitId, minSize, maxSize, maxYearlyPricePerSqm);
+			if (dwelling != null) {
+				suitableDwellings.add(dwelling);
 			}
 		}
 		return suitableDwellings.size();
@@ -136,18 +132,8 @@ public class DwellingsOnMarket {
 	 * @param maxSize the maximum size of the dwellings
 	 * @return Number of suitable dwellings found
 	 */
-	public int selectSuitableDwellingsOnMarket(ArrayList<Long> spatialUnitIdList, int minSize, int maxSize) {
-		suitableDwellings = new ArrayList<DwellingRow>();
-		for (long spatialUnitId : spatialUnitIdList) {
-			ArrayList<DwellingRow> allDwellingsPerArea = getDwellingsOnMarket(spatialUnitId);
-			for (DwellingRow dwelling : allDwellingsPerArea) {
-				if ((minSize <= dwelling.getDwellingSize()) && 
-						(dwelling.getDwellingSize() <= maxSize)) {
-					suitableDwellings.add(dwelling);
-				}
-			}
-		}
-		return suitableDwellings.size();
+	public int selectSuitableDwellingsOnMarket(ArrayList<Long> spatialUnitIdList, short minSize, short maxSize) {
+		return selectSuitableDwellingsOnMarket(spatialUnitIdList, minSize, maxSize, -1);
 	}
 	/**
 	 * Randomly pick one dwelling of the list of suitable dwellings for a household created with
@@ -160,7 +146,13 @@ public class DwellingsOnMarket {
 		assert suitableDwellings.size() > 0 : "no suitable dwellings";
 		return suitableDwellings.get(r.nextInt(suitableDwellings.size()));
 	}
-	public DwellingRow getDwelling(int spatialUnitId, byte livingSpaceGroup6Id) {
+	/**
+	 * Get the first available (free) dwelling that matches the given parameters
+	 * @param spatialUnitId
+	 * @param livingSpaceGroup6Id
+	 * @return
+	 */
+	public DwellingRow getDwelling(long spatialUnitId, byte livingSpaceGroup6Id) {
 		ArrayList<DwellingRow> dwellings =  dwellingsOnMarketList[spatialUnitArrayPosition(spatialUnitId)];
 		for (DwellingRow dwelling : dwellings) {
 			if (dwelling.getLivingSpaceGroup6Id() == livingSpaceGroup6Id)
@@ -168,7 +160,34 @@ public class DwellingsOnMarket {
 		}
 		return null;
 	}
-	
+	/**
+	 * Get the first available (free) dwelling that matches the given parameters
+	 * @param spatialUnitId
+	 * @param minSize
+	 * @param maxSize
+	 * @return
+	 */
+	public DwellingRow getDwelling(long spatialUnitId, short minSize, short maxSize, long maxYearlyPricePerSqm) {
+		ArrayList<DwellingRow> allDwellingsPerArea = getDwellingsOnMarket(spatialUnitId);
+		for (DwellingRow dwelling : allDwellingsPerArea) {
+			if ((minSize <= dwelling.getDwellingSize()) && 
+					(dwelling.getDwellingSize() <= maxSize) && 
+					((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= maxYearlyPricePerSqm) || (maxYearlyPricePerSqm < 0)) {
+				return dwelling;
+			}
+		}
+		return null;
+	}
+	/**
+	 * Get the first available (free) dwelling that matches the given parameters
+	 * @param spatialUnitId
+	 * @param minSize
+	 * @param maxSize
+	 * @return
+	 */
+	public DwellingRow getDwelling(long spatialUnitId, short minSize, short maxSize) {
+		return getDwelling(spatialUnitId, minSize, maxSize, -1);
+	}
 	public void putDwellingOnMarket(DwellingRow dwelling) {
 		int su = spatialUnits.indexOf(dwelling.getSpatialunit());
 		dwellingsOnMarketList[su].add(dwelling);

@@ -216,8 +216,10 @@ public class Main {
 					personEventManager.process(person);
 				}
 				// Household was removed during demographic events -> process next household 
-				if (household.getMembers().size() == 0)
+				if (household.getMembers().size() == 0) {
+					household.remove(dwellingsOnMarket);
 					continue;
+				}
 				
 				// Add household if it already made a moving decision previously
 				if (household.getMovingDecisionYear() != 0) {
@@ -265,7 +267,7 @@ public class Main {
 			if (modelYear > modelStartYear)
 				RentPerSpatialUnit.updateRentPerSpatialUnit();
 			// TODO: configurable number of units
-			ArrayList<Integer> cheapestSpatialUnits = RentPerSpatialUnit.getCheapestSpatialUnits(10);
+			ArrayList<Integer> cheapestSpatialUnits = RentPerSpatialUnit.getCheapestSpatialUnits(0);
 			int lowestYearlyRentPer100Sqm = RentPerSpatialUnit.getLowestYearlyRentPer100Sqm();
 			int highestYearlyRentPer100Sqm = RentPerSpatialUnit.getHighestYearlyRentPer100Sqm();
 			System.out.println(printInfo() + ": lowest rent (€/100m²/yr.): " + lowestYearlyRentPer100Sqm + ", highest rent: " + highestYearlyRentPer100Sqm);
@@ -273,7 +275,7 @@ public class Main {
 			MoversIndicatorManager.resetIndicators();
 			outputFreeDwellings(modelYear, "before moving households");
 			// Loop through potential movers
-			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0, hhZeroIncome = 0, hhLowIncome = 0;
+			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0, hhZeroIncome = 0, hhLowIncome = 0, hhMovedAway = 0;
 			j = 0;
 			for (HouseholdRow household : potentialMovers) {
 				if (j % 10000 == 0) {
@@ -296,6 +298,25 @@ public class Main {
 					if (household.getAspirationRegionMaxCosts() <= 63)
 						hhLowIncome++;
 				} else {
+					DwellingRow dwelling = null;
+					for (int spatialUnitId : potentialTargetSpatialUnitIds) {
+						SpatialUnitRow spatialUnit = spatialUnits.getSpatialUnit(spatialUnitId);
+						if (spatialUnit.isFreeDwellingsAlwaysAvailable()) {
+							// Household moves away
+							hhMovedAway++;
+							household.remove(dwellingsOnMarket);
+						} else {
+							dwelling = dwellingsOnMarket.getDwelling(spatialUnitId, household.getAspirationRegionLivingSpaceMin(), household.getAspirationRegionLivingSpaceMax());
+							if (dwelling != null)
+								break;
+						}
+					}
+					if (dwelling == null) {
+						hhFoundNoDwellings++;
+					} else {
+						household.relocate(dwellingsOnMarket, dwelling);
+					}
+					/*
 					// b) compare estimated residential satisfaction in these spatial units and select the highest scoring 
 					//    spatial units (random component for each unit, number of units selected as sysparam)
 					ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
@@ -327,6 +348,7 @@ public class Main {
 						// the current one - household stays (except on a forced move)
 						hhNoSatisfaction++;
 					}
+					*/
 				}
 				j++;
 			}
@@ -335,25 +357,30 @@ public class Main {
 					"and " + hhLowIncome + " households can afford a dwelling with costs <= 63 per m²/year only");
 			System.out.println(printInfo() + " " + hhNoSatisfaction + " out of " + potentialMovers.size() + " potential moving households would not improve their estimated residential satisfaction");
 			System.out.println(printInfo() + " " + hhFoundNoDwellings + " out of " + potentialMovers.size() + " potential moving households found no dwelling");
+			System.out.println(printInfo() + " " + hhMovedAway + " out of " + potentialMovers.size() + " potential moving households moved away");
 			outputFreeDwellings(modelYear, "after moving households, before immigration");
 			// Immigrating Households
 			ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(modelYear);
 			hhFoundNoDwellings = 0; hhNoSatisfaction = 0;
-			int hhMovedToCheapest = 0;
+			int hhMovedToCheapest = 0, hhNoCheapDwelling = 0;
 			for (HouseholdRow household : immigratingHouseholds) {
 				residentialMobility.estimateAspirationRegion(household, modelYear, modelStartYear, highestYearlyRentPer100Sqm);
 				if (household.getAspirationRegionMaxCosts() * 100 < lowestYearlyRentPer100Sqm) {
 					// Household can't afford even the lowest rent -> we choose a dwelling in one of the cheapest spatial units available
-					ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(cheapestSpatialUnits);
-					household.setResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
-					DwellingRow dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, false);
-					if (dwelling == null) {
-						dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, false);
+					DwellingRow dwelling = null;
+					for (long spatialUnitId : cheapestSpatialUnits) {
+						dwelling = dwellingsOnMarket.getDwelling(spatialUnitId, (short) 0, household.getAspirationRegionLivingSpaceMax());
+						if (dwelling != null)
+							break;
 					}
-					household.clearResidentialSatisfactionEstimate();
 //					assert dwelling != null : "No dwelling found";
 					if (dwelling == null) {
-						hhFoundNoDwellings++;
+						hhNoCheapDwelling++;
+						for (long spatialUnitId : cheapestSpatialUnits) {
+							dwelling = dwellingsOnMarket.getDwelling(spatialUnitId, (short) 0, household.getAspirationRegionLivingSpaceMax());
+							if (dwelling != null)
+								break;
+						}
 					} else {
 						// 1) add household to common lists
 						households.add(household);
@@ -395,6 +422,7 @@ public class Main {
 				}
 			}
 			System.out.println(printInfo() + " " + hhFoundNoDwellings + " out of " + immigratingHouseholds.size() + " immigrating households found no dwelling");
+			System.out.println(printInfo() + " " + hhNoCheapDwelling + " out of " + immigratingHouseholds.size() + " immigrating households found no low-cost dwelling");
 			System.out.println(printInfo() + " " + hhNoSatisfaction + " out of " + immigratingHouseholds.size() + " immigrating households could not find spatial units matching their aspirations");
 			System.out.println(printInfo() + " " + hhMovedToCheapest + " out of " + immigratingHouseholds.size() + " immigrating households moved to the cheapest possible spatial units");
 			//if (modelYear == modelEndYear - 1)

@@ -756,6 +756,20 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 		MoversIndicatorManager.addHousehold(this);
 	}
 
+	public void remove(DwellingsOnMarket dwellingsOnMarket) {
+		if (hasDwelling())
+			dwellingsOnMarket.putDwellingOnMarket(getDwelling());
+		super.remove();
+	}
+
+	/* (non-Javadoc)
+	 * @see at.sume.db.RecordSetRow#remove()
+	 */
+	@Override
+	public void remove() {
+		throw new AssertionError("HouseholdRow.remove() must not be used - use HouseholdRow.remove(DwellingsOnMarket) instead!");
+	}
+
 	/**
 	 * @param currentResidentialSatisfaction the currentResidentialSatisfaction to set
 	 */

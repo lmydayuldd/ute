@@ -166,14 +166,16 @@ public class RentPerSpatialUnit {
 	 * TODO: speed this up by remembering the list?
 	 */
 	public static ArrayList<Integer> getCheapestSpatialUnits(int numUnits) {
-		ArrayList<Integer> result = new ArrayList<Integer>();
+		if (numUnits == 0)
+			numUnits = rentPerSpatialUnit.size();
+		ArrayList<Integer> result = new ArrayList<Integer>(numUnits);
 		ArrayList<RentPerSpatialUnitRow> cheapestRents = (ArrayList<RentPerSpatialUnitRow>) rentPerSpatialUnit.clone();
 		Collections.sort(cheapestRents,new CompareYearlyRentPerSqm());
 		for (int i = 0; i != numUnits; i++) {
 			result.add(cheapestRents.get(i).getSpatialUnitId());
 		}
 		lowestYearlyRentPer100Sqm = cheapestRents.get(0).getYearlyRentPer100Sqm();
-		highestYearlyRentPer100Sqm = cheapestRents.get(cheapestRents.size() - 1).getYearlyRentPer100Sqm();
+		highestYearlyRentPer100Sqm = cheapestRents.get(numUnits - 1).getYearlyRentPer100Sqm();
 		return result;
 	}
 	public static ArrayList<RentPerSpatialUnitRow> getRentPerSpatialUnit() {
