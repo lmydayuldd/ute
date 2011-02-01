@@ -15,6 +15,7 @@ import java.util.Random;
 import net.remesch.db.Database;
 import net.remesch.db.Sequence;
 import net.remesch.util.DateUtil;
+import net.remesch.util.FileUtil;
 import at.sume.dm.demography.events.ChildBirth;
 import at.sume.dm.demography.events.EventManager;
 import at.sume.dm.demography.events.PersonDeath;
@@ -454,6 +455,7 @@ public class Main {
 			pathName = path + "FreeDwellings.csv";
 		else
 			pathName = path + "\\" + "FreeDwellings.csv";
+		FileUtil.rotateFile(pathName);
 		FileOutputStream freeDwellingsFile = new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(freeDwellingsFile);
 //		ps.println("======= " + label + "=======" + modelYear + "=======");

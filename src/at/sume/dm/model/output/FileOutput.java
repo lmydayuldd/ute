@@ -10,6 +10,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.remesch.util.FileUtil;
+
 /**
  * @author Alexander Remesch
  *
@@ -45,7 +47,8 @@ public class FileOutput {
 	 */
 	public void persistDb(short modelYear) throws IOException {
 		String pathName = path + fileName + "_" + modelYear + ".csv";
-		// TODO: manage existing files (rename old files and start a new one) here
+		// Rename existing file to a unique filename
+		FileUtil.rotateFile(pathName);
 		FileOutputStream fileOutputStream = new FileOutputStream(pathName, true);
 		psOut = new PrintStream(fileOutputStream);
 		psOut.println("ModelYear" + delimiter + rowList.get(0).toCsvHeadline(delimiter));
