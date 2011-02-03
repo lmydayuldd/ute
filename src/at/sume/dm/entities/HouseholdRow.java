@@ -759,6 +759,10 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 	public void remove(DwellingsOnMarket dwellingsOnMarket) {
 		if (hasDwelling())
 			dwellingsOnMarket.putDwellingOnMarket(getDwelling());
+		// Remove household members as well
+		for (PersonRow member : members) {
+			member.remove();
+		}
 		super.remove();
 	}
 
