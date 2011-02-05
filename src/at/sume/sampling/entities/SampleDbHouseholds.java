@@ -154,7 +154,7 @@ public class SampleDbHouseholds {
 			livingSpace = sampleLivingSpace.randomSample(householdsPerSpatialUnit.householdSize);
 			byte livingSpaceGroup6Id = LivingSpaceGroup6.getLivingSpaceGroupId(livingSpace);
 			while ((dwelling == null) && (livingSpaceGroup6Id <= livingSpaceGroupCount)) {
-				dwelling = dwellingsOnMarket.getDwelling(spatialUnitId, livingSpaceGroup6Id);
+				dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, livingSpaceGroup6Id);
 				if (dwelling == null) {
 //					System.out.println(Common.printInfo() + ": no dwelling with " + livingSpace + "m² (class: " + LivingSpaceGroup6.getLivingSpaceGroupName(livingSpaceGroup6Id) + ") in spatial unit " + spatialUnitId + " anymore");
 					livingSpaceGroup6Id++;
