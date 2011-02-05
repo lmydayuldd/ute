@@ -5,8 +5,6 @@ package at.sume.dm.model.residential_satisfaction;
 
 import java.util.ArrayList;
 
-import at.sume.dm.entities.DwellingRow;
-import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.SpatialUnitRow;
 
 /**
@@ -48,7 +46,7 @@ public enum ResidentialSatisfactionManager {
 	 * @param household
 	 * @return
 	 */
-	public static short calcResidentialSatisfaction(HouseholdRow household, int modelYear) {
+	public static short calcResidentialSatisfaction(ResidentialSatisfactionHouseholdProperties household, int modelYear) {
 		return calcResidentialSatisfaction(household, household.getDwelling(), modelYear);
 	}
 	/**
@@ -60,7 +58,7 @@ public enum ResidentialSatisfactionManager {
 	 * @param dwelling
 	 * @return Overall residential satisfaction in thousandth part
 	 */
-	public static short calcResidentialSatisfaction(HouseholdRow household, SpatialUnitRow spatialUnit, int modelYear) {
+	public static short calcResidentialSatisfaction(ResidentialSatisfactionHouseholdProperties household, SpatialUnitRow spatialUnit, int modelYear) {
 		long rv = 0;
 		short weight = maxWeight;
 		int weightSum = 0;
@@ -84,7 +82,7 @@ public enum ResidentialSatisfactionManager {
 	 * @param dwelling
 	 * @return Overall residential satisfaction in thousandth part
 	 */
-	public static short calcResidentialSatisfaction(HouseholdRow household, DwellingRow dwelling, int modelYear) {
+	public static short calcResidentialSatisfaction(ResidentialSatisfactionHouseholdProperties household, ResidentialSatisfactionDwellingProperties dwelling, int modelYear) {
 		long rv = 0;
 		short weight = maxWeight;
 		int weightSum = 0;

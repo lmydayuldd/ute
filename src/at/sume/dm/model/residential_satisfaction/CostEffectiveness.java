@@ -3,8 +3,6 @@
  */
 package at.sume.dm.model.residential_satisfaction;
 
-import at.sume.dm.entities.DwellingRow;
-import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 
@@ -23,7 +21,7 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 	 * @see at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionComponent#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.DwellingRow, at.sume.dm.entities.SpatialUnitRow, int)
 	 */
 	@Override
-	public short calc(HouseholdRow household, DwellingRow dwelling,
+	public short calc(ResidentialSatisfactionHouseholdProperties household, ResidentialSatisfactionDwellingProperties dwelling,
 			SpatialUnitRow spatialUnitId, int ModelYear) {
 		// TODO: add household-specific rentPerceptionModifier here, that may also increase over the years if the household
 		// is unable to find a new residence for a long time (?)
@@ -75,7 +73,7 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 		if (result > 1000)
 			return 1000;
 		assert result >= 0 : "rsCostEffectiveness out of range (" + result + ")";
-		household.rsCostEffectiveness = (short) result;
+		household.setRsCostEffectiveness((short) result);
 		return (short) result;
 	}
 }

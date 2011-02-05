@@ -3,8 +3,6 @@
  */
 package at.sume.dm.model.residential_satisfaction;
 
-import at.sume.dm.entities.DwellingRow;
-import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerSpatialUnit;
 
@@ -21,7 +19,7 @@ public class SocialPrestige extends ResidentialSatisfactionComponent {
 	 * @see at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionComponent#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow)
 	 */
 	@Override
-	public short calc(HouseholdRow household, DwellingRow dwelling, SpatialUnitRow spatialUnit, int modelYear) {
+	public short calc(ResidentialSatisfactionHouseholdProperties household, ResidentialSatisfactionDwellingProperties dwelling, SpatialUnitRow spatialUnit, int modelYear) {
 		// Calculate household income per member
 		long hhIncome = household.getYearlyIncomePerMemberWeighted();
 		// Calculate average household income per member
@@ -40,7 +38,7 @@ public class SocialPrestige extends ResidentialSatisfactionComponent {
 		if (result > 1000)
 			result = 1000;
 		assert result >= 0 : "rsSocialPrestige out of range (" + result + ")";
-		household.rsSocialPrestige = (short) result;
+		household.setRsSocialPrestige((short) result);
 		return (short) result;
 	}
 }

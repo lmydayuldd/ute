@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import at.sume.dm.Common;
-import at.sume.dm.entities.DwellingRow;
-import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.SpatialUnitRow;
 
 /**
@@ -148,7 +146,7 @@ public class UDPCentrality extends ResidentialSatisfactionComponent {
 	 * @see at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionComponent#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow)
 	 */
 	@Override
-	public short calc(HouseholdRow household, DwellingRow dwelling, SpatialUnitRow spatialUnit, int modelYear) {
+	public short calc(ResidentialSatisfactionHouseholdProperties household, ResidentialSatisfactionDwellingProperties dwelling, SpatialUnitRow spatialUnit, int modelYear) {
 		// Lookup the UDP-indicators for the given spatial unit
 		SpatialUnitUdp lookupSpatialUnitUdp = new SpatialUnitUdp();
 		lookupSpatialUnitUdp.setSpatialUnitId(spatialUnit.getSpatialUnitId());
@@ -174,7 +172,7 @@ public class UDPCentrality extends ResidentialSatisfactionComponent {
 		if (result > 1000)
 			result = 1000;
 		assert result >= 0 : "rsCentrality out of range (" + result + ")";
-		household.rsUdpCentrality = result;
+		household.setRsUdpCentrality(result);
 		return result;
 	}
 }

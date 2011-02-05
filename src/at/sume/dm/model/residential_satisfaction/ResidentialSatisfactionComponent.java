@@ -3,8 +3,6 @@
  */
 package at.sume.dm.model.residential_satisfaction;
 
-import at.sume.dm.entities.DwellingRow;
-import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.SpatialUnitRow;
 
 /**
@@ -25,7 +23,7 @@ public class ResidentialSatisfactionComponent {
 	 * @param ModelYear
 	 * @return
 	 */
-	public short calc(HouseholdRow household, DwellingRow dwelling, SpatialUnitRow spatialUnit, int ModelYear) {
+	public short calc(ResidentialSatisfactionHouseholdProperties household, ResidentialSatisfactionDwellingProperties dwelling, SpatialUnitRow spatialUnit, int ModelYear) {
 		return (short)1000;
 	}
 	/**
@@ -37,7 +35,7 @@ public class ResidentialSatisfactionComponent {
 	 * @param spatialUnit
 	 * @return Residential satisfaction in thousandth part
 	 */
-	public final short calc(HouseholdRow household, SpatialUnitRow spatialUnit, int modelYear) {
+	public final short calc(ResidentialSatisfactionHouseholdProperties household, SpatialUnitRow spatialUnit, int modelYear) {
 		short result = calc(household, household.getDwelling(), spatialUnit, modelYear);
 		assert (result >= 0) && (result <= 1000) : "residential satisfaction out of range (" + result + ")";
 		return result;
@@ -47,7 +45,7 @@ public class ResidentialSatisfactionComponent {
 	 * @param household
 	 * @return Residential satisfaction in thousandth part
 	 */
-	public final short calc(HouseholdRow household, int modelYear) {
+	public final short calc(ResidentialSatisfactionHouseholdProperties household, int modelYear) {
 		short result = calc(household, household.getDwelling(), modelYear);
 		assert (result >= 0) && (result <= 1000) : "residential satisfaction out of range (" + result + ")";
 		return result;
@@ -60,7 +58,7 @@ public class ResidentialSatisfactionComponent {
 	 * @param modelYear
 	 * @return Residential satisfaction in thousandth part
 	 */
-	public final short calc(HouseholdRow household, DwellingRow dwelling, int modelYear) {
+	public final short calc(ResidentialSatisfactionHouseholdProperties household, ResidentialSatisfactionDwellingProperties dwelling, int modelYear) {
 		short result = calc(household, dwelling, dwelling.getSpatialunit(), modelYear);
 		assert (result >= 0) && (result <= 1000) : "residential satisfaction out of range (" + result + ")";
 		return result;

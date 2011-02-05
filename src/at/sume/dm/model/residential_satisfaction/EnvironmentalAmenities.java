@@ -3,8 +3,6 @@
  */
 package at.sume.dm.model.residential_satisfaction;
 
-import at.sume.dm.entities.DwellingRow;
-import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.SpatialUnitRow;
 
 /**
@@ -19,7 +17,7 @@ public class EnvironmentalAmenities extends ResidentialSatisfactionComponent {
 	 * @see at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionComponent#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.DwellingRow, at.sume.dm.entities.SpatialUnitRow, int)
 	 */
 	@Override
-	public short calc(HouseholdRow household, DwellingRow dwelling,
+	public short calc(ResidentialSatisfactionHouseholdProperties household, ResidentialSatisfactionDwellingProperties dwelling,
 			SpatialUnitRow spatialUnit, int ModelYear) {
 		int envAmenitiesSum = spatialUnit.getAreaShareArtificialVegetation() + spatialUnit.getAreaShareAgricultural() +
 			spatialUnit.getAreaShareForest() + spatialUnit.getAreaShareWater();
@@ -27,7 +25,7 @@ public class EnvironmentalAmenities extends ResidentialSatisfactionComponent {
 		if (result > 1000)
 			return 1000;
 		assert result >= 0 : "Environmental amenities score is out of range: " + result;
-		household.rsEnvironmentalAmenities = (short) result;
+		household.setRsEnvironmentalAmenities((short) result);
 		return (short) result;
 	}
 }

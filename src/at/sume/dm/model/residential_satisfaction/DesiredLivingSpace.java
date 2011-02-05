@@ -3,8 +3,6 @@
  */
 package at.sume.dm.model.residential_satisfaction;
 
-import at.sume.dm.entities.DwellingRow;
-import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.SpatialUnitRow;
 
 /**
@@ -19,13 +17,13 @@ public class DesiredLivingSpace extends ResidentialSatisfactionComponent {
 	 * @see at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionComponent#calc(at.sume.dm.entities.HouseholdRow, at.sume.dm.entities.SpatialUnitRow, int)
 	 */
 	@Override
-	public short calc(HouseholdRow household, DwellingRow dwelling, SpatialUnitRow spatialUnit, int modelYear) {
+	public short calc(ResidentialSatisfactionHouseholdProperties household, ResidentialSatisfactionDwellingProperties dwelling, SpatialUnitRow spatialUnit, int modelYear) {
 		long currentLivingSpace = 0;
 		short result = 0;
 		// TODO: add household-specific desiredLivingSpace modifier here
 		household.estimateDesiredLivingSpace();
 		long desiredLivingSpace = (household.getAspirationRegionLivingSpaceMin() + household.getAspirationRegionLivingSpaceMax()) / 2;
-		assert desiredLivingSpace > 0 : "Desired living space <= 0 (" + desiredLivingSpace + ") for household " + household.getId();
+		assert desiredLivingSpace > 0 : "Desired living space <= 0 (" + desiredLivingSpace + ")";
 		if (!household.hasDwelling()) {
 			if (dwelling == null) {
 				// Household has no dwelling and no alternative dwelling was given -> currentLivingSpace stays = 0
@@ -42,12 +40,12 @@ public class DesiredLivingSpace extends ResidentialSatisfactionComponent {
 				currentLivingSpace = dwelling.getDwellingSize();
 			}
 		}
-		assert currentLivingSpace >= 0 : "Current living space < 0 (" + currentLivingSpace + ") for household " + household.getId();
+		assert currentLivingSpace >= 0 : "Current living space < 0 (" + currentLivingSpace + ")";
 		result = (short) Math.round(currentLivingSpace * 1000 / desiredLivingSpace);
 		if (result > 1000)
 			return 1000;
 		assert result >= 0 : "rsDesiredLivingSpace out of range (" + result + ")";
-		household.rsDesiredLivingSpace = result;
+		household.setRsDesiredLivingSpace(result);
 		return result;
 	}
 }
