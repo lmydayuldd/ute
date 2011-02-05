@@ -37,12 +37,12 @@ public class OutputHouseholdRow implements OutputRow {
 		this.aspirationRegionLivingSpaceMin = household.getAspirationRegionLivingSpaceMin();
 		this.aspirationRegionLivingSpaceMax = household.getAspirationRegionLivingSpaceMax();
 		this.currentResidentialSatisfaction = household.getCurrentResidentialSatisfaction();
-		this.rsUdpCentrality = household.rsUdpCentrality;
-		this.rsUdpPublicTransportAccessibility = household.rsUdpPublicTransportAccessibility;
-		this.rsCostEffectiveness = household.rsCostEffectiveness;
-		this.rsEnvironmentalAmenities = household.rsEnvironmentalAmenities;
-		this.rsSocialPrestige = household.rsSocialPrestige;
-		this.rsDesiredLivingSpace = household.rsDesiredLivingSpace;
+		this.rsUdpCentrality = household.getRsUdpCentrality();
+		this.rsUdpPublicTransportAccessibility = household.getRsUdpPublicTransportAccessibility();
+		this.rsCostEffectiveness = household.getRsCostEffectiveness();
+		this.rsEnvironmentalAmenities = household.getRsEnvironmentalAmenities();
+		this.rsSocialPrestige = household.getRsSocialPrestige();
+		this.rsDesiredLivingSpace = household.getRsDesiredLivingSpace();
 	}
 	/* (non-Javadoc)
 	 * @see at.sume.dm.model.output.OutputRow#toCsv()

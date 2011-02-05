@@ -303,18 +303,29 @@ public class Main {
 					for (int spatialUnitId : potentialTargetSpatialUnitIds) {
 						SpatialUnitRow spatialUnit = spatialUnits.getSpatialUnit(spatialUnitId);
 						if (spatialUnit.isFreeDwellingsAlwaysAvailable()) {
+// TODO: spatial unit 3 is always the first in the list -> all households move away - change this behavior by sorting the spatial units by some preference score.
 							// Household moves away
 							hhMovedAway++;
 							household.remove(dwellingsOnMarket);
+							dwelling = null;
+							break;
 						} else {
-							dwelling = dwellingsOnMarket.getDwelling(spatialUnitId, household.getAspirationRegionLivingSpaceMin(), household.getAspirationRegionLivingSpaceMax());
-							if (dwelling != null)
+							dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, household, true, modelYear);
+							if (dwelling != null) {
 								break;
+							} else {
+								switch (dwellingsOnMarket.getNoDwellingFoundReason()) {
+								case NO_SATISFACTION:
+									hhNoSatisfaction++;
+									break;
+								default:
+									hhFoundNoDwellings++;
+									break;
+								}
+							}
 						}
 					}
-					if (dwelling == null) {
-						hhFoundNoDwellings++;
-					} else {
+					if (dwelling != null) {
 						household.relocate(dwellingsOnMarket, dwelling);
 					}
 					/*
@@ -330,9 +341,9 @@ public class Main {
 					if ((maxResidentialSatisfactionEstimate > household.getCurrentResidentialSatisfaction()) || (Common.getAlwaysLookForDwellings() != 0)) {
 						// do the extra mile and look for a dwelling
 						DwellingRow suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, true);
-						if (suitableDwelling == null) {
-							suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, true);
-						}
+//						if (suitableDwelling == null) {
+//							suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, true);
+//						}
 						household.clearResidentialSatisfactionEstimate();
 						if (suitableDwelling != null) {
 							household.relocate(dwellingsOnMarket, suitableDwelling);
@@ -370,7 +381,7 @@ public class Main {
 					// Household can't afford even the lowest rent -> we choose a dwelling in one of the cheapest spatial units available
 					DwellingRow dwelling = null;
 					for (long spatialUnitId : cheapestSpatialUnits) {
-						dwelling = dwellingsOnMarket.getDwelling(spatialUnitId, (short) 0, household.getAspirationRegionLivingSpaceMax());
+						dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, (short) 0, household.getAspirationRegionLivingSpaceMax());
 						if (dwelling != null)
 							break;
 					}
@@ -378,7 +389,7 @@ public class Main {
 					if (dwelling == null) {
 						hhNoCheapDwelling++;
 						for (long spatialUnitId : cheapestSpatialUnits) {
-							dwelling = dwellingsOnMarket.getDwelling(spatialUnitId, (short) 0, household.getAspirationRegionLivingSpaceMax());
+							dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, (short) 0, household.getAspirationRegionLivingSpaceMax());
 							if (dwelling != null)
 								break;
 						}

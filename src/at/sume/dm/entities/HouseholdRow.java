@@ -17,6 +17,8 @@ import at.sume.dm.Common;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
+import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionDwellingProperties;
+import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionHouseholdProperties;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
@@ -25,7 +27,7 @@ import at.sume.dm.types.IncomeGroup;
  * @author Alexander Remesch
  *
  */
-public class HouseholdRow extends RecordSetRowFileable<Households> {
+public class HouseholdRow extends RecordSetRowFileable<Households> implements ResidentialSatisfactionHouseholdProperties {
 	private class SpatialUnitScore {
 		private long spatialUnitId;
 		private long score;
@@ -86,12 +88,12 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 	private ArrayList<SpatialUnitScore> residentialSatisfactionEstimate;
 	private short currentResidentialSatisfaction;
 	// residential satisfaction components
-	public short rsUdpCentrality;
-	public short rsUdpPublicTransportAccessibility;
-	public short rsCostEffectiveness;
-	public short rsEnvironmentalAmenities;
-	public short rsSocialPrestige;
-	public short rsDesiredLivingSpace;
+	private short rsUdpCentrality;
+	private short rsUdpPublicTransportAccessibility;
+	private short rsCostEffectiveness;
+	private short rsEnvironmentalAmenities;
+	private short rsSocialPrestige;
+	private short rsDesiredLivingSpace;
 	
 	/**
 	 * 
@@ -696,6 +698,19 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 		return result;
 	}
 	/**
+	 * Estimate the residential satisfaction for the given spatial unit and a certain dwelling specification
+	 * 
+	 * @param spatialUnit
+	 * @param dwellingSpec
+	 * @param modelYear
+	 * @return
+	 */
+	public int estimateResidentialSatisfaction(ResidentialSatisfactionDwellingProperties dwellingSpec, int modelYear) {
+		// TODO: introduce random factor into score (sysparam ~10%?)
+		int residentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(this, dwellingSpec, modelYear); 
+		return residentialSatisfaction;
+	}
+	/**
 	 * Build the array of residential satisfaction estimates for a household (sam as in function
 	 * estimateResidentialSatisfaction()) but set all residential satisfactions to the same value.
 	 * This is useful for getting a dwelling for a household that can't afford and will take any
@@ -760,9 +775,9 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 		if (hasDwelling())
 			dwellingsOnMarket.putDwellingOnMarket(getDwelling());
 		// Remove household members as well
-		for (PersonRow member : members) {
-			member.remove();
-		}
+//		for (PersonRow member : members) {
+//			member.remove();
+//		}
 		super.remove();
 	}
 
@@ -788,6 +803,91 @@ public class HouseholdRow extends RecordSetRowFileable<Households> {
 	public short getCurrentResidentialSatisfaction() {
 		return currentResidentialSatisfaction;
 	}
+	/**
+	 * @return the rsUdpCentrality
+	 */
+	public short getRsUdpCentrality() {
+		return rsUdpCentrality;
+	}
+
+	/**
+	 * @param rsUdpCentrality the rsUdpCentrality to set
+	 */
+	public void setRsUdpCentrality(short rsUdpCentrality) {
+		this.rsUdpCentrality = rsUdpCentrality;
+	}
+
+	/**
+	 * @return the rsUdpPublicTransportAccessibility
+	 */
+	public short getRsUdpPublicTransportAccessibility() {
+		return rsUdpPublicTransportAccessibility;
+	}
+
+	/**
+	 * @param rsUdpPublicTransportAccessibility the rsUdpPublicTransportAccessibility to set
+	 */
+	public void setRsUdpPublicTransportAccessibility(
+			short rsUdpPublicTransportAccessibility) {
+		this.rsUdpPublicTransportAccessibility = rsUdpPublicTransportAccessibility;
+	}
+
+	/**
+	 * @return the rsCostEffectiveness
+	 */
+	public short getRsCostEffectiveness() {
+		return rsCostEffectiveness;
+	}
+
+	/**
+	 * @param rsCostEffectiveness the rsCostEffectiveness to set
+	 */
+	public void setRsCostEffectiveness(short rsCostEffectiveness) {
+		this.rsCostEffectiveness = rsCostEffectiveness;
+	}
+
+	/**
+	 * @return the rsEnvironmentalAmenities
+	 */
+	public short getRsEnvironmentalAmenities() {
+		return rsEnvironmentalAmenities;
+	}
+
+	/**
+	 * @param rsEnvironmentalAmenities the rsEnvironmentalAmenities to set
+	 */
+	public void setRsEnvironmentalAmenities(short rsEnvironmentalAmenities) {
+		this.rsEnvironmentalAmenities = rsEnvironmentalAmenities;
+	}
+
+	/**
+	 * @return the rsSocialPrestige
+	 */
+	public short getRsSocialPrestige() {
+		return rsSocialPrestige;
+	}
+
+	/**
+	 * @param rsSocialPrestige the rsSocialPrestige to set
+	 */
+	public void setRsSocialPrestige(short rsSocialPrestige) {
+		this.rsSocialPrestige = rsSocialPrestige;
+	}
+
+	/**
+	 * @return the rsDesiredLivingSpace
+	 */
+	public short getRsDesiredLivingSpace() {
+		return rsDesiredLivingSpace;
+	}
+
+	/**
+	 * @param rsDesiredLivingSpace the rsDesiredLivingSpace to set
+	 */
+	public void setRsDesiredLivingSpace(short rsDesiredLivingSpace) {
+		this.rsDesiredLivingSpace = rsDesiredLivingSpace;
+	}
+
 	/**
 	 * Does the household have a dwelling?
 	 * @return

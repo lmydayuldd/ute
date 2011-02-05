@@ -10,6 +10,7 @@ import java.util.Random;
 import at.sume.dm.Common;
 import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.Dwellings;
+import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.types.LivingSpaceGroup6;
 
@@ -51,6 +52,7 @@ public class DwellingsOnMarket {
 	private SpatialUnits spatialUnits;
 	private ArrayList<DwellingRow> suitableDwellings;
 	private boolean headLineWritten = false;
+	private NoDwellingFoundReason noDwellingFoundReason = NoDwellingFoundReason.NO_REASON;
 
 	@SuppressWarnings("unchecked")
 	public DwellingsOnMarket(Dwellings dwellings, SpatialUnits spatialUnits, int dwellingsOnMarketShare) {
@@ -91,17 +93,19 @@ public class DwellingsOnMarket {
 	 * @param minSize the minimum size of the dwellings
 	 * @param maxSize the maximum size of the dwellings
 	 * @param maxYearlyPricePerSqm the maximum yearly price per m² for the dwellings
+	 * @return 
 	 */
-	public void selectSuitableDwellingsOnMarket(long spatialUnitId, int minSize, int maxSize, long maxYearlyPricePerSqm) {
+	public int selectSuitableDwellingsOnMarket(long spatialUnitId, int minSize, int maxSize, long maxYearlyPricePerSqm) {
 		ArrayList<DwellingRow> allDwellingsPerArea = getDwellingsOnMarket(spatialUnitId);
 		suitableDwellings = new ArrayList<DwellingRow>();
 		for (DwellingRow dwelling : allDwellingsPerArea) {
 			if ((minSize <= dwelling.getDwellingSize()) && 
 					(dwelling.getDwellingSize() <= maxSize) && 
-					((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= maxYearlyPricePerSqm)) {
+					((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= maxYearlyPricePerSqm) || (maxYearlyPricePerSqm < 0)) {
 				suitableDwellings.add(dwelling);
 			}
 		}
+		return suitableDwellings.size();
 	}
 	/**
 	 * Select a list of available dwellings from a list of spatial units within a defined size range and
@@ -116,10 +120,15 @@ public class DwellingsOnMarket {
 	public int selectSuitableDwellingsOnMarket(ArrayList<Long> spatialUnitIdList, short minSize, short maxSize, long maxYearlyPricePerSqm) {
 		suitableDwellings = new ArrayList<DwellingRow>();
 		for (long spatialUnitId : spatialUnitIdList) {
-			DwellingRow dwelling = getDwelling(spatialUnitId, minSize, maxSize, maxYearlyPricePerSqm);
-			if (dwelling != null) {
-				suitableDwellings.add(dwelling);
-			}
+			selectSuitableDwellingsOnMarket(spatialUnitId, minSize, maxSize, maxYearlyPricePerSqm);
+//			ArrayList<DwellingRow> allDwellingsPerArea = getDwellingsOnMarket(spatialUnitId);
+//			for (DwellingRow dwelling : allDwellingsPerArea) {
+//				if ((minSize <= dwelling.getDwellingSize()) && 
+//						(dwelling.getDwellingSize() <= maxSize) &&
+//						((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= maxYearlyPricePerSqm) || (maxYearlyPricePerSqm < 0)) {
+//					suitableDwellings.add(dwelling);
+//				}
+//			}
 		}
 		return suitableDwellings.size();
 	}
@@ -152,7 +161,7 @@ public class DwellingsOnMarket {
 	 * @param livingSpaceGroup6Id
 	 * @return
 	 */
-	public DwellingRow getDwelling(long spatialUnitId, byte livingSpaceGroup6Id) {
+	public DwellingRow getFirstMatchingDwelling(long spatialUnitId, byte livingSpaceGroup6Id) {
 		ArrayList<DwellingRow> dwellings =  dwellingsOnMarketList[spatialUnitArrayPosition(spatialUnitId)];
 		for (DwellingRow dwelling : dwellings) {
 			if (dwelling.getLivingSpaceGroup6Id() == livingSpaceGroup6Id)
@@ -167,7 +176,7 @@ public class DwellingsOnMarket {
 	 * @param maxSize
 	 * @return
 	 */
-	public DwellingRow getDwelling(long spatialUnitId, short minSize, short maxSize, long maxYearlyPricePerSqm) {
+	public DwellingRow getFirstMatchingDwelling(long spatialUnitId, short minSize, short maxSize, long maxYearlyPricePerSqm) {
 		ArrayList<DwellingRow> allDwellingsPerArea = getDwellingsOnMarket(spatialUnitId);
 		for (DwellingRow dwelling : allDwellingsPerArea) {
 			if ((minSize <= dwelling.getDwellingSize()) && 
@@ -185,8 +194,42 @@ public class DwellingsOnMarket {
 	 * @param maxSize
 	 * @return
 	 */
-	public DwellingRow getDwelling(long spatialUnitId, short minSize, short maxSize) {
-		return getDwelling(spatialUnitId, minSize, maxSize, -1);
+	public DwellingRow getFirstMatchingDwelling(long spatialUnitId, short minSize, short maxSize) {
+		return getFirstMatchingDwelling(spatialUnitId, minSize, maxSize, -1);
+	}
+	/**
+	 * Get the first available (free) dwelling that matches the given parameters
+	 * 
+	 * @param spatialUnitId Spatial unit to search dwellings in
+	 * @param household Properties of the household looking for the dwelling
+	 * @param compareDwellingCosts True if the dwelling costs shall be considered in the comparison
+	 * @param modelYear
+	 * @return
+	 */
+	public DwellingRow getFirstMatchingDwelling(long spatialUnitId, HouseholdRow household, boolean compareDwellingCosts, int modelYear) {
+		ArrayList<DwellingRow> allDwellingsPerArea = getDwellingsOnMarket(spatialUnitId);
+		for (DwellingRow dwelling : allDwellingsPerArea) {
+			if ((household.getAspirationRegionLivingSpaceMin() <= dwelling.getDwellingSize()) && 
+					(dwelling.getDwellingSize() <= household.getAspirationRegionLivingSpaceMax()) && 
+					((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= household.getAspirationRegionMaxCosts()) || (!compareDwellingCosts)) {
+				if (household.getCurrentResidentialSatisfaction() < household.estimateResidentialSatisfaction(dwelling, modelYear)) {
+					return dwelling;
+				} else {
+					noDwellingFoundReason = NoDwellingFoundReason.NO_SATISFACTION;
+				}
+			}
+		}
+		if (noDwellingFoundReason == NoDwellingFoundReason.NO_REASON)
+			noDwellingFoundReason = NoDwellingFoundReason.NO_SUITABLE_DWELLING;
+		return null;
+	}
+	/**
+	 * Return the reason why no dwelling was found by getFirstMatchingDwelling()
+	 * 
+	 * @return
+	 */
+	public NoDwellingFoundReason getNoDwellingFoundReason() {
+		return noDwellingFoundReason;
 	}
 	public void putDwellingOnMarket(DwellingRow dwelling) {
 		int su = spatialUnits.indexOf(dwelling.getSpatialunit());

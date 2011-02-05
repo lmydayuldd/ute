@@ -9,12 +9,13 @@ import java.sql.SQLException;
 import net.remesch.db.Sequence;
 import net.remesch.db.schema.Ignore;
 import at.sume.db.RecordSetRowFileable;
+import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionDwellingProperties;
 
 /**
  * @author Alexander Remesch
  *
  */
-public class DwellingRow extends RecordSetRowFileable<Dwellings> {
+public class DwellingRow extends RecordSetRowFileable<Dwellings> implements ResidentialSatisfactionDwellingProperties {
 	private int dwellingId;
 	private int spatialunitId;
 	@Ignore
