@@ -299,7 +299,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		int numAdults = 0, adultMaxAge = 0, adultMinAge = 255, femAdultMaxAge = 0, femAdultMinAge = 255;
 		boolean adultMale = false, adultFemale = false;
 		for (PersonRow member : members) {
-			if (member.getAge() >= 19) {
+			if (member.getAge() >= 18) {
 				numAdults++;
 				if (member.getAge() > adultMaxAge)
 					adultMaxAge = member.getAge();
@@ -320,7 +320,11 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		switch (numAdults) {
 		case 0:
 //			System.out.println("Household " + getHouseholdId() + " unexpectedly consisting only of children (" + getHouseholdSize() + " persons).");
-			this.householdType = HouseholdType.OTHER;
+			if (getHouseholdSize() > 1) {
+				this.householdType = HouseholdType.OTHER;
+			} else {
+				this.householdType = HouseholdType.SINGLE_YOUNG;
+			}
 			break;
 		case 1:
 			assert getHouseholdSize() >= numAdults : "Counted " + numAdults + " adult(s) but household size = " + getHouseholdSize();
