@@ -5,16 +5,18 @@ package at.sume.dm.indicators;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.indicators.base.Indicator;
+import at.sume.dm.model.output.Fileable;
 
 /**
  * @author Alexander Remesch
  *
  */
 public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
-	private static class BaseIndicators implements Comparable<BaseIndicators> {
+	private static class BaseIndicators implements Comparable<BaseIndicators>, Fileable {
 		private int spatialUnitId;
 		private int householdCount;
 		private int personCount;
@@ -84,6 +86,16 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 		@Override
 		public int compareTo(BaseIndicators arg0) {
 			return ((Integer)spatialUnitId).compareTo(arg0.getSpatialUnitId());
+		}
+		@Override
+		public String toCsvHeadline(String delimiter) {
+			// TODO Auto-generated method stub
+			throw new AssertionError("not yet implemented");
+		}
+		@Override
+		public String toString(String delimiter) {
+			// TODO Auto-generated method stub
+			throw new AssertionError("not yet implemented");
 		}
 	}
 
@@ -187,5 +199,10 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 		} else {
 			return 0;
 		}
+	}
+
+	@Override
+	public List<? extends Fileable> getIndicatorList() {
+		return indicatorList;
 	}
 }

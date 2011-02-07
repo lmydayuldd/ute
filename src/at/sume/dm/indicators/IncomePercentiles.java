@@ -5,10 +5,12 @@ package at.sume.dm.indicators;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.indicators.base.Indicator;
+import at.sume.dm.model.output.Fileable;
 
 /**
  * @author Alexander Remesch
@@ -83,5 +85,9 @@ public class IncomePercentiles implements Indicator<HouseholdRow> {
 		}
 		int index = Math.round((personIncomes.size() - 1) * percentage / 100);
 		return personIncomes.get(index);
+	}
+	@Override
+	public List<? extends Fileable> getIndicatorList() {
+		throw new AssertionError("not applicable here");
 	}
 }

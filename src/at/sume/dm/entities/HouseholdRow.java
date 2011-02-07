@@ -180,8 +180,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	/**
 	 * @return the householdSize
 	 */
-	public short getHouseholdSize() {
-		return (short) members.size();
+	public byte getHouseholdSize() {
+		return (byte) members.size();
 	}
 
 //	/**
@@ -508,7 +508,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	/**
 	 * @return the livingSpaceGroupId of the dwelling
 	 */
-	public short getLivingSpaceGroupId() {
+	public byte getLivingSpaceGroupId() {
 		assert dwelling != null : "no dwelling for household " + getHouseholdId();
 		return dwelling.getLivingSpaceGroup6Id();
 	}

@@ -233,7 +233,7 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 		}
 	}
 	
-	public static ArrayList<BaseIndicators> getIndicatorList() {
+	public ArrayList<BaseIndicators> getIndicatorList() {
 		return indicatorList;
 	}
 }

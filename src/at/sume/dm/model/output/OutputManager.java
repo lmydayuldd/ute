@@ -3,7 +3,6 @@
  */
 package at.sume.dm.model.output;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -38,15 +37,15 @@ public class OutputManager {
 	/**
 	 * 
 	 * @param path
-	 * @param households
-	 * @param dwellings
-	 * @param persons
-	 * @throws FileNotFoundException 
+	 * @param fileNameList
+	 * @param fileableList
 	 */
-	public OutputManager(String path, List<List<? extends Fileable>> fileableList) {
+	public OutputManager(String path, List<String> fileNameList, List<List<? extends Fileable>> fileableList) {
+		assert fileNameList.size() == fileableList.size() : "fileNameList is longer/shorter than fileableList";
 		fileOutputList = new ArrayList<FileOutput>();
+		int i = 0;
 		for (List<? extends Fileable> fileable : fileableList) {
-			add(path, fileable);
+			add(path, fileNameList.get(i++), fileable);
 		}
 //		fileOutputHouseholds = new FileOutput(path, "households", households.getRowList());
 //		fileOutputPersons = new FileOutput(path, "persons", persons.getRowList());
@@ -58,10 +57,11 @@ public class OutputManager {
 	 * @param path
 	 * @param fileable
 	 */
-	public void add(String path, List<? extends Fileable> fileable) {
-		assert fileable.size() > 0 : "List fileable is empty!";
-		String entityName = fileable.get(0).getClass().getSimpleName();
-		FileOutput fileoutput = new FileOutput(path, entityName, fileable);
+	public void add(String path, String fileName, List<? extends Fileable> fileable) {
+		// Fileable list may yet be empty (in case of indicators)
+//		assert fileable.size() > 0 : "List fileable is empty!";
+//		String entityName = fileable.get(0).getClass().getSimpleName();
+		FileOutput fileoutput = new FileOutput(path, fileName, fileable);
 		fileOutputList.add(fileoutput);
 	}
 	/**

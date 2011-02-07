@@ -114,13 +114,22 @@ public class Main {
         System.out.println(printInfo() + ": determined all household types");
 
         List<List<? extends Fileable>> fileableList = new ArrayList<List<? extends Fileable>>();
-        fileableList.add((List<? extends Fileable>) households.getRowList());
-        fileableList.add((List<? extends Fileable>) dwellings.getRowList());
-        fileableList.add((List<? extends Fileable>) persons.getRowList());
-        fileableList.add((List<? extends Fileable>) RentPerSpatialUnit.getRentPerSpatialUnit());
-        // TODO: change AllHouseholdsIndicatorManager from enum to class to use FileOutput
-//        fileableList.add((List<? extends Fileable>) AllHouseholdsIndicatorManager.INDICATORS_PER_HOUSEHOLDTYPE_AND_INCOME.getIndicator().getIndicatorList());
-        outputManager = new OutputManager(Common.getPathOutput(), fileableList);
+        List<String> fileNameList = new ArrayList<String>();
+        fileableList.add(households.getRowList());
+        fileNameList.add("Households");
+        fileableList.add(dwellings.getRowList());
+        fileNameList.add("Dwellings");
+        fileableList.add(persons.getRowList());
+        fileNameList.add("Persons");
+        fileableList.add(RentPerSpatialUnit.getRentPerSpatialUnit());
+        fileNameList.add("RentPerSpatialUnit");
+        fileableList.add(AllHouseholdsIndicatorManager.INDICATORS_PER_HOUSEHOLDTYPE_AND_INCOME.getIndicator().getIndicatorList());
+        fileNameList.add("IndicatorsPerHouseholdTypeAndIncome");
+        fileableList.add(AllHouseholdsIndicatorManager.AGGREGATED_HOUSEHOLDS.getIndicator().getIndicatorList());
+        fileNameList.add("AggregatedHouseholds");
+        fileableList.add(AllHouseholdsIndicatorManager.AGGREGATED_PERSONS.getIndicator().getIndicatorList());
+        fileNameList.add("AggregatedPersons");
+        outputManager = new OutputManager(Common.getPathOutput(), fileNameList, fileableList);
         initOutputFreeDwellings();
         
 		// Model main loop
@@ -190,7 +199,7 @@ public class Main {
 		int modelStartYear = Common.getModelStartYear();
 		int modelEndYear = modelStartYear + iterations;
 		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
-	        // this must be done each model year because with add/remove it is a problem when the age of a person changes
+	        // (Re)build household indicators - this must be done each model year because with add/remove it is a problem when the age of a person changes
 			buildIndicators();			
 	        System.out.println(printInfo() + ": build of model indicators complete");
 	        outputManager.output((short) modelYear);
@@ -206,12 +215,6 @@ public class Main {
 				if (j % 100000 == 0) {
 					System.out.println(printInfo() + ": Processing household " + j + " of " + households.size() + " in year " + modelYear + ", nr. of persons: " + persons.size());
 				}
-				
-				// Remove household from all indicators in its original state
-				// the disadvantage of this solution is that the currently processed household
-				// is missing in the indicators while it is processed - the up side is we don't need a clone-method
-				// maybe its more realistic anyway but the effect of this should be limited
-//				AllHouseholdsIndicatorManager.removeHousehold(household);
 				
 				// Process demographic events for all household members
 				ArrayList<PersonRow> p_helper = (ArrayList<PersonRow>) ((ArrayList<PersonRow>) household.getMembers()).clone();
@@ -256,13 +259,8 @@ public class Main {
 					// TODO: add potential mover to the indicators
 				}
 				
-				// Add potentially changed household to the indicators
-//				AllHouseholdsIndicatorManager.addHousehold(household);
-				
 				j++;
 			}
-//			// Save changes
-//			households = hh_helper;
 			// Update rent prices for each spatial unit from last years data (from the movers indicators)
 			// from the second year on
 //			CostEffectiveness costEffectiveness = (CostEffectiveness)ResidentialSatisfactionManager.COSTEFFECTIVENESS.getComponent();
@@ -340,39 +338,6 @@ public class Main {
 						}
 					}
 					noDwellingFoundReason = NoDwellingFoundReason.NO_REASON;
-					/*
-					// b) compare estimated residential satisfaction in these spatial units and select the highest scoring 
-					//    spatial units (random component for each unit, number of units selected as sysparam)
-					ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
-					int maxResidentialSatisfactionEstimate = household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
-					// c) look for a configurable number of randomly chosen dwellings in these units and compute residential satisfaction. take the first
-					//    dwelling with a higher result than the current dwelling (= satisfying). limit the number of dwellings
-					//    considered (sysparam)
-					// do this only, if the potential residential satisfaction is higher than the current
-					// residential satisfaction - otherwise save computing time! (depending on a sysparam)
-					if ((maxResidentialSatisfactionEstimate > household.getCurrentResidentialSatisfaction()) || (Common.getAlwaysLookForDwellings() != 0)) {
-						// do the extra mile and look for a dwelling
-						DwellingRow suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, true);
-//						if (suitableDwelling == null) {
-//							suitableDwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, true);
-//						}
-						household.clearResidentialSatisfactionEstimate();
-						if (suitableDwelling != null) {
-							household.relocate(dwellingsOnMarket, suitableDwelling);
-						} else {
-	//						if (!residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket)) {
-							// if number of maximum search years reached - stop searching
-							//household.redefineAspirations();
-							hhFoundNoDwellings++;
-						}
-						// TODO: what happens if the household didn't find a new dwelling?
-						// depending on whether this was a forced move the household could stay at its current residence or vanish (= move outside)
-					} else {
-						// TODO: what to do if the estimated residential satisfaction is not higher than
-						// the current one - household stays (except on a forced move)
-						hhNoSatisfaction++;
-					}
-					*/
 				}
 				j++;
 			}
@@ -456,14 +421,12 @@ public class Main {
 			persons.aging();
 		} // model year
 	}
-	
+	/**
+	 * Rebuild Household Indicators (AllHouseholdsIndicatorManager) 
+	 */
 	public static void buildIndicators() {
-//		int j = 0;
 		AllHouseholdsIndicatorManager.resetIndicators();
 		for (HouseholdRow household : households) {
-//			if (++j % 10000 == 0) {
-//				System.out.println(printInfo() + ": Added household " + j + " of " + households.size() + " to indicators");
-//			}
 			AllHouseholdsIndicatorManager.addHousehold(household);
 			PercentileIndicatorManager.addHousehold(household);
 		}

@@ -49,7 +49,8 @@ public class IncomeGroup {
 				return i.id;
 			}
 		}
-		return 0;
+		throw new AssertionError("No income group for income " + income + " found");
+//		return 0;
 	}
 	/**
 	 * Get the printable name of a certain income group by direct access to ArrayList

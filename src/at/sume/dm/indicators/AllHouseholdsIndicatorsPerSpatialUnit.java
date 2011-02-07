@@ -5,9 +5,11 @@ package at.sume.dm.indicators;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.indicators.base.Indicator;
+import at.sume.dm.model.output.Fileable;
 
 /**
  * @author Alexander Remesch
@@ -15,7 +17,7 @@ import at.sume.dm.indicators.base.Indicator;
  */
 public class AllHouseholdsIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 	// TODO: find common base class with ResidentialObjectRent
-	private static class BaseIndicators implements Comparable<BaseIndicators> {
+	private static class BaseIndicators implements Comparable<BaseIndicators>, Fileable {
 		private long spatialUnitId;
 		private long householdCount;
 		private long personCount;
@@ -141,6 +143,14 @@ public class AllHouseholdsIndicatorsPerSpatialUnit implements Indicator<Househol
 		@Override
 		public int compareTo(BaseIndicators arg0) {
 			return ((Long)spatialUnitId).compareTo(arg0.getSpatialUnitId());
+		}
+		@Override
+		public String toCsvHeadline(String delimiter) {
+			throw new AssertionError("not yet implemented");
+		}
+		@Override
+		public String toString(String delimiter) {
+			throw new AssertionError("not yet implemented");
 		}
 	}
 	private static ArrayList<BaseIndicators> indicatorList;
@@ -287,5 +297,10 @@ public class AllHouseholdsIndicatorsPerSpatialUnit implements Indicator<Househol
 			assert b.getHouseholdCount() >= 0 : "IndicatorsPerSpatialUnit.remove() - " + spatialUnitId + ": householdCount < 0";
 			assert b.getPersonCount() >= 0 : "IndicatorsPerSpatialUnit.remove() - " + spatialUnitId + ": personCount < 0";
 		}
+	}
+
+	@Override
+	public List<? extends Fileable> getIndicatorList() {
+		return indicatorList;
 	}
 }

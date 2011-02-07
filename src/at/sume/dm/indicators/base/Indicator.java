@@ -3,7 +3,10 @@
  */
 package at.sume.dm.indicators.base;
 
+import java.util.List;
+
 import at.sume.db.RecordSetRow;
+import at.sume.dm.model.output.Fileable;
 
 /**
  * @author Alexander Remesch
@@ -15,16 +18,18 @@ import at.sume.db.RecordSetRow;
 public interface Indicator<T extends RecordSetRow<?>> {
 	/**
 	 * Add data of a household to the set of indicators
-	 * @param hh
+	 * @param entity
 	 */
-	public void add(T hh);
+	public void add(T entity);
 	/**
 	 * Remove data of a household from the set of indicators
-	 * @param hh
+	 * @param entity
 	 */
-	public void remove(T hh);
+	public void remove(T entity);
 	/**
 	 * Reset the set of indicators to zero
 	 */
 	public void clear();
+	
+	public List<? extends Fileable> getIndicatorList();
 }

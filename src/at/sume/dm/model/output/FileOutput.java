@@ -31,7 +31,7 @@ public class FileOutput {
 	 */
 	@SuppressWarnings("unchecked")
 	public FileOutput(String path, String fileName, List<? extends Fileable> rowList) {
-		assert rowList.size() > 0 : "rowList cannot be empty!";
+//		assert rowList.size() > 0 : "rowList cannot be empty!";
 		this.rowList = (ArrayList<Fileable>) rowList;
 		if (path != null)
 			if (path.endsWith("\\"))
