@@ -15,18 +15,19 @@ public class FileUtil {
 		File file = new File(fileName);
 		if (file.exists()) {
 			int x = fileName.lastIndexOf('.');
-			String newFileName = "";
+			String newFileName = "", newExtension = "";
 			if (x == -1) {
 				newFileName = fileName + "_" + DateUtil.now("MMdd");
 			} else {
-				newFileName = fileName.substring(0, x) + "_" + DateUtil.now("MMdd") + fileName.substring(x);
+				newFileName = fileName.substring(0, x) + "_" + DateUtil.now("MMdd");
+				newExtension = fileName.substring(x);
 			}
-			File newFile = new File(newFileName);
+			File newFile = new File(newFileName + newExtension);
 			Integer i = 1;
 			if (newFile.exists()) {
 				NumberFormat numberFormat = new DecimalFormat("000");
 				while (newFile.exists()) {
-					String newFileNameCount = newFileName + numberFormat.format(i);
+					String newFileNameCount = newFileName + "_" + numberFormat.format(i) + newExtension;
 					newFile = new File(newFileNameCount);
 					i++;
 				}

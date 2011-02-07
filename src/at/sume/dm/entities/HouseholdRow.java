@@ -29,31 +29,44 @@ import at.sume.dm.types.IncomeGroup;
  */
 public class HouseholdRow extends RecordSetRowFileable<Households> implements ResidentialSatisfactionHouseholdProperties {
 	private class SpatialUnitScore {
-		private long spatialUnitId;
-		private long score;
+		private int spatialUnitId;
+		private int score;
+		private int modifier;
 		/**
 		 * @return the spatialUnitId
 		 */
-		public long getSpatialUnitId() {
+		public int getSpatialUnitId() {
 			return spatialUnitId;
 		}
 		/**
 		 * @param spatialUnitId the spatialUnitId to set
 		 */
-		public void setSpatialUnitId(long spatialUnitId) {
+		public void setSpatialUnitId(int spatialUnitId) {
 			this.spatialUnitId = spatialUnitId;
 		}
 		/**
 		 * @return the score
 		 */
-		public long getScore() {
+		public int getScore() {
 			return score;
 		}
 		/**
 		 * @param score the score to set
 		 */
-		public void setScore(long score) {
+		public void setScore(int score) {
 			this.score = score;
+		}
+		/**
+		 * @return the modifier
+		 */
+		public int getModifier() {
+			return modifier;
+		}
+		/**
+		 * @param modifier the modifier to set
+		 */
+		public void setModifier(int modifier) {
+			this.modifier = modifier;
 		}
 	}
 	
@@ -63,7 +76,12 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		 */
 		@Override
 		public int compare(SpatialUnitScore arg0, SpatialUnitScore arg1) {
-			return ((Long)arg0.getScore()).compareTo(arg1.getScore());
+//			int result = ((Integer)arg0.getScore()).compareTo(arg1.getScore());
+//			if (result == 0) {
+//				return ((Integer)arg0.getModifier()).compareTo(arg1.getModifier());
+//			}
+//			return (result);
+			return ((Integer)(arg0.getScore() + arg0.getModifier())).compareTo(arg1.getScore() + arg1.getModifier());
 		}
 	}
 	
@@ -681,7 +699,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * @param modelYear
 	 * @return highest residential satisfaction found
 	 */
-	public int estimateResidentialSatisfaction(ArrayList<SpatialUnitRow> spatialUnitList, int modelYear) {
+	public int estimateResidentialSatisfaction(ArrayList<SpatialUnitRow> spatialUnitList, int modelYear, int residentialSatisfactionEstimateRange) {
 		int result = 0;
 		assert spatialUnitList.size() > 0 : "spatialUnitList must be initialized (size > 0)";
 		residentialSatisfactionEstimate = new ArrayList<SpatialUnitScore>(spatialUnitList.size());
@@ -691,6 +709,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			// TODO: introduce random factor into score (sysparam ~10%?)
 			int residentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(this, spatialUnit, modelYear); 
 			s.setScore(residentialSatisfaction);
+			s.setModifier((int) Math.round(Math.random() * residentialSatisfactionEstimateRange * 2 - residentialSatisfactionEstimateRange));
 			residentialSatisfactionEstimate.add(s);
 			if (residentialSatisfaction > result)
 				result = residentialSatisfaction;
@@ -698,15 +717,14 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		return result;
 	}
 	/**
-	 * Estimate the residential satisfaction for the given spatial unit and a certain dwelling specification
+	 * Calculate the residential satisfaction for the given dwelling specification
 	 * 
-	 * @param spatialUnit
 	 * @param dwellingSpec
 	 * @param modelYear
 	 * @return
 	 */
-	public int estimateResidentialSatisfaction(ResidentialSatisfactionDwellingProperties dwellingSpec, int modelYear) {
-		// TODO: introduce random factor into score (sysparam ~10%?)
+	public int calcResidentialSatisfaction(ResidentialSatisfactionDwellingProperties dwellingSpec, int modelYear) {
+		// TODO: Should a random factor be included here as well?
 		int residentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(this, dwellingSpec, modelYear); 
 		return residentialSatisfaction;
 	}
@@ -725,7 +743,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		for (SpatialUnitRow spatialUnit : spatialUnitList) {
 			SpatialUnitScore s = new SpatialUnitScore();
 			s.setSpatialUnitId(spatialUnit.getSpatialUnitId());
-			s.setScore(100);
+			s.setScore(1000);
 			residentialSatisfactionEstimate.add(s);
 		}
 		return 100;
@@ -738,7 +756,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * @return
 	 * TODO: prefer target areas that are close to the current residence
 	 */
-	public ArrayList<Long> getPreferredSpatialUnits(int numSpatialUnits) {
+	public ArrayList<Integer> getPreferredSpatialUnits(int numSpatialUnits) {
 		// sort results descending according to residential satisfaction (find highest scoring spatial units)
 		assert residentialSatisfactionEstimate.size() > 0 : "residentialSatisfactionEstimate must be initialized! (size = 0)";
 		if (residentialSatisfactionEstimate.size() < numSpatialUnits)
@@ -746,11 +764,20 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		Comparator<SpatialUnitScore> compareSpatialUnitScoreDesc = Collections.reverseOrder(new CompareSpatialUnitScore());
 		Collections.sort(residentialSatisfactionEstimate, compareSpatialUnitScoreDesc);
 		// build new array to return
-		ArrayList<Long> ret = new ArrayList<Long>(numSpatialUnits);
+		ArrayList<Integer> ret = new ArrayList<Integer>(numSpatialUnits);
 		for (int i = 0; i != numSpatialUnits; i++) {
 			ret.add(residentialSatisfactionEstimate.get(i).getSpatialUnitId());
 		}
 		return ret;
+	}
+	/**
+	 * Return all spatial units ordered by the level of estimated residential satisfaction
+	 * for the household
+	 * 
+	 * @return
+	 */
+	public ArrayList<Integer> getPreferredSpatialUnits() {
+		return getPreferredSpatialUnits(residentialSatisfactionEstimate.size());
 	}
 	public void clearResidentialSatisfactionEstimate() {
 		residentialSatisfactionEstimate.clear();

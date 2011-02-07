@@ -117,7 +117,7 @@ public class DwellingsOnMarket {
 	 * @param maxYearlyPricePerSqm the maximum yearly price per m² for the dwellings
 	 * @return Number of suitable dwellings found
 	 */
-	public int selectSuitableDwellingsOnMarket(ArrayList<Long> spatialUnitIdList, short minSize, short maxSize, long maxYearlyPricePerSqm) {
+	public int selectSuitableDwellingsOnMarket(ArrayList<Integer> spatialUnitIdList, short minSize, short maxSize, long maxYearlyPricePerSqm) {
 		suitableDwellings = new ArrayList<DwellingRow>();
 		for (long spatialUnitId : spatialUnitIdList) {
 			selectSuitableDwellingsOnMarket(spatialUnitId, minSize, maxSize, maxYearlyPricePerSqm);
@@ -141,7 +141,7 @@ public class DwellingsOnMarket {
 	 * @param maxSize the maximum size of the dwellings
 	 * @return Number of suitable dwellings found
 	 */
-	public int selectSuitableDwellingsOnMarket(ArrayList<Long> spatialUnitIdList, short minSize, short maxSize) {
+	public int selectSuitableDwellingsOnMarket(ArrayList<Integer> spatialUnitIdList, short minSize, short maxSize) {
 		return selectSuitableDwellingsOnMarket(spatialUnitIdList, minSize, maxSize, -1);
 	}
 	/**
@@ -212,7 +212,7 @@ public class DwellingsOnMarket {
 			if ((household.getAspirationRegionLivingSpaceMin() <= dwelling.getDwellingSize()) && 
 					(dwelling.getDwellingSize() <= household.getAspirationRegionLivingSpaceMax()) && 
 					((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= household.getAspirationRegionMaxCosts()) || (!compareDwellingCosts)) {
-				if (household.getCurrentResidentialSatisfaction() < household.estimateResidentialSatisfaction(dwelling, modelYear)) {
+				if (household.getCurrentResidentialSatisfaction() < household.calcResidentialSatisfaction(dwelling, modelYear)) {
 					return dwelling;
 				} else {
 					noDwellingFoundReason = NoDwellingFoundReason.NO_SATISFACTION;

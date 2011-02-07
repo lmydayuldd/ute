@@ -31,6 +31,7 @@ public class Common {
 	private static short movingDecisionMin;
 	private static String pathOutput;
 	private static SpatialUnitLevel spatialUnitLevel;
+	private static int residentialSatisfactionEstimateRange;
 	
 	/**
 	 * @return the iniFilename
@@ -111,6 +112,9 @@ public class Common {
 		return spatialUnitLevel;
 	}
 	
+	public static int getResidentialSatisfactionEstimateRange() {
+		return residentialSatisfactionEstimateRange;
+	}
 	
 	/**
 	 * Get the location of the database from the INI-file
@@ -175,6 +179,7 @@ public class Common {
 		} else {
 			throw new AssertionError("Systemparameter SpatialUnitLevel must be ZB or SGT (is " + sysParam);
 		}
+		residentialSatisfactionEstimateRange = Integer.parseInt(getSysParam("ResidentialSatisfactionEstimateRange"));
 	}
 	
 	/**

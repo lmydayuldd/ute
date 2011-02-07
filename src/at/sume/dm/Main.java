@@ -36,6 +36,7 @@ import at.sume.dm.model.output.Fileable;
 import at.sume.dm.model.output.OutputManager;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_mobility.MinimumIncome;
+import at.sume.dm.model.residential_mobility.NoDwellingFoundReason;
 import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.dm.model.residential_mobility.ResidentialMobility;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
@@ -120,6 +121,7 @@ public class Main {
         // TODO: change AllHouseholdsIndicatorManager from enum to class to use FileOutput
 //        fileableList.add((List<? extends Fileable>) AllHouseholdsIndicatorManager.INDICATORS_PER_HOUSEHOLDTYPE_AND_INCOME.getIndicator().getIndicatorList());
         outputManager = new OutputManager(Common.getPathOutput(), fileableList);
+        initOutputFreeDwellings();
         
 		// Model main loop
 		// - Biographical events for all persons/households
@@ -300,7 +302,11 @@ public class Main {
 						hhLowIncome++;
 				} else {
 					DwellingRow dwelling = null;
-					for (int spatialUnitId : potentialTargetSpatialUnitIds) {
+					ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
+					household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear, Common.getResidentialSatisfactionEstimateRange());
+					ArrayList<Integer> preferredSpatialUnits = household.getPreferredSpatialUnits();
+					NoDwellingFoundReason noDwellingFoundReason = NoDwellingFoundReason.NO_REASON;
+					for (int spatialUnitId : preferredSpatialUnits) {
 						SpatialUnitRow spatialUnit = spatialUnits.getSpatialUnit(spatialUnitId);
 						if (spatialUnit.isFreeDwellingsAlwaysAvailable()) {
 // TODO: spatial unit 3 is always the first in the list -> all households move away - change this behavior by sorting the spatial units by some preference score.
@@ -314,20 +320,26 @@ public class Main {
 							if (dwelling != null) {
 								break;
 							} else {
-								switch (dwellingsOnMarket.getNoDwellingFoundReason()) {
-								case NO_SATISFACTION:
-									hhNoSatisfaction++;
-									break;
-								default:
-									hhFoundNoDwellings++;
-									break;
+								if (dwellingsOnMarket.getNoDwellingFoundReason() != NoDwellingFoundReason.NO_SUITABLE_DWELLING) {
+									noDwellingFoundReason = dwellingsOnMarket.getNoDwellingFoundReason();
 								}
 							}
 						}
 					}
+					household.clearResidentialSatisfactionEstimate();
 					if (dwelling != null) {
 						household.relocate(dwellingsOnMarket, dwelling);
+					} else {
+						switch (noDwellingFoundReason) {
+						case NO_SATISFACTION:
+							hhNoSatisfaction++;
+							break;
+						default:
+							hhFoundNoDwellings++;
+							break;
+						}
 					}
+					noDwellingFoundReason = NoDwellingFoundReason.NO_REASON;
 					/*
 					// b) compare estimated residential satisfaction in these spatial units and select the highest scoring 
 					//    spatial units (random component for each unit, number of units selected as sysparam)
@@ -408,7 +420,7 @@ public class Main {
 					ArrayList<Integer> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
 					if (potentialTargetSpatialUnitIds.size() > 0) {
 						ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
-						household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear);
+						household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear, Common.getResidentialSatisfactionEstimateRange());
 						DwellingRow dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, true);
 						household.clearResidentialSatisfactionEstimate();
 						if (dwelling == null) {
@@ -456,9 +468,8 @@ public class Main {
 			PercentileIndicatorManager.addHousehold(household);
 		}
 	}
-	
-	public static void outputFreeDwellings(int modelYear, String label) throws FileNotFoundException {
-		// TODO: put this in an extra class and delete the file once per model run
+
+	public static String freeDwellingsPathName() {
 		String path = Common.getPathOutput();
 		if (path == null) path = "";
 		String pathName;
@@ -466,7 +477,18 @@ public class Main {
 			pathName = path + "FreeDwellings.csv";
 		else
 			pathName = path + "\\" + "FreeDwellings.csv";
+		return pathName;
+	}
+	
+	public static void initOutputFreeDwellings() {
+		String pathName = freeDwellingsPathName();
+		// TODO: put this in an extra class and delete the file once per model run
 		FileUtil.rotateFile(pathName);
+	}
+	
+	public static void outputFreeDwellings(int modelYear, String label) throws FileNotFoundException {
+		String pathName = freeDwellingsPathName();
+		// TODO: put this in an extra class and delete the file once per model run
 		FileOutputStream freeDwellingsFile = new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(freeDwellingsFile);
 //		ps.println("======= " + label + "=======" + modelYear + "=======");

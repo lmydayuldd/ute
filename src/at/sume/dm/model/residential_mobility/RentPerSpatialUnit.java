@@ -4,9 +4,12 @@
 package at.sume.dm.model.residential_mobility;
 
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Locale;
 
 import at.sume.dm.Common;
 import at.sume.dm.indicators.MoversIndicatorsPerSpatialUnit;
@@ -58,8 +61,11 @@ public class RentPerSpatialUnit {
 		}
 		@Override
 		public String toString(String delimiter) {
+			NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMAN);
+			DecimalFormat df = (DecimalFormat)nf;
 			double monthlyRentPerSqm = ((double) Math.round(yearlyRentPer100Sqm / 12)) / 100.0;
-			return spatialUnitId + delimiter + yearlyRentPer100Sqm + delimiter + ((Double)monthlyRentPerSqm).toString();
+			String output = df.format(monthlyRentPerSqm);
+			return spatialUnitId + delimiter + yearlyRentPer100Sqm + delimiter + output;
 		}
 	}
 
@@ -169,6 +175,7 @@ public class RentPerSpatialUnit {
 		if (numUnits == 0)
 			numUnits = rentPerSpatialUnit.size();
 		ArrayList<Integer> result = new ArrayList<Integer>(numUnits);
+		@SuppressWarnings("unchecked")
 		ArrayList<RentPerSpatialUnitRow> cheapestRents = (ArrayList<RentPerSpatialUnitRow>) rentPerSpatialUnit.clone();
 		Collections.sort(cheapestRents,new CompareYearlyRentPerSqm());
 		for (int i = 0; i != numUnits; i++) {
