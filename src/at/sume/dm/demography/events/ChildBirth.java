@@ -63,8 +63,9 @@ public class ChildBirth extends Event<PersonRow> {
 		} else {
 			child.setSex((byte)1);
 		}
-		entity.getHousehold().addMember(child);
+		household.addMember(child);
 		entity.getPersons().add(child);
+		household.updateHouseholdTypeAfterBirth();
 	}
 	
 	/**

@@ -12,7 +12,7 @@ import net.remesch.db.Database;
  * @author Alexander Remesch
  *
  */
-public abstract class Event<T extends RecordSetRow> {
+public abstract class Event<T extends RecordSetRow<?>> {
 	public Event(Database db, EventManager<T> eventManager) {
 		eventManager.register(this);
 	}

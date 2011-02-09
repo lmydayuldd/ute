@@ -183,4 +183,16 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	public void setSpatialunits(SpatialUnits spatialunits) {
 		this.spatialunits = spatialunits;
 	}
+	/**
+	 * Aging for all persons in all households
+	 */
+	public void aging() {
+		for (HouseholdRow household : rowList) {
+			for (PersonRow person : household.getMembers()) {
+				person.aging();
+			}
+			// Update household type if necessary
+			household.updateHouseholdTypeAfterAging();
+		}
+	}
 }

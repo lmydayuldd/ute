@@ -83,10 +83,4 @@ public class Persons extends RecordSetClonable<PersonRow> {
 	public RecordSetClonable<PersonRow> factory() {
 		return new Persons();
 	}
-	
-	public void aging() {
-		for (PersonRow row : rowList) {
-			row.aging();
-		}
-	}
 }

@@ -149,6 +149,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> {
 	 * @param yearlyIncome the yearlyIncome to set
 	 */
 	public void setYearlyIncome(int yearlyIncome) {
+		assert yearlyIncome >= 0 : "Yearly income must be > 0 (= " + yearlyIncome + ")"; 
 		this.yearlyIncome = yearlyIncome;
 	}
 
@@ -215,6 +216,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> {
 	@Override
 	public void remove() {
 		household.removeMember(this);
+		household.updateHouseholdTypeAfterDeath();
 		recordSet.remove(this);
 	}
 

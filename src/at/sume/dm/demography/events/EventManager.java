@@ -11,7 +11,7 @@ import at.sume.db.RecordSetRow;
  * @author Alexander Remesch
  *
  */
-public class EventManager<E extends RecordSetRow> {
+public class EventManager<E extends RecordSetRow<?>> {
 	private ArrayList<Event<E>> eventHandlers;
 	
 	public EventManager() {

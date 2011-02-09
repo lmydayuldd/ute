@@ -387,15 +387,78 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		}
 		return this.householdType;
 	}
-
+	
 	/**
-	 * Setter for the household type - should be only necessary in the demographic module for transitions
-	 * between household-types
-	 * @param householdType
+	 * Update the household type after person aging 
 	 */
-	public void setHouseholdType(HouseholdType householdType) {
-		this.householdType = householdType;
+	public void updateHouseholdTypeAfterAging() {
+		switch (householdType) {
+		case SINGLE_YOUNG:		// single young -> single old
+			// TODO: make this threshold (45) configurable
+			if (members.get(0).getAge() > 45)
+				householdType = HouseholdType.SINGLE_OLD;
+			break;
+		case COUPLE_YOUNG:
+			// find maximum female age in household
+			int femAdultMaxAge = 0;
+			for (PersonRow member : members) {
+				if (member.getSex() == 1) {
+					if (member.getAge() > femAdultMaxAge)
+						femAdultMaxAge = member.getAge();
+				}
+			}
+			if (femAdultMaxAge > 45) {
+				householdType = HouseholdType.COUPLE_OLD;
+			}
+			break;
+		}
 	}
+	
+	public void updateHouseholdTypeAfterDeath() {
+		// Singles are not covered since the household will be removed anyway
+		switch (householdType) {
+		case OTHER:			// no useful previous information - start from scratch
+		case SMALL_FAMILY:
+		case LARGE_FAMILY:
+		case SINGLE_PARENT:
+			determineInitialHouseholdType();
+			break;
+		case COUPLE_OLD:
+			householdType = HouseholdType.SINGLE_OLD;
+			break;
+		case COUPLE_YOUNG:
+			householdType = HouseholdType.SINGLE_YOUNG;
+			break;
+		}
+	}
+	
+	public void updateHouseholdTypeAfterBirth() {
+		switch (householdType) {
+		case OTHER:			// no useful previous information - start from scratch
+			determineInitialHouseholdType();
+			break;
+		case SMALL_FAMILY:
+			householdType = HouseholdType.LARGE_FAMILY;
+			break;
+		case COUPLE_YOUNG:
+		case COUPLE_OLD:
+			householdType = HouseholdType.SMALL_FAMILY;
+			break;
+		case SINGLE_YOUNG:
+		case SINGLE_OLD:
+			householdType = HouseholdType.SINGLE_PARENT;
+			break;
+		}
+	}
+	
+//	/**
+//	 * Setter for the household type - should be only necessary in the demographic module for transitions
+//	 * between household-types
+//	 * @param householdType
+//	 */
+//	public void setHouseholdType(HouseholdType householdType) {
+//		this.householdType = householdType;
+//	}
 	
 	/**
 	 * Return the stored household type calculated previously by determineHouseholdType()
@@ -559,6 +622,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		int yearlyIncome = 0;
 		for (PersonRow person : members) {
 			yearlyIncome += person.getYearlyIncome();
+			assert yearlyIncome >= 0 : "Yearly income must be >= 0 (= " + yearlyIncome + ")";
 		}
 		return yearlyIncome;
 	}

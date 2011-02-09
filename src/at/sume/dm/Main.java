@@ -417,8 +417,8 @@ public class Main {
 			//if (modelYear == modelEndYear - 1)
 				outputFreeDwellings(modelYear, "after immigration");
 			
-			// Aging of persons
-			persons.aging();
+			// Aging of persons (household-wise)
+			households.aging();
 		} // model year
 	}
 	/**
