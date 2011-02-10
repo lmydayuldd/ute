@@ -122,9 +122,7 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 			if (comp1 != 0)
 				return comp1;
 			else
-				if (comp1 != 0)
-					return comp2;
-			return 0;
+				return comp2;
 		}
 		@Override
 		public String toCsvHeadline(String delimiter) {
