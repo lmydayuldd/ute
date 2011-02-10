@@ -336,8 +336,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 					this.householdType = HouseholdType.SINGLE_YOUNG;
 				else
 					this.householdType = HouseholdType.SINGLE_OLD;
-				break;
 			}
+			break;
 		case 2:
 			assert getHouseholdSize() >= numAdults : "Counted " + numAdults + " adult(s) but household size = " + getHouseholdSize();
 			if (getHouseholdSize() == 2) {
