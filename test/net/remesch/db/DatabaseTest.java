@@ -23,7 +23,9 @@ public class DatabaseTest {
 	private Database db, odb;
 	
 	public static class HouseholdTest {
+		@SuppressWarnings("unused")
 		private short modelYear;
+		@SuppressWarnings("unused")
 		private int householdId;
 	}
 	
