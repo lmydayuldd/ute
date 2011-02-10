@@ -3,10 +3,8 @@
  */
 package at.sume.dm.demography.events;
 
-import java.util.Random;
-
-import at.sume.db.RecordSetRow;
 import net.remesch.db.Database;
+import at.sume.db.RecordSetRow;
 
 /**
  * @author Alexander Remesch
@@ -20,11 +18,10 @@ public abstract class Event<T extends RecordSetRow<?>> {
 	protected abstract double probability(T entity);
 	
 	public void occur(T entity) {
-		Random r = new Random();
 		// generate random number for sampling
-		long rand = (long) (r.nextDouble() * 100);
+		double rand = Math.random();
 		double p = probability(entity);
-		if (rand <= p) {
+		if (rand < p) {
 			action(entity);
 		}
 	}

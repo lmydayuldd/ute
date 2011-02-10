@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import net.remesch.db.Sequence;
 import net.remesch.db.schema.Ignore;
 import at.sume.db.RecordSetRowFileable;
+import at.sume.dm.types.AgeGroup;
 
 /**
  * @author Alexander Remesch
@@ -94,6 +95,10 @@ public class PersonRow extends RecordSetRowFileable<Persons> {
 	 * @return the ageGroupId
 	 */
 	public byte getAgeGroupId() {
+		if (ageGroupId == 0) {
+			ageGroupId = AgeGroup.getAgeGroupId(age);
+		}
+		assert ageGroupId > 0 : "ageGroupId <= 0";
 		return ageGroupId;
 	}
 
@@ -101,6 +106,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> {
 	 * @param ageGroupId the ageGroupId to set
 	 */
 	public void setAgeGroupId(byte ageGroupId) {
+		assert ageGroupId > 0 : "ageGroupId <= 0";
 		this.ageGroupId = ageGroupId;
 	}
 
@@ -110,6 +116,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> {
 	public void setAge(short age) {
 		assert age >= 0 : "Age < 0 (" + age + ")";
 		this.age = age;
+		ageGroupId = AgeGroup.getAgeGroupId(age);
 	}
 
 	/**
@@ -198,7 +205,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> {
 		} else if (name.equals("Age")) {
 			setAge(rs.getByte(name));
 		} else if (name.equals("AgeGroupId")) {
-			setAgeGroupId(rs.getByte(name));
+//			setAgeGroupId(rs.getByte(name));
 		} else if (name.equals("HouseholdRepresentative")) {
 //			setHouseholdRepresentative(rs.getBoolean(name));
 		} else if (name.equals("YearlyIncome")) {
