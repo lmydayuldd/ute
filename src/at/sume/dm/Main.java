@@ -307,7 +307,6 @@ public class Main {
 					for (int spatialUnitId : preferredSpatialUnits) {
 						SpatialUnitRow spatialUnit = spatialUnits.getSpatialUnit(spatialUnitId);
 						if (spatialUnit.isFreeDwellingsAlwaysAvailable()) {
-// TODO: spatial unit 3 is always the first in the list -> all households move away - change this behavior by sorting the spatial units by some preference score.
 							// Household moves away
 							hhMovedAway++;
 							household.remove(dwellingsOnMarket);
@@ -337,16 +336,15 @@ public class Main {
 							break;
 						}
 					}
-					noDwellingFoundReason = NoDwellingFoundReason.NO_REASON;
 				}
 				j++;
 			}
-			System.out.println(printInfo() + " " + hhNoAspiration + " out of " + potentialMovers.size() + " potential moving households found no spatial unit within their aspiration region. " + 
+			System.out.println(printInfo() + ": " + hhNoAspiration + " out of " + potentialMovers.size() + " potential moving households found no spatial unit within their aspiration region. " + 
 					"Out of these " + hhZeroIncome + " households can afford a dwelling with costs <= 0 " +
 					"and " + hhLowIncome + " households can afford a dwelling with costs <= 63 per m²/year only");
-			System.out.println(printInfo() + " " + hhNoSatisfaction + " out of " + potentialMovers.size() + " potential moving households would not improve their estimated residential satisfaction");
-			System.out.println(printInfo() + " " + hhFoundNoDwellings + " out of " + potentialMovers.size() + " potential moving households found no dwelling");
-			System.out.println(printInfo() + " " + hhMovedAway + " out of " + potentialMovers.size() + " potential moving households moved away");
+			System.out.println(printInfo() + ": " + hhNoSatisfaction + " out of " + potentialMovers.size() + " potential moving households would not improve their estimated residential satisfaction");
+			System.out.println(printInfo() + ": " + hhFoundNoDwellings + " out of " + potentialMovers.size() + " potential moving households found no dwelling");
+			System.out.println(printInfo() + ": " + hhMovedAway + " out of " + potentialMovers.size() + " potential moving households moved away");
 			outputFreeDwellings(modelYear, "after moving households, before immigration");
 			// Immigrating Households
 			ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(modelYear);
@@ -365,11 +363,11 @@ public class Main {
 //					assert dwelling != null : "No dwelling found";
 					if (dwelling == null) {
 						hhNoCheapDwelling++;
-						for (long spatialUnitId : cheapestSpatialUnits) {
-							dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, (short) 0, household.getAspirationRegionLivingSpaceMax());
-							if (dwelling != null)
-								break;
-						}
+//						for (long spatialUnitId : cheapestSpatialUnits) {
+//							dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, (short) 0, household.getAspirationRegionLivingSpaceMax());
+//							if (dwelling != null)
+//								break;
+//						}
 					} else {
 						// 1) add household to common lists
 						households.add(household);
@@ -382,38 +380,52 @@ public class Main {
 						// TODO: update indicators
 					}
 				} else {
-					ArrayList<Integer> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
-					if (potentialTargetSpatialUnitIds.size() > 0) {
-						ArrayList<SpatialUnitRow> potentialTargetSpatialUnits = spatialUnits.getSpatialUnits(potentialTargetSpatialUnitIds);
-						household.estimateResidentialSatisfaction(potentialTargetSpatialUnits, modelYear, Common.getResidentialSatisfactionEstimateRange());
-						DwellingRow dwelling = residentialMobility.searchDwelling(household, modelYear, dwellingsOnMarket, true);
-						household.clearResidentialSatisfactionEstimate();
-						if (dwelling == null) {
-							// household didn't find a suitable dwelling -> join another household
-							// TODO: update indicators
-							//household.redefineAspirations();
-							hhFoundNoDwellings++;
-						} else {
-							// 1) add household to common lists
-							households.add(household);
-							for (PersonRow member : household.getMembers()) {
-								persons.add(member);
+					DwellingRow dwelling = null;
+					household.estimateResidentialSatisfaction(spatialUnits.getRowList(), modelYear, Common.getResidentialSatisfactionEstimateRange());
+					ArrayList<Integer> preferredSpatialUnits = household.getPreferredSpatialUnits();
+					NoDwellingFoundReason noDwellingFoundReason = NoDwellingFoundReason.NO_REASON;
+					for (int spatialUnitId : preferredSpatialUnits) {
+						SpatialUnitRow spatialUnit = spatialUnits.getSpatialUnit(spatialUnitId);
+						if (!spatialUnit.isFreeDwellingsAlwaysAvailable()) {
+//							dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, household, false, modelYear);
+							dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, (short) 0, household.getAspirationRegionLivingSpaceMax());
+							if (dwelling != null) {
+								break;
+							} else {
+								if (dwellingsOnMarket.getNoDwellingFoundReason() != NoDwellingFoundReason.NO_SUITABLE_DWELLING) {
+									noDwellingFoundReason = dwellingsOnMarket.getNoDwellingFoundReason();
+								}
 							}
-							// 2 move household
-							household.relocate(dwellingsOnMarket, dwelling);
-							// TODO: update indicators
+						}
+					}
+					household.clearResidentialSatisfactionEstimate();
+					if (dwelling == null) {
+						// household didn't find a suitable dwelling -> join another household
+						// TODO: update indicators
+						switch (noDwellingFoundReason) {
+						case NO_SATISFACTION:
+							hhNoSatisfaction++;
+							break;
+						default:
+							hhFoundNoDwellings++;
+							break;
 						}
 					} else {
-						// no spatial units below the max costs for the household -> join another household
+						// 1) add household to common lists
+						households.add(household);
+						for (PersonRow member : household.getMembers()) {
+							persons.add(member);
+						}
+						// 2 move household
+						household.relocate(dwellingsOnMarket, dwelling);
 						// TODO: update indicators
-						hhNoSatisfaction++;
 					}
 				}
 			}
-			System.out.println(printInfo() + " " + hhFoundNoDwellings + " out of " + immigratingHouseholds.size() + " immigrating households found no dwelling");
-			System.out.println(printInfo() + " " + hhNoCheapDwelling + " out of " + immigratingHouseholds.size() + " immigrating households found no low-cost dwelling");
-			System.out.println(printInfo() + " " + hhNoSatisfaction + " out of " + immigratingHouseholds.size() + " immigrating households could not find spatial units matching their aspirations");
-			System.out.println(printInfo() + " " + hhMovedToCheapest + " out of " + immigratingHouseholds.size() + " immigrating households moved to the cheapest possible spatial units");
+			System.out.println(printInfo() + ": " + hhFoundNoDwellings + " out of " + immigratingHouseholds.size() + " immigrating households found no dwelling");
+			System.out.println(printInfo() + ": " + hhNoCheapDwelling + " out of " + immigratingHouseholds.size() + " immigrating households found no low-cost dwelling");
+			System.out.println(printInfo() + ": " + hhNoSatisfaction + " out of " + immigratingHouseholds.size() + " immigrating households could not find spatial units matching their aspirations");
+			System.out.println(printInfo() + ": " + hhMovedToCheapest + " out of " + immigratingHouseholds.size() + " immigrating households moved to the cheapest possible spatial units");
 			//if (modelYear == modelEndYear - 1)
 				outputFreeDwellings(modelYear, "after immigration");
 			
