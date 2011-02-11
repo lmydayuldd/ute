@@ -19,8 +19,8 @@ import net.remesch.util.FileUtil;
 public class FileOutput {
 	private PrintStream psOut;
 	private ArrayList<Fileable> rowList;
-	private String path = "";
-	private String fileName;
+//	private String path = "";
+//	private String fileName;
 	private final static String delimiter = ";";
 	
 	/**
@@ -30,33 +30,32 @@ public class FileOutput {
 	 * @throws FileNotFoundException
 	 */
 	@SuppressWarnings("unchecked")
-	public FileOutput(String path, String fileName, List<? extends Fileable> rowList) {
+	public FileOutput(String path, String fileName, List<? extends Fileable> rowList) throws FileNotFoundException {
+		String pathName;
 //		assert rowList.size() > 0 : "rowList cannot be empty!";
 		this.rowList = (ArrayList<Fileable>) rowList;
-		if (path != null)
-			if (path.endsWith("\\"))
-				this.path = path;
-			else
-				this.path = path + "\\";
-		this.fileName = fileName;
+		if (path.endsWith("\\"))
+			pathName = path + fileName + ".csv";
+		else
+			pathName = path + "\\" + fileName + ".csv";
+//		this.fileName = fileName;
+		// Rename existing file to a unique filename
+		FileUtil.rotateFile(pathName);
+		FileOutputStream fileOutputStream = new FileOutputStream(pathName, true);
+		psOut = new PrintStream(fileOutputStream);
 	}
 	/**
 	 * 
 	 * @param modelYear
 	 * @throws IOException 
 	 */
-	public void persistDb(short modelYear) throws IOException {
-		String pathName = path + fileName + "_" + modelYear + ".csv";
-		// Rename existing file to a unique filename
-		FileUtil.rotateFile(pathName);
-		FileOutputStream fileOutputStream = new FileOutputStream(pathName, true);
-		psOut = new PrintStream(fileOutputStream);
+	public void persistDb(short modelYear) {
 		psOut.println("ModelYear" + delimiter + rowList.get(0).toCsvHeadline(delimiter));
 		for (Fileable row : rowList) {
 			String orow = modelYear + delimiter + row.toString(delimiter);
 			psOut.println(orow);
 		}
-		psOut.close();
-		fileOutputStream.close();
+//		psOut.close();
+//		fileOutputStream.close();
 	}
 }

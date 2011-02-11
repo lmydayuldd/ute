@@ -3,6 +3,7 @@
  */
 package at.sume.dm.model.output;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -39,8 +40,9 @@ public class OutputManager {
 	 * @param path
 	 * @param fileNameList
 	 * @param fileableList
+	 * @throws FileNotFoundException 
 	 */
-	public OutputManager(String path, List<String> fileNameList, List<List<? extends Fileable>> fileableList) {
+	public OutputManager(String path, List<String> fileNameList, List<List<? extends Fileable>> fileableList) throws FileNotFoundException {
 		assert fileNameList.size() == fileableList.size() : "fileNameList is longer/shorter than fileableList";
 		fileOutputList = new ArrayList<FileOutput>();
 		int i = 0;
@@ -56,8 +58,9 @@ public class OutputManager {
 	 * Add a new fileable output entity
 	 * @param path
 	 * @param fileable
+	 * @throws FileNotFoundException 
 	 */
-	public void add(String path, String fileName, List<? extends Fileable> fileable) {
+	public void add(String path, String fileName, List<? extends Fileable> fileable) throws FileNotFoundException {
 		// Fileable list may yet be empty (in case of indicators)
 //		assert fileable.size() > 0 : "List fileable is empty!";
 //		String entityName = fileable.get(0).getClass().getSimpleName();
@@ -79,7 +82,7 @@ public class OutputManager {
 	 * @param modelYear
 	 * @throws IOException 
 	 */
-	public void fileOutput(short modelYear) throws IOException {
+	public void fileOutput(short modelYear) {
 		for (FileOutput fileOutput : fileOutputList) {
 			fileOutput.persistDb(modelYear);
 		}
