@@ -94,8 +94,12 @@ public class AgeGroup {
 		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
 		Random r = new Random();
 		AgeGroupRow sample = ageGroups.get(ageGroupId - 1);
-//		return (short) (ageGroup.minage + (r.nextDouble() * (ageGroup.maxage - ageGroup.minage)));
-		return (short) (sample.minage + r.nextInt(sample.maxage - sample.minage));
+		if (ageGroupId == ageGroups.size()) {
+			// sample the lowest possible age in the highest age group
+			return sample.minage;
+		} else {
+			return (short) (sample.minage + r.nextInt(sample.maxage - sample.minage));
+		}
 	}
 	public static short getMinAge(byte ageGroupId) {
 		return ageGroups.get(ageGroupId - 1).minage;
