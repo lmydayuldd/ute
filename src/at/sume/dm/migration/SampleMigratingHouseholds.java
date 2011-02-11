@@ -19,7 +19,7 @@ import at.sume.sampling.ExactDistribution;
  * @author Alexander Remesch
  *
  */
-public class SampleImmigratingHouseholds {
+public class SampleMigratingHouseholds {
 	public static class MigrationsPerAgeSex implements Comparable<MigrationsPerAgeSex> {
 		private int id;
 		private byte ageGroupId;
@@ -129,12 +129,12 @@ public class SampleImmigratingHouseholds {
 			return ((Integer)id).compareTo(o.id);
 		}
 	}
-	private TotalImmigrationPerYear totalImmigrationsPerYear;
+	private TotalMigrationPerYear totalMigrationsPerYear;
 	private ExactDistribution<MigrationsPerAgeSex> migrationsPerAgeSex;
 	private ArrayList<MigrationHouseholdSize> migrationHouseholdSize;
 	private long migrationHouseholdSizeShareTotal = 0;
 	
-	public SampleImmigratingHouseholds(String scenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
+	public SampleMigratingHouseholds(String scenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
 		selectStatement = "SELECT id, ageGroupId, sex, share " +
 			"FROM _DM_MigrationAgeSex " +
@@ -152,7 +152,7 @@ public class SampleImmigratingHouseholds {
 		migrationHouseholdSize = Common.db.select(MigrationHouseholdSize.class, selectStatement);
 		assert migrationHouseholdSize.size() > 0 : "No rows selected from _DM_MigrationHouseholdSize (scenarioName = " + scenarioName + ")";
 		migrationHouseholdSizeShareTotal = Math.round((Double)Common.db.lookupSql("select sum(share) from _DM_MigrationHouseholdSize where scenarioName = 'NEUZUD'"));
-		totalImmigrationsPerYear = new TotalImmigrationPerYear(scenarioName);
+		totalMigrationsPerYear = new TotalMigrationPerYear(scenarioName);
 	}
 	
 	public ArrayList<HouseholdRow> sample(int modelYear) {
@@ -160,7 +160,7 @@ public class SampleImmigratingHouseholds {
 		Random r = new Random();
 		
 		// 1) Get number of persons immigrating in that year
-		long numImmigrants = totalImmigrationsPerYear.get(modelYear);
+		long numImmigrants = totalMigrationsPerYear.getImmigration(modelYear);
 		//    and calculate the exact age & sex distribution
 		migrationsPerAgeSex.buildExactThresholds(numImmigrants);
 		
@@ -239,5 +239,13 @@ public class SampleImmigratingHouseholds {
 		result.determineInitialHouseholdType();
 		// TODO: each household requires at least one adult (is this a good idea? - maybe not for single households)
 		return result;
+	}
+	/**
+	 * Get total international out migration (nr. of persons) for the given year
+	 * @param modelYear
+	 * @return
+	 */
+	public int getOutMigrationInternational(int modelYear) {
+		return totalMigrationsPerYear.getOutMigrationInternational(modelYear);
 	}
 }

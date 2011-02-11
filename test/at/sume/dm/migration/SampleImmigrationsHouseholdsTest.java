@@ -21,18 +21,18 @@ import at.sume.dm.entities.HouseholdRow;
  *
  */
 public class SampleImmigrationsHouseholdsTest {
-	SampleImmigratingHouseholds sampleImmigratingHouseholds; 
+	SampleMigratingHouseholds sampleImmigratingHouseholds; 
 
 	@Before
 	public void setUp() throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException {
 		@SuppressWarnings("unused")
 		Database db = Common.openDatabase();
 		Common.init();
-		sampleImmigratingHouseholds = new SampleImmigratingHouseholds("STATA2010");
+		sampleImmigratingHouseholds = new SampleMigratingHouseholds("STATA2010");
 	}
 
 	/**
-	 * Test method for {@link at.sume.dm.migration.SampleImmigratingHouseholds#sample(int)}.
+	 * Test method for {@link at.sume.dm.migration.SampleMigratingHouseholds#sample(int)}.
 	 */
 	@Test
 	public void testSample() {

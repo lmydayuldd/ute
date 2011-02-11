@@ -30,7 +30,7 @@ import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
-import at.sume.dm.migration.SampleImmigratingHouseholds;
+import at.sume.dm.migration.SampleMigratingHouseholds;
 import at.sume.dm.model.core.EntityDecisionManager;
 import at.sume.dm.model.output.Fileable;
 import at.sume.dm.model.output.OutputManager;
@@ -191,7 +191,7 @@ public class Main {
 		@SuppressWarnings("unused")
 		ChildBirth childBirth = new ChildBirth(db, personEventManager);
 		// TODO: include scenario handling!!!
-		SampleImmigratingHouseholds sampleImmigratingHouseholds = new SampleImmigratingHouseholds("STATA2010");
+		SampleMigratingHouseholds sampleMigratingHouseholds = new SampleMigratingHouseholds("STATA2010");
 		
 		EntityDecisionManager<HouseholdRow, Households> householdDecisionManager = new EntityDecisionManager<HouseholdRow, Households>();
 		MinimumIncome minimumIncome = new MinimumIncome(db, householdDecisionManager, households);
@@ -347,9 +347,9 @@ public class Main {
 			System.out.println(printInfo() + ": " + hhMovedAway + " out of " + potentialMovers.size() + " potential moving households moved away");
 			outputFreeDwellings(modelYear, "after moving households, before immigration");
 			// Immigrating Households
-			ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(modelYear);
+			ArrayList<HouseholdRow> immigratingHouseholds = sampleMigratingHouseholds.sample(modelYear);
 			hhFoundNoDwellings = 0; hhNoSatisfaction = 0;
-			int hhMovedToCheapest = 0, hhNoCheapDwelling = 0;
+			int hhMovedToCheapest = 0, hhNoCheapDwelling = 0, migratingHouseholds = 0, migratingPersons = 0;
 			for (HouseholdRow household : immigratingHouseholds) {
 				residentialMobility.estimateAspirationRegion(household, modelYear, modelStartYear, highestYearlyRentPer100Sqm);
 				if (household.getAspirationRegionMaxCosts() * 100 < lowestYearlyRentPer100Sqm) {
@@ -377,6 +377,8 @@ public class Main {
 						// 2 move household
 						household.relocate(dwellingsOnMarket, dwelling);
 						hhMovedToCheapest++;
+						migratingHouseholds++;
+						migratingPersons += household.getMemberCount();
 						// TODO: update indicators
 					}
 				} else {
@@ -418,16 +420,24 @@ public class Main {
 						}
 						// 2 move household
 						household.relocate(dwellingsOnMarket, dwelling);
+						migratingHouseholds++;
+						migratingPersons += household.getMemberCount();
 						// TODO: update indicators
 					}
 				}
 			}
+			System.out.println(printInfo() + ": a total of " + migratingPersons + " persons (" + migratingHouseholds + " households) immigrated in " + modelYear);
 			System.out.println(printInfo() + ": " + hhFoundNoDwellings + " out of " + immigratingHouseholds.size() + " immigrating households found no dwelling");
 			System.out.println(printInfo() + ": " + hhNoCheapDwelling + " out of " + immigratingHouseholds.size() + " immigrating households found no low-cost dwelling");
 			System.out.println(printInfo() + ": " + hhNoSatisfaction + " out of " + immigratingHouseholds.size() + " immigrating households could not find spatial units matching their aspirations");
 			System.out.println(printInfo() + ": " + hhMovedToCheapest + " out of " + immigratingHouseholds.size() + " immigrating households moved to the cheapest possible spatial units");
 			//if (modelYear == modelEndYear - 1)
-				outputFreeDwellings(modelYear, "after immigration");
+			outputFreeDwellings(modelYear, "after immigration");
+			
+			// Out-Migration: randomly remove households
+			int numOutMigrationInternational = sampleMigratingHouseholds.getOutMigrationInternational(modelYear);
+			int numOutMigrationIntlHouseholds = households.randomRemoveHouseholds(dwellingsOnMarket, numOutMigrationInternational);
+			System.out.println(printInfo() + ": " + numOutMigrationInternational + " persons (" + numOutMigrationIntlHouseholds + " households) out-migrated internationally");
 			
 			// Aging of persons (household-wise)
 			households.aging();
