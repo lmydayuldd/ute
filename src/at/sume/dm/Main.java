@@ -187,7 +187,7 @@ public class Main {
 		//       concrete event types??? Maybe put into its own static class or a ModelMain class?
 		// TODO: Use enums!
 		@SuppressWarnings("unused")
-		PersonDeath personDeath = new PersonDeath(db, personEventManager);
+		PersonDeath personDeath = new PersonDeath(db, personEventManager, Common.getPersonMaxAge());
 		@SuppressWarnings("unused")
 		ChildBirth childBirth = new ChildBirth(db, personEventManager);
 		// TODO: include scenario handling!!!

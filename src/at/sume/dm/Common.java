@@ -32,6 +32,7 @@ public class Common {
 	private static String pathOutput;
 	private static SpatialUnitLevel spatialUnitLevel;
 	private static int residentialSatisfactionEstimateRange;
+	private static short personMaxAge;
 	
 	/**
 	 * @return the iniFilename
@@ -116,6 +117,10 @@ public class Common {
 		return residentialSatisfactionEstimateRange;
 	}
 	
+	public static short getPersonMaxAge() {
+		return personMaxAge;
+	}
+
 	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
@@ -180,6 +185,7 @@ public class Common {
 			throw new AssertionError("Systemparameter SpatialUnitLevel must be ZB or SGT (is " + sysParam);
 		}
 		residentialSatisfactionEstimateRange = Integer.parseInt(getSysParam("ResidentialSatisfactionEstimateRange"));
+		personMaxAge = Short.parseShort(getSysParam("PersonMaxAge"));
 	}
 	
 	/**

@@ -13,21 +13,21 @@ import at.sume.db.RecordSetRow;
  * @author Alexander Remesch
  */
 public class MortalityProbabilityRow extends RecordSetRow<Mortality> {
-	private short ageGroupId;
+	private short age;
 	private short sex;
 	
 	/**
-	 * @return the ageGroupId
+	 * @return the age
 	 */
-	public short getAgeGroupId() {
-		return ageGroupId;
+	public short age() {
+		return age;
 	}
 
 	/**
-	 * @param ageGroupId the ageGroupId to set
+	 * @param age the age to set
 	 */
-	public void setAgeGroupId(short ageGroupId) {
-		this.ageGroupId = ageGroupId;
+	public void setAge(short age) {
+		this.age = age;
 	}
 
 	/**
@@ -51,8 +51,8 @@ public class MortalityProbabilityRow extends RecordSetRow<Mortality> {
 	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
 		if (name.equals("sex")) {
 			setSex(rs.getShort(name));
-		} else if (name.equals("AgeGroupId")) {
-			setAgeGroupId(rs.getShort("AgeGroupId"));
+		} else if (name.equals("age")) {
+			setAge(rs.getShort("age"));
 		} else {
 			throw new UnsupportedOperationException("Unknown field name " + name);
 		}
@@ -69,7 +69,7 @@ public class MortalityProbabilityRow extends RecordSetRow<Mortality> {
 		if ((lookupKeys[0] instanceof Short) && (lookupKeys[1] instanceof Short)) {
 			short lookupAgeGroupId = (Short) lookupKeys[0];
 			short lookupSex = (Short) lookupKeys[1];
-			if ((lookupAgeGroupId == getAgeGroupId()) && (lookupSex == getSex()))
+			if ((lookupAgeGroupId == age()) && (lookupSex == getSex()))
 				return true;
 			else
 				return false;
@@ -85,7 +85,7 @@ public class MortalityProbabilityRow extends RecordSetRow<Mortality> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ageGroupId;
+		result = prime * result + age;
 		result = prime * result + sex;
 		return result;
 	}
@@ -102,7 +102,7 @@ public class MortalityProbabilityRow extends RecordSetRow<Mortality> {
 		if (getClass() != obj.getClass())
 			return false;
 		MortalityProbabilityRow other = (MortalityProbabilityRow) obj;
-		if (ageGroupId != other.ageGroupId)
+		if (age != other.age)
 			return false;
 		if (sex != other.sex)
 			return false;

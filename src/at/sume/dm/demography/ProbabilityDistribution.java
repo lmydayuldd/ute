@@ -27,6 +27,7 @@ public abstract class ProbabilityDistribution<E extends RecordSetRow<?>> extends
 	 * Construct class and load probabilities from the database. Variable parts have to be implemented in implementation
 	 * classes ("Factories")
 	 * @param db Database to load rows from
+	 * @param returnClosestProbability If no exact match can be found for the search criteria, shall the closest found probability be returned instead?
 	 * @throws SQLException
 	 */
 	public ProbabilityDistribution(Database db) throws SQLException {
