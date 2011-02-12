@@ -1,7 +1,7 @@
 /**
  * 
  */
-package at.sume.dm.indicators.rows;
+package net.remesch.obsolete;
 
 import at.sume.dm.indicators.base.IndicatorRow;
 import at.sume.dm.types.IncomeGroup;

@@ -1,13 +1,13 @@
 /**
  * 
  */
-package at.sume.dm.indicators;
+package net.remesch.obsolete;
 
 import java.util.Collections;
 
+
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.indicators.base.IndicatorBase;
-import at.sume.dm.indicators.rows.ImmigratingHouseholdsRow;
 import at.sume.dm.types.IncomeGroup;
 
 /**

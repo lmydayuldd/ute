@@ -1,13 +1,12 @@
 /**
  * 
  */
-package at.sume.dm.indicators.managers;
+package net.remesch.obsolete;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import at.sume.dm.entities.HouseholdRow;
-import at.sume.dm.indicators.ImmigratingHouseholds;
 import at.sume.dm.indicators.base.IndicatorBase;
 
 /**
