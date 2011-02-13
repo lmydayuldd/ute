@@ -30,6 +30,7 @@ import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
+import at.sume.dm.indicators.simple.MigrationPerSpatialUnit;
 import at.sume.dm.migration.SampleMigratingHouseholds;
 import at.sume.dm.model.core.EntityDecisionManager;
 import at.sume.dm.model.output.Fileable;
@@ -40,6 +41,7 @@ import at.sume.dm.model.residential_mobility.NoDwellingFoundReason;
 import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.dm.model.residential_mobility.ResidentialMobility;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
+import at.sume.dm.types.MigrationRealm;
 
 /**
  * @author Alexander Remesch
@@ -57,6 +59,7 @@ public class Main {
 	private static Sequence dwellingSeq;
 	private static DwellingsOnMarket dwellingsOnMarket;
 	private static OutputManager outputManager;
+	private static MigrationPerSpatialUnit migrationPerSpatialUnit;
 
 	private static String printInfo() {
 		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)";
@@ -105,7 +108,12 @@ public class Main {
         // Inter-link persons and households
         persons.linkHouseholds(households);
         System.out.println(printInfo() + ": linked households + persons");
-		
+
+        // create migration counter + register with households (once!)
+        migrationPerSpatialUnit = new MigrationPerSpatialUnit();
+        // TODO: find a way to make this registration out of the MigrationPerSpatialUnit() class directly (but only once!!!)
+        households.get(0).registerMigrationObserver(migrationPerSpatialUnit);
+        
         // get all dwellings on the housing market
         dwellingsOnMarket = new DwellingsOnMarket(dwellings, spatialUnits);
         System.out.println(printInfo() + ": determined all available dwellings on the housing market");
@@ -129,8 +137,10 @@ public class Main {
         fileNameList.add("AggregatedHouseholds");
         fileableList.add(AllHouseholdsIndicatorManager.AGGREGATED_PERSONS.getIndicator().getIndicatorList());
         fileNameList.add("AggregatedPersons");
+//        fileableList.add(migrationPerSpatialUnit.getIndicatorList());
+//        fileNameList.add("Migrations");
         outputManager = new OutputManager(Common.getPathOutput(), fileNameList, fileableList);
-        initOutputFreeDwellings();
+        initSimpleOutputFiles();
         
 		// Model main loop
 		// - Biographical events for all persons/households
@@ -199,12 +209,15 @@ public class Main {
 		int modelStartYear = Common.getModelStartYear();
 		int modelEndYear = modelStartYear + iterations;
 		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
+			// Clear migration indicators
+			migrationPerSpatialUnit.clearIndicatorList();
 	        // (Re)build household indicators - this must be done each model year because with add/remove it is a problem when the age of a person changes
 			buildIndicators();			
 	        System.out.println(printInfo() + ": build of model indicators complete");
 	        outputManager.output((short) modelYear);
 	        System.out.println(printInfo() + ": model data output to database");
 	        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
+
 			ArrayList<HouseholdRow> potentialMovers = new ArrayList<HouseholdRow>();
 	        int j = 0;
 	        // the following clone() is necessary because otherwise it wouldn't be possible to remove households from
@@ -309,7 +322,7 @@ public class Main {
 						if (spatialUnit.isFreeDwellingsAlwaysAvailable()) {
 							// Household moves away
 							hhMovedAway++;
-							household.remove(dwellingsOnMarket);
+							household.emigrate(dwellingsOnMarket, MigrationRealm.NATIONAL);
 							dwelling = null;
 							break;
 						} else {
@@ -431,13 +444,15 @@ public class Main {
 			System.out.println(printInfo() + ": " + hhNoCheapDwelling + " out of " + immigratingHouseholds.size() + " immigrating households found no low-cost dwelling");
 			System.out.println(printInfo() + ": " + hhNoSatisfaction + " out of " + immigratingHouseholds.size() + " immigrating households could not find spatial units matching their aspirations");
 			System.out.println(printInfo() + ": " + hhMovedToCheapest + " out of " + immigratingHouseholds.size() + " immigrating households moved to the cheapest possible spatial units");
-			//if (modelYear == modelEndYear - 1)
-			outputFreeDwellings(modelYear, "after immigration");
 			
 			// Out-Migration: randomly remove households
 			int numOutMigrationInternational = sampleMigratingHouseholds.getOutMigrationInternational(modelYear);
-			int numOutMigrationIntlHouseholds = households.randomRemoveHouseholds(dwellingsOnMarket, numOutMigrationInternational);
+			int numOutMigrationIntlHouseholds = households.randomRemoveHouseholds(dwellingsOnMarket, numOutMigrationInternational, MigrationRealm.INTERNATIONAL);
 			System.out.println(printInfo() + ": " + numOutMigrationInternational + " persons (" + numOutMigrationIntlHouseholds + " households) out-migrated internationally");
+			
+			//if (modelYear == modelEndYear - 1)
+			outputFreeDwellings(modelYear, "after immigration");
+			outputMigrationCount(modelYear);
 			
 			// Aging of persons (household-wise)
 			households.aging();
@@ -454,29 +469,50 @@ public class Main {
 		}
 	}
 
-	public static String freeDwellingsPathName() {
+	public static String createPathName(String fileName) {
 		String path = Common.getPathOutput();
 		if (path == null) path = "";
 		String pathName;
 		if (path.endsWith("\\") || (path == ""))
-			pathName = path + "FreeDwellings.csv";
+			pathName = path + fileName;
 		else
-			pathName = path + "\\" + "FreeDwellings.csv";
+			pathName = path + "\\" + fileName;
 		return pathName;
 	}
 	
-	public static void initOutputFreeDwellings() {
-		String pathName = freeDwellingsPathName();
+	private static String freeDwellingsFileName = "FreeDwellings.csv";
+	private static String migrationCountFileName = "Migrations.csv";
+	
+	public static void initSimpleOutputFiles() {
+		String pathName = createPathName(freeDwellingsFileName);
 		// TODO: put this in an extra class and delete the file once per model run
+		FileUtil.rotateFile(pathName);
+		pathName = createPathName(migrationCountFileName);
 		FileUtil.rotateFile(pathName);
 	}
 	
 	public static void outputFreeDwellings(int modelYear, String label) throws FileNotFoundException {
-		String pathName = freeDwellingsPathName();
+		String pathName = createPathName(freeDwellingsFileName);
 		// TODO: put this in an extra class and delete the file once per model run
 		FileOutputStream freeDwellingsFile = new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(freeDwellingsFile);
 //		ps.println("======= " + label + "=======" + modelYear + "=======");
 		dwellingsOnMarket.outputDwellingsPerSize(ps, modelYear);
+	}
+	
+	/**
+	 * Output the migration count - this can't be done within the FileOutput class
+	 * unless this class supports the specification of when the output shall happen.
+	 * The migration counts shall be output at the end of each model year, which is different to
+	 * the timing of the other outputs...
+	 * 
+	 * @param modelYear
+	 * @throws FileNotFoundException
+	 */
+	public static void outputMigrationCount(int modelYear) throws FileNotFoundException {
+		String pathName = createPathName(migrationCountFileName);
+		FileOutputStream migrationCountFile= new FileOutputStream(pathName, true);
+		PrintStream ps = new PrintStream(migrationCountFile);
+		migrationPerSpatialUnit.output(ps, modelYear);
 	}
 }

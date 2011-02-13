@@ -16,18 +16,21 @@ import at.sume.db.RecordSetRowFileable;
 import at.sume.dm.Common;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
+import at.sume.dm.indicators.simple.MigrationObservable;
+import at.sume.dm.indicators.simple.MigrationObserver;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionDwellingProperties;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionHouseholdProperties;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
+import at.sume.dm.types.MigrationRealm;
 
 /**
  * @author Alexander Remesch
  *
  */
-public class HouseholdRow extends RecordSetRowFileable<Households> implements ResidentialSatisfactionHouseholdProperties {
+public class HouseholdRow extends RecordSetRowFileable<Households> implements ResidentialSatisfactionHouseholdProperties, MigrationObservable {
 	private class SpatialUnitScore {
 		private int spatialUnitId;
 		private int score;
@@ -178,7 +181,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	}
 
 	/**
-	 * @return the householdSize
+	 * @return the number of members in the household
 	 */
 	public byte getHouseholdSize() {
 		return (byte) members.size();
@@ -857,8 +860,13 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * @param dwelling
 	 */
 	public void relocate(DwellingsOnMarket dwellingsOnMarket, DwellingRow dwelling) {
-		if (hasDwelling())
+		if (hasDwelling()) {
 			dwellingsOnMarket.putDwellingOnMarket(getDwelling());
+			notifyLocalMigration(getSpatialunitId(), dwelling.getSpatialunitId());
+		} else {
+			// TODO: specify the migration realm and distinguish between national and international immigration
+			notifyImmigration(dwelling.getSpatialunitId(), MigrationRealm.NATIONAL);
+		}
 		dwellingsOnMarket.removeDwellingFromMarket(dwelling);
 		setDwelling(dwelling);
 		dwelling.setHousehold(this);
@@ -876,6 +884,12 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		super.remove();
 	}
 
+	public void emigrate(DwellingsOnMarket dwellingsOnMarket, MigrationRealm migrationRealm) {
+		// TODO: specify the migration realm and distinguish between national and international immigration
+		notifyEmigration(getSpatialunitId(), migrationRealm);
+		remove(dwellingsOnMarket);
+	}
+	
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSetRow#remove()
 	 */
@@ -1026,5 +1040,46 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			householdType + delimiter + movingDecisionYear + delimiter + aspirationRegionLivingSpaceMin + delimiter +
 			aspirationRegionLivingSpaceMax + delimiter + aspirationRegionMaxCosts + delimiter + currentResidentialSatisfaction + delimiter +
 			rsUdpCentrality + delimiter + rsUdpPublicTransportAccessibility + delimiter + rsCostEffectiveness + delimiter + rsEnvironmentalAmenities + delimiter + rsSocialPrestige + delimiter + rsDesiredLivingSpace;
+	}
+
+	private static ArrayList<MigrationObserver> migrationObservers = new ArrayList<MigrationObserver>();
+	
+	@Override
+	public void registerMigrationObserver(MigrationObserver o) {
+		int i = migrationObservers.indexOf(o);
+		// Add observer only once!
+		if (i < 0)
+			migrationObservers.add(o);
+	}
+
+	@Override
+	public void removeMigrationObserver(MigrationObserver o) {
+		int i = migrationObservers.indexOf(o);
+		if (i >= 0)
+			migrationObservers.remove(i);
+	}
+
+	@Override
+	public void notifyLocalMigration(Integer srcSpatialUnitId,
+			Integer destSpatialUnitId) {
+		for (MigrationObserver obs : migrationObservers) {
+			obs.addLocalMigration(srcSpatialUnitId, destSpatialUnitId, getHouseholdSize());
+		}
+	}
+
+	@Override
+	public void notifyEmigration(Integer srcSpatialUnitId,
+			MigrationRealm migrationRealm) {
+		for (MigrationObserver obs : migrationObservers) {
+			obs.addEmigration(srcSpatialUnitId, getHouseholdSize(), migrationRealm);
+		}
+	}
+
+	@Override
+	public void notifyImmigration(Integer destSpatialUnitId,
+			MigrationRealm migrationRealm) {
+		for (MigrationObserver obs : migrationObservers) {
+			obs.addImmigration(destSpatialUnitId, getHouseholdSize(), migrationRealm);
+		}
 	}
 }

@@ -24,6 +24,10 @@ public class MoversIndicatorManager {
 	MoversIndicatorManager(String label, Indicator<HouseholdRow> indicator) {
 //		this.label = label;
 		this.indicator = indicator;
+		if (values == null) {
+			values = new ArrayList<MoversIndicatorManager>();
+		}
+		values.add(this);
 	}
 	
 	public static void addHousehold(HouseholdRow household) {
