@@ -253,16 +253,18 @@ public class DwellingsOnMarket {
 			headLineWritten = true;
 		}
 		for (int i = 0; i != spatialUnits.size(); i++) {
-			output = new StringBuffer(modelYear + ";" + spatialUnits.get(i).getSpatialUnitId());
-			// Count dwellings per living space group
-			for (DwellingRow dwelling : dwellingsOnMarketList[i]) {
-				dwellingSizeCount[LivingSpaceGroup6.getLivingSpaceGroupId(dwelling.getDwellingSize()) - 1]++;
+			if (!spatialUnits.get(i).isFreeDwellingsAlwaysAvailable()) { // don't output for spatial units outside the model area
+				output = new StringBuffer(modelYear + ";" + spatialUnits.get(i).getSpatialUnitId());
+				// Count dwellings per living space group
+				for (DwellingRow dwelling : dwellingsOnMarketList[i]) {
+					dwellingSizeCount[LivingSpaceGroup6.getLivingSpaceGroupId(dwelling.getDwellingSize()) - 1]++;
+				}
+				// Output dwelling count per living space group
+				for (byte j = 0; j != LivingSpaceGroup6.getLivingSpaceGroupCount(); j++) {
+					output.append(";" + dwellingSizeCount[j]);
+				}
+				ps.println(output);
 			}
-			// Output dwelling count per living space group
-			for (byte j = 0; j != LivingSpaceGroup6.getLivingSpaceGroupCount(); j++) {
-				output.append(";" + dwellingSizeCount[j]);
-			}
-			ps.println(output);
 		}
 	}
 }
