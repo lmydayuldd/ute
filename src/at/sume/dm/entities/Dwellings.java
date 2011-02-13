@@ -140,4 +140,12 @@ public class Dwellings extends RecordSet<DwellingRow> {
 			dwelling.setTotalYearlyDwellingCosts(dwellingCosts);
 		}
 	}
+	/* (non-Javadoc)
+	 * @see at.sume.db.RecordSet#add(at.sume.db.RecordSetRow)
+	 */
+	@Override
+	public boolean add(DwellingRow row) {
+		preAddRow(row);
+		return super.add(row);
+	}
 }

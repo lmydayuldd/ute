@@ -17,7 +17,6 @@ import at.sume.sampling.ExactDistribution;
 
 /**
  * @author Alexander Remesch
- *
  */
 public class SampleMigratingHouseholds {
 	public static class MigrationsPerAgeSex implements Comparable<MigrationsPerAgeSex> {
@@ -202,6 +201,7 @@ public class SampleMigratingHouseholds {
 		result.setMovingDecisionYear((short) modelYear);
 		for (int i = 0; i != householdSize; i++) {
 			PersonRow person = new PersonRow();
+			// TODO: why are we not using randomExactSample() here when we use a ExactDistribution?
 			int index = migrationsPerAgeSex.randomSample();
 			MigrationsPerAgeSex m = migrationsPerAgeSex.get(index);
 			person.setAgeGroupId(m.getAgeGroupId());

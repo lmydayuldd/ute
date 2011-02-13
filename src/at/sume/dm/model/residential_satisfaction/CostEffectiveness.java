@@ -66,6 +66,10 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 				} else {
 					// Calculate cost effectiveness satisfaction for a given dwelling with considering the households current dwelling
 					currentCostOfResidence = household.getDwelling().getTotalYearlyDwellingCosts();
+					// TODO: this is a bad workaround (probably) for prices going to 0 in a spatial unit!!!!
+					if (costOfNewDwelling == 0) {
+						costOfNewDwelling = 1;
+					}
 					result = Math.round(currentCostOfResidence * 1000 / costOfNewDwelling);
 				}
 			}

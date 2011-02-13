@@ -112,4 +112,11 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 		int index = Collections.binarySearch(rowList, lookup);
 		return rowList.get(index);
 	}
+
+	/**
+	 * @return the spatialUnitLevel
+	 */
+	public SpatialUnitLevel getSpatialUnitLevel() {
+		return spatialUnitLevel;
+	}
 }

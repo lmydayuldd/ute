@@ -16,6 +16,7 @@ import net.remesch.db.Database;
 import net.remesch.db.Sequence;
 import net.remesch.util.DateUtil;
 import net.remesch.util.FileUtil;
+import at.sume.dm.buildingprojects.SampleBuildingProjects;
 import at.sume.dm.demography.events.ChildBirth;
 import at.sume.dm.demography.events.EventManager;
 import at.sume.dm.demography.events.PersonDeath;
@@ -202,6 +203,7 @@ public class Main {
 		ChildBirth childBirth = new ChildBirth(db, personEventManager);
 		// TODO: include scenario handling!!!
 		SampleMigratingHouseholds sampleMigratingHouseholds = new SampleMigratingHouseholds("STATA2010");
+		SampleBuildingProjects sampleBuildingProjects = new SampleBuildingProjects("BASE", spatialUnits);
 		
 		EntityDecisionManager<HouseholdRow, Households> householdDecisionManager = new EntityDecisionManager<HouseholdRow, Households>();
 		MinimumIncome minimumIncome = new MinimumIncome(db, householdDecisionManager, households);
@@ -218,6 +220,11 @@ public class Main {
 	        System.out.println(printInfo() + ": model data output to database");
 	        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
 
+	        // Create new-built dwellings
+	        List<DwellingRow> newDwellings = sampleBuildingProjects.sample(modelYear);
+	        dwellings.addAll(newDwellings);
+	        dwellingsOnMarket.addAll(newDwellings);
+	        
 			ArrayList<HouseholdRow> potentialMovers = new ArrayList<HouseholdRow>();
 	        int j = 0;
 	        // the following clone() is necessary because otherwise it wouldn't be possible to remove households from

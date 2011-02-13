@@ -5,6 +5,7 @@ package at.sume.dm.model.residential_mobility;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import at.sume.dm.Common;
@@ -56,22 +57,12 @@ public class DwellingsOnMarket {
 
 	@SuppressWarnings("unchecked")
 	public DwellingsOnMarket(Dwellings dwellings, SpatialUnits spatialUnits, int dwellingsOnMarketShare) {
-		Random r = new Random();
 		this.spatialUnits = spatialUnits;
 		dwellingsOnMarketList = (ArrayList<DwellingRow>[])new ArrayList[spatialUnits.size()];
 		for (int i = 0; i != spatialUnits.size(); i++)
 			dwellingsOnMarketList[i] = new ArrayList<DwellingRow>();
 		grossFreeDwellingCount = new int[spatialUnits.size()];
-		for (DwellingRow row : dwellings) {
-			if (row.getHousehold() == null) {
-				int pos = spatialUnits.indexOf(row.getSpatialunit());
-				grossFreeDwellingCount[pos]++;
-				if (r.nextInt(100) <= dwellingsOnMarketShare) {
-//					dwellingsOnMarketList[pos].add(row);
-					putDwellingOnMarket(row);
-				}
-			}
-		}
+		addAll(dwellings.getRowList(), dwellingsOnMarketShare);
 	}
 	public DwellingsOnMarket(Dwellings dwellings, SpatialUnits spatialUnits) {
 		this(dwellings, spatialUnits, Common.getDwellingsOnMarketShare());
@@ -84,6 +75,34 @@ public class DwellingsOnMarket {
 	}
 	public int getGrossFreeDwellingCount(long spatialUnitId) {
 		return grossFreeDwellingCount[spatialUnitArrayPosition(spatialUnitId)];
+	}
+	/**
+	 * Add a share of the dwellings given to the list of dwellings on the market.
+	 * The dwellings that will be added are selected by random.
+	 * 
+	 * @param dwellings List of dwellings, out of which elements are randomly selected
+	 * @param dwellingsOnMarketShare Share of dwellings that will be selected
+	 */
+	public void addAll(List<DwellingRow> dwellings, int dwellingsOnMarketShare) {
+		Random r = new Random();
+		for (DwellingRow row : dwellings) {
+			if (row.getHousehold() == null) {
+				int pos = spatialUnits.indexOf(row.getSpatialunit());
+				grossFreeDwellingCount[pos]++;
+				if (r.nextInt(100) <= dwellingsOnMarketShare) {
+//					dwellingsOnMarketList[pos].add(row);
+					putDwellingOnMarket(row);
+				}
+			}
+		}
+	}
+	/**
+	 * Add all dwellings given to the list of dwellings on the market
+	 * 
+	 * @param dwellings List of dwellings that will be added
+	 */
+	public void addAll(List<DwellingRow> dwellings) {
+		addAll(dwellings, 100);
 	}
 	/**
 	 * Select a list of available dwellings in a certain spatial unit within a defined size range and

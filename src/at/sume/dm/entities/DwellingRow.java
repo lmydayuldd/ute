@@ -5,11 +5,14 @@ package at.sume.dm.entities;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Random;
 
 import net.remesch.db.Sequence;
 import net.remesch.db.schema.Ignore;
 import at.sume.db.RecordSetRowFileable;
+import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionDwellingProperties;
+import at.sume.dm.types.LivingSpaceGroup6;
 
 /**
  * @author Alexander Remesch
@@ -65,6 +68,14 @@ public class DwellingRow extends RecordSetRowFileable<Dwellings> implements Resi
 	 */
 	public void setSpatialunitId(int spatialunitId) {
 		this.spatialunitId = spatialunitId;
+		if ((totalYearlyDwellingCosts == 0) && (dwellingSize != 0)) {
+			Random r = new Random();
+			long yearlyRentPer100Sqm = RentPerSpatialUnit.getYearlyAverageRentPer100Sqm(spatialunitId) / 100;
+			// TODO: 20% random deviance from the avg. rent price -> sysparam!
+			yearlyRentPer100Sqm = yearlyRentPer100Sqm + Math.round(yearlyRentPer100Sqm * (r.nextGaussian() - 0.5) * 0.1);
+			int dwellingCosts = Math.round(dwellingSize * yearlyRentPer100Sqm / 100);
+			totalYearlyDwellingCosts = dwellingCosts;
+		}
 	}
 
 	/**
@@ -93,6 +104,14 @@ public class DwellingRow extends RecordSetRowFileable<Dwellings> implements Resi
 	 */
 	public void setDwellingSize(short i) {
 		this.dwellingSize = i;
+		if ((totalYearlyDwellingCosts == 0) && (spatialunitId != 0)) {
+			Random r = new Random();
+			long yearlyRentPer100Sqm = RentPerSpatialUnit.getYearlyAverageRentPer100Sqm(spatialunitId) / 100;
+			// TODO: 20% random deviance from the avg. rent price -> sysparam!
+			yearlyRentPer100Sqm = yearlyRentPer100Sqm + Math.round(yearlyRentPer100Sqm * (r.nextGaussian() - 0.5) * 0.1);
+			int dwellingCosts = Math.round(dwellingSize * yearlyRentPer100Sqm / 100);
+			totalYearlyDwellingCosts = dwellingCosts;
+		}
 	}
 
 	/**
@@ -121,6 +140,7 @@ public class DwellingRow extends RecordSetRowFileable<Dwellings> implements Resi
 	 */
 	public void setLivingSpaceGroup6Id(byte livingSpaceGroup6Id) {
 		this.livingSpaceGroup6Id = livingSpaceGroup6Id;
+		dwellingSize = LivingSpaceGroup6.sampleLivingSpace(livingSpaceGroup6Id);
 	}
 
 	/**

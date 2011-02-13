@@ -19,7 +19,6 @@ public class ResidentialSatisfactionWeight {
 	public static class HouseholdPrefs implements Comparable<HouseholdPrefs> {
 		// must be public static in order to be able to use Database.select()/java reflection api
 		public long id;
-		public long scenarioId;
 		public long householdTypeId;
 		public short prefDiversity;
 		public short prefCentrality;
@@ -40,20 +39,6 @@ public class ResidentialSatisfactionWeight {
 		 */
 		public void setId(long id) {
 			this.id = id;
-		}
-
-		/**
-		 * @return the scenarioId
-		 */
-		public long getScenarioId() {
-			return scenarioId;
-		}
-
-		/**
-		 * @param scenarioId the scenarioId to set
-		 */
-		public void setScenarioId(long scenarioId) {
-			this.scenarioId = scenarioId;
 		}
 
 		/**
@@ -172,8 +157,9 @@ public class ResidentialSatisfactionWeight {
 
 	static {
 		try {
+			// TODO: finish scenario handling
 			householdPrefs = Common.db.select(HouseholdPrefs.class, 
-					"select * from _DM_HouseholdPrefs where ScenarioId = " + Common.getScenarioId() + " order by HouseholdTypeId");
+					"select * from _DM_HouseholdPrefs where HouseholdPrefsScenarioName = 'BASE' order by HouseholdTypeId");
 			assert householdPrefs.size() > 0 : "No rows selected from _DM_HouseholdPrefs";
 		} catch (SQLException e) {
 			e.printStackTrace();
