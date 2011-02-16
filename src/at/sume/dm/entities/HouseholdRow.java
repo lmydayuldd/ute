@@ -115,6 +115,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	private short rsEnvironmentalAmenities;
 	private short rsSocialPrestige;
 	private short rsDesiredLivingSpace;
+	private short numAdults = 0, adultMaxAge = 0, adultMinAge = 255, femAdultMaxAge = 0, femAdultMinAge = 255;
+	private boolean adultMale = false, adultFemale = false;
 	
 	/**
 	 * 
@@ -205,12 +207,16 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 
 	public void addMembers(ArrayList<PersonRow> members){
 		this.members.addAll(members);
+		setAspirationRegionLivingSpaceMax((short) 0);
+		setAspirationRegionLivingSpaceMin((short) 0);
+		countAdults();
 	}
 	
 	public void addMember(PersonRow person) {
 		this.members.add(person);
 		setAspirationRegionLivingSpaceMax((short) 0);
 		setAspirationRegionLivingSpaceMin((short) 0);
+		countAdults();
 	}
 	
 	public void removeMember(PersonRow person) {
@@ -231,6 +237,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		}
 		setAspirationRegionLivingSpaceMax((short) 0);
 		setAspirationRegionLivingSpaceMin((short) 0);
+		countAdults();
 	}
 	
 	public ArrayList<PersonRow> getMembers() {
@@ -289,18 +296,9 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		return residentialSatisfactionThreshMod;
 	}
 
-	/**
-	 * Determine the household type from the household structure and save it for later use
-	 * This function is only intended for the first determination of the household type. Later on in the
-	 * model run, it makes more sense to determine the household type through the type of demographic event
-	 * happening to the household
-	 * @param householdType the householdType to set
-	 */
-	public HouseholdType determineInitialHouseholdType() {
-		assert (getHouseholdSize() > 0) : "Invalid household size: " + getHouseholdSize();
-		// determine the number of adults, whether it is a mixed household, etc.
-		int numAdults = 0, adultMaxAge = 0, adultMinAge = 255, femAdultMaxAge = 0, femAdultMinAge = 255;
-		boolean adultMale = false, adultFemale = false;
+	public void countAdults() {
+		numAdults = 0; adultMaxAge = 0; adultMinAge = 255; femAdultMaxAge = 0; femAdultMinAge = 255;
+		adultMale = false; adultFemale = false;
 		for (PersonRow member : members) {
 			if (member.getAge() >= 18) {
 				numAdults++;
@@ -319,6 +317,23 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 					adultMale = true;
 			}
 		}
+	}
+
+	public short getAdultsCount() {
+		return numAdults;
+	}
+	
+	/**
+	 * Determine the household type from the household structure and save it for later use
+	 * This function is only intended for the first determination of the household type. Later on in the
+	 * model run, it makes more sense to determine the household type through the type of demographic event
+	 * happening to the household
+	 * @param householdType the householdType to set
+	 */
+	public HouseholdType determineInitialHouseholdType() {
+		assert (getHouseholdSize() > 0) : "Invalid household size: " + getHouseholdSize();
+		// determine the number of adults, whether it is a mixed household, etc.
+//		countAdults();
 		boolean mixedHousehold = adultMale && adultFemale;
 		switch (numAdults) {
 		case 0:

@@ -12,6 +12,7 @@ import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.indicators.IncomePercentiles;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
+import at.sume.dm.policy.MinimumYearlyIncome;
 import at.sume.dm.types.AgeGroup;
 import at.sume.sampling.ExactDistribution;
 
@@ -196,9 +197,10 @@ public class SampleMigratingHouseholds {
 	 * @return
 	 */
 	private HouseholdRow sampleHousehold(short householdSize, int modelYear) {
-//		ArrayList<PersonRow> persons = new ArrayList<PersonRow>(householdSize);
+		ArrayList<PersonRow> persons = new ArrayList<PersonRow>(householdSize);
 		HouseholdRow result = new HouseholdRow();
 		result.setMovingDecisionYear((short) modelYear);
+		// sample persons
 		for (int i = 0; i != householdSize; i++) {
 			PersonRow person = new PersonRow();
 			// TODO: why are we not using randomExactSample() here when we use a ExactDistribution?
@@ -208,6 +210,12 @@ public class SampleMigratingHouseholds {
 			person.setAge(AgeGroup.sampleAge(person.getAgeGroupId()));
 			person.setSex(m.getSex());
 			person.setHousehold(result);
+			persons.add(person);
+		}
+		result.addMembers(persons);
+		result.determineInitialHouseholdType();
+		// calculate income for each household member
+		for (PersonRow person : result.getMembers()) {
 			int yearlyIncome = 0;
 			// TODO: put this data into the database (but how?)
 			// since Austria only seems to have statistics about origin, age, sex and destination of immigrants,
@@ -223,20 +231,23 @@ public class SampleMigratingHouseholds {
 					if (r.nextInt(100) <= 33) {
 						minIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 80);
 						maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 100);
+						assert maxIncome - minIncome > 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
 					} else {
-						minIncome = 0;
+						MinimumYearlyIncome minimumYearlyIncome = MinimumYearlyIncome.getInstance();
+						minIncome = minimumYearlyIncome.get(modelYear, (byte) result.getAdultsCount(), (byte) (result.getMemberCount() - result.getAdultsCount()));
 						maxIncome = Math.max(0, ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 20));
+						if (maxIncome < minIncome) {
+							int t = minIncome;
+							minIncome = maxIncome;
+							maxIncome = t;
+						}
+						assert maxIncome - minIncome > 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
 					}
-					if (maxIncome - minIncome <= 0)
-						System.out.println("SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome);
 					yearlyIncome = minIncome + r.nextInt((int) (maxIncome - minIncome));
 				}
 			}
 			person.setYearlyIncome(yearlyIncome);
-//			persons.add(person);
-			result.addMember(person);
 		}
-		result.determineInitialHouseholdType();
 		// TODO: each household requires at least one adult (is this a good idea? - maybe not for single households)
 		return result;
 	}

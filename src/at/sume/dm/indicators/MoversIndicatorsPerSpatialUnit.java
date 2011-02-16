@@ -197,6 +197,7 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 			BaseIndicators b = indicatorList.get(pos);
 			return (int) (b.getYearlyRentPer100SqmSum() / b.getHouseholdCount());
 		} else {
+//			throw new AssertionError("SpatialUnit " + spatialUnitId + " not found");
 			return 0;
 		}
 	}

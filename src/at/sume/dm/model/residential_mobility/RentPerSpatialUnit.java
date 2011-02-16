@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.Locale;
 
 import at.sume.dm.Common;
+import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.indicators.MoversIndicatorsPerSpatialUnit;
 import at.sume.dm.model.output.Fileable;
 
@@ -121,12 +122,17 @@ public class RentPerSpatialUnit {
 	/**
 	 * Update rents per spatial unit from MoversIndicatorsPerSpatialUnit class
 	 */
-	public static void updateRentPerSpatialUnit() {
+	public static void updateRentPerSpatialUnit(SpatialUnits spatialUnits) {
 		for (RentPerSpatialUnitRow rpsu : rentPerSpatialUnit) {
-			int avgYearlyRentPer100Sqm = MoversIndicatorsPerSpatialUnit.getAvgYearlyRentPer100Sqm(rpsu.getSpatialUnitId());
-			assert avgYearlyRentPer100Sqm >= 0 : "Average yearly rent per 100m² < 0 (" + avgYearlyRentPer100Sqm + ")";
-			if (avgYearlyRentPer100Sqm != 0) {
-				rpsu.setYearlyRentPer100Sqm(avgYearlyRentPer100Sqm);
+			// TODO: don't calculate new rents for the surroundings of Vienna, since rent-calculation (MoversIndicatorsPerSpatialUnit) depends on
+			// dwellilngs currently - we need to change this to be able to collect rent prices for Vienna surroundings
+			if (!spatialUnits.lookup(rpsu.getSpatialUnitId()).isFreeDwellingsAlwaysAvailable()) {
+				int avgYearlyRentPer100Sqm = MoversIndicatorsPerSpatialUnit.getAvgYearlyRentPer100Sqm(rpsu.getSpatialUnitId());
+//				assert avgYearlyRentPer100Sqm > 0 : "Average yearly rent per 100m² <= 0 (" + avgYearlyRentPer100Sqm + ")";
+//				rpsu.setYearlyRentPer100Sqm(avgYearlyRentPer100Sqm);
+				assert avgYearlyRentPer100Sqm >= 0 : "Average yearly rent per 100m² < 0 (" + avgYearlyRentPer100Sqm + ")";
+				if (avgYearlyRentPer100Sqm != 0)
+					rpsu.setYearlyRentPer100Sqm(avgYearlyRentPer100Sqm);
 			}
 		}
 	}

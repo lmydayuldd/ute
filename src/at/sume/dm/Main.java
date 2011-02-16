@@ -286,7 +286,7 @@ public class Main {
 //			CostEffectiveness costEffectiveness = (CostEffectiveness)ResidentialSatisfactionManager.COSTEFFECTIVENESS.getComponent();
 			// TODO: shouldn't this be done after the movings??? But we need fresh movers indicators...
 			if (modelYear > modelStartYear)
-				RentPerSpatialUnit.updateRentPerSpatialUnit();
+				RentPerSpatialUnit.updateRentPerSpatialUnit(spatialUnits);
 			// TODO: configurable number of units
 			ArrayList<Integer> cheapestSpatialUnits = RentPerSpatialUnit.getCheapestSpatialUnits(0);
 			int lowestYearlyRentPer100Sqm = RentPerSpatialUnit.getLowestYearlyRentPer100Sqm();
