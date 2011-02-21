@@ -33,6 +33,7 @@ public class Common {
 	private static SpatialUnitLevel spatialUnitLevel;
 	private static int residentialSatisfactionEstimateRange;
 	private static short personMaxAge;
+	private static boolean activeResidentialMobility = false;
 	
 	/**
 	 * @return the iniFilename
@@ -119,6 +120,10 @@ public class Common {
 	
 	public static short getPersonMaxAge() {
 		return personMaxAge;
+	}
+	
+	public static boolean isActiveResidentialMobility() {
+		return activeResidentialMobility;
 	}
 
 	/**
