@@ -31,7 +31,8 @@ import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
-import at.sume.dm.indicators.simple.MigrationPerSpatialUnit;
+import at.sume.dm.indicators.simple.CountDemographicMovements;
+import at.sume.dm.indicators.simple.CountMigrationPerSpatialUnit;
 import at.sume.dm.migration.SampleMigratingHouseholds;
 import at.sume.dm.model.core.EntityDecisionManager;
 import at.sume.dm.model.output.Fileable;
@@ -60,7 +61,8 @@ public class Main {
 	private static Sequence dwellingSeq;
 	private static DwellingsOnMarket dwellingsOnMarket;
 	private static OutputManager outputManager;
-	private static MigrationPerSpatialUnit migrationPerSpatialUnit;
+	private static CountMigrationPerSpatialUnit migrationPerSpatialUnit;
+	private static CountDemographicMovements demographicMovementsPerSpatialUnit;
 
 	private static String printInfo() {
 		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)";
@@ -111,9 +113,11 @@ public class Main {
         System.out.println(printInfo() + ": linked households + persons");
 
         // create migration counter + register with households (once!)
-        migrationPerSpatialUnit = new MigrationPerSpatialUnit();
+        migrationPerSpatialUnit = new CountMigrationPerSpatialUnit();
         // TODO: find a way to make this registration out of the MigrationPerSpatialUnit() class directly (but only once!!!)
         households.get(0).registerMigrationObserver(migrationPerSpatialUnit);
+        demographicMovementsPerSpatialUnit = new CountDemographicMovements();
+        persons.get(0).registerDemographyObserver(demographicMovementsPerSpatialUnit);
         
         // get all dwellings on the housing market
         dwellingsOnMarket = new DwellingsOnMarket(dwellings, spatialUnits);
@@ -213,6 +217,7 @@ public class Main {
 		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
 			// Clear migration indicators
 			migrationPerSpatialUnit.clearIndicatorList();
+			demographicMovementsPerSpatialUnit.clearIndicatorList();
 	        // (Re)build household indicators - this must be done each model year because with add/remove it is a problem when the age of a person changes
 			buildIndicators();			
 	        System.out.println(printInfo() + ": build of model indicators complete");
@@ -453,13 +458,16 @@ public class Main {
 			System.out.println(printInfo() + ": " + hhMovedToCheapest + " out of " + immigratingHouseholds.size() + " immigrating households moved to the cheapest possible spatial units");
 			
 			// Out-Migration: randomly remove households
-			int numOutMigrationInternational = sampleMigratingHouseholds.getOutMigrationInternational(modelYear);
-			int numOutMigrationIntlHouseholds = households.randomRemoveHouseholds(dwellingsOnMarket, numOutMigrationInternational, MigrationRealm.INTERNATIONAL);
-			System.out.println(printInfo() + ": " + numOutMigrationInternational + " persons (" + numOutMigrationIntlHouseholds + " households) out-migrated internationally");
+			int numOutMigrationInternational = sampleMigratingHouseholds.getOutMigrationInternational(modelYear) + sampleMigratingHouseholds.getOutMigrationNational(modelYear) - hhMovedAway;
+			if (numOutMigrationInternational > 0) {
+				int numOutMigrationIntlHouseholds = households.randomRemoveHouseholds(dwellingsOnMarket, numOutMigrationInternational, MigrationRealm.INTERNATIONAL);
+				System.out.println(printInfo() + ": " + numOutMigrationInternational + " persons (" + numOutMigrationIntlHouseholds + " households) out-migrated internationally");
+			}
 			
 			//if (modelYear == modelEndYear - 1)
 			outputFreeDwellings(modelYear, "after immigration");
 			outputMigrationCount(modelYear);
+			outputDemographicMovementCount(modelYear);
 			
 			// Aging of persons (household-wise)
 			households.aging();
@@ -489,12 +497,15 @@ public class Main {
 	
 	private static String freeDwellingsFileName = "FreeDwellings.csv";
 	private static String migrationCountFileName = "Migrations.csv";
+	private static String demographicMovementsFileName = "DemographicMovements.csv";
 	
 	public static void initSimpleOutputFiles() {
 		String pathName = createPathName(freeDwellingsFileName);
 		// TODO: put this in an extra class and delete the file once per model run
 		FileUtil.rotateFile(pathName);
 		pathName = createPathName(migrationCountFileName);
+		FileUtil.rotateFile(pathName);
+		pathName = createPathName(demographicMovementsFileName);
 		FileUtil.rotateFile(pathName);
 	}
 	
@@ -521,5 +532,11 @@ public class Main {
 		FileOutputStream migrationCountFile= new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(migrationCountFile);
 		migrationPerSpatialUnit.output(ps, modelYear);
+	}
+	public static void outputDemographicMovementCount(int modelYear) throws FileNotFoundException {
+		String pathName = createPathName(demographicMovementsFileName);
+		FileOutputStream demographicMovementCountFile= new FileOutputStream(pathName, true);
+		PrintStream ps = new PrintStream(demographicMovementCountFile);
+		demographicMovementsPerSpatialUnit.output(ps, modelYear);
 	}
 }

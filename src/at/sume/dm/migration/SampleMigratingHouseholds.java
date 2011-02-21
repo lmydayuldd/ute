@@ -259,4 +259,12 @@ public class SampleMigratingHouseholds {
 	public int getOutMigrationInternational(int modelYear) {
 		return totalMigrationsPerYear.getOutMigrationInternational(modelYear);
 	}
+	/**
+	 * Get total national out migration (nr. of persons) for the given year
+	 * @param modelYear
+	 * @return
+	 */
+	public int getOutMigrationNational(int modelYear) {
+		return totalMigrationsPerYear.getOutMigrationNational(modelYear);
+	}
 }

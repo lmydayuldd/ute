@@ -10,7 +10,7 @@ import at.sume.dm.types.MigrationRealm;
  * @author Alexander Remesch
  *
  */
-public class MigrationPerSpatialUnitRow implements Comparable<Integer>,Fileable {
+public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable {
 	private int spatialUnitId;
 	private int householdLocalImmigrationCount;
 	private int householdNationalImmigrationCount;

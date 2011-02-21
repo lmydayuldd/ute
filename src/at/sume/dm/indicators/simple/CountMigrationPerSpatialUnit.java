@@ -16,7 +16,7 @@ import at.sume.dm.types.MigrationRealm;
  *  
  * @author Alexander Remesch
  */
-public class MigrationPerSpatialUnit implements MigrationObserver {
+public class CountMigrationPerSpatialUnit implements MigrationObserver {
 	private ArrayList<MigrationPerSpatialUnitRow> indicatorList = new ArrayList<MigrationPerSpatialUnitRow>();
 	private boolean headLineWritten = false;
 	/**

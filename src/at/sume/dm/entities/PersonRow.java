@@ -5,17 +5,20 @@ package at.sume.dm.entities;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import net.remesch.db.Sequence;
 import net.remesch.db.schema.Ignore;
 import at.sume.db.RecordSetRowFileable;
+import at.sume.dm.indicators.simple.DemographyObservable;
+import at.sume.dm.indicators.simple.DemographyObserver;
 import at.sume.dm.types.AgeGroup;
 
 /**
  * @author Alexander Remesch
  *
  */
-public class PersonRow extends RecordSetRowFileable<Persons> {
+public class PersonRow extends RecordSetRowFileable<Persons> implements DemographyObservable {
 	private int householdId;
 	private byte sex;
 //	private int yearBorn;
@@ -166,6 +169,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> {
 
 	public void setHousehold(HouseholdRow household) {
 		this.household = household;
+//		household.addMember(this);
 	}
 
 //	/**
@@ -216,7 +220,32 @@ public class PersonRow extends RecordSetRowFileable<Persons> {
 			throw new UnsupportedOperationException("Unknown field name " + name);
 		}
 	}
-
+	
+	/**
+	 * Birth of a person in a household
+	 * 
+	 * @param household
+	 * @return
+	 */
+	public static PersonRow giveBirth(HouseholdRow household) {
+		PersonRow child = new PersonRow();
+		child.setHousehold(household);
+		household.addMember(child);
+//		child.setAgeGroupId((byte) 1);
+		child.setAge((byte)0);
+		household.updateHouseholdTypeAfterBirth();
+		child.notifyBirth(household.getSpatialunitId());
+		return child;
+	}
+	
+	/**
+	 * Death of a person
+	 */
+	public void die() {
+		notifyDeath(getHousehold().getSpatialunitId());
+		remove();
+	}
+	
 	/**
 	 * Remove this record from the list of persons and the list of household members
 	 */
@@ -279,5 +308,37 @@ public class PersonRow extends RecordSetRowFileable<Persons> {
 	@Override
 	public String toString(String delimiter) {
 		return getPersonId() + delimiter + getHousehold().getHouseholdId() + delimiter + getSex() + delimiter + getAge() + delimiter + getYearlyIncome();
+	}
+
+	
+	private static ArrayList<DemographyObserver> demographyObservers = new ArrayList<DemographyObserver>();
+
+	@Override
+	public void registerDemographyObserver(DemographyObserver o) {
+		int i = demographyObservers.indexOf(o);
+		// Add observer only once!
+		if (i < 0)
+			demographyObservers.add(o);
+	}
+
+	@Override
+	public void removeDemographyObserver(DemographyObserver o) {
+		int i = demographyObservers.indexOf(o);
+		if (i >= 0)
+			demographyObservers.remove(i);
+	}
+
+	@Override
+	public void notifyBirth(Integer spatialUnitId) {
+		for (DemographyObserver obs : demographyObservers) {
+			obs.addBirth(spatialUnitId);
+		}
+	}
+
+	@Override
+	public void notifyDeath(Integer spatialUnitId) {
+		for (DemographyObserver obs : demographyObservers) {
+			obs.addDeath(spatialUnitId);
+		}
 	}
 }

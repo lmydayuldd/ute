@@ -206,7 +206,7 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	public int randomRemoveHouseholds(DwellingsOnMarket dwellingsOnMarket, int numPersons, MigrationRealm migrationRealm) {
 		int i = 0, result = 0;
 		while (i <= numPersons) {
-			int householdNr = (int) Math.round(Math.random() * rowList.size());
+			int householdNr = (int) (Math.random() * rowList.size());
 			HouseholdRow household = rowList.get(householdNr);
 			i += household.getMemberCount();
 			household.emigrate(dwellingsOnMarket, migrationRealm);

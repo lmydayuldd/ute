@@ -48,6 +48,6 @@ public class PersonDeath extends Event<PersonRow> {
 		// if a person dies, it will be simply removed
 		// the corresponding household will be notified via an Observer/Observable 
 		// and will check itself if any further action is necessary
-		entity.remove();
+		entity.die();
 	}
 }

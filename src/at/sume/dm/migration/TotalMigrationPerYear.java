@@ -19,6 +19,7 @@ public class TotalMigrationPerYear {
 		private int immigrationInternational;
 		private int immigrationNational;
 		private int outMigrationInternational;
+		private int outMigrationNational;
 		/**
 		 * @return the id
 		 */
@@ -79,6 +80,18 @@ public class TotalMigrationPerYear {
 		public int getOutMigrationInternational() {
 			return outMigrationInternational;
 		}
+		/**
+		 * @return the outMigrationNational
+		 */
+		public int getOutMigrationNational() {
+			return outMigrationNational;
+		}
+		/**
+		 * @param outMigrationNational the outMigrationNational to set
+		 */
+		public void setOutMigrationNational(int outMigrationNational) {
+			this.outMigrationNational = outMigrationNational;
+		}
 		/* (non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
@@ -91,7 +104,7 @@ public class TotalMigrationPerYear {
 	private ArrayList<MigrationsPerYear> migrationsPerYear;
 	
 	public TotalMigrationPerYear(String scenarioName) throws SQLException, InstantiationException, IllegalAccessException {
-		String selectStatement = "SELECT id, modelYear, immigrationInternational, immigrationNational, outMigrationInternational " +
+		String selectStatement = "SELECT id, modelYear, immigrationInternational, immigrationNational, outMigrationInternational, outMigrationNational " +
 			"FROM _DM_Migration " +
 			"WHERE scenarioName = '" + scenarioName + "' " +
 			"ORDER BY modelYear";
@@ -116,6 +129,17 @@ public class TotalMigrationPerYear {
 		MigrationsPerYear m = migrationsPerYear.get(pos);
 		assert m.getModelYear() == modelYear : "Calculated index for year " + modelYear + " returns data for year " + m.getModelYear(); 
 		return m.getOutMigrationInternational();
+	}
+	/**
+	 * Get total national out migration (nr. of persons) for the given year
+	 * @param modelYear
+	 * @return
+	 */
+	public int getOutMigrationNational(int modelYear) {
+		int pos = lookupYear(modelYear);
+		MigrationsPerYear m = migrationsPerYear.get(pos);
+		assert m.getModelYear() == modelYear : "Calculated index for year " + modelYear + " returns data for year " + m.getModelYear(); 
+		return m.getOutMigrationNational();
 	}
 //	private long get_v1(int modelYear) {
 //		for (MigrationsPerYear m : migrationsPerYear) {
