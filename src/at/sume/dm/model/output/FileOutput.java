@@ -19,9 +19,8 @@ import net.remesch.util.FileUtil;
 public class FileOutput {
 	private PrintStream psOut;
 	private ArrayList<Fileable> rowList;
-//	private String path = "";
-//	private String fileName;
 	private final static String delimiter = ";";
+	private boolean headLineWritten = false;
 	
 	/**
 	 * 
@@ -32,13 +31,11 @@ public class FileOutput {
 	@SuppressWarnings("unchecked")
 	public FileOutput(String path, String fileName, List<? extends Fileable> rowList) throws FileNotFoundException {
 		String pathName;
-//		assert rowList.size() > 0 : "rowList cannot be empty!";
 		this.rowList = (ArrayList<Fileable>) rowList;
 		if (path.endsWith("\\"))
 			pathName = path + fileName + ".csv";
 		else
 			pathName = path + "\\" + fileName + ".csv";
-//		this.fileName = fileName;
 		// Rename existing file to a unique filename
 		FileUtil.rotateFile(pathName);
 		FileOutputStream fileOutputStream = new FileOutputStream(pathName, true);
@@ -50,12 +47,13 @@ public class FileOutput {
 	 * @throws IOException 
 	 */
 	public void persistDb(short modelYear) {
-		psOut.println("ModelYear" + delimiter + rowList.get(0).toCsvHeadline(delimiter));
+		if (!headLineWritten) {
+			psOut.println("ModelYear" + delimiter + rowList.get(0).toCsvHeadline(delimiter));
+			headLineWritten = true;
+		}
 		for (Fileable row : rowList) {
 			String orow = modelYear + delimiter + row.toString(delimiter);
 			psOut.println(orow);
 		}
-//		psOut.close();
-//		fileOutputStream.close();
 	}
 }
