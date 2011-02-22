@@ -131,6 +131,7 @@ public abstract class RecordSetRow<T extends RecordSet<?>> implements Comparable
 	/**
 	 * Remove this row from its recordset (only in RAM)
 	 */
+	// TODO: implement as a function of the collection - RecordSetRow should not know anything about the collection!!!
 	public void remove() {
 //		rowList.remove(this);
 		recordSet.getRowList().remove(this);
