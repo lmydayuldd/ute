@@ -893,9 +893,9 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		if (hasDwelling())
 			dwellingsOnMarket.putDwellingOnMarket(getDwelling());
 		// Remove household members as well
-//		for (PersonRow member : members) {
-//			member.remove();
-//		}
+		for (PersonRow member : members) {
+			member.remove();
+		}
 		super.remove();
 	}
 
