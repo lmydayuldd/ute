@@ -14,11 +14,11 @@ import at.sume.dm.indicators.base.Indicator;
 public enum PercentileIndicatorManager {
 	INCOME_PERCENTILES("Income percentiles", new IncomePercentiles());
 	
-	private String label;
+//	private String label;
 	private Indicator<HouseholdRow> indicator;
 
 	PercentileIndicatorManager(String label, Indicator<HouseholdRow> indicator) {
-		this.label = label;
+//		this.label = label;
 		this.indicator = indicator;
 	}
 	

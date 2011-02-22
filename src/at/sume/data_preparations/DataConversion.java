@@ -24,44 +24,44 @@ public class DataConversion {
 	 * Conversion of table "VZ_2001_Alter_Geschlecht_Familienstand (ZB)" to "VZ_2001_Alter_Geschlecht_Familienstand (ZB) relational" 
 	 * @throws SQLException 
 	 */
-	private static void Convert_VZ2001_HH_Age() throws SQLException {
-		Database db = new Database(Common.getDbLocation());
-		ResultSet res = db.executeQuery("select *, val([GKZ]) AS GKZnum from [VZ_2001_Alter_Geschlecht_Familienstand (ZB)] where len(gkz) = 6 and Geschlecht <> 'gesamt'");
-		String sqlx = "insert into [VZ_2001_Alter_Geschlecht_Familienstand (ZB) relational] (ID, SpatialunitId, Sex, AgeGroupId, PersonCount) " + 
-			" values (?, ?, ?, ?, ?)";
-		PreparedStatement ps = db.con.prepareStatement(sqlx);
-		String fieldnames[] = { "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80-84", "85-" };
-		String sex;
-		Long gkzNum;
-		
-		int i = 1;
-		while (res.next()) {
-			gkzNum = res.getLong("GKZnum");
-			sex = res.getString("Geschlecht");
-			ps.setString(1, Integer.toString(i++));
-			ps.setString(2, Long.toString(gkzNum));
-			if (sex.equals("weiblich"))
-				ps.setString(3, "1");
-			else
-				ps.setString(3, "2");
-			// Age 0-14
-			ps.setString(4, "1");
-			ps.setString(5, Long.toString(res.getLong("0-4") + res.getLong("5-9") + res.getLong("10-14")));
-			ps.executeUpdate();
-			// Age 15-19 to 85-
-			for (int j = 0; j != fieldnames.length; j++) {
-				ps.setString(1, Integer.toString(i++));
-//				ps.setString(2, gkzNum);
-//				if (sex == "weiblich")
-//					ps.setString(3, "1");
-//				else
-//					ps.setString(3, "2");
-				ps.setString(4, Integer.toString(j + 2));
-				ps.setString(5, Long.toString(res.getLong(fieldnames[j])));
-				ps.executeUpdate();
-			}
-		}
-	}
+//	private static void Convert_VZ2001_HH_Age() throws SQLException {
+//		Database db = new Database(Common.getDbLocation());
+//		ResultSet res = db.executeQuery("select *, val([GKZ]) AS GKZnum from [VZ_2001_Alter_Geschlecht_Familienstand (ZB)] where len(gkz) = 6 and Geschlecht <> 'gesamt'");
+//		String sqlx = "insert into [VZ_2001_Alter_Geschlecht_Familienstand (ZB) relational] (ID, SpatialunitId, Sex, AgeGroupId, PersonCount) " + 
+//			" values (?, ?, ?, ?, ?)";
+//		PreparedStatement ps = db.con.prepareStatement(sqlx);
+//		String fieldnames[] = { "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80-84", "85-" };
+//		String sex;
+//		Long gkzNum;
+//		
+//		int i = 1;
+//		while (res.next()) {
+//			gkzNum = res.getLong("GKZnum");
+//			sex = res.getString("Geschlecht");
+//			ps.setString(1, Integer.toString(i++));
+//			ps.setString(2, Long.toString(gkzNum));
+//			if (sex.equals("weiblich"))
+//				ps.setString(3, "1");
+//			else
+//				ps.setString(3, "2");
+//			// Age 0-14
+//			ps.setString(4, "1");
+//			ps.setString(5, Long.toString(res.getLong("0-4") + res.getLong("5-9") + res.getLong("10-14")));
+//			ps.executeUpdate();
+//			// Age 15-19 to 85-
+//			for (int j = 0; j != fieldnames.length; j++) {
+//				ps.setString(1, Integer.toString(i++));
+////				ps.setString(2, gkzNum);
+////				if (sex == "weiblich")
+////					ps.setString(3, "1");
+////				else
+////					ps.setString(3, "2");
+//				ps.setString(4, Integer.toString(j + 2));
+//				ps.setString(5, Long.toString(res.getLong(fieldnames[j])));
+//				ps.executeUpdate();
+//			}
+//		}
+//	}
 	
 	public static void Convert_VZ2001_HH_Size() throws SQLException {
 		Database db = new Database(Common.getDbLocation());

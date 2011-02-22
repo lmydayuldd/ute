@@ -7,10 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-
-import net.remesch.util.StringUtil;
 
 import at.sume.dm.entities.HouseholdRow;
 
@@ -107,12 +104,12 @@ public abstract class IndicatorBase<E extends IndicatorRow> {
 	 */
 	public void outputHeadline() {
 		String result = "";
-		E e = null;
+//		E e = null;
 		// TODO: causes exception because of null pointer - ist this fixable?
-		Class<? extends IndicatorRow> c = e.getClass();
-		for (Field field : c.getDeclaredFields()) {
-			result = StringUtil.concat("\t", result, field.getName());
-		}
+//		Class<? extends IndicatorRow> c = e.getClass();
+//		for (Field field : c.getDeclaredFields()) {
+//			result = StringUtil.concat("\t", result, field.getName());
+//		}
 		output.println(result);
 	}
 	public void outputIndicatorData(int modelYear) throws FileNotFoundException, IOException {

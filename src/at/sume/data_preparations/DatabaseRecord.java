@@ -29,10 +29,10 @@ public abstract class DatabaseRecord {
 		ps = db.con.prepareStatement(sqlx);
 	}
 
-	private void executeUpdate() throws SQLException
-	{
-		ps.executeUpdate();
-	}
+//	private void executeUpdate() throws SQLException
+//	{
+//		ps.executeUpdate();
+//	}
 	
 	public void dbInsert() throws SQLException {
 		ps.executeUpdate();

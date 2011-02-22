@@ -302,8 +302,10 @@ public class Main {
 			outputFreeDwellings(modelYear, "before moving households");
 			// Loop through potential movers
 			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0, hhZeroIncome = 0, hhLowIncome = 0, hhMovedAway = 0;
+			int hhNotMoving = 0;
 			j = 0;
 			for (HouseholdRow household : potentialMovers) {
+				boolean notMoving = false;
 				if (j % 10000 == 0) {
 					System.out.println(printInfo() + ": Processing potential mover " + j + " of " + potentialMovers.size() + " in year " + modelYear);
 				}
@@ -333,14 +335,23 @@ public class Main {
 						SpatialUnitRow spatialUnit = spatialUnits.getSpatialUnit(spatialUnitId);
 						if (spatialUnit.isFreeDwellingsAlwaysAvailable()) {
 							// Household moves away
-							hhMovedAway++;
-							household.emigrate(dwellingsOnMarket, MigrationRealm.NATIONAL);
-							dwelling = null;
-							break;
+							if (Common.getMovingOutProbability().occurs()) {
+								hhMovedAway++;
+								household.emigrate(dwellingsOnMarket, MigrationRealm.NATIONAL);
+								dwelling = null;
+								break;
+							} else {
+								notMoving = true;
+							}
 						} else {
 							dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, household, true, modelYear);
 							if (dwelling != null) {
-								break;
+								if (Common.getMovingProbability().occurs()) {
+									break;
+								} else {
+									notMoving = true;
+									dwelling = null;
+								}
 							} else {
 								if (dwellingsOnMarket.getNoDwellingFoundReason() != NoDwellingFoundReason.NO_SUITABLE_DWELLING) {
 									noDwellingFoundReason = dwellingsOnMarket.getNoDwellingFoundReason();
@@ -352,13 +363,17 @@ public class Main {
 					if (dwelling != null) {
 						household.relocate(dwellingsOnMarket, dwelling);
 					} else {
-						switch (noDwellingFoundReason) {
-						case NO_SATISFACTION:
-							hhNoSatisfaction++;
-							break;
-						default:
-							hhFoundNoDwellings++;
-							break;
+						if (notMoving) {
+							hhNotMoving++;
+						} else {
+							switch (noDwellingFoundReason) {
+							case NO_SATISFACTION:
+								hhNoSatisfaction++;
+								break;
+							default:
+								hhFoundNoDwellings++;
+								break;
+							}
 						}
 					}
 				}
@@ -370,6 +385,7 @@ public class Main {
 			System.out.println(printInfo() + ": " + hhNoSatisfaction + " out of " + potentialMovers.size() + " potential moving households would not improve their estimated residential satisfaction");
 			System.out.println(printInfo() + ": " + hhFoundNoDwellings + " out of " + potentialMovers.size() + " potential moving households found no dwelling");
 			System.out.println(printInfo() + ": " + hhMovedAway + " out of " + potentialMovers.size() + " potential moving households moved away");
+			System.out.println(printInfo() + ": " + hhNotMoving + " out of " + potentialMovers.size() + " potential moving households decided not to move to a dwelling/an area that suited their needs");
 			outputFreeDwellings(modelYear, "after moving households, before immigration");
 			// Immigrating Households
 			ArrayList<HouseholdRow> immigratingHouseholds = sampleMigratingHouseholds.sample(modelYear);

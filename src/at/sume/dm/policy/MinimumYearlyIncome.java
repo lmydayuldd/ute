@@ -3,7 +3,6 @@
  */
 package at.sume.dm.policy;
 
-import at.sume.dm.types.HouseholdType;
 
 /**
  * Calculate the minimum yearly income for a household type in a certain model year

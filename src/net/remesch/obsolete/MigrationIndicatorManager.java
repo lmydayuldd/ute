@@ -16,11 +16,11 @@ import at.sume.dm.indicators.base.IndicatorBase;
 public enum MigrationIndicatorManager {
 	IMMIGRATING_HOUSEHOLDS("Immigrating households", new ImmigratingHouseholds(), "immigrating_households.txt");
 	
-	private String label;
+//	private String label;
 	private IndicatorBase<?> indicatorBase;
 
 	MigrationIndicatorManager(String label, IndicatorBase<?> indicatorBase, String outputFileName) {
-		this.label = label;
+//		this.label = label;
 		this.indicatorBase = indicatorBase;
 		indicatorBase.setOutputFileName(outputFileName);
 		try {

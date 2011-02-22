@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import net.remesch.db.Database;
+import net.remesch.probability.SingleProbability;
 import net.remesch.util.DateUtil;
 import at.sume.dm.entities.SpatialUnitLevel;
 
@@ -34,6 +35,8 @@ public class Common {
 	private static int residentialSatisfactionEstimateRange;
 	private static short personMaxAge;
 	private static boolean activeResidentialMobility = false;
+	private static SingleProbability movingProbability;
+	private static SingleProbability movingOutProbability;
 	
 	/**
 	 * @return the iniFilename
@@ -127,6 +130,20 @@ public class Common {
 	}
 
 	/**
+	 * @return the movingProbability
+	 */
+	public static SingleProbability getMovingProbability() {
+		return movingProbability;
+	}
+
+	/**
+	 * @return the movingOutProbability
+	 */
+	public static SingleProbability getMovingOutProbability() {
+		return movingOutProbability;
+	}
+	
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -191,6 +208,8 @@ public class Common {
 		}
 		residentialSatisfactionEstimateRange = Integer.parseInt(getSysParam("ResidentialSatisfactionEstimateRange"));
 		personMaxAge = Short.parseShort(getSysParam("PersonMaxAge"));
+		movingProbability = new SingleProbability(Byte.parseByte(getSysParam("ProbabilityForMoving")), 100);
+		movingOutProbability = new SingleProbability(Byte.parseByte(getSysParam("ProbabilityForMovingOut")), 100);
 	}
 	
 	/**
