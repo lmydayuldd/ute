@@ -259,12 +259,12 @@ public class DwellingsOnMarket {
 		int su = spatialUnits.indexOf(dwelling.getSpatialunit());
 		dwellingsOnMarketList[su].remove(dwelling);
 	}
-	public void outputDwellingsPerSize(PrintStream ps, int modelYear) {
+	public void outputDwellingsPerSize(PrintStream ps, int modelYear, String label) {
 		int dwellingSizeCount[] = new int[LivingSpaceGroup6.getLivingSpaceGroupCount()];
 		StringBuffer output = new StringBuffer();
 		// Headline - written only once per model run
 		if (!headLineWritten) {
-			output.append("ModelYear;SpatialUnit");
+			output.append("ModelYear;SpatialUnit;Label;");
 			for (byte i = 0; i != LivingSpaceGroup6.getLivingSpaceGroupCount(); i++) {
 				output.append(";" + LivingSpaceGroup6.getLivingSpaceGroupName((byte) (i + 1)));
 			}
@@ -273,7 +273,7 @@ public class DwellingsOnMarket {
 		}
 		for (int i = 0; i != spatialUnits.size(); i++) {
 			if (!spatialUnits.get(i).isFreeDwellingsAlwaysAvailable()) { // don't output for spatial units outside the model area
-				output = new StringBuffer(modelYear + ";" + spatialUnits.get(i).getSpatialUnitId());
+				output = new StringBuffer(modelYear + ";" + spatialUnits.get(i).getSpatialUnitId() + ";" + label);
 				// Count dwellings per living space group
 				for (DwellingRow dwelling : dwellingsOnMarketList[i]) {
 					dwellingSizeCount[LivingSpaceGroup6.getLivingSpaceGroupId(dwelling.getDwellingSize()) - 1]++;

@@ -531,7 +531,7 @@ public class Main {
 		FileOutputStream freeDwellingsFile = new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(freeDwellingsFile);
 //		ps.println("======= " + label + "=======" + modelYear + "=======");
-		dwellingsOnMarket.outputDwellingsPerSize(ps, modelYear);
+		dwellingsOnMarket.outputDwellingsPerSize(ps, modelYear, label);
 	}
 	
 	/**
