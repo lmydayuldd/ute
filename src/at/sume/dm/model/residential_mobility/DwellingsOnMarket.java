@@ -264,7 +264,7 @@ public class DwellingsOnMarket {
 		StringBuffer output = new StringBuffer();
 		// Headline - written only once per model run
 		if (!headLineWritten) {
-			output.append("ModelYear;SpatialUnit;Label;");
+			output.append("ModelYear;SpatialUnit;Label");
 			for (byte i = 0; i != LivingSpaceGroup6.getLivingSpaceGroupCount(); i++) {
 				output.append(";" + LivingSpaceGroup6.getLivingSpaceGroupName((byte) (i + 1)));
 			}
