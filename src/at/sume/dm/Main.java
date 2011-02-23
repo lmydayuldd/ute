@@ -299,7 +299,7 @@ public class Main {
 			System.out.println(printInfo() + ": lowest rent (€/100m²/yr.): " + lowestYearlyRentPer100Sqm + ", highest rent: " + highestYearlyRentPer100Sqm);
 			// Reset the movers indicators
 			MoversIndicatorManager.resetIndicators();
-			outputFreeDwellings(modelYear, "before moving households");
+			outputFreeDwellings(modelYear, "before moving households + after demographic changes");
 			// Loop through potential movers
 			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0, hhZeroIncome = 0, hhLowIncome = 0, hhMovedAway = 0;
 			int hhNotMoving = 0;
