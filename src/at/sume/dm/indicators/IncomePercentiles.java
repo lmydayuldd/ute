@@ -67,7 +67,7 @@ public class IncomePercentiles implements Indicator<HouseholdRow> {
 			Collections.sort(householdIncomes);
 			householdIncomesSorted = true;
 		}
-		int index = (int)((householdIncomes.size() - 1) * percentage / 100);
+		int index = (int)((householdIncomes.size() - 1) * ((double) percentage / 100));
 		return householdIncomes.get(index);
 	}
 	/**
@@ -83,7 +83,7 @@ public class IncomePercentiles implements Indicator<HouseholdRow> {
 			Collections.sort(personIncomes);
 			personIncomesSorted = true;
 		}
-		int index = (int)((personIncomes.size() - 1) * percentage / 100);
+		int index = (int)((personIncomes.size() - 1) * ((double) percentage / 100));
 		return personIncomes.get(index);
 	}
 	@Override

@@ -494,6 +494,7 @@ public class Main {
 	 */
 	public static void buildIndicators() {
 		AllHouseholdsIndicatorManager.resetIndicators();
+		PercentileIndicatorManager.resetIndicators();
 		for (HouseholdRow household : households) {
 			AllHouseholdsIndicatorManager.addHousehold(household);
 			PercentileIndicatorManager.addHousehold(household);
