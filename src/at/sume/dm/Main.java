@@ -28,6 +28,7 @@ import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
+import at.sume.dm.indicators.AggregatedDwellings;
 import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
@@ -63,6 +64,7 @@ public class Main {
 	private static OutputManager outputManager;
 	private static CountMigrationPerSpatialUnit migrationPerSpatialUnit;
 	private static CountDemographicMovements demographicMovementsPerSpatialUnit;
+	private static AggregatedDwellings aggregatedDwellings;
 
 	private static String printInfo() {
 		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)";
@@ -144,6 +146,9 @@ public class Main {
         fileNameList.add("AggregatedHouseholds");
         fileableList.add(AllHouseholdsIndicatorManager.AGGREGATED_PERSONS.getIndicator().getIndicatorList());
         fileNameList.add("AggregatedPersons");
+        aggregatedDwellings = new AggregatedDwellings();
+        fileableList.add(aggregatedDwellings.getIndicatorList());
+        fileNameList.add("AggregatedDwellings");
 //        fileableList.add(migrationPerSpatialUnit.getIndicatorList());
 //        fileNameList.add("Migrations");
         outputManager = new OutputManager(Common.getPathOutput(), fileNameList, fileableList);
@@ -223,10 +228,11 @@ public class Main {
 	        // (Re)build household indicators - this must be done each model year because with add/remove it is a problem when the age of a person changes
 			buildIndicators();			
 	        System.out.println(printInfo() + ": build of model indicators complete");
+	        aggregatedDwellings.build(dwellings.getRowList());
 	        outputManager.output((short) modelYear);
 	        System.out.println(printInfo() + ": model data output to database");
 	        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
-
+	        
 	        // Create new-built dwellings
 	        List<DwellingRow> newDwellings = sampleBuildingProjects.sample(modelYear);
 	        dwellings.addAll(newDwellings);

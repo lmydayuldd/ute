@@ -54,7 +54,7 @@ public class CostOfResidenceGroup {
 				return i.costOfResidenceGroupId;
 			}
 		}
-		return 0;
+		throw new AssertionError("no cost of residence group found for " + costOfResidence);
 	}
 	/**
 	 * Get the printable name of a certain cost of residence group by direct access to ArrayList
