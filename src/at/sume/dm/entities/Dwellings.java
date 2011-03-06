@@ -10,7 +10,6 @@ import java.util.Random;
 import net.remesch.db.Database;
 import at.sume.db.RecordSet;
 import at.sume.dm.Common;
-import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.dm.types.LivingSpaceGroup6;
 
 /**
@@ -98,7 +97,7 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	public ArrayList<DwellingRow> getFreeDwellings() {
 		ArrayList<DwellingRow> freeDwellings = new ArrayList<DwellingRow>();
 		for (DwellingRow dwelling : rowList) {
-			if (dwelling.getHousehold().equals(null)) {
+			if (dwelling.getHousehold() == null) {
 				freeDwellings.add(dwelling);
 			}
 		}
@@ -114,7 +113,7 @@ public class Dwellings extends RecordSet<DwellingRow> {
 		Random r = new Random();
 		ArrayList<DwellingRow> freeDwellings = new ArrayList<DwellingRow>();
 		for (DwellingRow dwelling : rowList) {
-			if (dwelling.getHousehold().equals(null)) {
+			if (dwelling.getHousehold() == null) {
 				if (r.nextInt() <= Common.getDwellingsOnMarketShare()) {
 					freeDwellings.add(dwelling);
 				}
@@ -131,13 +130,11 @@ public class Dwellings extends RecordSet<DwellingRow> {
 		if (dwelling.getDwellingSize() == 0)
 			dwelling.setDwellingSize(LivingSpaceGroup6.sampleLivingSpace(dwelling.getLivingSpaceGroup6Id()));
 		// calculate dwelling costs
-		if (dwelling.getTotalYearlyDwellingCosts() == 0) {
-			Random r = new Random();
-			long yearlyRentPer100Sqm = RentPerSpatialUnit.getYearlyAverageRentPer100Sqm(dwelling.getSpatialunitId()) / 100;
-			// TODO: 20% random deviance from the avg. rent price -> sysparam!
-			yearlyRentPer100Sqm = yearlyRentPer100Sqm + Math.round(yearlyRentPer100Sqm * (r.nextGaussian() - 0.5) * 0.1);
-			int dwellingCosts = Math.round(dwelling.getDwellingSize() * yearlyRentPer100Sqm / 100);
-			dwelling.setTotalYearlyDwellingCosts(dwellingCosts);
+		if (dwelling.getHousehold() == null) {
+			// Force calculation of dwelling costs to current market values if the dwelling is vacant
+			dwelling.calcTotalYearlyDwellingCosts(true);
+		} else {
+			dwelling.calcTotalYearlyDwellingCosts(false);
 		}
 	}
 	/* (non-Javadoc)

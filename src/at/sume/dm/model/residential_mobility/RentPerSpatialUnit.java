@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 
+import net.remesch.db.schema.Ignore;
 import at.sume.dm.Common;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.indicators.MoversIndicatorsPerSpatialUnit;
@@ -25,6 +26,10 @@ public class RentPerSpatialUnit {
 	public static class RentPerSpatialUnitRow implements Comparable<RentPerSpatialUnitRow>, Fileable {
 		private int spatialUnitId;
 		private int yearlyRentPer100Sqm;
+		@Ignore
+		private int numSamples;
+		@Ignore
+		private short sampleYear;
 		/**
 		 * @return the spatialUnitId
 		 */
@@ -38,7 +43,7 @@ public class RentPerSpatialUnit {
 			this.spatialUnitId = spatialUnitId;
 		}
 		/**
-		 * @return the yearlyRentPerSqm
+		 * @return the yearlyRentPer100Sqm
 		 */
 		public int getYearlyRentPer100Sqm() {
 			return yearlyRentPer100Sqm;
@@ -49,6 +54,30 @@ public class RentPerSpatialUnit {
 		public void setYearlyRentPer100Sqm(int yearlyRentPer100Sqm) {
 			this.yearlyRentPer100Sqm = yearlyRentPer100Sqm;
 		}
+		/**
+		 * @return the numSamples
+		 */
+		public int getNumSamples() {
+			return numSamples;
+		}
+		/**
+		 * @param numSamples the numSamples to set
+		 */
+		public void setNumSamples(int numSamples) {
+			this.numSamples = numSamples;
+		}
+		/**
+		 * @return the sampleYear
+		 */
+		public short getSampleYear() {
+			return sampleYear;
+		}
+		/**
+		 * @param sampleYear the sampleYear to set
+		 */
+		public void setSampleYear(short sampleYear) {
+			this.sampleYear = sampleYear;
+		}
 		/* (non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
@@ -58,7 +87,7 @@ public class RentPerSpatialUnit {
 		}
 		@Override
 		public String toCsvHeadline(String delimiter) {
-			return "SpatialUnitId" + delimiter + "YearlyRentPer100Sqm" + delimiter + "MonthlyRentPerSqm";
+			return "SpatialUnitId" + delimiter + "YearlyRentPer100Sqm" + delimiter + "MonthlyRentPerSqm" + delimiter + "NumSamples" + delimiter + "SampleYear";
 		}
 		@Override
 		public String toString(String delimiter) {
@@ -66,7 +95,7 @@ public class RentPerSpatialUnit {
 			DecimalFormat df = (DecimalFormat)nf;
 			double monthlyRentPerSqm = ((double) Math.round(yearlyRentPer100Sqm / 12)) / 100.0;
 			String output = df.format(monthlyRentPerSqm);
-			return spatialUnitId + delimiter + yearlyRentPer100Sqm + delimiter + output;
+			return spatialUnitId + delimiter + yearlyRentPer100Sqm + delimiter + output + delimiter + numSamples + delimiter + sampleYear;
 		}
 	}
 
@@ -122,7 +151,7 @@ public class RentPerSpatialUnit {
 	/**
 	 * Update rents per spatial unit from MoversIndicatorsPerSpatialUnit class
 	 */
-	public static void updateRentPerSpatialUnit(SpatialUnits spatialUnits) {
+	public static void updateRentPerSpatialUnit(SpatialUnits spatialUnits, int modelYear) {
 		for (RentPerSpatialUnitRow rpsu : rentPerSpatialUnit) {
 			// TODO: don't calculate new rents for the surroundings of Vienna, since rent-calculation (MoversIndicatorsPerSpatialUnit) depends on
 			// dwellilngs currently - we need to change this to be able to collect rent prices for Vienna surroundings
@@ -131,8 +160,11 @@ public class RentPerSpatialUnit {
 //				assert avgYearlyRentPer100Sqm > 0 : "Average yearly rent per 100m² <= 0 (" + avgYearlyRentPer100Sqm + ")";
 //				rpsu.setYearlyRentPer100Sqm(avgYearlyRentPer100Sqm);
 				assert avgYearlyRentPer100Sqm >= 0 : "Average yearly rent per 100m² < 0 (" + avgYearlyRentPer100Sqm + ")";
-				if (avgYearlyRentPer100Sqm != 0)
+				if (avgYearlyRentPer100Sqm != 0) {
 					rpsu.setYearlyRentPer100Sqm(avgYearlyRentPer100Sqm);
+					rpsu.setSampleYear((short) modelYear);
+					rpsu.setNumSamples(MoversIndicatorsPerSpatialUnit.getHouseholdCount(rpsu.getSpatialUnitId()));
+				}
 			}
 		}
 	}

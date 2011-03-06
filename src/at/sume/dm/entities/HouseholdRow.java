@@ -125,7 +125,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		members = new ArrayList<PersonRow>();
 		if (childrenWeight == 0) {
 			String sp = Common.getSysParam("ChildrenWeight");
-			if (sp.equals(null))
+			if (sp == null)
 				childrenWeight = 0.5F;
 			else
 				childrenWeight = Float.parseFloat(sp);
@@ -133,21 +133,21 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		}
 		if (childrenMaxAge == 0) {
 			String sp = Common.getSysParam("ChildrenMaxAge");
-			if (sp.equals(null))
+			if (sp == null)
 				childrenWeight = 14;
 			else
 				childrenMaxAge = Byte.parseByte(sp);
 		}
 //		if (desiredLivingSpaceRandomPct == 0) {
 //			String sp = Common.getSysParam("DesiredLivingSpaceRandomPct");
-//			if (sp.equals(null))
+//			if (sp == null)
 //				desiredLivingSpaceRandomPct = 10;
 //			else
 //				desiredLivingSpaceRandomPct = Byte.parseByte(sp);
 //		}
 		if (desiredLivingSpaceRangePct == 0) {
 			String sp = Common.getSysParam("DesiredLivingSpaceRangePct");
-			if (sp.equals(null))
+			if (sp == null)
 				desiredLivingSpaceRangePct = 10;
 			else
 				desiredLivingSpaceRangePct = Byte.parseByte(sp);
@@ -876,7 +876,10 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 */
 	public void relocate(DwellingsOnMarket dwellingsOnMarket, DwellingRow dwelling) {
 		if (hasDwelling()) {
-			dwellingsOnMarket.putDwellingOnMarket(getDwelling());
+			DwellingRow oldDwelling = getDwelling();
+			dwellingsOnMarket.putDwellingOnMarket(oldDwelling);
+			// Force calculation of dwelling costs to current market values for the old dwelling
+			oldDwelling.calcTotalYearlyDwellingCosts(true);
 			notifyLocalMigration(getSpatialunitId(), dwelling.getSpatialunitId());
 		} else {
 			// TODO: specify the migration realm and distinguish between national and international immigration

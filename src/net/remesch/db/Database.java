@@ -263,6 +263,8 @@ public class Database {
 					continue;
 				String type = field.getType().getName();
 				String fieldName = field.getName();
+				if (fieldName.equals("$assertionsDisabled"))
+					continue;
 				if (!field.isAccessible()) {
 					field.setAccessible(true);
 					modifiedFieldAccessibility = true;

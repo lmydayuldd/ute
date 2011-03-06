@@ -6,12 +6,10 @@ package at.sume.dm.buildingprojects;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import at.sume.dm.Common;
 import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.SpatialUnits;
-import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.dm.types.LivingSpaceGroup6;
 import at.sume.sampling.Distribution;
 
@@ -104,13 +102,7 @@ public class SampleBuildingProjects {
 				dwelling.setLivingSpaceGroup6Id(newDwellingSize.get(index).livingSpaceGroupId);
 				dwelling.setDwellingSize(LivingSpaceGroup6.sampleLivingSpace(dwelling.getLivingSpaceGroup6Id()));
 				dwelling.setSpatialunitId(n.spatialUnitId);
-				// TODO: this must be done by the DwellingRow class
-				Random r = new Random();
-				long yearlyRentPer100Sqm = RentPerSpatialUnit.getYearlyAverageRentPer100Sqm(dwelling.getSpatialunitId()) / 100;
-				// TODO: 20% random deviance from the avg. rent price -> sysparam!
-				yearlyRentPer100Sqm = yearlyRentPer100Sqm + Math.round(yearlyRentPer100Sqm * (r.nextGaussian() - 0.5) * 0.1);
-				int dwellingCosts = Math.round(dwelling.getDwellingSize() * yearlyRentPer100Sqm / 100);
-				dwelling.setTotalYearlyDwellingCosts(dwellingCosts);
+				dwelling.calcTotalYearlyDwellingCosts(true);
 				result.add(dwelling);
 			}
 		}

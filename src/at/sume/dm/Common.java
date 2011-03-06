@@ -37,6 +37,8 @@ public class Common {
 	private static boolean activeResidentialMobility = false;
 	private static SingleProbability movingProbability;
 	private static SingleProbability movingOutProbability;
+	private static boolean outputFullData = false;
+	private static byte dwellingPriceRange;
 	
 	/**
 	 * @return the iniFilename
@@ -144,6 +146,20 @@ public class Common {
 	}
 	
 	/**
+	 * @return the outputFullData
+	 */
+	public static boolean isOutputFullData() {
+		return outputFullData;
+	}
+
+	/**
+	 * @return the dwellingPriceRange
+	 */
+	public static byte getDwellingPriceRange() {
+		return dwellingPriceRange;
+	}
+
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -158,7 +174,7 @@ public class Common {
 	
 		return null;
 	}
-	
+
 	public static Database openDatabase() {
 		db = new Database(Common.getDbLocation());
 		return(db);
@@ -210,6 +226,10 @@ public class Common {
 		personMaxAge = Short.parseShort(getSysParam("PersonMaxAge"));
 		movingProbability = new SingleProbability(Byte.parseByte(getSysParam("ProbabilityForMoving")), 100);
 		movingOutProbability = new SingleProbability(Byte.parseByte(getSysParam("ProbabilityForMovingOut")), 100);
+		if (Short.parseShort(getSysParam("OutputFullData")) == -1) {
+			outputFullData = true;
+		}
+		dwellingPriceRange = Byte.parseByte(getSysParam("DwellingPriceRange"));
 	}
 	
 	/**

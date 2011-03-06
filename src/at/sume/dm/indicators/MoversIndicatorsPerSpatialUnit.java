@@ -106,6 +106,7 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 	 */
 	@Override
 	public void add(HouseholdRow hh) {
+		assert hh.getCostOfResidence() > 0 : "Household cost of residence <= 0";
 		BaseIndicators lookup = new BaseIndicators();
 		lookup.setSpatialUnitId(hh.getSpatialunitId());
 		int pos = Collections.binarySearch(indicatorList, lookup);
@@ -117,7 +118,7 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 			b.setHouseholdCount(1);
 			b.setPersonCount(hh.getMemberCount());
 			b.setYearlyRentSum(hh.getCostOfResidence());
-			b.setYearlyRentPer100SqmSum(hh.getCostOfResidence() * 100 / hh.getLivingSpace());
+			b.setYearlyRentPer100SqmSum((hh.getCostOfResidence() * 100) / hh.getLivingSpace());
 			indicatorList.add(pos, b);
 		} else {
 			// available at position pos
@@ -202,6 +203,19 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 		}
 	}
 
+	public static int getHouseholdCount(int spatialUnitId) {
+		BaseIndicators lookup = new BaseIndicators();
+		lookup.setSpatialUnitId(spatialUnitId);
+		int pos = Collections.binarySearch(indicatorList, lookup);
+		if (pos >= 0) {
+			BaseIndicators b = indicatorList.get(pos);
+			return b.getHouseholdCount();
+		} else {
+//			throw new AssertionError("SpatialUnit " + spatialUnitId + " not found");
+			return 0;
+		}
+	}
+	
 	@Override
 	public List<? extends Fileable> getIndicatorList() {
 		return indicatorList;

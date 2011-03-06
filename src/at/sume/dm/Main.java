@@ -128,12 +128,14 @@ public class Main {
 
         List<List<? extends Fileable>> fileableList = new ArrayList<List<? extends Fileable>>();
         List<String> fileNameList = new ArrayList<String>();
-        fileableList.add(households.getRowList());
-        fileNameList.add("Households");
-        fileableList.add(dwellings.getRowList());
-        fileNameList.add("Dwellings");
-        fileableList.add(persons.getRowList());
-        fileNameList.add("Persons");
+        if (Common.isOutputFullData()) {
+	        fileableList.add(households.getRowList());
+	        fileNameList.add("Households");
+	        fileableList.add(dwellings.getRowList());
+	        fileNameList.add("Dwellings");
+	        fileableList.add(persons.getRowList());
+	        fileNameList.add("Persons");
+        }
         fileableList.add(RentPerSpatialUnit.getRentPerSpatialUnit());
         fileNameList.add("RentPerSpatialUnit");
         fileableList.add(AllHouseholdsIndicatorManager.INDICATORS_PER_HOUSEHOLDTYPE_AND_INCOME.getIndicator().getIndicatorList());
@@ -291,7 +293,7 @@ public class Main {
 //			CostEffectiveness costEffectiveness = (CostEffectiveness)ResidentialSatisfactionManager.COSTEFFECTIVENESS.getComponent();
 			// TODO: shouldn't this be done after the movings??? But we need fresh movers indicators...
 			if (modelYear > modelStartYear)
-				RentPerSpatialUnit.updateRentPerSpatialUnit(spatialUnits);
+				RentPerSpatialUnit.updateRentPerSpatialUnit(spatialUnits, modelYear);
 			// TODO: configurable number of units
 			ArrayList<Integer> cheapestSpatialUnits = RentPerSpatialUnit.getCheapestSpatialUnits(0);
 			int lowestYearlyRentPer100Sqm = RentPerSpatialUnit.getLowestYearlyRentPer100Sqm();
@@ -342,6 +344,7 @@ public class Main {
 								break;
 							} else {
 								notMoving = true;
+								break; // don't continue after moving probability check
 							}
 						} else {
 							dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, household, true, modelYear);
@@ -351,6 +354,7 @@ public class Main {
 								} else {
 									notMoving = true;
 									dwelling = null;
+									break;	// don't continue after moving probability check
 								}
 							} else {
 								if (dwellingsOnMarket.getNoDwellingFoundReason() != NoDwellingFoundReason.NO_SUITABLE_DWELLING) {
