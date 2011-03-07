@@ -445,6 +445,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			householdType = HouseholdType.SINGLE_OLD;
 			break;
 		case COUPLE_YOUNG:
+			// TODO: if a female <= 45 dies and leaves a male > 45 then he would be SINGLE_OLD
 			householdType = HouseholdType.SINGLE_YOUNG;
 			break;
 		}
