@@ -207,6 +207,9 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 
 	public void addMembers(ArrayList<PersonRow> members){
 		this.members.addAll(members);
+		for (PersonRow person : members) {
+			person.setHousehold(this);
+		}
 		setAspirationRegionLivingSpaceMax((short) 0);
 		setAspirationRegionLivingSpaceMin((short) 0);
 		countAdults();
@@ -214,6 +217,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	
 	public void addMember(PersonRow person) {
 		this.members.add(person);
+		person.setHousehold(this);
 		setAspirationRegionLivingSpaceMax((short) 0);
 		setAspirationRegionLivingSpaceMin((short) 0);
 		countAdults();
@@ -323,6 +327,20 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		return numAdults;
 	}
 	
+	/**
+	 * @return the adultMale
+	 */
+	public boolean isAdultMale() {
+		return adultMale;
+	}
+
+	/**
+	 * @return the adultFemale
+	 */
+	public boolean isAdultFemale() {
+		return adultFemale;
+	}
+
 	/**
 	 * Determine the household type from the household structure and save it for later use
 	 * This function is only intended for the first determination of the household type. Later on in the
@@ -892,13 +910,24 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		// Update indicators
 		MoversIndicatorManager.addHousehold(this);
 	}
-
+	/**
+	 * Merge household members with the members of the given household
+	 * 
+	 * @param household
+	 */
+	public void join(HouseholdRow household) {
+		addMembers(household.getMembers());
+		household.members = null;
+		determineInitialHouseholdType();
+	}
 	public void remove(DwellingsOnMarket dwellingsOnMarket) {
 		if (hasDwelling())
 			dwellingsOnMarket.putDwellingOnMarket(getDwelling());
 		// Remove household members as well
-		for (PersonRow member : members) {
-			member.remove();
+		if (members != null) {
+			for (PersonRow member : members) {
+				member.remove();
+			}
 		}
 		super.remove();
 	}

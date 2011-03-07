@@ -18,6 +18,7 @@ import net.remesch.util.DateUtil;
 import net.remesch.util.FileUtil;
 import at.sume.dm.buildingprojects.SampleBuildingProjects;
 import at.sume.dm.demography.events.ChildBirth;
+import at.sume.dm.demography.events.Cohabitation;
 import at.sume.dm.demography.events.EventManager;
 import at.sume.dm.demography.events.PersonDeath;
 import at.sume.dm.entities.DwellingRow;
@@ -238,6 +239,9 @@ public class Main {
 	        dwellings.addAll(newDwellings);
 	        dwellingsOnMarket.addAll(newDwellings);
 	        
+	        int cohabitationCount = Common.getCohabitationRate() * (persons.size() / 1000);
+	        Cohabitation cohabitation = new Cohabitation(cohabitationCount, modelYear, dwellingsOnMarket);
+	        
 			ArrayList<HouseholdRow> potentialMovers = new ArrayList<HouseholdRow>();
 	        int j = 0;
 	        // the following clone() is necessary because otherwise it wouldn't be possible to remove households from
@@ -291,6 +295,9 @@ public class Main {
 					}
 					// TODO: add potential mover to the indicators
 				}
+				
+				// Add household for cohabitation processing
+				cohabitation.addHousehold(household);
 				
 				j++;
 			}
@@ -397,7 +404,12 @@ public class Main {
 			System.out.println(printInfo() + ": " + hhMovedAway + " out of " + potentialMovers.size() + " potential moving households moved away");
 			System.out.println(printInfo() + ": " + hhNotMoving + " out of " + potentialMovers.size() + " potential moving households decided not to move to a dwelling/an area that suited their needs");
 			outputFreeDwellings(modelYear, "after moving households, before immigration");
-			// Immigrating Households
+
+			// Cohabitating households
+			cohabitation.randomJoinHouseholds();
+			System.out.println(printInfo() + ": " + cohabitationCount + " household cohabitations/marriages took place");
+			
+			// Immigrating households
 			ArrayList<HouseholdRow> immigratingHouseholds = sampleMigratingHouseholds.sample(modelYear);
 			hhFoundNoDwellings = 0; hhNoSatisfaction = 0;
 			int hhMovedToCheapest = 0, hhNoCheapDwelling = 0, migratingHouseholds = 0, migratingPersons = 0;

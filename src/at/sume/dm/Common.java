@@ -39,6 +39,7 @@ public class Common {
 	private static SingleProbability movingOutProbability;
 	private static boolean outputFullData = false;
 	private static byte dwellingPriceRange;
+	private static byte cohabitationRate;
 	
 	/**
 	 * @return the iniFilename
@@ -160,6 +161,13 @@ public class Common {
 	}
 
 	/**
+	 * @return the cohabitationRate
+	 */
+	public static byte getCohabitationRate() {
+		return cohabitationRate;
+	}
+
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -230,6 +238,7 @@ public class Common {
 			outputFullData = true;
 		}
 		dwellingPriceRange = Byte.parseByte(getSysParam("DwellingPriceRange"));
+		cohabitationRate = Byte.parseByte(getSysParam("CohabitationRate"));
 	}
 	
 	/**
