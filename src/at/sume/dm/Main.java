@@ -66,6 +66,7 @@ public class Main {
 	private static CountMigrationPerSpatialUnit migrationPerSpatialUnit;
 	private static CountDemographicMovements demographicMovementsPerSpatialUnit;
 	private static AggregatedDwellings aggregatedDwellings;
+	private static RentPerSpatialUnit rentPerSpatialUnit;
 
 	private static String printInfo() {
 		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)";
@@ -78,6 +79,9 @@ public class Main {
 		Database db = Common.openDatabase();
 //		Database odb = Common.openOutputDatabase();
 		Common.init();
+
+        // TODO: Scenario handling
+        rentPerSpatialUnit = RentPerSpatialUnit.getInstance("BASE");
 
 		// Load entity sets from database
 		try {
@@ -139,7 +143,7 @@ public class Main {
 	        fileableList.add(persons.getRowList());
 	        fileNameList.add("Persons");
         }
-        fileableList.add(RentPerSpatialUnit.getRentPerSpatialUnit());
+        fileableList.add(rentPerSpatialUnit.getRentPerSpatialUnit());
         fileNameList.add("RentPerSpatialUnit");
         fileableList.add(AllHouseholdsIndicatorManager.INDICATORS_PER_HOUSEHOLDTYPE_AND_INCOME.getIndicator().getIndicatorList());
         fileNameList.add("IndicatorsPerHouseholdTypeAndIncome");
@@ -306,11 +310,11 @@ public class Main {
 //			CostEffectiveness costEffectiveness = (CostEffectiveness)ResidentialSatisfactionManager.COSTEFFECTIVENESS.getComponent();
 			// TODO: shouldn't this be done after the movings??? But we need fresh movers indicators...
 			if (modelYear > modelStartYear)
-				RentPerSpatialUnit.updateRentPerSpatialUnit(spatialUnits, modelYear);
+				rentPerSpatialUnit.updateRentPerSpatialUnit(spatialUnits, modelYear);
 			// TODO: configurable number of units
-			ArrayList<Integer> cheapestSpatialUnits = RentPerSpatialUnit.getCheapestSpatialUnits(0);
-			int lowestYearlyRentPer100Sqm = RentPerSpatialUnit.getLowestYearlyRentPer100Sqm();
-			int highestYearlyRentPer100Sqm = RentPerSpatialUnit.getHighestYearlyRentPer100Sqm();
+			ArrayList<Integer> cheapestSpatialUnits = rentPerSpatialUnit.getCheapestSpatialUnits(0);
+			int lowestYearlyRentPer100Sqm = rentPerSpatialUnit.getLowestYearlyRentPer100Sqm();
+			int highestYearlyRentPer100Sqm = rentPerSpatialUnit.getHighestYearlyRentPer100Sqm();
 			System.out.println(printInfo() + ": lowest rent (€/100m²/yr.): " + lowestYearlyRentPer100Sqm + ", highest rent: " + highestYearlyRentPer100Sqm);
 			// Reset the movers indicators
 			MoversIndicatorManager.resetIndicators();
@@ -333,7 +337,7 @@ public class Main {
 				
 				// 2) define the search area
 				// a) get all spatial units with costs within the aspiration region of the household
-				ArrayList<Integer> potentialTargetSpatialUnitIds = RentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
+				ArrayList<Integer> potentialTargetSpatialUnitIds = rentPerSpatialUnit.getSpatialUnitsBelowGivenPrice(household.getAspirationRegionMaxCosts());
 				if (potentialTargetSpatialUnitIds.size() == 0) {
 					hhNoAspiration++;
 					if (household.getAspirationRegionMaxCosts() <= 0)

@@ -20,7 +20,6 @@ import at.sume.dm.model.output.Fileable;
 
 /**
  * @author Alexander Remesch
- * TODO: better with Singleton?
  */
 public class RentPerSpatialUnit {
 	public static class RentPerSpatialUnitRow implements Comparable<RentPerSpatialUnitRow>, Fileable {
@@ -113,14 +112,18 @@ public class RentPerSpatialUnit {
 		}
 	}
 	
-	private static ArrayList<RentPerSpatialUnitRow> rentPerSpatialUnit;
-	private static int lowestYearlyRentPer100Sqm;
-	private static int highestYearlyRentPer100Sqm;
+	private volatile static RentPerSpatialUnit uniqueInstance;
+	private static String scenarioName;
+	
+	private ArrayList<RentPerSpatialUnitRow> rentPerSpatialUnit;
+	private int lowestYearlyRentPer100Sqm;
+	private int highestYearlyRentPer100Sqm;
+	private RentAdjustments rentAdjustments;
 	
 	/**
 	 * Set initial values from table WKO_Mietpreise
 	 */
-	static {
+	private RentPerSpatialUnit(String scenarioName) {
 		try {
 			String selectStatement = "";
 			switch (Common.getSpatialUnitLevel()) {
@@ -140,6 +143,7 @@ public class RentPerSpatialUnit {
 			rentPerSpatialUnit = Common.db.select(RentPerSpatialUnitRow.class, selectStatement);
 			assert rentPerSpatialUnit.size() > 0 : "No rows selected from WKO_Mietpreise";
 			assert rentPerSpatialUnit.get(0).yearlyRentPer100Sqm > 0 : "Rent per spatial unit = " + rentPerSpatialUnit.get(0).yearlyRentPer100Sqm;
+			rentAdjustments = new RentAdjustments(scenarioName);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {
@@ -148,15 +152,39 @@ public class RentPerSpatialUnit {
 			e.printStackTrace();
 		}
 	}
+	public static RentPerSpatialUnit getInstance(String scenarioName) {
+		if (RentPerSpatialUnit.scenarioName == null) {
+			RentPerSpatialUnit.scenarioName = scenarioName;
+		} else {
+			if (!RentPerSpatialUnit.scenarioName.equals(scenarioName)) {
+				throw new AssertionError("Can't change scenarioName from '" + RentPerSpatialUnit.scenarioName + "' to '" + scenarioName + "'");
+			}
+		}
+		return getInstance();
+	}
+	public static RentPerSpatialUnit getInstance() {
+		if (RentPerSpatialUnit.scenarioName == null) {
+			throw new AssertionError("scenarioName must be set in first call to getInstance()");
+		}
+		if (uniqueInstance == null) {
+			synchronized (RentPerSpatialUnit.class) {
+				if (uniqueInstance == null) {
+					uniqueInstance = new RentPerSpatialUnit(scenarioName);
+				}
+			}
+		}
+		return uniqueInstance;
+	}
 	/**
 	 * Update rents per spatial unit from MoversIndicatorsPerSpatialUnit class
 	 */
-	public static void updateRentPerSpatialUnit(SpatialUnits spatialUnits, int modelYear) {
+	public void updateRentPerSpatialUnit(SpatialUnits spatialUnits, int modelYear) {
 		for (RentPerSpatialUnitRow rpsu : rentPerSpatialUnit) {
 			// TODO: don't calculate new rents for the surroundings of Vienna, since rent-calculation (MoversIndicatorsPerSpatialUnit) depends on
-			// dwellilngs currently - we need to change this to be able to collect rent prices for Vienna surroundings
+			// dwellings currently - we need to change this to be able to collect rent prices for Vienna surroundings
 			if (!spatialUnits.lookup(rpsu.getSpatialUnitId()).isFreeDwellingsAlwaysAvailable()) {
-				int avgYearlyRentPer100Sqm = MoversIndicatorsPerSpatialUnit.getAvgYearlyRentPer100Sqm(rpsu.getSpatialUnitId());
+				double rentAdjustment = rentAdjustments.getRentAdjustmentFactor(rpsu.getSpatialUnitId(), (short)modelYear);
+				int avgYearlyRentPer100Sqm = (int)Math.round(rentAdjustment * MoversIndicatorsPerSpatialUnit.getAvgYearlyRentPer100Sqm(rpsu.getSpatialUnitId()));
 //				assert avgYearlyRentPer100Sqm > 0 : "Average yearly rent per 100m² <= 0 (" + avgYearlyRentPer100Sqm + ")";
 //				rpsu.setYearlyRentPer100Sqm(avgYearlyRentPer100Sqm);
 				assert avgYearlyRentPer100Sqm >= 0 : "Average yearly rent per 100m² < 0 (" + avgYearlyRentPer100Sqm + ")";
@@ -173,7 +201,7 @@ public class RentPerSpatialUnit {
 	 * @param spatialUnitId
 	 * @return
 	 */
-	public static int lookupSpatialUnitPos(int spatialUnitId) {
+	public int lookupSpatialUnitPos(int spatialUnitId) {
 		RentPerSpatialUnitRow lookup = new RentPerSpatialUnitRow();
 		lookup.setSpatialUnitId(spatialUnitId);
 		return Collections.binarySearch(rentPerSpatialUnit, lookup);
@@ -183,7 +211,7 @@ public class RentPerSpatialUnit {
 	 * @param spatialUnitId
 	 * @return
 	 */
-	public static int getYearlyAverageRentPer100Sqm(int spatialUnitId) {
+	public int getYearlyAverageRentPer100Sqm(int spatialUnitId) {
 		int pos = lookupSpatialUnitPos(spatialUnitId);
 		assert pos >= 0 : "Can't lookup a price for spatial unit id " + spatialUnitId;
 		return rentPerSpatialUnit.get(pos).getYearlyRentPer100Sqm();
@@ -194,7 +222,7 @@ public class RentPerSpatialUnit {
 	 * @param maxCostOfResidence Yearly maximum cost of residence (rent) per m²
 	 * @return
 	 */
-	public static ArrayList<Integer> getSpatialUnitsBelowGivenPrice(int maxCostOfResidence) {
+	public ArrayList<Integer> getSpatialUnitsBelowGivenPrice(int maxCostOfResidence) {
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		for(RentPerSpatialUnitRow r : rentPerSpatialUnit) {
 			int yearlyRentPerSqm = r.getYearlyRentPer100Sqm() / 100;
@@ -209,7 +237,7 @@ public class RentPerSpatialUnit {
 	 * @return
 	 * TODO: speed this up by remembering the list?
 	 */
-	public static ArrayList<Integer> getCheapestSpatialUnits(int numUnits) {
+	public ArrayList<Integer> getCheapestSpatialUnits(int numUnits) {
 		if (numUnits == 0)
 			numUnits = rentPerSpatialUnit.size();
 		ArrayList<Integer> result = new ArrayList<Integer>(numUnits);
@@ -223,7 +251,7 @@ public class RentPerSpatialUnit {
 		highestYearlyRentPer100Sqm = cheapestRents.get(numUnits - 1).getYearlyRentPer100Sqm();
 		return result;
 	}
-	public static ArrayList<RentPerSpatialUnitRow> getRentPerSpatialUnit() {
+	public ArrayList<RentPerSpatialUnitRow> getRentPerSpatialUnit() {
 		return rentPerSpatialUnit;
 	}
 	/***
@@ -231,7 +259,7 @@ public class RentPerSpatialUnit {
 	 * Function getCheapestSpatialUnits() must be called first to determine the value returned by this function.
 	 * @return
 	 */
-	public static int getLowestYearlyRentPer100Sqm() {
+	public int getLowestYearlyRentPer100Sqm() {
 		assert lowestYearlyRentPer100Sqm > 0 : "Lowest rent <= 0. Probably getCheapestSpatialUnits() wasn't called to initialize this value.";
 		return lowestYearlyRentPer100Sqm;
 	}
@@ -240,7 +268,7 @@ public class RentPerSpatialUnit {
 	 * Function getCheapestSpatialUnits() must be called first to determine the value returned by this function.
 	 * @return
 	 */
-	public static int getHighestYearlyRentPer100Sqm() {
+	public int getHighestYearlyRentPer100Sqm() {
 		assert highestYearlyRentPer100Sqm > 0 : "Highest rent <= 0. Probably getCheapestSpatialUnits() wasn't called to initialize this value.";
 		return highestYearlyRentPer100Sqm;
 	}

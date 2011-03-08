@@ -125,7 +125,8 @@ public class DwellingRow extends RecordSetRowFileable<Dwellings> implements Resi
 	public void calcTotalYearlyDwellingCosts(boolean forceCalculation) {
 		if (((totalYearlyDwellingCosts == 0) || forceCalculation) && (spatialunitId != 0) && (dwellingSize != 0)) {
 			Random r = new Random();
-			long yearlyRentPer100Sqm = RentPerSpatialUnit.getYearlyAverageRentPer100Sqm(spatialunitId);
+			RentPerSpatialUnit rentPerSpatialUnit = RentPerSpatialUnit.getInstance();
+			long yearlyRentPer100Sqm = rentPerSpatialUnit.getYearlyAverageRentPer100Sqm(spatialunitId);
 			assert yearlyRentPer100Sqm > 0 : "yearly rent per 100m² must be > 0";
 			double dwellingPriceRange = ((double) Common.getDwellingPriceRange()) / 100;
 			double randomFactor = r.nextGaussianRange(1);

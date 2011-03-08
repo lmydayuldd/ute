@@ -28,6 +28,7 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 		long potentialCostOfResidence = 0;
 		long currentCostOfResidence = 0;
 		int result = 0;
+		RentPerSpatialUnit rentPerSpatialUnit = RentPerSpatialUnit.getInstance();
 		if (!household.hasDwelling()) {
 //			assert dwelling != null : "Household has no dwelling and no other dwelling was given for cost effectiveness calculation";
 			if (dwelling == null) {
@@ -38,7 +39,7 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 				// Household has no dwelling - CostEffectiveness must be calculated between cost of new dwelling considered and
 				// potential cost of residence in the target area
 				currentCostOfResidence = dwelling.getTotalYearlyDwellingCosts();
-				int potentialRentPer100Sqm = RentPerSpatialUnit.getYearlyAverageRentPer100Sqm(spatialUnitId.getSpatialUnitId());
+				int potentialRentPer100Sqm = rentPerSpatialUnit.getYearlyAverageRentPer100Sqm(spatialUnitId.getSpatialUnitId());
 				potentialCostOfResidence = Math.round(dwelling.getDwellingSize() * potentialRentPer100Sqm);
 				if (currentCostOfResidence <= 0)
 					result = 1000;
@@ -50,7 +51,7 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 				// Calculate cost effectiveness satisfaction for the household's own dwelling (no other dwelling was given)
 				// compared to a dwelling with the current's size in another spatial unit
 				currentCostOfResidence = household.getDwelling().getTotalYearlyDwellingCosts();
-				int potentialRentPer100Sqm = RentPerSpatialUnit.getYearlyAverageRentPer100Sqm(spatialUnitId.getSpatialUnitId());
+				int potentialRentPer100Sqm = rentPerSpatialUnit.getYearlyAverageRentPer100Sqm(spatialUnitId.getSpatialUnitId());
 				potentialCostOfResidence = Math.round(dwelling.getDwellingSize() * potentialRentPer100Sqm);
 				if (currentCostOfResidence <= 0)
 					result = 1000;
