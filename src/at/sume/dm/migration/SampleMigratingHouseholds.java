@@ -213,7 +213,7 @@ public class SampleMigratingHouseholds {
 			persons.add(person);
 		}
 		result.addMembers(persons);
-		result.determineInitialHouseholdType();
+		result.determineInitialHouseholdType(false);	// countAdults() was already done in addMembers()
 		// calculate income for each household member
 		for (PersonRow person : result.getMembers()) {
 			int yearlyIncome = 0;

@@ -79,7 +79,7 @@ public class ResidentialSatisfactionManagerTest {
 		pr.setSex((byte)1);
 		pr.setYearlyIncome(20000);
 		hhr1.addMember(pr);
-		hhr1.determineInitialHouseholdType();
+		hhr1.determineInitialHouseholdType(true);
 		hh.add(hhr1);
 		
 		// Household 1: 2 persons + 1 child, 30000 + 0
@@ -112,7 +112,7 @@ public class ResidentialSatisfactionManagerTest {
 		pr.setSex((byte)1);
 		pr.setYearlyIncome(0);
 		hhr2.addMember(pr);
-		hhr2.determineInitialHouseholdType();
+		hhr2.determineInitialHouseholdType(true);
 		hh.add(hhr2);
 		
 		spatialUnits = new SpatialUnits(db, Common.getSpatialUnitLevel());

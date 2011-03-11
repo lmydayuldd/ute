@@ -72,7 +72,7 @@ public class UDPClassificationTest {
 		pr.setSex((byte)1);
 		pr.setYearlyIncome(20000);
 		hhr1.addMember(pr);
-		hhr1.determineInitialHouseholdType();
+		hhr1.determineInitialHouseholdType(true);
 		
 		// Household 1: 2 persons + 1 child, 30000 + 0
 		hhr2 = new HouseholdRow();
@@ -103,7 +103,7 @@ public class UDPClassificationTest {
 		pr.setSex((byte)1);
 		pr.setYearlyIncome(0);
 		hhr2.addMember(pr);
-		hhr2.determineInitialHouseholdType();
+		hhr2.determineInitialHouseholdType(true);
 	}
 
 	/**

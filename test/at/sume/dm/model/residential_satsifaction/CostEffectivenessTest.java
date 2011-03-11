@@ -78,7 +78,7 @@ public class CostEffectivenessTest {
 		pr.setSex((byte)1);
 		pr.setYearlyIncome(20000);
 		hhr1.addMember(pr);
-		hhr1.determineInitialHouseholdType();
+		hhr1.determineInitialHouseholdType(true);
 		
 		// Household 2: 2 persons + 1 child, 30000 + 0
 		hhr2 = new HouseholdRow();
@@ -110,7 +110,7 @@ public class CostEffectivenessTest {
 		pr.setSex((byte)1);
 		pr.setYearlyIncome(0);
 		hhr2.addMember(pr);
-		hhr2.determineInitialHouseholdType();
+		hhr2.determineInitialHouseholdType(true);
 		
 		// Household 3: immigration household - no current dwelling, 2 persons + 1 child, 4000 + 4000
 		hhr3 = new HouseholdRow();
@@ -131,7 +131,7 @@ public class CostEffectivenessTest {
 		pr.setSex((byte)1);
 		pr.setYearlyIncome(4000);
 		hhr3.addMember(pr);
-		hhr3.determineInitialHouseholdType();
+		hhr3.determineInitialHouseholdType(true);
 
 		// Household 3: immigration household - no current dwelling, 2 persons + 1 child, 4000 + 4000
 		hhr4 = new HouseholdRow();
@@ -145,7 +145,7 @@ public class CostEffectivenessTest {
 		pr.setSex((byte)1);
 		pr.setYearlyIncome(32063);
 		hhr4.addMember(pr);
-		hhr4.determineInitialHouseholdType();
+		hhr4.determineInitialHouseholdType(true);
 		dr = new DwellingRow();
 		hhr4.setDwelling(dr);
 		dr.setSpatialunitId(90101);

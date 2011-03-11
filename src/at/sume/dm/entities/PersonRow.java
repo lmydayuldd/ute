@@ -29,6 +29,9 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	private HouseholdRow household;
 //	private short personNrInHousehold;
 	@Ignore
+	private boolean livingWithParents;	// is the person a child living with her/his parents
+										// necessary to be able to move the child out of the parental home 
+	@Ignore
 	private static Sequence personIdSeq = null;
 	
 	public PersonRow() {
@@ -36,6 +39,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 		if (personIdSeq != null) {
 			setPersonId(personIdSeq.getNext());
 		}
+		livingWithParents = false;
 	}
 
 	/**
@@ -187,6 +191,20 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 //	}
 
 	/**
+	 * @return the livingWithParents
+	 */
+	public boolean isLivingWithParents() {
+		return livingWithParents;
+	}
+
+	/**
+	 * @param livingWithParents the livingWithParents to set
+	 */
+	public void setLivingWithParents(boolean livingWithParents) {
+		this.livingWithParents = livingWithParents;
+	}
+
+	/**
 	 * @return the persons
 	 */
 	public Persons getPersons() {
@@ -230,6 +248,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	public static PersonRow giveBirth(HouseholdRow household) {
 		PersonRow child = new PersonRow();
 		child.setHousehold(household);
+		child.setLivingWithParents(true);
 		household.addMember(child);
 //		child.setAgeGroupId((byte) 1);
 		child.setAge((byte)0);

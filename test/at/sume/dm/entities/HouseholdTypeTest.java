@@ -32,7 +32,7 @@ public class HouseholdTypeTest {
 		p.setAge((byte)45);
 		p.setSex((byte)2);
 		hh.addMember(p);
-		HouseholdType result = hh.determineInitialHouseholdType();
+		HouseholdType result = hh.determineInitialHouseholdType(true);
 		assertEquals("Single male 45 yrs.", HouseholdType.SINGLE_YOUNG, result);
 	}
 	
@@ -46,7 +46,7 @@ public class HouseholdTypeTest {
 		p.setAge((byte)35);
 		p.setSex((byte)1);
 		hh.addMember(p);
-		HouseholdType result = hh.determineInitialHouseholdType();
+		HouseholdType result = hh.determineInitialHouseholdType(true);
 		assertEquals("Couple, fem = 35 yrs., male = 45 yrs.", HouseholdType.COUPLE_YOUNG, result);
 	}
 	
@@ -64,7 +64,7 @@ public class HouseholdTypeTest {
 		p.setAge((byte)10);
 		p.setSex((byte)1);
 		hh.addMember(p);
-		HouseholdType result = hh.determineInitialHouseholdType();
+		HouseholdType result = hh.determineInitialHouseholdType(true);
 		assertEquals("Couple, fem = 35 yrs., male = 45 yrs., 1 child", HouseholdType.SMALL_FAMILY, result);
 	}
 
@@ -86,7 +86,7 @@ public class HouseholdTypeTest {
 		p.setAge((byte)8);
 		p.setSex((byte)1);
 		hh.addMember(p);
-		HouseholdType result = hh.determineInitialHouseholdType();
+		HouseholdType result = hh.determineInitialHouseholdType(true);
 		assertEquals("Couple, fem = 35 yrs., male = 45 yrs., 2 children", HouseholdType.LARGE_FAMILY, result);
 	}
 	
@@ -112,7 +112,7 @@ public class HouseholdTypeTest {
 		p.setAge((byte)6);
 		p.setSex((byte)1);
 		hh.addMember(p);
-		HouseholdType result = hh.determineInitialHouseholdType();
+		HouseholdType result = hh.determineInitialHouseholdType(true);
 		assertEquals("Couple, fem = 35 yrs., male = 45 yrs., 3 children", HouseholdType.LARGE_FAMILY, result);
 	}
 }

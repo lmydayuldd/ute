@@ -130,7 +130,7 @@ public class Main {
         dwellingsOnMarket = new DwellingsOnMarket(dwellings, spatialUnits);
         System.out.println(printInfo() + ": determined all available dwellings on the housing market");
         // determine household-types
-        households.determineHouseholdTypes();
+        households.determineHouseholdTypes(true);
         System.out.println(printInfo() + ": determined all household types");
 
         List<List<? extends Fileable>> fileableList = new ArrayList<List<? extends Fileable>>();

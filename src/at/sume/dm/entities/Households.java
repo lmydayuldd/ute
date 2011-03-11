@@ -54,9 +54,9 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	/**
 	 * Determine all initial household-types
 	 */
-	public void determineHouseholdTypes() {
+	public void determineHouseholdTypes(boolean forceCount) {
 		for (HouseholdRow household : rowList) {
-			household.determineInitialHouseholdType();
+			household.determineInitialHouseholdType(forceCount);
 		}
 	}
 	/* (non-Javadoc)

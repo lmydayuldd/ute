@@ -66,7 +66,7 @@ public class IndicatorManagerTest {
 //		pr.setPersonNrInHousehold((short)2);
 		pr.setYearlyIncome(20000);
 		hhr.addMember(pr);
-		hhr.determineInitialHouseholdType();
+		hhr.determineInitialHouseholdType(true);
 		AllHouseholdsIndicatorManager.addHousehold(hhr);
 		
 		// Household 1: 2 persons + 1 child, 30000 + 0
@@ -105,7 +105,7 @@ public class IndicatorManagerTest {
 //		pr.setPersonNrInHousehold((short)3);
 		pr.setYearlyIncome(0);
 		hhr.addMember(pr);
-		hhr.determineInitialHouseholdType();
+		hhr.determineInitialHouseholdType(true);
 		AllHouseholdsIndicatorManager.addHousehold(hhr);
 	}
 

@@ -301,28 +301,69 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	}
 
 	public void countAdults() {
-		numAdults = 0; adultMaxAge = 0; adultMinAge = 255; femAdultMaxAge = 0; femAdultMinAge = 255;
-		adultMale = false; adultFemale = false;
-		for (PersonRow member : members) {
-			if (member.getAge() >= 18) {
-				numAdults++;
-				if (member.getAge() > adultMaxAge)
-					adultMaxAge = member.getAge();
-				if (member.getAge() < adultMinAge)
-					adultMinAge = member.getAge();
-				if (member.getSex() == 1) {
-					adultFemale = true;
-					if (member.getAge() > femAdultMaxAge)
-						femAdultMaxAge = member.getAge();
-					if (member.getAge() < femAdultMinAge)
-						femAdultMinAge = member.getAge();
+		if (householdType == null) {	// first time counting based on age only
+			numAdults = 0; adultMaxAge = 0; adultMinAge = 255; femAdultMaxAge = 0; femAdultMinAge = 255;
+			adultMale = false; adultFemale = false;
+			boolean child = false;
+			int childMinAge = 99;
+			for (PersonRow member : members) {
+				if (member.getAge() >= 18) {
+					numAdults++;
+					if (member.getAge() > adultMaxAge)
+						adultMaxAge = member.getAge();
+					if (member.getAge() < adultMinAge)
+						adultMinAge = member.getAge();
+					if (member.getSex() == 1) {
+						adultFemale = true;
+						if (member.getAge() > femAdultMaxAge)
+							femAdultMaxAge = member.getAge();
+						if (member.getAge() < femAdultMinAge)
+							femAdultMinAge = member.getAge();
+					}
+					if (member.getSex() == 2)
+						adultMale = true;
+				} else {
+					child = true;
+					if (member.getAge() < childMinAge)
+						childMinAge = member.getAge();
 				}
-				if (member.getSex() == 2)
-					adultMale = true;
+			}
+			// identify household children
+			if (child) {
+				if (femAdultMaxAge - childMinAge >= 15) {
+					// children are there!
+					for (PersonRow member : members) {
+						if ((member.getAge() < 18) && (member.getAge() <= femAdultMaxAge - 15)) {
+							member.setLivingWithParents(true);
+						}
+					}
+				}
+			}
+		} else { // later counting based on child (livingWithParents) marker
+			numAdults = 0; adultMaxAge = 0; adultMinAge = 255; femAdultMaxAge = 0; femAdultMinAge = 255;
+			adultMale = false; adultFemale = false;
+			for (PersonRow member : members) {
+				if (!member.isLivingWithParents()) {
+					numAdults++;
+					if (member.getAge() > adultMaxAge)
+						adultMaxAge = member.getAge();
+					if (member.getAge() < adultMinAge)
+						adultMinAge = member.getAge();
+					if (member.getSex() == 1) {
+						adultFemale = true;
+						if (member.getAge() > femAdultMaxAge)
+							femAdultMaxAge = member.getAge();
+						if (member.getAge() < femAdultMinAge)
+							femAdultMinAge = member.getAge();
+					}
+					if (member.getSex() == 2)
+						adultMale = true;
+				}
 			}
 		}
 	}
 
+	
 	public short getAdultsCount() {
 		return numAdults;
 	}
@@ -345,13 +386,15 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * Determine the household type from the household structure and save it for later use
 	 * This function is only intended for the first determination of the household type. Later on in the
 	 * model run, it makes more sense to determine the household type through the type of demographic event
-	 * happening to the household
+	 * happening to the household (but it can be useful there too)
 	 * @param householdType the householdType to set
 	 */
-	public HouseholdType determineInitialHouseholdType() {
+	public HouseholdType determineInitialHouseholdType(boolean forceCount) {
 		assert (getHouseholdSize() > 0) : "Invalid household size: " + getHouseholdSize();
 		// determine the number of adults, whether it is a mixed household, etc.
-//		countAdults();
+		if (forceCount || (householdType == null)) {
+			countAdults();
+		}
 		boolean mixedHousehold = adultMale && adultFemale;
 		switch (numAdults) {
 		case 0:
@@ -452,12 +495,21 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	
 	public void updateHouseholdTypeAfterDeath() {
 		// Singles are not covered since the household will be removed anyway
+		if ((householdType == HouseholdType.SINGLE_YOUNG) || (householdType == HouseholdType.SINGLE_OLD))
+			return;
+		countAdults();
+		if (numAdults == 0) {
+			for (PersonRow member : members) {
+				member.setLivingWithParents(false);
+			}
+			countAdults();
+		}
 		switch (householdType) {
 		case OTHER:			// no useful previous information - start from scratch
 		case SMALL_FAMILY:
 		case LARGE_FAMILY:
 		case SINGLE_PARENT:
-			determineInitialHouseholdType();
+			determineInitialHouseholdType(false);
 			break;
 		case COUPLE_OLD:
 			householdType = HouseholdType.SINGLE_OLD;
@@ -470,9 +522,10 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	}
 	
 	public void updateHouseholdTypeAfterBirth() {
+		countAdults();
 		switch (householdType) {
 		case OTHER:			// no useful previous information - start from scratch
-			determineInitialHouseholdType();
+			determineInitialHouseholdType(false);
 			break;
 		case SMALL_FAMILY:
 			householdType = HouseholdType.LARGE_FAMILY;
@@ -918,7 +971,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	public void join(HouseholdRow household) {
 		addMembers(household.getMembers());
 		household.members = null;
-		determineInitialHouseholdType();
+		determineInitialHouseholdType(false); //countAdults has already been done in addMembers()
 	}
 	public void remove(DwellingsOnMarket dwellingsOnMarket) {
 		if (hasDwelling())
