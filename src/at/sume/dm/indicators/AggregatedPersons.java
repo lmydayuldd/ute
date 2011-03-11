@@ -25,8 +25,10 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 	@Override
 	public void add(HouseholdRow household) {
 		for (PersonRow person : household.getMembers()) {
+			byte householdSize6 = person.getHousehold().getHouseholdSize();
+			if (householdSize6 > 6) householdSize6 = 6;
 			int pos = lookupIndicator(household.getSpatialunitId(), IncomeGroup.getIncomeGroupId(person.getYearlyIncome()), person.getSex(), 
-					AgeGroup.getAgeGroupId(person.getAge()));
+					AgeGroup.getAgeGroupId(person.getAge()), person.isLivingWithParents(), householdSize6);
 			if (pos < 0) {
 				// insert at position pos
 				pos = (pos + 1) * -1;
@@ -35,6 +37,8 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 				b.setIncomeGroupId(IncomeGroup.getIncomeGroupId(person.getYearlyIncome()));
 				b.setSex(person.getSex());
 				b.setAgeGroupId(AgeGroup.getAgeGroupId(person.getAge()));
+				b.setLivingWithParents(person.isLivingWithParents());
+				b.setHouseholdSize6(householdSize6);
 				b.setPersonCount(1);
 				indicatorList.add(pos, b);
 			} else {
@@ -56,12 +60,14 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 		indicatorList.clear();
 	}
 	
-	private int lookupIndicator(int spatialUnitId, byte incomeGroupId, byte sex, byte ageGroupId) {
+	private int lookupIndicator(int spatialUnitId, byte incomeGroupId, byte sex, byte ageGroupId, boolean livingWithParents, byte householdSize6) {
 		AggregatedPersonRow lookup = new AggregatedPersonRow();
 		lookup.setSpatialUnitId(spatialUnitId);
 		lookup.setIncomeGroupId(incomeGroupId);
 		lookup.setSex(sex);
 		lookup.setAgeGroupId(ageGroupId);
+		lookup.setLivingWithParents(livingWithParents);
+		lookup.setHouseholdSize6(householdSize6);
 		return Collections.binarySearch(indicatorList, lookup);
 	}
 

@@ -40,6 +40,7 @@ public class Common {
 	private static boolean outputFullData = false;
 	private static byte dwellingPriceRange;
 	private static byte cohabitationRate;
+	private static SingleProbability leavingParentsProbability;
 	
 	/**
 	 * @return the iniFilename
@@ -168,6 +169,13 @@ public class Common {
 	}
 
 	/**
+	 * @return the leavingParentsProbability
+	 */
+	public static SingleProbability getLeavingParentsProbability() {
+		return leavingParentsProbability;
+	}
+
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -239,6 +247,7 @@ public class Common {
 		}
 		dwellingPriceRange = Byte.parseByte(getSysParam("DwellingPriceRange"));
 		cohabitationRate = Byte.parseByte(getSysParam("CohabitationRate"));
+		leavingParentsProbability = new SingleProbability(Byte.parseByte(getSysParam("ProbabilityLeavingParents")), 100);
 	}
 	
 	/**

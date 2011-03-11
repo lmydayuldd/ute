@@ -15,8 +15,10 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 	private byte incomeGroupId;
 	private byte sex;
 	private byte ageGroupId;
+	private boolean livingWithParents;
+	private byte householdSize6;
 	private int personCount;
-
+	
 	/**
 	 * @return the spatialUnitId
 	 */
@@ -74,6 +76,34 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 	}
 
 	/**
+	 * @return the livingWithParents
+	 */
+	public boolean isLivingWithParents() {
+		return livingWithParents;
+	}
+
+	/**
+	 * @param livingWithParents the livingWithParents to set
+	 */
+	public void setLivingWithParents(boolean livingWithParents) {
+		this.livingWithParents = livingWithParents;
+	}
+
+	/**
+	 * @return the householdSize6
+	 */
+	public byte getHouseholdSize6() {
+		return householdSize6;
+	}
+
+	/**
+	 * @param householdSize6 the householdSize6 to set
+	 */
+	public void setHouseholdSize6(byte householdSize6) {
+		this.householdSize6 = householdSize6;
+	}
+
+	/**
 	 * @return the personCount
 	 */
 	public int getPersonCount() {
@@ -93,7 +123,7 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 	@Override
 	public String toCsvHeadline(String delimiter) {
 		return "SpatialUnit" + delimiter + "IncomeGroup" + delimiter + "Sex" + delimiter + "AgeGroup" + 
-			delimiter + "PersonCount";
+			delimiter + "LivingWithParents" + delimiter + "HouseholdSize6" + delimiter + "PersonCount";
 	}
 
 	/* (non-Javadoc)
@@ -102,7 +132,8 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 	@Override
 	public String toString(String delimiter) {
 		return spatialUnitId + delimiter + IncomeGroup.getIncomeGroupNameDirect(incomeGroupId) + delimiter + sex +
-			delimiter + AgeGroup.getAgeGroupNameDirect(ageGroupId) + delimiter + personCount;
+			delimiter + AgeGroup.getAgeGroupNameDirect(ageGroupId) + delimiter + livingWithParents + 
+			delimiter + householdSize6 + delimiter + personCount;
 	}
 
 	@Override
@@ -115,6 +146,10 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 		result = ((Byte)sex).compareTo(o.sex);
 		if (result != 0) return(result);
 		result = ((Byte)ageGroupId).compareTo(o.ageGroupId);
+		if (result != 0) return(result);
+		result = ((Boolean)livingWithParents).compareTo(o.livingWithParents);
+		if (result != 0) return(result);
+		result = ((Byte)householdSize6).compareTo(o.householdSize6);
 		if (result != 0) return(result);
 		return 0;
 	}

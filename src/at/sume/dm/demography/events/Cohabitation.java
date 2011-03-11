@@ -49,6 +49,7 @@ public class Cohabitation {
 				femaleHouseholds.add(household);
 			else
 				maleHouseholds.add(household);
+			break;
 		}
 	}
 	/**

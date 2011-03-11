@@ -190,6 +190,8 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	 */
 	public void aging() {
 		for (HouseholdRow household : rowList) {
+			assert household.getMembers() != null : "No household members found";
+			assert household.getDwelling() != null : "No dwelling found";
 			for (PersonRow person : household.getMembers()) {
 				person.aging();
 			}

@@ -263,7 +263,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	public void die() {
 		notifyDeath(getHousehold().getSpatialunitId());
 		household.removeMember(this);
-		household.updateHouseholdTypeAfterDeath();
+		household.updateHouseholdTypeAfterDeathOrMemberLeaving();
 		remove();
 	}
 	

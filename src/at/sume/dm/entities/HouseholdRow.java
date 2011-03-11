@@ -493,7 +493,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		}
 	}
 	
-	public void updateHouseholdTypeAfterDeath() {
+	public void updateHouseholdTypeAfterDeathOrMemberLeaving() {
 		// Singles are not covered since the household will be removed anyway
 		if ((householdType == HouseholdType.SINGLE_YOUNG) || (householdType == HouseholdType.SINGLE_OLD))
 			return;
@@ -721,9 +721,34 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * Calculate and return the yearly household income per household member
 	 * @return the yearly household income per household member
 	 */
-	public long getYearlyIncomePerMember() {
+	public int getYearlyIncomePerMember() {
 		return getYearlyIncome() / getMembers().size();
 	}
+	
+	public int getHighestAdultIncome() {
+		int result = 0;
+		for (PersonRow person : members) {
+			if (!person.isLivingWithParents()) {
+				if (person.getYearlyIncome() > result) {
+					result = person.getYearlyIncome();
+				}
+			}
+		}
+		return result;
+	}
+	
+	public int getLowestAdultIncome() {
+		int result = Integer.MAX_VALUE;
+		for (PersonRow person : members) {
+			if (!person.isLivingWithParents()) {
+				if (person.getYearlyIncome() < result) {
+					result = person.getYearlyIncome();
+				}
+			}
+		}
+		return result;
+	}
+	
 	/**
 	 * Get the number of household members
 	 * @return

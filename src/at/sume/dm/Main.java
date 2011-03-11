@@ -20,6 +20,7 @@ import at.sume.dm.buildingprojects.SampleBuildingProjects;
 import at.sume.dm.demography.events.ChildBirth;
 import at.sume.dm.demography.events.Cohabitation;
 import at.sume.dm.demography.events.EventManager;
+import at.sume.dm.demography.events.LeavingParents;
 import at.sume.dm.demography.events.PersonDeath;
 import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.Dwellings;
@@ -246,6 +247,8 @@ public class Main {
 	        int cohabitationCount = Common.getCohabitationRate() * (persons.size() / 1000);
 	        Cohabitation cohabitation = new Cohabitation(cohabitationCount, modelYear, dwellingsOnMarket);
 	        
+	        LeavingParents leavingParents = new LeavingParents(Common.getLeavingParentsProbability(), modelYear);
+	        
 			ArrayList<HouseholdRow> potentialMovers = new ArrayList<HouseholdRow>();
 	        int j = 0;
 	        // the following clone() is necessary because otherwise it wouldn't be possible to remove households from
@@ -302,6 +305,9 @@ public class Main {
 				
 				// Add household for cohabitation processing
 				cohabitation.addHousehold(household);
+				
+				// Add children leaving parents
+				leavingParents.addHousehold(household);
 				
 				j++;
 			}
@@ -413,8 +419,16 @@ public class Main {
 			cohabitation.randomJoinHouseholds();
 			System.out.println(printInfo() + ": " + cohabitationCount + " household cohabitations/marriages took place");
 			
-			// Immigrating households
+			// Immigrating households + Children moving out from home
+			ArrayList<HouseholdRow> childrenHouseholds = leavingParents.getNewSingleHouseholds();
 			ArrayList<HouseholdRow> immigratingHouseholds = sampleMigratingHouseholds.sample(modelYear);
+			ArrayList<HouseholdRow> dwellingSeekers = new ArrayList<HouseholdRow>(immigratingHouseholds.size() + childrenHouseholds.size());
+			dwellingSeekers.addAll(childrenHouseholds);
+			dwellingSeekers.addAll(immigratingHouseholds);
+			System.out.println(printInfo() + ": processing " + immigratingHouseholds.size() + " immigrating households, " + childrenHouseholds.size() + " children households moving out of their parents home (" +
+					dwellingSeekers.size() + " in total)");
+			immigratingHouseholds = dwellingSeekers;
+			childrenHouseholds = null;
 			hhFoundNoDwellings = 0; hhNoSatisfaction = 0;
 			int hhMovedToCheapest = 0, hhNoCheapDwelling = 0, migratingHouseholds = 0, migratingPersons = 0;
 			for (HouseholdRow household : immigratingHouseholds) {
@@ -437,12 +451,15 @@ public class Main {
 //						}
 					} else {
 						// 1) add household to common lists
+						assert household.getMembers() != null : "No household members found";
 						households.add(household);
 						for (PersonRow member : household.getMembers()) {
+							assert member.getHousehold() != null : "No household for person found";
 							persons.add(member);
 						}
 						// 2 move household
 						household.relocate(dwellingsOnMarket, dwelling);
+						assert household.getDwelling() != null : "No dwelling for household found";
 						hhMovedToCheapest++;
 						migratingHouseholds++;
 						migratingPersons += household.getMemberCount();
@@ -481,12 +498,15 @@ public class Main {
 						}
 					} else {
 						// 1) add household to common lists
+						assert household.getMembers() != null : "No household members found";
 						households.add(household);
 						for (PersonRow member : household.getMembers()) {
+							assert member.getHousehold() != null : "No household for person found";
 							persons.add(member);
 						}
 						// 2 move household
 						household.relocate(dwellingsOnMarket, dwelling);
+						assert household.getDwelling() != null : "No dwelling for household found";
 						migratingHouseholds++;
 						migratingPersons += household.getMemberCount();
 						// TODO: update indicators
