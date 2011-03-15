@@ -49,6 +49,7 @@ import at.sume.dm.types.LivingSpaceGroup6;
 public class DwellingsOnMarket {
 	// Dwellings on the market per spatial unit
 	private ArrayList<DwellingRow> dwellingsOnMarketList[];
+	private ArrayList<DwellingRow> dwellingsOnMarketFullList;
 	private int grossFreeDwellingCount[];	// Total number of free dwellings available, only a fraction of this number is put on the market
 	private SpatialUnits spatialUnits;
 	private ArrayList<DwellingRow> suitableDwellings;
@@ -61,6 +62,7 @@ public class DwellingsOnMarket {
 		dwellingsOnMarketList = (ArrayList<DwellingRow>[])new ArrayList[spatialUnits.size()];
 		for (int i = 0; i != spatialUnits.size(); i++)
 			dwellingsOnMarketList[i] = new ArrayList<DwellingRow>();
+		dwellingsOnMarketFullList = new ArrayList<DwellingRow>();
 		grossFreeDwellingCount = new int[spatialUnits.size()];
 		addAll(dwellings.getRowList(), dwellingsOnMarketShare);
 	}
@@ -217,6 +219,34 @@ public class DwellingsOnMarket {
 		return getFirstMatchingDwelling(spatialUnitId, minSize, maxSize, -1);
 	}
 	/**
+	 * Get the first available dwelling anywhere that matches the given size & rent criteria
+	 * @param minSize
+	 * @param maxSize
+	 * @param maxYearlyPricePerSqm
+	 * @return
+	 */
+	public DwellingRow getFirstMatchingDwelling(short minSize, short maxSize, long maxYearlyPricePerSqm) {
+		int startPos = (int)(Math.random() * dwellingsOnMarketFullList.size());
+		int endPos = dwellingsOnMarketFullList.size();
+		for (int i = startPos; i != endPos; i++) {
+			DwellingRow dwelling = dwellingsOnMarketFullList.get(i);
+			if ((minSize <= dwelling.getDwellingSize()) && 
+					(dwelling.getDwellingSize() <= maxSize) && 
+					((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= maxYearlyPricePerSqm) || (maxYearlyPricePerSqm < 0)) {
+				return dwelling;
+			}
+		}
+		for (int i = 0; i != startPos; i++) {
+			DwellingRow dwelling = dwellingsOnMarketFullList.get(i);
+			if ((minSize <= dwelling.getDwellingSize()) && 
+					(dwelling.getDwellingSize() <= maxSize) && 
+					((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= maxYearlyPricePerSqm) || (maxYearlyPricePerSqm < 0)) {
+				return dwelling;
+			}
+		}
+		return null;
+	}
+	/**
 	 * Get the first available (free) dwelling that matches the given parameters
 	 * 
 	 * @param spatialUnitId Spatial unit to search dwellings in
@@ -254,10 +284,12 @@ public class DwellingsOnMarket {
 		int su = spatialUnits.indexOf(dwelling.getSpatialunit());
 		dwellingsOnMarketList[su].add(dwelling);
 		dwelling.setHousehold(null);
+		dwellingsOnMarketFullList.add(dwelling);
 	}
 	public void removeDwellingFromMarket(DwellingRow dwelling) {
 		int su = spatialUnits.indexOf(dwelling.getSpatialunit());
 		dwellingsOnMarketList[su].remove(dwelling);
+		dwellingsOnMarketFullList.remove(dwelling);
 	}
 	public void outputDwellingsPerSize(PrintStream ps, int modelYear, String label) {
 		int dwellingSizeCount[] = new int[LivingSpaceGroup6.getLivingSpaceGroupCount()];

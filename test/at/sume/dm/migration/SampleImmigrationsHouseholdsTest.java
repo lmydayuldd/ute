@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
+import at.sume.dm.types.MigrationRealm;
 
 /**
  * @author Alexander Remesch
@@ -36,7 +37,7 @@ public class SampleImmigrationsHouseholdsTest {
 	 */
 	@Test
 	public void testSample() {
-		ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(2001);
+		ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(2001, MigrationRealm.INTERNATIONAL);
 		assertEquals("Number of immigrating households", 0, immigratingHouseholds.size()); 
 	}
 

@@ -113,4 +113,100 @@ public class CountMigrationPerSpatialUnit implements MigrationObserver {
 			indicatorList.set(pos, immigrationRow);
 		}
 	}
+	@Override
+	public void addChildLeavingParents(Integer srcSpatialUnitId,
+			Integer destSpatialUnitId) {
+		int pos = Collections.binarySearch(indicatorList, srcSpatialUnitId);
+		if (pos < 0) {
+			// insert at position pos
+			pos = (pos + 1) * -1;
+			MigrationPerSpatialUnitRow emigrationRow = new MigrationPerSpatialUnitRow();
+			emigrationRow.setSpatialUnidId(srcSpatialUnitId);
+			emigrationRow.addChildLeftParentsOrigin();
+			indicatorList.add(pos, emigrationRow);
+		} else {
+			// available at position pos
+			MigrationPerSpatialUnitRow emigrationRow = indicatorList.get(pos);
+			emigrationRow.addChildLeftParentsOrigin();
+			indicatorList.set(pos, emigrationRow);
+		}
+		pos = Collections.binarySearch(indicatorList, destSpatialUnitId);
+		if (pos < 0) {
+			// insert at position pos
+			pos = (pos + 1) * -1;
+			MigrationPerSpatialUnitRow emigrationRow = new MigrationPerSpatialUnitRow();
+			emigrationRow.setSpatialUnidId(srcSpatialUnitId);
+			emigrationRow.addChildLeftParentsDestination();
+			indicatorList.add(pos, emigrationRow);
+		} else {
+			// available at position pos
+			MigrationPerSpatialUnitRow emigrationRow = indicatorList.get(pos);
+			emigrationRow.addChildLeftParentsDestination();
+			indicatorList.set(pos, emigrationRow);
+		}
+	}
+	@Override
+	public void addCohabitation(Integer srcSpatialUnitId,
+			Integer destSpatialUnitId, byte householdMemberCount) {
+		int pos = Collections.binarySearch(indicatorList, srcSpatialUnitId);
+		if (pos < 0) {
+			// insert at position pos
+			pos = (pos + 1) * -1;
+			MigrationPerSpatialUnitRow emigrationRow = new MigrationPerSpatialUnitRow();
+			emigrationRow.setSpatialUnidId(srcSpatialUnitId);
+			emigrationRow.addCohabitationOrigin(householdMemberCount);
+			indicatorList.add(pos, emigrationRow);
+		} else {
+			// available at position pos
+			MigrationPerSpatialUnitRow emigrationRow = indicatorList.get(pos);
+			emigrationRow.addCohabitationOrigin(householdMemberCount);
+			indicatorList.set(pos, emigrationRow);
+		}
+		pos = Collections.binarySearch(indicatorList, destSpatialUnitId);
+		if (pos < 0) {
+			// insert at position pos
+			pos = (pos + 1) * -1;
+			MigrationPerSpatialUnitRow emigrationRow = new MigrationPerSpatialUnitRow();
+			emigrationRow.setSpatialUnidId(srcSpatialUnitId);
+			emigrationRow.addCohabitationDestination(householdMemberCount);
+			indicatorList.add(pos, emigrationRow);
+		} else {
+			// available at position pos
+			MigrationPerSpatialUnitRow emigrationRow = indicatorList.get(pos);
+			emigrationRow.addCohabitationDestination(householdMemberCount);
+			indicatorList.set(pos, emigrationRow);
+		}
+	}
+	public void addPotentialImmigrationCounters(int spatialUnitId, int householdCount, int householdMemberCount, MigrationRealm migrationRealm) {
+		int pos = Collections.binarySearch(indicatorList, spatialUnitId);
+		if (pos < 0) {
+			// insert at position pos
+			pos = (pos + 1) * -1;
+			MigrationPerSpatialUnitRow emigrationRow = new MigrationPerSpatialUnitRow();
+			emigrationRow.setSpatialUnidId(spatialUnitId);
+			emigrationRow.addPotentialImmigrationCounters(householdCount, householdMemberCount, migrationRealm);
+			indicatorList.add(pos, emigrationRow);
+		} else {
+			// available at position pos
+			MigrationPerSpatialUnitRow emigrationRow = indicatorList.get(pos);
+			emigrationRow.addPotentialImmigrationCounters(householdCount, householdMemberCount, migrationRealm);
+			indicatorList.set(pos, emigrationRow);
+		}
+	}
+	public void addPotentialLeftParentsOriginCount(int spatialUnitId, int personCount) {
+		int pos = Collections.binarySearch(indicatorList, spatialUnitId);
+		if (pos < 0) {
+			// insert at position pos
+			pos = (pos + 1) * -1;
+			MigrationPerSpatialUnitRow emigrationRow = new MigrationPerSpatialUnitRow();
+			emigrationRow.setSpatialUnidId(spatialUnitId);
+			emigrationRow.addPotentialLeftParentsOriginCount(personCount);
+			indicatorList.add(pos, emigrationRow);
+		} else {
+			// available at position pos
+			MigrationPerSpatialUnitRow emigrationRow = indicatorList.get(pos);
+			emigrationRow.addPotentialLeftParentsOriginCount(personCount);
+			indicatorList.set(pos, emigrationRow);
+		}
+	}
 }

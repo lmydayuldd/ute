@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import at.sume.dm.Common;
+import at.sume.dm.types.MigrationRealm;
 
 /**
  * @author Alexander Remesch
@@ -116,8 +117,8 @@ public class TotalMigrationPerYear {
 	 * @param modelYear
 	 * @return
 	 */
-	public int getImmigration(int modelYear) {
-		return get_v2(modelYear);
+	public int getImmigration(int modelYear, MigrationRealm migrationRealm) {
+		return get_v2(modelYear, migrationRealm);
 	}
 	/**
 	 * Get total international out migration (nr. of persons) for the given year
@@ -154,11 +155,17 @@ public class TotalMigrationPerYear {
 		assert (index >= 0) && (index < migrationsPerYear.size()) : "Model year " + modelYear + " not included in migrationsPerYear (_DM_Migration) for this scenario";
 		return index;
 	}
-	private int get_v2(int modelYear) {
+	private int get_v2(int modelYear, MigrationRealm migrationRealm) {
 		int index = lookupYear(modelYear);
 		MigrationsPerYear m = migrationsPerYear.get(index);
-		assert m.getModelYear() == modelYear : "Calculated index for year " + modelYear + " returns data for year " + m.getModelYear(); 
-		return m.getImmigrationInternational() + m.getImmigrationNational();
+		assert m.getModelYear() == modelYear : "Calculated index for year " + modelYear + " returns data for year " + m.getModelYear();
+		switch (migrationRealm) {
+		case NATIONAL:
+			return m.getImmigrationNational();
+		case INTERNATIONAL:
+			return m.getImmigrationInternational();
+		}
+		throw new AssertionError();
 	}
 //	private long get_v3(int modelYear) {
 //		MigrationsPerYear m = new MigrationsPerYear();

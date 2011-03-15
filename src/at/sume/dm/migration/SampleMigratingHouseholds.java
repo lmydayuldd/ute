@@ -14,6 +14,7 @@ import at.sume.dm.indicators.IncomePercentiles;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
 import at.sume.dm.policy.MinimumYearlyIncome;
 import at.sume.dm.types.AgeGroup;
+import at.sume.dm.types.MigrationRealm;
 import at.sume.sampling.ExactDistribution;
 
 /**
@@ -155,12 +156,12 @@ public class SampleMigratingHouseholds {
 		totalMigrationsPerYear = new TotalMigrationPerYear(scenarioName);
 	}
 	
-	public ArrayList<HouseholdRow> sample(int modelYear) {
+	public ArrayList<HouseholdRow> sample(int modelYear, MigrationRealm migrationRealm) {
 		ArrayList<HouseholdRow> result = new ArrayList<HouseholdRow>();
 		Random r = new Random();
 		
 		// 1) Get number of persons immigrating in that year
-		long numImmigrants = totalMigrationsPerYear.getImmigration(modelYear);
+		long numImmigrants = totalMigrationsPerYear.getImmigration(modelYear, migrationRealm);
 		//    and calculate the exact age & sex distribution
 		migrationsPerAgeSex.buildExactThresholds(numImmigrants);
 		
@@ -232,18 +233,18 @@ public class SampleMigratingHouseholds {
 						minIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 80);
 						maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 100);
 						assert maxIncome - minIncome > 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
+						yearlyIncome = minIncome + r.nextInt((int) (maxIncome - minIncome));
 					} else {
 						MinimumYearlyIncome minimumYearlyIncome = MinimumYearlyIncome.getInstance();
 						minIncome = minimumYearlyIncome.get(modelYear, (byte) result.getAdultsCount(), (byte) (result.getMemberCount() - result.getAdultsCount()));
-						maxIncome = Math.max(0, ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 20));
-						if (maxIncome < minIncome) {
-							int t = minIncome;
-							minIncome = maxIncome;
-							maxIncome = t;
+						maxIncome = Math.max(minIncome, ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 20));
+						if (maxIncome <= minIncome) {
+							yearlyIncome = minIncome;
+						} else {
+//							assert maxIncome - minIncome >= 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
+							yearlyIncome = minIncome + r.nextInt((int) (maxIncome - minIncome));
 						}
-						assert maxIncome - minIncome > 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
 					}
-					yearlyIncome = minIncome + r.nextInt((int) (maxIncome - minIncome));
 				}
 			}
 			person.setYearlyIncome(yearlyIncome);

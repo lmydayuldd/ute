@@ -8,5 +8,6 @@ package at.sume.dm.types;
 public enum MigrationRealm {
 	LOCAL,
 	NATIONAL,
-	INTERNATIONAL;
+	INTERNATIONAL,
+	LEAVING_PARENTS;
 }

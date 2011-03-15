@@ -19,11 +19,13 @@ public class LeavingParents {
 	private SingleProbability leavingParentsProbability;
 	private int modelYear;
 	private ArrayList<PersonRow> childrenLeaving;
+	private byte childrenMaxAge;
 
-	public LeavingParents(SingleProbability leavingParentsProbability, int modelYear) {
+	public LeavingParents(SingleProbability leavingParentsProbability, byte childrenMaxAge, int modelYear) {
 		this.leavingParentsProbability = leavingParentsProbability;
 		this.modelYear = modelYear;
 		childrenLeaving = new ArrayList<PersonRow>();
+		this.childrenMaxAge = childrenMaxAge;
 	}
 
 	public void addHousehold(HouseholdRow existingHousehold) {
@@ -32,9 +34,11 @@ public class LeavingParents {
 		case SMALL_FAMILY:
 		case LARGE_FAMILY:
 			for (PersonRow member : existingHousehold.getMembers()) {
-				if (member.isLivingWithParents()) {
-					if (leavingParentsProbability.occurs()) {
-						childrenLeaving.add(member);
+				if (member.getAge() > childrenMaxAge) {
+					if (member.isLivingWithParents()) {
+						if (leavingParentsProbability.occurs()) {
+							childrenLeaving.add(member);
+						}
 					}
 				}
 			}
@@ -77,6 +81,7 @@ public class LeavingParents {
 		person.setHousehold(newHousehold);
 		newHousehold.determineInitialHouseholdType(false);	// countAdults() was already done in addMember()
 		person.setYearlyIncome(yearlyIncome);
+		newHousehold.setDwelling(parentHousehold.getDwelling()); // this is needed to be able to count leaving parent moves per spatial unit
 		
 		return newHousehold;
 	}

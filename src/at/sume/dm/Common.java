@@ -41,6 +41,7 @@ public class Common {
 	private static byte dwellingPriceRange;
 	private static byte cohabitationRate;
 	private static SingleProbability leavingParentsProbability;
+	private static byte childrenMaxAge;
 	
 	/**
 	 * @return the iniFilename
@@ -176,6 +177,20 @@ public class Common {
 	}
 
 	/**
+	 * @param childrenMaxAge the childrenMaxAge to set
+	 */
+	public static void setChildrenMaxAge(byte childrenMaxAge) {
+		Common.childrenMaxAge = childrenMaxAge;
+	}
+
+	/**
+	 * @return the childrenMaxAge
+	 */
+	public static byte getChildrenMaxAge() {
+		return childrenMaxAge;
+	}
+
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -248,6 +263,7 @@ public class Common {
 		dwellingPriceRange = Byte.parseByte(getSysParam("DwellingPriceRange"));
 		cohabitationRate = Byte.parseByte(getSysParam("CohabitationRate"));
 		leavingParentsProbability = new SingleProbability(Byte.parseByte(getSysParam("ProbabilityLeavingParents")), 100);
+		setChildrenMaxAge(Byte.parseByte(getSysParam("ChildrenMaxAge")));
 	}
 	
 	/**

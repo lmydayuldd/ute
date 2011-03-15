@@ -15,7 +15,6 @@ import net.remesch.db.schema.Ignore;
 import at.sume.db.RecordSetRowFileable;
 import at.sume.dm.Common;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
-import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.indicators.simple.MigrationObservable;
 import at.sume.dm.indicators.simple.MigrationObserver;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
@@ -134,7 +133,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		if (childrenMaxAge == 0) {
 			String sp = Common.getSysParam("ChildrenMaxAge");
 			if (sp == null)
-				childrenWeight = 14;
+				childrenMaxAge = 14;
 			else
 				childrenMaxAge = Byte.parseByte(sp);
 		}
@@ -971,7 +970,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * 
 	 * @param dwelling
 	 */
-	public void relocate(DwellingsOnMarket dwellingsOnMarket, DwellingRow dwelling) {
+	public void relocate(DwellingsOnMarket dwellingsOnMarket, DwellingRow dwelling, MigrationRealm migrationRealm) {
 		if (hasDwelling()) {
 			DwellingRow oldDwelling = getDwelling();
 			dwellingsOnMarket.putDwellingOnMarket(oldDwelling);
@@ -979,14 +978,24 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			oldDwelling.calcTotalYearlyDwellingCosts(true);
 			notifyLocalMigration(getSpatialunitId(), dwelling.getSpatialunitId());
 		} else {
-			// TODO: specify the migration realm and distinguish between national and international immigration
-			notifyImmigration(dwelling.getSpatialunitId(), MigrationRealm.NATIONAL);
+			notifyImmigration(dwelling.getSpatialunitId(), migrationRealm);
 		}
 		dwellingsOnMarket.removeDwellingFromMarket(dwelling);
 		setDwelling(dwelling);
 		dwelling.setHousehold(this);
 		// Update indicators
-		MoversIndicatorManager.addHousehold(this);
+//		MoversIndicatorManager.addHousehold(this);
+	}
+	/**
+	 * 
+	 * @param dwellingsOnMarket
+	 * @param dwelling
+	 */
+	public void leaveParentsHome(DwellingsOnMarket dwellingsOnMarket, DwellingRow dwelling) {
+		notifyLeavingParents(getDwelling().getSpatialunit().getSpatialUnitId(), dwelling.getSpatialunit().getSpatialUnitId());
+		dwellingsOnMarket.removeDwellingFromMarket(dwelling);
+		setDwelling(dwelling);
+		dwelling.setHousehold(this);
 	}
 	/**
 	 * Merge household members with the members of the given household
@@ -994,6 +1003,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * @param household
 	 */
 	public void join(HouseholdRow household) {
+		notifyCohabitation(household.getDwelling().getSpatialunit().getSpatialUnitId(), getDwelling().getSpatialunit().getSpatialUnitId());
 		addMembers(household.getMembers());
 		household.members = null;
 		determineInitialHouseholdType(false); //countAdults has already been done in addMembers()
@@ -1206,6 +1216,22 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			MigrationRealm migrationRealm) {
 		for (MigrationObserver obs : migrationObservers) {
 			obs.addImmigration(destSpatialUnitId, getHouseholdSize(), migrationRealm);
+		}
+	}
+
+	@Override
+	public void notifyLeavingParents(Integer srcSpatialUnitId,
+			Integer destSpatialUnitId) {
+		for (MigrationObserver obs : migrationObservers) {
+			obs.addChildLeavingParents(srcSpatialUnitId, destSpatialUnitId);
+		}
+	}
+
+	@Override
+	public void notifyCohabitation(Integer srcSpatialUnitId,
+			Integer destSpatialUnitId) {
+		for (MigrationObserver obs : migrationObservers) {
+			obs.addCohabitation(srcSpatialUnitId, destSpatialUnitId, getHouseholdSize());
 		}
 	}
 }
