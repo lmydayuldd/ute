@@ -4,75 +4,47 @@
 package at.sume.dm.demography;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import net.remesch.db.Database;
 
 /**
  * Implementation of fertility probability per age and sex
+ * 
  * @author Alexander Remesch
  */
-public class Fertility extends ProbabilityDistribution<FertilityProbabilityRow> {
-
+public class Fertility {
+	private ArrayList<FertilityProbabilityRow> probabilityRow;
+	
 	/**
 	 * @param db
 	 * @throws SQLException
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
-	public Fertility(Database db) throws SQLException {
-		super(db);
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.dm.demography.ProbabilityDistribution#createProbabilityItem()
-	 */
-	@Override
-	public FertilityProbabilityRow createProbabilityItem() {
-		return new FertilityProbabilityRow();
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.dm.demography.ProbabilityDistribution#selectStatement()
-	 */
-	@Override
-	public String selectStatement() {
-		return "SELECT AgeGroupId, Fertziff/1000 AS p " +
-			"FROM StatA_FertZiff_W " +
-			"WHERE Jahr = 2009";
+	public Fertility(Database db) throws SQLException, InstantiationException, IllegalAccessException {
+//		String sqlStatement = "SELECT AgeGroupId, Fertziff/1000 AS p " +
+//			"FROM StatA_FertZiff_W " +
+//			"WHERE Jahr = 2009";
+		String sqlStatement = "select ageGroupId, householdSize, Fertility/1000 AS ProbabilityBirth from _DM_FertilityAgeHouseholdSize order by ageGroupId, householdSize";
+		probabilityRow = db.select(FertilityProbabilityRow.class, sqlStatement);
 	}
 
 	/**
-	 * Return the probability of birth for a given age-group of females
+	 * Return the probability of birth for females in a given age-group and living in a household of a certain size
 	 * @param ageGroupId
 	 * @return
 	 */
-	public double probability(short ageGroupId) {
-		FertilityProbabilityRow fpi = new FertilityProbabilityRow();
-		fpi.setAgeGroupId(ageGroupId);
-		return probability(fpi);
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSet#fieldnames()
-	 */
-	@Override
-	public String[] fieldnames() {
-		String s[] = { "AgeGroupId", "p" };
-		return s;
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSet#primaryKeyFieldnames()
-	 */
-	@Override
-	public String[] primaryKeyFieldnames() {
-		String s[] = { "AgeGroupId" };
-		return s;
-	}
-
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSet#tablename()
-	 */
-	@Override
-	public String tablename() {
-		return "StatA_FertZiff_W";
+	public double probability(byte ageGroupId, byte householdSize) {
+		FertilityProbabilityRow lookup = new FertilityProbabilityRow();
+		lookup.setAgeGroupId(ageGroupId);
+		lookup.setHouseholdSize(householdSize);
+		int index = Collections.binarySearch(probabilityRow, lookup);
+		if (index >= 0) {
+			return probabilityRow.get(index).getProbabilityBirth();
+		} else {
+			return 0;
+		}
 	}
 }

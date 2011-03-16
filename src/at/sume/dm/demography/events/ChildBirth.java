@@ -23,8 +23,10 @@ public class ChildBirth extends Event<PersonRow> {
 	/**
 	 * @param eventManager
 	 * @throws SQLException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
-	public ChildBirth(Database db, EventManager<PersonRow> eventManager) throws SQLException {
+	public ChildBirth(Database db, EventManager<PersonRow> eventManager) throws SQLException, InstantiationException, IllegalAccessException {
 		super(db, eventManager);
 		fertilityDistribution = new Fertility(db);
 		// set sex proportion here
@@ -39,7 +41,11 @@ public class ChildBirth extends Event<PersonRow> {
 	 */
 	@Override
 	protected double probability(PersonRow entity) {
-		return fertilityDistribution.probability(entity.getAgeGroupId());
+		if (entity.getSex() == 1) { // speedup - calculate probability for females only
+			return fertilityDistribution.probability(entity.getAgeGroupId(), entity.getHousehold().getHouseholdSize());
+		} else {
+			return 0;
+		}
 	}
 
 	/* (non-Javadoc)

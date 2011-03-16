@@ -3,61 +3,56 @@
  */
 package at.sume.dm.demography;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import at.sume.db.RecordSetRow;
 
 /**
  * Implementation of ProbabilityItem for fertility (= event) depending on age (= properties)
  * @author Alexander Remesch
  */
-public class FertilityProbabilityRow extends RecordSetRow<Fertility> {
-	private short ageGroupId;
+public class FertilityProbabilityRow implements Comparable<FertilityProbabilityRow> {
+	private byte ageGroupId;
+	private byte householdSize;
+	private double probabilityBirth;
 	
 	/**
 	 * @return the ageGroupId
 	 */
-	public short getAgeGroupId() {
+	public byte getAgeGroupId() {
 		return ageGroupId;
 	}
 
 	/**
 	 * @param ageGroupId the ageGroupId to set
 	 */
-	public void setAgeGroupId(short ageGroupId) {
+	public void setAgeGroupId(byte ageGroupId) {
 		this.ageGroupId = ageGroupId;
 	}
 
-	/* (non-Javadoc)
-	 * @see at.sume.dm.demography.ProbabilityItem#set(java.lang.String)
+	/**
+	 * @param householdSize the householdSize to set
 	 */
-	@Override
-	public void loadFromDatabase(ResultSet rs, String name) throws SQLException {
-		if (name.equals("AgeGroupId")) {
-			setAgeGroupId(rs.getShort("AgeGroupId"));
-		} else {
-			throw new UnsupportedOperationException("Unknown field name " + name);
-		}
+	public void setHouseholdSize(byte householdSize) {
+		this.householdSize = householdSize;
 	}
 
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSetRow#primaryKeyEquals(java.lang.Object[])
+	/**
+	 * @return the householdSize
 	 */
-	@Override
-	public boolean primaryKeyEquals(Object... lookupKeys) {
-		if (lookupKeys.length != 2) {
-			throw new IllegalArgumentException("PK must be two fields (of type Short)");
-		}
-		if ((lookupKeys[0] instanceof Short) && (lookupKeys[1] instanceof Short)) {
-			short lookupAgeGroupId = (Short) lookupKeys[0];
-			if (lookupAgeGroupId == getAgeGroupId())
-				return true;
-			else
-				return false;
-		} else {
-			throw new IllegalArgumentException("PK field must by of type Short");
-		}
+	public byte getHouseholdSize() {
+		return householdSize;
+	}
+
+	/**
+	 * @param probabilityBirth the probabilityBirth to set
+	 */
+	public void setProbabilityBirth(double probabilityBirth) {
+		this.probabilityBirth = probabilityBirth;
+	}
+
+	/**
+	 * @return the probabilityBirth
+	 */
+	public double getProbabilityBirth() {
+		return probabilityBirth;
 	}
 
 	/* (non-Javadoc)
@@ -67,7 +62,7 @@ public class FertilityProbabilityRow extends RecordSetRow<Fertility> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ageGroupId;
+		result = prime * result + ageGroupId + householdSize;
 		return result;
 	}
 
@@ -85,14 +80,17 @@ public class FertilityProbabilityRow extends RecordSetRow<Fertility> {
 		FertilityProbabilityRow other = (FertilityProbabilityRow) obj;
 		if (ageGroupId != other.ageGroupId)
 			return false;
+		if (householdSize != other.householdSize)
+			return false;
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see at.sume.db.RecordSetRow#remove()
-	 */
 	@Override
-	public void remove() {
-		throw new IllegalArgumentException("FertilityProbabilityRow.remove() not allowed");
+	public int compareTo(FertilityProbabilityRow o) {
+		int result = ((Byte)ageGroupId).compareTo(o.ageGroupId);
+		if (result == 0) {
+			return ((Byte)householdSize).compareTo(o.householdSize);
+		}
+		return result;
 	}
 }
