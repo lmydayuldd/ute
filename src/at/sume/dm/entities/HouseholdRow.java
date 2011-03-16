@@ -15,6 +15,7 @@ import net.remesch.db.schema.Ignore;
 import at.sume.db.RecordSetRowFileable;
 import at.sume.dm.Common;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
+import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.indicators.simple.MigrationObservable;
 import at.sume.dm.indicators.simple.MigrationObserver;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
@@ -446,6 +447,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			}
 			break;
 		case 3:
+			// This could be either household type OTHER or it is dealt with like below 
 			assert getHouseholdSize() >= numAdults : "Counted " + numAdults + " adult(s) but household size = " + getHouseholdSize();
 			if (getHouseholdSize() == 3) {
 				// 3 adults
@@ -984,7 +986,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		setDwelling(dwelling);
 		dwelling.setHousehold(this);
 		// Update indicators
-//		MoversIndicatorManager.addHousehold(this);
+		MoversIndicatorManager.addHousehold(this);
 	}
 	/**
 	 * 

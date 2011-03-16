@@ -32,6 +32,7 @@ import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.indicators.AggregatedDwellings;
 import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
+import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
 import at.sume.dm.indicators.simple.CountDemographicMovements;
 import at.sume.dm.indicators.simple.CountMigrationPerSpatialUnit;
@@ -322,7 +323,7 @@ public class Main {
 			int highestYearlyRentPer100Sqm = rentPerSpatialUnit.getHighestYearlyRentPer100Sqm();
 			System.out.println(printInfo() + ": lowest rent (€/100m²/yr.): " + lowestYearlyRentPer100Sqm + ", highest rent: " + highestYearlyRentPer100Sqm);
 			// Reset the movers indicators
-//			MoversIndicatorManager.resetIndicators();
+			MoversIndicatorManager.resetIndicators();
 			outputFreeDwellings(modelYear, "before moving households + after demographic changes");
 			// Loop through potential movers
 			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0, hhZeroIncome = 0, hhLowIncome = 0, hhMovedAway = 0;
