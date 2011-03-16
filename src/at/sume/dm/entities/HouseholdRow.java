@@ -1021,7 +1021,6 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	}
 
 	public void emigrate(DwellingsOnMarket dwellingsOnMarket, MigrationRealm migrationRealm) {
-		// TODO: specify the migration realm and distinguish between national and international immigration
 		notifyEmigration(getSpatialunitId(), migrationRealm);
 		remove(dwellingsOnMarket);
 	}

@@ -51,6 +51,7 @@ public class DwellingsOnMarket {
 	private ArrayList<DwellingRow> dwellingsOnMarketList[];
 	private ArrayList<DwellingRow> dwellingsOnMarketFullList;
 	private int grossFreeDwellingCount[];	// Total number of free dwellings available, only a fraction of this number is put on the market
+	private int grossFreeDwellingTotal;
 	private SpatialUnits spatialUnits;
 	private ArrayList<DwellingRow> suitableDwellings;
 	private boolean headLineWritten = false;
@@ -75,8 +76,17 @@ public class DwellingsOnMarket {
 	public ArrayList<DwellingRow> getDwellingsOnMarket(long spatialUnitId) {
 		return dwellingsOnMarketList[spatialUnitArrayPosition(spatialUnitId)];
 	}
+	/**
+	 * Return the gross free dwelling count (that is all dwellings that are not taken by a household).
+	 * This number is different (larger) than the number of dwellings on market!
+	 * @param spatialUnitId
+	 * @return
+	 */
 	public int getGrossFreeDwellingCount(long spatialUnitId) {
 		return grossFreeDwellingCount[spatialUnitArrayPosition(spatialUnitId)];
+	}
+	public int getGrossFreeDwellingTotal() {
+		return grossFreeDwellingTotal;
 	}
 	/**
 	 * Add a share of the dwellings given to the list of dwellings on the market.
@@ -91,6 +101,7 @@ public class DwellingsOnMarket {
 			if (row.getHousehold() == null) {
 				int pos = spatialUnits.indexOf(row.getSpatialunit());
 				grossFreeDwellingCount[pos]++;
+				grossFreeDwellingTotal++;
 				if (r.nextInt(100) <= dwellingsOnMarketShare) {
 //					dwellingsOnMarketList[pos].add(row);
 					putDwellingOnMarket(row);
@@ -292,11 +303,10 @@ public class DwellingsOnMarket {
 		dwellingsOnMarketFullList.remove(dwelling);
 	}
 	public void outputDwellingsPerSize(PrintStream ps, int modelYear, String label) {
-		int dwellingSizeCount[] = new int[LivingSpaceGroup6.getLivingSpaceGroupCount()];
 		StringBuffer output = new StringBuffer();
 		// Headline - written only once per model run
 		if (!headLineWritten) {
-			output.append("ModelYear;SpatialUnit;Label");
+			output.append("ModelYear;SpatialUnit;Label;Total");
 			for (byte i = 0; i != LivingSpaceGroup6.getLivingSpaceGroupCount(); i++) {
 				output.append(";" + LivingSpaceGroup6.getLivingSpaceGroupName((byte) (i + 1)));
 			}
@@ -305,7 +315,8 @@ public class DwellingsOnMarket {
 		}
 		for (int i = 0; i != spatialUnits.size(); i++) {
 			if (!spatialUnits.get(i).isFreeDwellingsAlwaysAvailable()) { // don't output for spatial units outside the model area
-				output = new StringBuffer(modelYear + ";" + spatialUnits.get(i).getSpatialUnitId() + ";" + label);
+				int dwellingSizeCount[] = new int[LivingSpaceGroup6.getLivingSpaceGroupCount()];
+				output = new StringBuffer(modelYear + ";" + spatialUnits.get(i).getSpatialUnitId() + ";" + label + ";" + dwellingsOnMarketList[i].size());
 				// Count dwellings per living space group
 				for (DwellingRow dwelling : dwellingsOnMarketList[i]) {
 					dwellingSizeCount[LivingSpaceGroup6.getLivingSpaceGroupId(dwelling.getDwellingSize()) - 1]++;
@@ -317,5 +328,8 @@ public class DwellingsOnMarket {
 				ps.println(output);
 			}
 		}
+	}
+	public int getFreeDwellingsCount() {
+		return dwellingsOnMarketFullList.size();
 	}
 }
