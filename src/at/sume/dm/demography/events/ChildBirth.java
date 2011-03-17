@@ -26,9 +26,9 @@ public class ChildBirth extends Event<PersonRow> {
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 */
-	public ChildBirth(Database db, EventManager<PersonRow> eventManager) throws SQLException, InstantiationException, IllegalAccessException {
+	public ChildBirth(Database db, String scenarioName, EventManager<PersonRow> eventManager) throws SQLException, InstantiationException, IllegalAccessException {
 		super(db, eventManager);
-		fertilityDistribution = new Fertility(db);
+		fertilityDistribution = new Fertility(db, scenarioName);
 		// set sex proportion here
 		// TODO: find a better place for this
 		sexProportion = (Double) db.lookupSql("select SexProp from StatA_SexProp_W where Jahr = 2009");

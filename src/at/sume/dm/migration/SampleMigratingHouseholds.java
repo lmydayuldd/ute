@@ -135,25 +135,23 @@ public class SampleMigratingHouseholds {
 	private ArrayList<MigrationHouseholdSize> migrationHouseholdSize;
 	private long migrationHouseholdSizeShareTotal = 0;
 	
-	public SampleMigratingHouseholds(String scenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
+	public SampleMigratingHouseholds(String migrationScenarioName, String migrationHouseholdSizeScenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
 		selectStatement = "SELECT id, ageGroupId, sex, share " +
 			"FROM _DM_MigrationAgeSex " +
-			"WHERE scenarioName = '" + scenarioName + "' " +
+			"WHERE scenarioName = '" + migrationScenarioName + "' " +
 			"ORDER BY ageGroupId, sex";
 		migrationsPerAgeSex = new ExactDistribution<MigrationsPerAgeSex>(Common.db.select(MigrationsPerAgeSex.class, selectStatement), "share");
-		assert migrationsPerAgeSex.size() > 0 : "No rows selected from _DM_MigrationAgeSex (scenarioName = " + scenarioName + ")";
+		assert migrationsPerAgeSex.size() > 0 : "No rows selected from _DM_MigrationAgeSex (scenarioName = " + migrationScenarioName + ")";
 
 		selectStatement = "SELECT id, householdSize, share " +
 			"FROM _DM_MigrationHouseholdSize " +
-			// TODO: change this with scenario-handling class!
-//			"WHERE scenarioName = '" + scenarioName + "' " +
-			"WHERE scenarioName = 'NEUZUD' " +
+			"WHERE scenarioName = '" + migrationHouseholdSizeScenarioName + "' " +
 			"ORDER BY householdSize";
 		migrationHouseholdSize = Common.db.select(MigrationHouseholdSize.class, selectStatement);
-		assert migrationHouseholdSize.size() > 0 : "No rows selected from _DM_MigrationHouseholdSize (scenarioName = " + scenarioName + ")";
-		migrationHouseholdSizeShareTotal = Math.round((Double)Common.db.lookupSql("select sum(share) from _DM_MigrationHouseholdSize where scenarioName = 'NEUZUD'"));
-		totalMigrationsPerYear = new TotalMigrationPerYear(scenarioName);
+		assert migrationHouseholdSize.size() > 0 : "No rows selected from _DM_MigrationHouseholdSize (scenarioName = " + migrationScenarioName + ")";
+		migrationHouseholdSizeShareTotal = Math.round((Double)Common.db.lookupSql("select sum(share) from _DM_MigrationHouseholdSize where scenarioName = '" + migrationHouseholdSizeScenarioName + "'"));
+		totalMigrationsPerYear = new TotalMigrationPerYear(migrationScenarioName);
 	}
 	
 	public ArrayList<HouseholdRow> sample(int modelYear, MigrationRealm migrationRealm) {

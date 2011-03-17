@@ -46,6 +46,8 @@ import at.sume.dm.model.residential_mobility.NoDwellingFoundReason;
 import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.dm.model.residential_mobility.ResidentialMobility;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
+import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionWeight;
+import at.sume.dm.scenario_handling.Scenario;
 import at.sume.dm.types.MigrationRealm;
 
 /**
@@ -68,6 +70,7 @@ public class Main {
 	private static CountDemographicMovements demographicMovementsPerSpatialUnit;
 	private static AggregatedDwellings aggregatedDwellings;
 	private static RentPerSpatialUnit rentPerSpatialUnit;
+	private static Scenario scenario;
 
 	private static String printInfo() {
 		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)";
@@ -80,9 +83,13 @@ public class Main {
 		Database db = Common.openDatabase();
 //		Database odb = Common.openOutputDatabase();
 		Common.init();
-
-        // TODO: Scenario handling
-        rentPerSpatialUnit = RentPerSpatialUnit.getInstance("BASE");
+		try {
+			scenario = new Scenario(db, Common.getScenarioId());
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		
+        rentPerSpatialUnit = RentPerSpatialUnit.getInstance(scenario.getRentScenario(), Common.getSpatialUnitLevel());
 
 		// Load entity sets from database
 		try {
@@ -217,10 +224,9 @@ public class Main {
 		@SuppressWarnings("unused")
 		PersonDeath personDeath = new PersonDeath(db, personEventManager, Common.getPersonMaxAge());
 		@SuppressWarnings("unused")
-		ChildBirth childBirth = new ChildBirth(db, personEventManager);
-		// TODO: include scenario handling!!!
-		SampleMigratingHouseholds sampleMigratingHouseholds = new SampleMigratingHouseholds("STATA2010");
-		SampleBuildingProjects sampleBuildingProjects = new SampleBuildingProjects("BASE", spatialUnits);
+		ChildBirth childBirth = new ChildBirth(db, scenario.getFertilityScenario(), personEventManager);
+		SampleMigratingHouseholds sampleMigratingHouseholds = new SampleMigratingHouseholds(scenario.getMigrationScenario(), scenario.getMigrationHouseholdSizeScenario());
+		SampleBuildingProjects sampleBuildingProjects = new SampleBuildingProjects(scenario.getBuildingProjectScenario(), scenario.getNewDwellingSizeScenario(), spatialUnits);
 		
 		EntityDecisionManager<HouseholdRow, Households> householdDecisionManager = new EntityDecisionManager<HouseholdRow, Households>();
 		MinimumIncome minimumIncome = new MinimumIncome(db, householdDecisionManager, households);
@@ -283,6 +289,8 @@ public class Main {
 				// TODO: add to potential_movers if this is the result of householdDecisionManager
 
 				// Calculate residential mobility depending on previous decisions
+				// - set scenario for residential satisfaction weight to be used in ResidentialSatisfactionManager
+				ResidentialSatisfactionWeight.getInstance(scenario.getHouseholdPrefsScenario());
 				// TODO: save residential satisfaction result for later use
 				short residential_satisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, modelYear);
 				assert (residential_satisfaction >= 0) && (residential_satisfaction <= 1000) : "residential satisfaction out of range (" + residential_satisfaction + ")";

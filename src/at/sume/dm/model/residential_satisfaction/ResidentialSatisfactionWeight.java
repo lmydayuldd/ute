@@ -153,14 +153,16 @@ public class ResidentialSatisfactionWeight {
 		}
 	}
 
-	private static ArrayList<HouseholdPrefs> householdPrefs;
+	private volatile static ResidentialSatisfactionWeight uniqueInstance;
+	private static String scenarioName;
+	
+	private ArrayList<HouseholdPrefs> householdPrefs;
 
-	static {
+	private ResidentialSatisfactionWeight(String scenarioName) {
 		try {
-			// TODO: finish scenario handling
 			householdPrefs = Common.db.select(HouseholdPrefs.class, 
-					"select * from _DM_HouseholdPrefs where HouseholdPrefsScenarioName = 'BASE' order by HouseholdTypeId");
-			assert householdPrefs.size() > 0 : "No rows selected from _DM_HouseholdPrefs";
+					"select * from _DM_HouseholdPrefs where HouseholdPrefsScenarioName = '" + scenarioName + "' order by HouseholdTypeId");
+			assert householdPrefs.size() > 0 : "No rows selected from _DM_HouseholdPrefs for scenario " + scenarioName;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {
@@ -170,7 +172,32 @@ public class ResidentialSatisfactionWeight {
 		}
 	}
 	
-	public static HouseholdPrefs lookupHouseholdTypePrefs(HouseholdType householdType) {
+	public static ResidentialSatisfactionWeight getInstance(String scenarioName) {
+		if (ResidentialSatisfactionWeight.scenarioName == null) {
+			ResidentialSatisfactionWeight.scenarioName = scenarioName;
+		} else {
+			if (!ResidentialSatisfactionWeight.scenarioName.equals(scenarioName)) {
+				throw new AssertionError("Can't change scenarioName from '" + ResidentialSatisfactionWeight.scenarioName + "' to '" + scenarioName + "'");
+			}
+		}
+		return getInstance();
+	}
+
+	public static ResidentialSatisfactionWeight getInstance() {
+		if (ResidentialSatisfactionWeight.scenarioName == null) {
+			throw new AssertionError("scenarioName must be set in first call to getInstance()");
+		}
+		if (uniqueInstance == null) {
+			synchronized (ResidentialSatisfactionWeight.class) {
+				if (uniqueInstance == null) {
+					uniqueInstance = new ResidentialSatisfactionWeight(scenarioName);
+				}
+			}
+		}
+		return uniqueInstance;
+	}
+	
+	public HouseholdPrefs lookupHouseholdTypePrefs(HouseholdType householdType) {
 		HouseholdPrefs lookupHouseholdPrefs = new HouseholdPrefs();
 		lookupHouseholdPrefs.setHouseholdTypeId(householdType.getId());
 		int posHHType = Collections.binarySearch(householdPrefs, lookupHouseholdPrefs);		
@@ -178,7 +205,7 @@ public class ResidentialSatisfactionWeight {
 		return householdPrefs.get(posHHType);
 	}
 	
-	public static ArrayList<Short> getPrefCosts() {
+	public ArrayList<Short> getPrefCosts() {
 		ArrayList<Short> result = new ArrayList<Short>(householdPrefs.size());
 		for (HouseholdPrefs prefs : householdPrefs) {
 			result.add(prefs.getPrefCosts());
@@ -186,7 +213,7 @@ public class ResidentialSatisfactionWeight {
 		return result;
 	}
 
-	public static ArrayList<Short> getPrefDiversity() {
+	public ArrayList<Short> getPrefDiversity() {
 		ArrayList<Short> result = new ArrayList<Short>(householdPrefs.size());
 		for (HouseholdPrefs prefs : householdPrefs) {
 			result.add(prefs.getPrefDiversity());
@@ -194,7 +221,7 @@ public class ResidentialSatisfactionWeight {
 		return result;
 	}
 	
-	public static ArrayList<Short> getPrefCentrality() {
+	public ArrayList<Short> getPrefCentrality() {
 		ArrayList<Short> result = new ArrayList<Short>(householdPrefs.size());
 		for (HouseholdPrefs prefs : householdPrefs) {
 			result.add(prefs.getPrefCentrality());
@@ -202,7 +229,7 @@ public class ResidentialSatisfactionWeight {
 		return result;
 	}
 	
-	public static ArrayList<Short> getPrefEnvAmen() {
+	public ArrayList<Short> getPrefEnvAmen() {
 		ArrayList<Short> result = new ArrayList<Short>(householdPrefs.size());
 		for (HouseholdPrefs prefs : householdPrefs) {
 			result.add(prefs.getPrefEnvAmen());
@@ -210,7 +237,7 @@ public class ResidentialSatisfactionWeight {
 		return result;
 	}
 
-	public static ArrayList<Short> getPrefLivingSpace() {
+	public ArrayList<Short> getPrefLivingSpace() {
 		ArrayList<Short> result = new ArrayList<Short>(householdPrefs.size());
 		for (HouseholdPrefs prefs : householdPrefs) {
 			result.add(prefs.getPrefLivingSpace());
@@ -218,7 +245,7 @@ public class ResidentialSatisfactionWeight {
 		return result;
 	}
 
-	public static ArrayList<Short> getPrefTransportAccess() {
+	public ArrayList<Short> getPrefTransportAccess() {
 		ArrayList<Short> result = new ArrayList<Short>(householdPrefs.size());
 		for (HouseholdPrefs prefs : householdPrefs) {
 			result.add(prefs.getPrefTransportAccess());

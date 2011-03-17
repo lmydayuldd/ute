@@ -29,7 +29,7 @@ public class SampleImmigrationsHouseholdsTest {
 		@SuppressWarnings("unused")
 		Database db = Common.openDatabase();
 		Common.init();
-		sampleImmigratingHouseholds = new SampleMigratingHouseholds("STATA2010");
+		sampleImmigratingHouseholds = new SampleMigratingHouseholds("STATA2010", "NEUZUD");
 	}
 
 	/**

@@ -71,16 +71,16 @@ public class SampleBuildingProjects {
 	private BuildingProjectsPerYear buildingProjectsPerYear;
 	private SpatialUnits spatialUnits;
 
-	public SampleBuildingProjects(String scenarioName, SpatialUnits spatialUnits) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
+	public SampleBuildingProjects(String buildingProjectScenarioName, String newDwellingSizeScenarioName, SpatialUnits spatialUnits) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
 		selectStatement = "SELECT newDwellingSizeId, livingSpaceGroupId, share " +
 			"FROM _DM_NewDwellingSize " +
-			"WHERE newDwellingSizeScenarioName = '" + scenarioName + "' " +
+			"WHERE newDwellingSizeScenarioName = '" + newDwellingSizeScenarioName + "' " +
 			"ORDER BY newDwellingSizeId, livingSpaceGroupId";
 		newDwellingSize = new Distribution<NewDwellingSize>(Common.db.select(NewDwellingSize.class, selectStatement), "share");
-		assert newDwellingSize.size() > 0 : "No rows selected from _DM_NewDwellingSize (scenarioName = " + scenarioName + ")";
+		assert newDwellingSize.size() > 0 : "No rows selected from _DM_NewDwellingSize (scenarioName = " + newDwellingSizeScenarioName + ")";
 
-		buildingProjectsPerYear = new BuildingProjectsPerYear(scenarioName, spatialUnits.getSpatialUnitLevel());
+		buildingProjectsPerYear = new BuildingProjectsPerYear(buildingProjectScenarioName, spatialUnits.getSpatialUnitLevel());
 		
 		this.spatialUnits = spatialUnits;
 	}

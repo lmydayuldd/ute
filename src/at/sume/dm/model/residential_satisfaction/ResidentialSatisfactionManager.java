@@ -13,11 +13,11 @@ import at.sume.dm.entities.SpatialUnitRow;
  */
 public enum ResidentialSatisfactionManager {
 	SOCIALPRESTIGE(new SocialPrestige()),
-	COSTEFFECTIVENESS(new CostEffectiveness(), ResidentialSatisfactionWeight.getPrefCosts()),
-	DESIREDLIVINGSPACE(new DesiredLivingSpace(), ResidentialSatisfactionWeight.getPrefLivingSpace()),
-	ENVIRONMENTALAMENITIES(new EnvironmentalAmenities(), ResidentialSatisfactionWeight.getPrefEnvAmen()),
-	UDPCENTRALITY(new UDPCentrality(), ResidentialSatisfactionWeight.getPrefCentrality()),
-	UDPTRANSPORT(new UDPPublicTransportAccessibility(), ResidentialSatisfactionWeight.getPrefTransportAccess());
+	COSTEFFECTIVENESS(new CostEffectiveness(), ResidentialSatisfactionWeight.getInstance().getPrefCosts()),
+	DESIREDLIVINGSPACE(new DesiredLivingSpace(), ResidentialSatisfactionWeight.getInstance().getPrefLivingSpace()),
+	ENVIRONMENTALAMENITIES(new EnvironmentalAmenities(), ResidentialSatisfactionWeight.getInstance().getPrefEnvAmen()),
+	UDPCENTRALITY(new UDPCentrality(), ResidentialSatisfactionWeight.getInstance().getPrefCentrality()),
+	UDPTRANSPORT(new UDPPublicTransportAccessibility(), ResidentialSatisfactionWeight.getInstance().getPrefTransportAccess());
 
 	private ResidentialSatisfactionComponent component;
 	private ArrayList<Short> weightList;

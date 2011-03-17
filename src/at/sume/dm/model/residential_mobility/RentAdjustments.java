@@ -20,6 +20,7 @@ public class RentAdjustments {
 	public RentAdjustments(String scenarioName) throws SQLException, InstantiationException, IllegalAccessException {
 		String selectStatement = "select * from _DM_RentAdjustment where rentScenarioName = '" + scenarioName + "' order by spatialUnitId, modelYear";
 		rentAdjustmentRows = Common.db.select(RentAdjustmentRow.class, selectStatement);
+		// it must be possible to have no rent adjustments at all!!!
 //		assert rentAdjustmentRows.size() > 0 : "No rows selected from _DM_RentAdjustment";
 	}
 	/**

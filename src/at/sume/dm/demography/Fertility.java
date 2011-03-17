@@ -23,11 +23,14 @@ public class Fertility {
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 */
-	public Fertility(Database db) throws SQLException, InstantiationException, IllegalAccessException {
+	public Fertility(Database db, String scenarioName) throws SQLException, InstantiationException, IllegalAccessException {
 //		String sqlStatement = "SELECT AgeGroupId, Fertziff/1000 AS p " +
 //			"FROM StatA_FertZiff_W " +
 //			"WHERE Jahr = 2009";
-		String sqlStatement = "select ageGroupId, householdSize, Fertility/1000 AS ProbabilityBirth from _DM_FertilityAgeHouseholdSize order by ageGroupId, householdSize";
+		String sqlStatement = "select ageGroupId, householdSize, Fertility/1000 AS ProbabilityBirth " +
+			"from _DM_FertilityAgeHouseholdSize " +
+			"where fertilityScenarioName = '" + scenarioName + "' " +
+			"order by ageGroupId, householdSize";
 		probabilityRow = db.select(FertilityProbabilityRow.class, sqlStatement);
 	}
 

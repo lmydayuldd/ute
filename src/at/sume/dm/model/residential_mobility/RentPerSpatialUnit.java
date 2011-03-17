@@ -13,6 +13,7 @@ import java.util.Locale;
 
 import net.remesch.db.schema.Ignore;
 import at.sume.dm.Common;
+import at.sume.dm.entities.SpatialUnitLevel;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.indicators.MoversIndicatorsPerSpatialUnit;
 import at.sume.dm.model.output.Fileable;
@@ -114,6 +115,7 @@ public class RentPerSpatialUnit {
 	
 	private volatile static RentPerSpatialUnit uniqueInstance;
 	private static String scenarioName;
+	private static SpatialUnitLevel spatialUnitLevel;
 	
 	private ArrayList<RentPerSpatialUnitRow> rentPerSpatialUnit;
 	private int lowestYearlyRentPer100Sqm;
@@ -123,10 +125,10 @@ public class RentPerSpatialUnit {
 	/**
 	 * Set initial values from table WKO_Mietpreise
 	 */
-	private RentPerSpatialUnit(String scenarioName) {
+	private RentPerSpatialUnit(String scenarioName, SpatialUnitLevel spatialUnitLevel) {
 		try {
 			String selectStatement = "";
-			switch (Common.getSpatialUnitLevel()) {
+			switch (spatialUnitLevel) {
 			case ZB:
 				selectStatement = "SELECT sgt.SpatialUnitId_ZB AS SpatialUnitId, Round(Avg([PreisJahr]) * 100, 0) AS YearlyRentPer100Sqm " +
 					"FROM MA18_Stadtgebietstypen_Zählbezirke  AS sgt INNER JOIN WKO_Mietpreise AS wko ON sgt.SpatialUnitId_AD = wko.SpatialUnitId_AD " +
@@ -152,12 +154,19 @@ public class RentPerSpatialUnit {
 			e.printStackTrace();
 		}
 	}
-	public static RentPerSpatialUnit getInstance(String scenarioName) {
+	public static RentPerSpatialUnit getInstance(String scenarioName, SpatialUnitLevel spatialUnitLevel) {
 		if (RentPerSpatialUnit.scenarioName == null) {
 			RentPerSpatialUnit.scenarioName = scenarioName;
 		} else {
 			if (!RentPerSpatialUnit.scenarioName.equals(scenarioName)) {
 				throw new AssertionError("Can't change scenarioName from '" + RentPerSpatialUnit.scenarioName + "' to '" + scenarioName + "'");
+			}
+		}
+		if (RentPerSpatialUnit.spatialUnitLevel == null) {
+			RentPerSpatialUnit.spatialUnitLevel = spatialUnitLevel;
+		} else {
+			if (!RentPerSpatialUnit.spatialUnitLevel.equals(spatialUnitLevel)) {
+				throw new AssertionError("Can't change spatial unit level");
 			}
 		}
 		return getInstance();
@@ -166,10 +175,13 @@ public class RentPerSpatialUnit {
 		if (RentPerSpatialUnit.scenarioName == null) {
 			throw new AssertionError("scenarioName must be set in first call to getInstance()");
 		}
+		if (RentPerSpatialUnit.spatialUnitLevel == null) {
+			throw new AssertionError("spatialUnitLevel must be set in first call to getInstance()");
+		}
 		if (uniqueInstance == null) {
 			synchronized (RentPerSpatialUnit.class) {
 				if (uniqueInstance == null) {
-					uniqueInstance = new RentPerSpatialUnit(scenarioName);
+					uniqueInstance = new RentPerSpatialUnit(scenarioName, spatialUnitLevel);
 				}
 			}
 		}
