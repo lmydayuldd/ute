@@ -174,20 +174,24 @@ public class SampleMigratingHouseholds {
 				numHouseholds = Math.round(actualNumImmigrants / (householdSize + 1));
 			} else {
 				// distribute remainingNumImmigrants on all remaining household sizes
-				if (householdSize == 8) {
-					if ((householdSize + 1) == remainingNumImmigrants) {
-						numHouseholds = 1;
+				if (remainingNumImmigrants > 0) {
+					if (householdSize == 8) {
+						if ((householdSize + 1) == remainingNumImmigrants) {
+							numHouseholds = 1;
+						} else {
+							numHouseholds = Math.round(remainingNumImmigrants / (householdSize + 1));
+						}
 					} else {
-						numHouseholds = Math.round(remainingNumImmigrants / (householdSize + 1));
+						if ((householdSize + 1) == remainingNumImmigrants) {
+							numHouseholds = 1;
+						} else {
+							int actualNumImmigrants = r.nextInt(remainingNumImmigrants);
+							numHouseholds = Math.round(actualNumImmigrants / (householdSize + 1));
+						}
+						remainingNumImmigrants -= numHouseholds * (householdSize + 1);
 					}
 				} else {
-					if ((householdSize + 1) == remainingNumImmigrants) {
-						numHouseholds = 1;
-					} else {
-						int actualNumImmigrants = r.nextInt(remainingNumImmigrants);
-						numHouseholds = Math.round(actualNumImmigrants / (householdSize + 1));
-					}
-					remainingNumImmigrants -= numHouseholds * (householdSize + 1);
+					numHouseholds = 0;
 				}
 			}
 			for (int i = 0; i != numHouseholds; i++) {
