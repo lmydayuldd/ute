@@ -168,18 +168,26 @@ public class SampleMigratingHouseholds {
 		// immigrants with household size >= migrationHouseholdSize.size()
 		int remainingNumImmigrants = Math.round(numImmigrants * migrationHouseholdSize.get(migrationHouseholdSize.size() - 1).getShare() / migrationHouseholdSizeShareTotal);
 		for (short householdSize = 0; householdSize != 9; householdSize++) {
-			if (householdSize < migrationHouseholdSize.size()) {
+			if (householdSize < migrationHouseholdSize.size() - 1) {
 				// calculate the share of households from the distribution migrationHouseholdSize
 				int actualNumImmigrants = Math.round(numImmigrants * migrationHouseholdSize.get(householdSize).getShare() / migrationHouseholdSizeShareTotal);
 				numHouseholds = Math.round(actualNumImmigrants / (householdSize + 1));
 			} else {
 				// distribute remainingNumImmigrants on all remaining household sizes
 				if (householdSize == 8) {
-					numHouseholds = Math.round(remainingNumImmigrants / (householdSize + 1));
+					if ((householdSize + 1) == remainingNumImmigrants) {
+						numHouseholds = 1;
+					} else {
+						numHouseholds = Math.round(remainingNumImmigrants / (householdSize + 1));
+					}
 				} else {
-					int actualNumImmigrants = r.nextInt(remainingNumImmigrants);
-					remainingNumImmigrants -= actualNumImmigrants;
-					numHouseholds = Math.round(actualNumImmigrants / (householdSize + 1));
+					if ((householdSize + 1) == remainingNumImmigrants) {
+						numHouseholds = 1;
+					} else {
+						int actualNumImmigrants = r.nextInt(remainingNumImmigrants);
+						numHouseholds = Math.round(actualNumImmigrants / (householdSize + 1));
+					}
+					remainingNumImmigrants -= numHouseholds * (householdSize + 1);
 				}
 			}
 			for (int i = 0; i != numHouseholds; i++) {

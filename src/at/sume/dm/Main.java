@@ -449,15 +449,15 @@ public class Main {
 			System.out.println(printInfo() + ": children moving out of parents homes");
 			ArrayList<HouseholdRow> childrenHouseholds = leavingParents.getNewSingleHouseholds();
 			forcedMoves(childrenHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.LEAVING_PARENTS, cheapestSpatialUnits);
-	        System.out.println(printInfo() + ": free dwellings after children leaving parents homes: " + dwellingsOnMarket.getFreeDwellingsCount());
+	        System.out.println(printInfo() + ": free dwellings after " + childrenHouseholds.size() + " children leaving parents homes: " + dwellingsOnMarket.getFreeDwellingsCount());
 			System.out.println(printInfo() + ": national immigration");
 			ArrayList<HouseholdRow> immigratingHouseholds = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.NATIONAL);
 			forcedMoves(immigratingHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL, cheapestSpatialUnits);
-	        System.out.println(printInfo() + ": free dwellings after national immigration: " + dwellingsOnMarket.getFreeDwellingsCount());
+	        System.out.println(printInfo() + ": free dwellings after " + immigratingHouseholds.size() + " immigrating households (national): " + dwellingsOnMarket.getFreeDwellingsCount());
 			System.out.println(printInfo() + ": international immigration");
 			immigratingHouseholds = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.INTERNATIONAL);
 			forcedMoves(immigratingHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.INTERNATIONAL, cheapestSpatialUnits);
-	        System.out.println(printInfo() + ": free dwellings after international immigration: " + dwellingsOnMarket.getFreeDwellingsCount());
+	        System.out.println(printInfo() + ": free dwellings after " + immigratingHouseholds.size() + " immigrating households (international): " + dwellingsOnMarket.getFreeDwellingsCount());
 		
 			//if (modelYear == modelEndYear - 1)
 			outputFreeDwellings(modelYear, "after immigration");
