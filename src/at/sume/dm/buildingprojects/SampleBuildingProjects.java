@@ -6,9 +6,11 @@ package at.sume.dm.buildingprojects;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import at.sume.dm.Common;
 import at.sume.dm.entities.DwellingRow;
+import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.types.LivingSpaceGroup6;
 import at.sume.sampling.Distribution;
@@ -85,7 +87,7 @@ public class SampleBuildingProjects {
 		this.spatialUnits = spatialUnits;
 	}
 	/**
-	 * Sample newly built dwellings for the given model year 
+	 * Sample newly built dwellings for the given model year that are part of a large building project
 	 * @param modelYear
 	 * @return
 	 */
@@ -105,6 +107,32 @@ public class SampleBuildingProjects {
 				dwelling.calcTotalYearlyDwellingCosts(true);
 				result.add(dwelling);
 			}
+		}
+		return result;
+	}
+	/**
+	 * Sample newly built dwellings that are randomly scattered over the city area
+	 * @param numberOfDwellings
+	 * @return
+	 */
+	public List<DwellingRow> sampleRandomDwellings(int numberOfDwellings) {
+		Random r = new Random();
+		List<DwellingRow> result = new ArrayList<DwellingRow>();
+		for (int i = 0; i != numberOfDwellings; i++) {
+			DwellingRow dwelling = new DwellingRow();
+			int index = r.nextInt(spatialUnits.size());
+			SpatialUnitRow spatialUnit = spatialUnits.get(index);
+			while (spatialUnit.isFreeDwellingsAlwaysAvailable()) {
+				index = r.nextInt(spatialUnits.size());
+				spatialUnit = spatialUnits.get(index);
+			}
+			dwelling.setSpatialunit(spatialUnit);
+			index = newDwellingSize.randomSample();
+			dwelling.setLivingSpaceGroup6Id(newDwellingSize.get(index).livingSpaceGroupId);
+			dwelling.setDwellingSize(LivingSpaceGroup6.sampleLivingSpace(dwelling.getLivingSpaceGroup6Id()));
+			dwelling.setSpatialunitId(spatialUnit.getSpatialUnitId());
+			dwelling.calcTotalYearlyDwellingCosts(true);
+			result.add(dwelling);
 		}
 		return result;
 	}

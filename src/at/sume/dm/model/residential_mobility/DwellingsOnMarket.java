@@ -50,6 +50,7 @@ public class DwellingsOnMarket {
 	// Dwellings on the market per spatial unit
 	private ArrayList<DwellingRow> dwellingsOnMarketList[];
 	private ArrayList<DwellingRow> dwellingsOnMarketFullList;
+	private ArrayList<DwellingRow> dwellingsNotOnMarketFullList;
 	private int grossFreeDwellingCount[];	// Total number of free dwellings available, only a fraction of this number is put on the market
 	private int grossFreeDwellingTotal;
 	private SpatialUnits spatialUnits;
@@ -64,6 +65,7 @@ public class DwellingsOnMarket {
 		for (int i = 0; i != spatialUnits.size(); i++)
 			dwellingsOnMarketList[i] = new ArrayList<DwellingRow>();
 		dwellingsOnMarketFullList = new ArrayList<DwellingRow>();
+		dwellingsNotOnMarketFullList = new ArrayList<DwellingRow>();
 		grossFreeDwellingCount = new int[spatialUnits.size()];
 		addAll(dwellings.getRowList(), dwellingsOnMarketShare);
 	}
@@ -103,11 +105,36 @@ public class DwellingsOnMarket {
 				grossFreeDwellingCount[pos]++;
 				grossFreeDwellingTotal++;
 				if (r.nextInt(100) <= dwellingsOnMarketShare) {
-//					dwellingsOnMarketList[pos].add(row);
 					putDwellingOnMarket(row);
+				} else {
+					dwellingsNotOnMarketFullList.add(row);
 				}
 			}
 		}
+	}
+	/**
+	 * Additionally put a given number of dwellings from the initial free dwelling pool on the dwelling
+	 * market.
+	 * 
+	 * @param additionalDwellingsCount Number of dwellings to put on the market
+	 * @return Number of dwellings that were actually put on the market
+	 */
+	public int increase(int additionalDwellingsCount) {
+		int result = 0;
+		if (dwellingsNotOnMarketFullList.size() == 0)
+			return result;
+		Random r = new Random();
+		int share = additionalDwellingsCount * 100 / dwellingsNotOnMarketFullList.size();
+		for (DwellingRow row : dwellingsNotOnMarketFullList) {
+			int pos = spatialUnits.indexOf(row.getSpatialunit());
+			grossFreeDwellingCount[pos]++;
+			grossFreeDwellingTotal++;
+			if (r.nextInt(100) <= share) {
+				result++;
+				putDwellingOnMarket(row);
+			}
+		}
+		return result;
 	}
 	/**
 	 * Add all dwellings given to the list of dwellings on the market

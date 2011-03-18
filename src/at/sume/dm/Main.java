@@ -16,6 +16,7 @@ import net.remesch.db.Database;
 import net.remesch.db.Sequence;
 import net.remesch.util.DateUtil;
 import net.remesch.util.FileUtil;
+import at.sume.dm.buildingprojects.AdditionalDwellingsPerYear;
 import at.sume.dm.buildingprojects.SampleBuildingProjects;
 import at.sume.dm.demography.events.ChildBirth;
 import at.sume.dm.demography.events.Cohabitation;
@@ -227,6 +228,7 @@ public class Main {
 		ChildBirth childBirth = new ChildBirth(db, scenario.getFertilityScenario(), personEventManager);
 		SampleMigratingHouseholds sampleMigratingHouseholds = new SampleMigratingHouseholds(scenario.getMigrationScenario(), scenario.getMigrationHouseholdSizeScenario());
 		SampleBuildingProjects sampleBuildingProjects = new SampleBuildingProjects(scenario.getBuildingProjectScenario(), scenario.getNewDwellingSizeScenario(), spatialUnits);
+		AdditionalDwellingsPerYear additionalDwellingsPerYear = new AdditionalDwellingsPerYear(scenario.getAdditionalDwellingsScenario());
 		
 		EntityDecisionManager<HouseholdRow, Households> householdDecisionManager = new EntityDecisionManager<HouseholdRow, Households>();
 		MinimumIncome minimumIncome = new MinimumIncome(db, householdDecisionManager, households);
@@ -249,7 +251,11 @@ public class Main {
 	        List<DwellingRow> newDwellings = sampleBuildingProjects.sample(modelYear);
 	        dwellings.addAll(newDwellings);
 	        dwellingsOnMarket.addAll(newDwellings);
-	        
+	        int newRandomDwellingCount = additionalDwellingsPerYear.getAdditionalDwellingsOnMarket(modelYear) + additionalDwellingsPerYear.getNewlyBuiltDwellings(modelYear);
+	        newDwellings = sampleBuildingProjects.sampleRandomDwellings(newRandomDwellingCount);
+	        dwellings.addAll(newDwellings);
+	        dwellingsOnMarket.addAll(newDwellings);
+
 	        int cohabitationCount = Common.getCohabitationRate() * (persons.size() / 1000);
 	        Cohabitation cohabitation = new Cohabitation(cohabitationCount, modelYear, dwellingsOnMarket);
 	        

@@ -111,9 +111,8 @@ public class BuildingProjectsPerYear {
 	private ArrayList<BuildingProjectRow> buildingProjects;
 
 	public BuildingProjectsPerYear(String scenarioName, SpatialUnitLevel spatialUnitLevel) throws SQLException, InstantiationException, IllegalAccessException {
-		String selectStatement = "";
 		String spatialUnitFieldName = "spatialUnitId_" + spatialUnitLevel.toString();
-		selectStatement = "SELECT buildingProjectId, modelYearStart, modelYearFinish, " + spatialUnitFieldName + ", dwellingCount " +
+		String selectStatement = "SELECT buildingProjectId, modelYearStart, modelYearFinish, " + spatialUnitFieldName + ", dwellingCount " +
 			"FROM _DM_BuildingProjects " +
 			"WHERE buildingProjectScenarioName = '" + scenarioName + "' " +
 			"ORDER BY buildingProjectId";

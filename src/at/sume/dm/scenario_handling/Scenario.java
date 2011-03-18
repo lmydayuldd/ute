@@ -20,6 +20,7 @@ public class Scenario {
 	private String migrationHouseholdSizeScenario;
 	private String householdPrefsScenario;
 	private String buildingProjectScenario;
+	private String additionalDwellingsScenario;
 	private String newDwellingSizeScenario;
 	private String rentScenario;
 	private String fertilityScenario;
@@ -35,6 +36,7 @@ public class Scenario {
 			migrationHouseholdSizeScenario = rs.getString("MigrationHouseholdSizeScenarioName");
 			householdPrefsScenario = rs.getString("HouseholdPrefsScenarioName");
 			buildingProjectScenario = rs.getString("BuildingProjectScenarioName");
+			additionalDwellingsScenario = rs.getString("AdditionalDwellingsScenarioName");
 			newDwellingSizeScenario = rs.getString("NewDwellingSizeScenarioName");
 			rentScenario = rs.getString("RentScenarioName");
 			if (rentScenario == null) rentScenario = "NULL";
@@ -77,6 +79,13 @@ public class Scenario {
 	 */
 	public String getBuildingProjectScenario() {
 		return buildingProjectScenario;
+	}
+
+	/**
+	 * @return the additionalDwellingsScenario
+	 */
+	public String getAdditionalDwellingsScenario() {
+		return additionalDwellingsScenario;
 	}
 
 	/**
