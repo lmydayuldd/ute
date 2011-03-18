@@ -61,6 +61,8 @@ public class Cohabitation {
 	 */
 	public int randomJoinHouseholds() {
 		int index = 0;
+		numCohabitations = Math.min(numCohabitations, maleHouseholds.size());
+		numCohabitations = Math.min(numCohabitations, femaleHouseholds.size());
 		for (int i = 0; i != numCohabitations; i++) {
 			index = (int) (Math.random() * maleHouseholds.size());
 			HouseholdRow maleHousehold = maleHouseholds.get(index);

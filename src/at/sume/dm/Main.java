@@ -427,8 +427,8 @@ public class Main {
 			outputFreeDwellings(modelYear, "after moving households, before immigration");
 
 			// Cohabitating households
-			cohabitation.randomJoinHouseholds();
-			System.out.println(printInfo() + ": " + cohabitationCount + " household cohabitations/marriages took place");
+			int numCohabitations = cohabitation.randomJoinHouseholds();
+			System.out.println(printInfo() + ": " + numCohabitations + " of "+ cohabitationCount + " projected household cohabitations/marriages took place");
 	        System.out.println(printInfo() + ": free dwellings after cohabitation: " + dwellingsOnMarket.getFreeDwellingsCount());
 			
 			// Out-Migration: randomly remove households
