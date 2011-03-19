@@ -19,14 +19,18 @@ public class ChildBirth extends Event<PersonRow> {
 	Fertility fertilityDistribution;
 	// Sex proportion for births - number of male per female births
 	static Double sexProportion;
+	private double birthAdjustment;
 
+	public ChildBirth(Database db, String scenarioName, EventManager<PersonRow> eventManager) throws SQLException, InstantiationException, IllegalAccessException {
+		this (db, scenarioName, eventManager, (byte) 0);
+	}
 	/**
 	 * @param eventManager
 	 * @throws SQLException 
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 */
-	public ChildBirth(Database db, String scenarioName, EventManager<PersonRow> eventManager) throws SQLException, InstantiationException, IllegalAccessException {
+	public ChildBirth(Database db, String scenarioName, EventManager<PersonRow> eventManager, byte birthAdjustment) throws SQLException, InstantiationException, IllegalAccessException {
 		super(db, eventManager);
 		fertilityDistribution = new Fertility(db, scenarioName);
 		// set sex proportion here
@@ -34,6 +38,10 @@ public class ChildBirth extends Event<PersonRow> {
 		sexProportion = (Double) db.lookupSql("select SexProp from StatA_SexProp_W where Jahr = 2009");
 		if (sexProportion == null)
 			sexProportion = 1000.0;
+		if (birthAdjustment == 0)
+			this.birthAdjustment = 1;
+		else
+			this.birthAdjustment = (100.0 + birthAdjustment) / 100;
 	}
 
 	/* (non-Javadoc)
@@ -42,7 +50,7 @@ public class ChildBirth extends Event<PersonRow> {
 	@Override
 	protected double probability(PersonRow entity) {
 		if (entity.getSex() == 1) { // speedup - calculate probability for females only
-			return fertilityDistribution.probability(entity.getAgeGroupId(), entity.getHousehold().getHouseholdSize());
+			return fertilityDistribution.probability(entity.getAgeGroupId(), entity.getHousehold().getHouseholdSize()) * birthAdjustment;
 		} else {
 			return 0;
 		}

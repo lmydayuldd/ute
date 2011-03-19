@@ -223,9 +223,9 @@ public class Main {
 		//       concrete event types??? Maybe put into its own static class or a ModelMain class?
 		// TODO: Use enums!
 		@SuppressWarnings("unused")
-		PersonDeath personDeath = new PersonDeath(db, personEventManager, Common.getPersonMaxAge());
+		PersonDeath personDeath = new PersonDeath(db, personEventManager, Common.getPersonMaxAge(), Common.getDeathAdjustment());
 		@SuppressWarnings("unused")
-		ChildBirth childBirth = new ChildBirth(db, scenario.getFertilityScenario(), personEventManager);
+		ChildBirth childBirth = new ChildBirth(db, scenario.getFertilityScenario(), personEventManager, Common.getBirthAdjustment());
 		SampleMigratingHouseholds sampleMigratingHouseholds = new SampleMigratingHouseholds(scenario.getMigrationScenario(), scenario.getMigrationHouseholdSizeScenario());
 		SampleBuildingProjects sampleBuildingProjects = new SampleBuildingProjects(scenario.getBuildingProjectScenario(), scenario.getNewDwellingSizeScenario(), spatialUnits);
 		AdditionalDwellingsPerYear additionalDwellingsPerYear = new AdditionalDwellingsPerYear(scenario.getAdditionalDwellingsScenario());

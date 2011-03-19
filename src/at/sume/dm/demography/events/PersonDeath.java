@@ -16,15 +16,24 @@ import at.sume.dm.entities.PersonRow;
 public class PersonDeath extends Event<PersonRow> {
 	private Mortality mortalityDistribution;
 	private short maxAge;
+	private double deathAdjustment;
 	
 	/**
 	 * @param eventManager
 	 * @throws SQLException 
 	 */
 	public PersonDeath(Database db, EventManager<PersonRow> eventManager, short maxAge) throws SQLException {
+		this (db, eventManager, maxAge, (byte) 0);
+	}
+	
+	public PersonDeath(Database db, EventManager<PersonRow> eventManager, short maxAge, byte deathAdjustment) throws SQLException {
 		super(db, eventManager);
 		mortalityDistribution = new Mortality(db);
 		this.maxAge = maxAge;
+		if (deathAdjustment == 0)
+			this.deathAdjustment = 1;
+		else
+			this.deathAdjustment = (100.0 + deathAdjustment) / 100;
 	}
 
 	/* (non-Javadoc)
@@ -36,7 +45,7 @@ public class PersonDeath extends Event<PersonRow> {
 			// this should not possibly happen
 			return 1;
 		} else {
-			return mortalityDistribution.probability(entity.getAge(), entity.getSex());
+			return mortalityDistribution.probability(entity.getAge(), entity.getSex()) * deathAdjustment;
 		}
 	}
 

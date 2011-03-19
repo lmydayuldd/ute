@@ -43,6 +43,8 @@ public class Common {
 	private static SingleProbability leavingParentsProbability;
 	private static byte childrenMaxAge;
 	private static byte dwellingsOnMarketAutoAdjust;
+	private static byte deathAdjustment;
+	private static byte birthAdjustment;
 	
 	/**
 	 * @return the iniFilename
@@ -199,6 +201,20 @@ public class Common {
 	}
 
 	/**
+	 * @return the deathAdjustment
+	 */
+	public static byte getDeathAdjustment() {
+		return deathAdjustment;
+	}
+
+	/**
+	 * @return the birthAdjustment
+	 */
+	public static byte getBirthAdjustment() {
+		return birthAdjustment;
+	}
+
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -273,6 +289,8 @@ public class Common {
 		leavingParentsProbability = new SingleProbability(Byte.parseByte(getSysParam("ProbabilityLeavingParents")), 100);
 		setChildrenMaxAge(Byte.parseByte(getSysParam("ChildrenMaxAge")));
 		dwellingsOnMarketAutoAdjust = Byte.parseByte(getSysParam("DwellingsOnMarketAutoAdjust"));
+		birthAdjustment = Byte.parseByte(getSysParam("BirthProbabilityAdjustment"));
+		deathAdjustment = Byte.parseByte(getSysParam("DeathProbabilityAdjustment"));
 	}
 	
 	/**
