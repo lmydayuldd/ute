@@ -79,14 +79,22 @@ public class DwellingsOnMarket {
 		return dwellingsOnMarketList[spatialUnitArrayPosition(spatialUnitId)];
 	}
 	/**
-	 * Return the gross free dwelling count (that is all dwellings that are not taken by a household).
+	 * Return the gross free dwelling count (that is all dwellings that are not taken by a household)
+	 * per spatial unit.
 	 * This number is different (larger) than the number of dwellings on market!
+	 * 
 	 * @param spatialUnitId
 	 * @return
 	 */
 	public int getGrossFreeDwellingCount(long spatialUnitId) {
 		return grossFreeDwellingCount[spatialUnitArrayPosition(spatialUnitId)];
 	}
+	/**
+	 * Return the gross free dwelling count (that is all dwellings that are not taken by a household).
+	 * This number is different (larger) than the number of dwellings on market!
+	 * 
+	 * @return The number of dwellings not taken by a household
+	 */
 	public int getGrossFreeDwellingTotal() {
 		return grossFreeDwellingTotal;
 	}
@@ -124,12 +132,12 @@ public class DwellingsOnMarket {
 		if (dwellingsNotOnMarketFullList.size() == 0)
 			return result;
 		Random r = new Random();
-		int share = additionalDwellingsCount * 100 / dwellingsNotOnMarketFullList.size();
+		double share = (double) additionalDwellingsCount / dwellingsNotOnMarketFullList.size();
 		for (DwellingRow row : dwellingsNotOnMarketFullList) {
 			int pos = spatialUnits.indexOf(row.getSpatialunit());
 			grossFreeDwellingCount[pos]++;
 			grossFreeDwellingTotal++;
-			if (r.nextInt(100) <= share) {
+			if (r.nextDouble() <= share) {
 				result++;
 				putDwellingOnMarket(row);
 			}
@@ -291,7 +299,7 @@ public class DwellingsOnMarket {
 	 * @param household Properties of the household looking for the dwelling
 	 * @param compareDwellingCosts True if the dwelling costs shall be considered in the comparison
 	 * @param modelYear
-	 * @return
+	 * @return The first available (free) dwelling that matches the given parameters
 	 */
 	public DwellingRow getFirstMatchingDwelling(long spatialUnitId, HouseholdRow household, boolean compareDwellingCosts, int modelYear) {
 		ArrayList<DwellingRow> allDwellingsPerArea = getDwellingsOnMarket(spatialUnitId);
@@ -311,9 +319,7 @@ public class DwellingsOnMarket {
 		return null;
 	}
 	/**
-	 * Return the reason why no dwelling was found by getFirstMatchingDwelling()
-	 * 
-	 * @return
+	 * @return The reason why no dwelling was found by getFirstMatchingDwelling()
 	 */
 	public NoDwellingFoundReason getNoDwellingFoundReason() {
 		return noDwellingFoundReason;
@@ -356,6 +362,9 @@ public class DwellingsOnMarket {
 			}
 		}
 	}
+	/**
+	 * @return The total number of free dwellings that are available on the dwelling market
+	 */
 	public int getFreeDwellingsCount() {
 		return dwellingsOnMarketFullList.size();
 	}

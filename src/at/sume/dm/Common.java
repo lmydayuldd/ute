@@ -42,6 +42,7 @@ public class Common {
 	private static byte cohabitationRate;
 	private static SingleProbability leavingParentsProbability;
 	private static byte childrenMaxAge;
+	private static byte dwellingsOnMarketAutoAdjust;
 	
 	/**
 	 * @return the iniFilename
@@ -191,6 +192,13 @@ public class Common {
 	}
 
 	/**
+	 * @return the dwellingsOnMarketAutoAdjust
+	 */
+	public static byte getDwellingsOnMarketAutoAdjust() {
+		return dwellingsOnMarketAutoAdjust;
+	}
+
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -264,6 +272,7 @@ public class Common {
 		cohabitationRate = Byte.parseByte(getSysParam("CohabitationRate"));
 		leavingParentsProbability = new SingleProbability(Byte.parseByte(getSysParam("ProbabilityLeavingParents")), 100);
 		setChildrenMaxAge(Byte.parseByte(getSysParam("ChildrenMaxAge")));
+		dwellingsOnMarketAutoAdjust = Byte.parseByte(getSysParam("DwellingsOnMarketAutoAdjust"));
 	}
 	
 	/**

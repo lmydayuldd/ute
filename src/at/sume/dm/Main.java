@@ -249,12 +249,22 @@ public class Main {
 	        
 	        // Create new-built dwellings
 	        List<DwellingRow> newDwellings = sampleBuildingProjects.sample(modelYear);
+        	System.out.println(printInfo() + ": adding " + newDwellings.size() + " new built dwellings from building projects and putting them on the market");
 	        dwellings.addAll(newDwellings);
 	        dwellingsOnMarket.addAll(newDwellings);
-	        int newRandomDwellingCount = additionalDwellingsPerYear.getAdditionalDwellingsOnMarket(modelYear) + additionalDwellingsPerYear.getNewlyBuiltDwellings(modelYear);
-	        newDwellings = sampleBuildingProjects.sampleRandomDwellings(newRandomDwellingCount);
-	        dwellings.addAll(newDwellings);
-	        dwellingsOnMarket.addAll(newDwellings);
+	        int additionalDwellingsOnMarket = additionalDwellingsPerYear.getAdditionalDwellingsOnMarket(modelYear);
+	        if (additionalDwellingsOnMarket > 0) {
+	        	System.out.println(printInfo() + ": putting additional " + additionalDwellingsOnMarket + " existing dwellings on the market");
+	        	int result = dwellingsOnMarket.increase(additionalDwellingsOnMarket);
+	        	System.out.println(printInfo() + ": " + result + " dwellings were put on the market");
+	        }
+	        int newRandomDwellingCount = additionalDwellingsPerYear.getNewlyBuiltDwellings(modelYear);
+	        if (newRandomDwellingCount > 0) {
+	        	System.out.println(printInfo() + ": adding " + newRandomDwellingCount + " new built dwellings and putting them on the market");
+		        newDwellings = sampleBuildingProjects.sampleRandomDwellings(newRandomDwellingCount);
+		        dwellings.addAll(newDwellings);
+		        dwellingsOnMarket.addAll(newDwellings);
+	        }
 
 	        int cohabitationCount = Common.getCohabitationRate() * (persons.size() / 1000);
 	        Cohabitation cohabitation = new Cohabitation(cohabitationCount, modelYear, dwellingsOnMarket);
@@ -446,18 +456,36 @@ public class Main {
 	        System.out.println(printInfo() + ": free dwellings after out-migration: " + dwellingsOnMarket.getFreeDwellingsCount());
 			
 			// Immigrating households + Children moving out from home
-			System.out.println(printInfo() + ": children moving out of parents homes");
+			System.out.println(printInfo() + ": generating immigrating households and new single households form children moving out of parents homes");
 			ArrayList<HouseholdRow> childrenHouseholds = leavingParents.getNewSingleHouseholds();
+			ArrayList<HouseholdRow> immigratingHouseholdsNational = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.NATIONAL);
+			ArrayList<HouseholdRow> immigratingHouseholdsIntl = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.INTERNATIONAL);
+
+			int dwellingExcessShare = Common.getDwellingsOnMarketAutoAdjust();
+			if (dwellingExcessShare >= 0) {
+				// Auto-adjust dwellings if necessary
+				int dwellingsDemandCount = childrenHouseholds.size() + immigratingHouseholdsNational.size() + immigratingHouseholdsIntl.size();
+				int dwellingsAvailableCount = dwellingsOnMarket.getFreeDwellingsCount();
+				int dwellingsExcessSupplyCount = (dwellingsDemandCount * (100 + dwellingExcessShare)) / 100;
+				System.out.println(printInfo() + ": number of dwellings needed for immigration + children leaving parents: " + dwellingsDemandCount);
+				System.out.println(printInfo() + ": number of total dwellings needed incl. excess: " + dwellingsExcessSupplyCount);
+				System.out.println(printInfo() + ": number of dwellings available on the market: " + dwellingsAvailableCount);
+				if (dwellingsExcessSupplyCount > dwellingsAvailableCount) {
+					int dwellingsMissingCount = dwellingsExcessSupplyCount - dwellingsAvailableCount;
+					newDwellings = sampleBuildingProjects.sampleRandomDwellings(dwellingsMissingCount);
+			        dwellings.addAll(newDwellings);
+			        dwellingsOnMarket.addAll(newDwellings);
+				}
+		        System.out.println(printInfo() + ": free dwellings after auto-adjustment: " + dwellingsOnMarket.getFreeDwellingsCount());
+			}
+
+			// Now move the immigrating households + children leaving parents
 			forcedMoves(childrenHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.LEAVING_PARENTS, cheapestSpatialUnits);
 	        System.out.println(printInfo() + ": free dwellings after " + childrenHouseholds.size() + " children leaving parents homes: " + dwellingsOnMarket.getFreeDwellingsCount());
-			System.out.println(printInfo() + ": national immigration");
-			ArrayList<HouseholdRow> immigratingHouseholds = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.NATIONAL);
-			forcedMoves(immigratingHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL, cheapestSpatialUnits);
-	        System.out.println(printInfo() + ": free dwellings after " + immigratingHouseholds.size() + " immigrating households (national): " + dwellingsOnMarket.getFreeDwellingsCount());
-			System.out.println(printInfo() + ": international immigration");
-			immigratingHouseholds = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.INTERNATIONAL);
-			forcedMoves(immigratingHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.INTERNATIONAL, cheapestSpatialUnits);
-	        System.out.println(printInfo() + ": free dwellings after " + immigratingHouseholds.size() + " immigrating households (international): " + dwellingsOnMarket.getFreeDwellingsCount());
+			forcedMoves(immigratingHouseholdsNational, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL, cheapestSpatialUnits);
+	        System.out.println(printInfo() + ": free dwellings after " + immigratingHouseholdsNational.size() + " immigrating households (national): " + dwellingsOnMarket.getFreeDwellingsCount());
+			forcedMoves(immigratingHouseholdsIntl, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.INTERNATIONAL, cheapestSpatialUnits);
+	        System.out.println(printInfo() + ": free dwellings after " + immigratingHouseholdsIntl.size() + " immigrating households (international): " + dwellingsOnMarket.getFreeDwellingsCount());
 		
 			//if (modelYear == modelEndYear - 1)
 			outputFreeDwellings(modelYear, "after immigration");
