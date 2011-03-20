@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import at.sume.dm.Common;
+import at.sume.dm.entities.SpatialUnitLevel;
 import at.sume.dm.entities.SpatialUnitRow;
 
 /**
@@ -122,13 +123,20 @@ public class UDPPublicTransportAccessibility extends ResidentialSatisfactionComp
 		}
 	}
 
+	private volatile static UDPPublicTransportAccessibility uniqueInstance;
 	private ArrayList<SpatialUnitUdp> spatialUnitUdp;
+	private static SpatialUnitLevel spatialUnitLevel;
 	
-	public UDPPublicTransportAccessibility() {
+	private UDPPublicTransportAccessibility(SpatialUnitLevel spatialUnitLevel) {
+		String tableName;
+		if (spatialUnitLevel.equals(SpatialUnitLevel.SGT))
+			tableName = "_DM_SpatialUnitUdp_" + spatialUnitLevel.toString();
+		else
+			tableName = "_DM_SpatialUnitUdp";
 		try {
 			spatialUnitUdp = Common.db.select(SpatialUnitUdp.class, 
-					"select * from _DM_SpatialUnitUdp order by SpatialUnitId, StartYear");
-			assert spatialUnitUdp.size() > 0 : "No rows selected from _DM_SpatialUnitUdp";
+					"select * from " + tableName + " order by SpatialUnitId, StartYear");
+			assert spatialUnitUdp.size() > 0 : "No rows selected from " + tableName;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {
@@ -136,6 +144,29 @@ public class UDPPublicTransportAccessibility extends ResidentialSatisfactionComp
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
+	}
+	public static UDPPublicTransportAccessibility getInstance(SpatialUnitLevel spatialUnitLevel) {
+		if (UDPPublicTransportAccessibility.spatialUnitLevel == null) {
+			UDPPublicTransportAccessibility.spatialUnitLevel = spatialUnitLevel;
+		} else {
+			if (!UDPPublicTransportAccessibility.spatialUnitLevel.equals(spatialUnitLevel)) {
+				throw new AssertionError("Can't change spatial unit level");
+			}
+		}
+		return getInstance();
+	}
+	public static UDPPublicTransportAccessibility getInstance() {
+		if (UDPPublicTransportAccessibility.spatialUnitLevel == null) {
+			throw new AssertionError("spatialUnitLevel must be set in first call to getInstance()");
+		}
+		if (uniqueInstance == null) {
+			synchronized (UDPPublicTransportAccessibility.class) {
+				if (uniqueInstance == null) {
+					uniqueInstance = new UDPPublicTransportAccessibility(spatialUnitLevel);
+				}
+			}
+		}
+		return uniqueInstance;
 	}
 	
 	/* (non-Javadoc)

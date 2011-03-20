@@ -16,8 +16,8 @@ public enum ResidentialSatisfactionManager {
 	COSTEFFECTIVENESS(new CostEffectiveness(), ResidentialSatisfactionWeight.getInstance().getPrefCosts()),
 	DESIREDLIVINGSPACE(new DesiredLivingSpace(), ResidentialSatisfactionWeight.getInstance().getPrefLivingSpace()),
 	ENVIRONMENTALAMENITIES(new EnvironmentalAmenities(), ResidentialSatisfactionWeight.getInstance().getPrefEnvAmen()),
-	UDPCENTRALITY(new UDPCentrality(), ResidentialSatisfactionWeight.getInstance().getPrefCentrality()),
-	UDPTRANSPORT(new UDPPublicTransportAccessibility(), ResidentialSatisfactionWeight.getInstance().getPrefTransportAccess());
+	UDPCENTRALITY(UDPCentrality.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefCentrality()),
+	UDPTRANSPORT(UDPPublicTransportAccessibility.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefTransportAccess());
 
 	private ResidentialSatisfactionComponent component;
 	private ArrayList<Short> weightList;

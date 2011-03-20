@@ -48,6 +48,8 @@ import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.dm.model.residential_mobility.ResidentialMobility;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionWeight;
+import at.sume.dm.model.residential_satisfaction.UDPCentrality;
+import at.sume.dm.model.residential_satisfaction.UDPPublicTransportAccessibility;
 import at.sume.dm.scenario_handling.Scenario;
 import at.sume.dm.types.MigrationRealm;
 
@@ -307,6 +309,8 @@ public class Main {
 				// Calculate residential mobility depending on previous decisions
 				// - set scenario for residential satisfaction weight to be used in ResidentialSatisfactionManager
 				ResidentialSatisfactionWeight.getInstance(scenario.getHouseholdPrefsScenario());
+				UDPCentrality.getInstance(Common.getSpatialUnitLevel());
+				UDPPublicTransportAccessibility.getInstance(Common.getSpatialUnitLevel());
 				// TODO: save residential satisfaction result for later use
 				short residential_satisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, modelYear);
 				assert (residential_satisfaction >= 0) && (residential_satisfaction <= 1000) : "residential satisfaction out of range (" + residential_satisfaction + ")";

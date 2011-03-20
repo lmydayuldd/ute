@@ -3,7 +3,7 @@
  */
 package at.sume.dm.model.residential_satsifaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.sql.SQLException;
 
@@ -18,6 +18,7 @@ import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.Households;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
+import at.sume.dm.entities.SpatialUnitLevel;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.model.residential_satisfaction.UDPCentrality;
@@ -111,7 +112,7 @@ public class UDPClassificationTest {
 	 */
 	@Test
 	public void testCalc() {
-		udpClassification = new UDPCentrality();
+		udpClassification = UDPCentrality.getInstance(SpatialUnitLevel.SGT);
 
 		SpatialUnits su = new SpatialUnits();
 		su.setDb(db);
