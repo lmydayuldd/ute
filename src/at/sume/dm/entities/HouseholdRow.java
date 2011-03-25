@@ -16,6 +16,9 @@ import at.sume.db.RecordSetRowFileable;
 import at.sume.dm.Common;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
+import at.sume.dm.indicators.simple.HouseholdCharacteristics;
+import at.sume.dm.indicators.simple.MigrationDetailsObservable;
+import at.sume.dm.indicators.simple.MigrationDetailsObserver;
 import at.sume.dm.indicators.simple.MigrationObservable;
 import at.sume.dm.indicators.simple.MigrationObserver;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
@@ -30,7 +33,7 @@ import at.sume.dm.types.MigrationRealm;
  * @author Alexander Remesch
  *
  */
-public class HouseholdRow extends RecordSetRowFileable<Households> implements ResidentialSatisfactionHouseholdProperties, MigrationObservable {
+public class HouseholdRow extends RecordSetRowFileable<Households> implements ResidentialSatisfactionHouseholdProperties, MigrationObservable, MigrationDetailsObservable, HouseholdCharacteristics {
 	private class SpatialUnitScore {
 		private int spatialUnitId;
 		private int score;
@@ -979,8 +982,10 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			// Force calculation of dwelling costs to current market values for the old dwelling
 			oldDwelling.calcTotalYearlyDwellingCosts(true);
 			notifyLocalMigration(getSpatialunitId(), dwelling.getSpatialunitId());
+			notifyMigration(getDwelling().getSpatialunit().getSpatialUnitId(), dwelling.getSpatialunitId(), MigrationRealm.LOCAL, this);
 		} else {
 			notifyImmigration(dwelling.getSpatialunitId(), migrationRealm);
+			notifyMigration(null, dwelling.getSpatialunitId(), migrationRealm, this);
 		}
 		dwellingsOnMarket.removeDwellingFromMarket(dwelling);
 		setDwelling(dwelling);
@@ -995,6 +1000,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 */
 	public void leaveParentsHome(DwellingsOnMarket dwellingsOnMarket, DwellingRow dwelling) {
 		notifyLeavingParents(getDwelling().getSpatialunit().getSpatialUnitId(), dwelling.getSpatialunit().getSpatialUnitId());
+		notifyMigration(getDwelling().getSpatialunit().getSpatialUnitId(), dwelling.getSpatialunitId(), MigrationRealm.LEAVING_PARENTS, this);
 		dwellingsOnMarket.removeDwellingFromMarket(dwelling);
 		setDwelling(dwelling);
 		dwelling.setHousehold(this);
@@ -1006,6 +1012,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 */
 	public void join(HouseholdRow household) {
 		notifyCohabitation(household.getDwelling().getSpatialunit().getSpatialUnitId(), getDwelling().getSpatialunit().getSpatialUnitId());
+		notifyMigration(household.getDwelling().getSpatialunit().getSpatialUnitId(), getDwelling().getSpatialunit().getSpatialUnitId(), MigrationRealm.COHABITATION, household);		
 		addMembers(household.getMembers());
 		household.members = null;
 		determineInitialHouseholdType(false); //countAdults has already been done in addMembers()
@@ -1024,6 +1031,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 
 	public void emigrate(DwellingsOnMarket dwellingsOnMarket, MigrationRealm migrationRealm) {
 		notifyEmigration(getSpatialunitId(), migrationRealm);
+		notifyMigration(getSpatialunitId(), null, migrationRealm, this);
 		remove(dwellingsOnMarket);
 	}
 	
@@ -1233,6 +1241,32 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			Integer destSpatialUnitId) {
 		for (MigrationObserver obs : migrationObservers) {
 			obs.addCohabitation(srcSpatialUnitId, destSpatialUnitId, getHouseholdSize());
+		}
+	}
+
+	private static ArrayList<MigrationDetailsObserver> migrationDetailsObservers = new ArrayList<MigrationDetailsObserver>();
+
+	@Override
+	public void registerMigrationObserver(MigrationDetailsObserver o) {
+		int i = migrationDetailsObservers.indexOf(o);
+		// Add observer only once!
+		if (i < 0)
+			migrationDetailsObservers.add(o);
+	}
+
+	@Override
+	public void removeMigrationObserver(MigrationDetailsObserver o) {
+		int i = migrationDetailsObservers.indexOf(o);
+		if (i >= 0)
+			migrationDetailsObservers.remove(i);
+	}
+
+	@Override
+	public void notifyMigration(Integer spatialUnitIdFrom,
+			Integer spatialUnitIdTo, MigrationRealm migrationRealm,
+			HouseholdCharacteristics householdCharacteristics) {
+		for (MigrationDetailsObserver obs : migrationDetailsObservers) {
+			obs.addMigration(spatialUnitIdFrom, spatialUnitIdTo, migrationRealm, householdCharacteristics);
 		}
 	}
 }

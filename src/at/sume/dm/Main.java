@@ -36,6 +36,7 @@ import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
 import at.sume.dm.indicators.simple.CountDemographicMovements;
+import at.sume.dm.indicators.simple.CountMigrationDetails;
 import at.sume.dm.indicators.simple.CountMigrationPerSpatialUnit;
 import at.sume.dm.migration.SampleMigratingHouseholds;
 import at.sume.dm.model.core.EntityDecisionManager;
@@ -70,6 +71,7 @@ public class Main {
 	private static DwellingsOnMarket dwellingsOnMarket;
 	private static OutputManager outputManager;
 	private static CountMigrationPerSpatialUnit migrationPerSpatialUnit;
+	private static CountMigrationDetails migrationDetails;
 	private static CountDemographicMovements demographicMovementsPerSpatialUnit;
 	private static AggregatedDwellings aggregatedDwellings;
 	private static RentPerSpatialUnit rentPerSpatialUnit;
@@ -132,8 +134,10 @@ public class Main {
 
         // create migration counter + register with households (once!)
         migrationPerSpatialUnit = new CountMigrationPerSpatialUnit();
+        migrationDetails = new CountMigrationDetails();
         // TODO: find a way to make this registration out of the MigrationPerSpatialUnit() class directly (but only once!!!)
         households.get(0).registerMigrationObserver(migrationPerSpatialUnit);
+        households.get(0).registerMigrationObserver(migrationDetails);
         demographicMovementsPerSpatialUnit = new CountDemographicMovements();
         persons.get(0).registerDemographyObserver(demographicMovementsPerSpatialUnit);
         
@@ -239,8 +243,10 @@ public class Main {
 		int modelEndYear = modelStartYear + iterations;
 		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
 			// Clear migration indicators
+			// TODO: include these three into the OutputManager (which might need to have a function for output of data at the end of a model year)
 			migrationPerSpatialUnit.clearIndicatorList();
 			demographicMovementsPerSpatialUnit.clearIndicatorList();
+			migrationDetails.clear();
 	        // (Re)build household indicators - this must be done each model year because with add/remove it is a problem when the age of a person changes
 			buildIndicators();			
 	        System.out.println(printInfo() + ": build of model indicators complete");
@@ -495,6 +501,7 @@ public class Main {
 			outputFreeDwellings(modelYear, "after immigration");
 			outputMigrationCount(modelYear);
 			outputDemographicMovementCount(modelYear);
+			outputMigrationDetailsCount(modelYear);
 			
 			// Aging of persons (household-wise)
 			households.aging();
@@ -588,6 +595,7 @@ public class Main {
 	
 	private static String freeDwellingsFileName = "FreeDwellings.csv";
 	private static String migrationCountFileName = "Migrations.csv";
+	private static String migrationDetailsCountFileName = "MigrationDetails.csv";
 	private static String demographicMovementsFileName = "DemographicMovements.csv";
 	
 	public static void initSimpleOutputFiles() {
@@ -629,5 +637,11 @@ public class Main {
 		FileOutputStream demographicMovementCountFile= new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(demographicMovementCountFile);
 		demographicMovementsPerSpatialUnit.output(ps, modelYear);
+	}
+	public static void outputMigrationDetailsCount(int modelYear) throws FileNotFoundException {
+		String pathName = createPathName(migrationDetailsCountFileName);
+		FileOutputStream outputFile = new FileOutputStream(pathName, true);
+		PrintStream ps = new PrintStream(outputFile);
+		migrationDetails.output(ps, modelYear);
 	}
 }

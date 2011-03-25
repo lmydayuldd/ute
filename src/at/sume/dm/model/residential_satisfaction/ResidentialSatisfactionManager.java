@@ -12,27 +12,38 @@ import at.sume.dm.entities.SpatialUnitRow;
  *
  */
 public enum ResidentialSatisfactionManager {
-	SOCIALPRESTIGE(new SocialPrestige()),
-	COSTEFFECTIVENESS(new CostEffectiveness(), ResidentialSatisfactionWeight.getInstance().getPrefCosts()),
-	DESIREDLIVINGSPACE(new DesiredLivingSpace(), ResidentialSatisfactionWeight.getInstance().getPrefLivingSpace()),
-	ENVIRONMENTALAMENITIES(new EnvironmentalAmenities(), ResidentialSatisfactionWeight.getInstance().getPrefEnvAmen()),
-	UDPCENTRALITY(UDPCentrality.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefCentrality()),
-	UDPTRANSPORT(UDPPublicTransportAccessibility.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefTransportAccess());
+	SOCIALPRESTIGE(new SocialPrestige(), false),
+	COSTEFFECTIVENESS(new CostEffectiveness(), ResidentialSatisfactionWeight.getInstance().getPrefCosts(), true),
+	DESIREDLIVINGSPACE(new DesiredLivingSpace(), ResidentialSatisfactionWeight.getInstance().getPrefLivingSpace(), true),
+	ENVIRONMENTALAMENITIES(new EnvironmentalAmenities(), ResidentialSatisfactionWeight.getInstance().getPrefEnvAmen(), true),
+	UDPCENTRALITY(UDPCentrality.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefCentrality(), true),
+	UDPTRANSPORT(UDPPublicTransportAccessibility.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefTransportAccess(), true);
 
 	private ResidentialSatisfactionComponent component;
 	private ArrayList<Short> weightList;
 	private static short maxWeight = 4;
-
-	ResidentialSatisfactionManager(ResidentialSatisfactionComponent component) {
+	private boolean calcForFreeDwellingsAlwaysAvailable;
+	/**
+	 * 
+	 * @param component
+	 * @param calcForFreeDwellingsAlwaysAvailable Calculate this part of residential satisfaction for spatial units where dwellings are not managed (= always available)
+	 */
+	ResidentialSatisfactionManager(ResidentialSatisfactionComponent component, boolean calcForFreeDwellingsAlwaysAvailable) {
 		this.component = component;
 		this.weightList = null;
+		this.calcForFreeDwellingsAlwaysAvailable = calcForFreeDwellingsAlwaysAvailable;
 	}
-	
-	ResidentialSatisfactionManager(ResidentialSatisfactionComponent component, ArrayList<Short> weightList) {
+	/**
+	 * 
+	 * @param component
+	 * @param weightList
+	 * @param calcForFreeDwellingsAlwaysAvailable Calculate this part of residential satisfaction for spatial units where dwellings are not managed (= always available)
+	 */
+	ResidentialSatisfactionManager(ResidentialSatisfactionComponent component, ArrayList<Short> weightList, boolean calcForFreeDwellingsAlwaysAvailable) {
 		this.component = component;
 		this.weightList = weightList;
+		this.calcForFreeDwellingsAlwaysAvailable = calcForFreeDwellingsAlwaysAvailable;
 	}
-	
 	/**
 	 * Set the weight for each component of residential satisfaction
 	 * @param weightList
@@ -63,6 +74,8 @@ public enum ResidentialSatisfactionManager {
 		short weight = maxWeight;
 		int weightSum = 0;
 		for (ResidentialSatisfactionManager rs : values()) {
+			if (!rs.calcForFreeDwellingsAlwaysAvailable && spatialUnit.isFreeDwellingsAlwaysAvailable())
+				continue;
 			if (rs.weightList != null)
 				weight = rs.weightList.get(household.getHouseholdType().getId() - 1);
 			if (weight == 0)
@@ -87,6 +100,7 @@ public enum ResidentialSatisfactionManager {
 		short weight = maxWeight;
 		int weightSum = 0;
 		for (ResidentialSatisfactionManager rs : values()) {
+			// isFreeDwellingsAlwaysAvailable() is ignored here since we always have a dwelling at this point
 			if (rs.weightList != null)
 				weight = rs.weightList.get(household.getHouseholdType().getId() - 1);
 			if (weight == 0)
