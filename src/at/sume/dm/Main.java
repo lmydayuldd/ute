@@ -606,6 +606,8 @@ public class Main {
 		FileUtil.rotateFile(pathName);
 		pathName = createPathName(demographicMovementsFileName);
 		FileUtil.rotateFile(pathName);
+		pathName = createPathName(migrationDetailsCountFileName);
+		FileUtil.rotateFile(pathName);
 	}
 	
 	public static void outputFreeDwellings(int modelYear, String label) throws FileNotFoundException {
