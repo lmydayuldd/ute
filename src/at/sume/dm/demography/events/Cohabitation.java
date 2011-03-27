@@ -5,8 +5,8 @@ package at.sume.dm.demography.events;
 
 import java.util.ArrayList;
 
-import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.HouseholdRow;
+import at.sume.dm.entities.PersonRow;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 
@@ -70,23 +70,29 @@ public class Cohabitation {
 			index = (int) (Math.random() * femaleHouseholds.size());
 			HouseholdRow femaleHousehold = femaleHouseholds.get(index);
 			femaleHouseholds.remove(index);
-			maleHousehold.join(femaleHousehold);
+			// Create a fictive household to determine the direction of the move
+			HouseholdRow temp = new HouseholdRow();
+			temp.addMembers(maleHousehold.getMembers());
+			temp.addMembers(femaleHousehold.getMembers());
+			temp.determineInitialHouseholdType(false);
 			// Choose dwelling by comparison of residential satisfaction
-			int currentResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(maleHousehold, modelYear);
-			int alternativeResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(maleHousehold, femaleHousehold.getDwelling(), modelYear);
-			DwellingRow oldDwelling = null;
-			if (alternativeResidentialSatisfaction > currentResidentialSatisfaction) {
-				oldDwelling = maleHousehold.getDwelling();
-				maleHousehold.setDwelling(femaleHousehold.getDwelling());
+			int maleDwellingResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(temp, maleHousehold.getDwelling(), modelYear);
+			int femaleDwellingResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(temp, femaleHousehold.getDwelling(), modelYear);
+			// Reset household pointed to by the persons (was changed by temp.addMembers() above!
+			// TODO: this is a mess!
+			for (PersonRow person : maleHousehold.getMembers())
+				person.setHousehold(maleHousehold);
+			for (PersonRow person : femaleHousehold.getMembers())
+				person.setHousehold(femaleHousehold);
+			if (femaleDwellingResidentialSatisfaction > maleDwellingResidentialSatisfaction) {
+				femaleHousehold.join(maleHousehold);
+				maleHousehold.remove(dwellingsOnMarket);
+				assert femaleHousehold.hasDwelling() == true : "New household has no dwelling!";
 			} else {
-				oldDwelling = femaleHousehold.getDwelling();
+				maleHousehold.join(femaleHousehold);
+				femaleHousehold.remove(dwellingsOnMarket);
+				assert maleHousehold.hasDwelling() == true : "New household has no dwelling!";
 			}
-			maleHousehold.getDwelling().setHousehold(maleHousehold);
-			femaleHousehold.setDwelling(null);
-			dwellingsOnMarket.putDwellingOnMarket(oldDwelling);
-			// Force calculation of dwelling costs to current market values for the old dwelling
-			oldDwelling.calcTotalYearlyDwellingCosts(true);
-			femaleHousehold.remove(dwellingsOnMarket);
 		}
 		return numCohabitations;
 	}

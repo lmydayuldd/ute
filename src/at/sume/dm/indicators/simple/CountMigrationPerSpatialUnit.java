@@ -135,7 +135,7 @@ public class CountMigrationPerSpatialUnit implements MigrationObserver {
 			// insert at position pos
 			pos = (pos + 1) * -1;
 			MigrationPerSpatialUnitRow emigrationRow = new MigrationPerSpatialUnitRow();
-			emigrationRow.setSpatialUnidId(srcSpatialUnitId);
+			emigrationRow.setSpatialUnidId(destSpatialUnitId);
 			emigrationRow.addChildLeftParentsDestination();
 			indicatorList.add(pos, emigrationRow);
 		} else {
@@ -167,7 +167,7 @@ public class CountMigrationPerSpatialUnit implements MigrationObserver {
 			// insert at position pos
 			pos = (pos + 1) * -1;
 			MigrationPerSpatialUnitRow emigrationRow = new MigrationPerSpatialUnitRow();
-			emigrationRow.setSpatialUnidId(srcSpatialUnitId);
+			emigrationRow.setSpatialUnidId(destSpatialUnitId);
 			emigrationRow.addCohabitationDestination(householdMemberCount);
 			indicatorList.add(pos, emigrationRow);
 		} else {

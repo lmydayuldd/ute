@@ -57,6 +57,7 @@ public class LeavingParents {
 				parentHousehold.updateHouseholdTypeAfterDeathOrMemberLeaving();
 				
 				// add to results
+				assert newHousehold.hasDwelling() == true : "Children household has no dwelling!";
 				result.add(newHousehold);
 			}
 		}
@@ -82,6 +83,7 @@ public class LeavingParents {
 		newHousehold.determineInitialHouseholdType(false);	// countAdults() was already done in addMember()
 		person.setYearlyIncome(yearlyIncome);
 		newHousehold.setDwelling(parentHousehold.getDwelling()); // this is needed to be able to count leaving parent moves per spatial unit
+		assert newHousehold.hasDwelling() == true : "Children household has no dwelling!";
 		
 		return newHousehold;
 	}

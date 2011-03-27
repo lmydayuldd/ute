@@ -328,6 +328,7 @@ public class DwellingsOnMarket {
 		int su = spatialUnits.indexOf(dwelling.getSpatialunit());
 		dwellingsOnMarketList[su].add(dwelling);
 		dwelling.setHousehold(null);
+		dwelling.calcTotalYearlyDwellingCosts(true);
 		dwellingsOnMarketFullList.add(dwelling);
 	}
 	public void removeDwellingFromMarket(DwellingRow dwelling) {

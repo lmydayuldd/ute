@@ -981,8 +981,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			dwellingsOnMarket.putDwellingOnMarket(oldDwelling);
 			// Force calculation of dwelling costs to current market values for the old dwelling
 			oldDwelling.calcTotalYearlyDwellingCosts(true);
-			notifyLocalMigration(getSpatialunitId(), dwelling.getSpatialunitId());
-			notifyMigration(getDwelling().getSpatialunit().getSpatialUnitId(), dwelling.getSpatialunitId(), MigrationRealm.LOCAL, this);
+			notifyLocalMigration(oldDwelling.getSpatialunit().getSpatialUnitId(), dwelling.getSpatialunitId());
+			notifyMigration(oldDwelling.getSpatialunit().getSpatialUnitId(), dwelling.getSpatialunitId(), MigrationRealm.LOCAL, this);
 		} else {
 			notifyImmigration(dwelling.getSpatialunitId(), migrationRealm);
 			notifyMigration(null, dwelling.getSpatialunitId(), migrationRealm, this);
@@ -1011,12 +1011,18 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * @param household
 	 */
 	public void join(HouseholdRow household) {
+		// Count the members of the moving household here only
 		notifyCohabitation(household.getDwelling().getSpatialunit().getSpatialUnitId(), getDwelling().getSpatialunit().getSpatialUnitId());
 		notifyMigration(household.getDwelling().getSpatialunit().getSpatialUnitId(), getDwelling().getSpatialunit().getSpatialUnitId(), MigrationRealm.COHABITATION, household);		
 		addMembers(household.getMembers());
 		household.members = null;
 		determineInitialHouseholdType(false); //countAdults has already been done in addMembers()
 	}
+	/**
+	 * Remove a household
+	 * 
+	 * @param dwellingsOnMarket List of dwellings on market to be able to put the household's dwelling on the market
+	 */
 	public void remove(DwellingsOnMarket dwellingsOnMarket) {
 		if (hasDwelling())
 			dwellingsOnMarket.putDwellingOnMarket(getDwelling());
