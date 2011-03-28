@@ -17,15 +17,15 @@ import at.sume.dm.types.HouseholdType;
  */
 public class ResidentialSatisfactionWeight {
 	public static class HouseholdPrefs implements Comparable<HouseholdPrefs> {
-		// must be public static in order to be able to use Database.select()/java reflection api
-		public long id;
-		public long householdTypeId;
-		public short prefDiversity;
-		public short prefCentrality;
-		public short prefEnvAmen;
-		public short prefCosts;
-		public short prefTransportAccess;
-		public short prefLivingSpace;
+		private long id;
+		private long householdTypeId;
+		private short prefDiversity;
+		private short prefCentrality;
+		private short prefEnvAmen;
+		private short prefCosts;
+		private short prefTransportAccess;
+		private short prefLivingSpace;
+		private short prefSocialPrestige;
 		
 		/**
 		 * @return the id
@@ -139,6 +139,20 @@ public class ResidentialSatisfactionWeight {
 			this.prefLivingSpace = prefLivingSpace;
 		}
 
+		/**
+		 * @param prefSocialPrestige the prefSocialPrestige to set
+		 */
+		public void setPrefSocialPrestige(short prefSocialPrestige) {
+			this.prefSocialPrestige = prefSocialPrestige;
+		}
+
+		/**
+		 * @return the prefSocialPrestige
+		 */
+		public short getPrefSocialPrestige() {
+			return prefSocialPrestige;
+		}
+
 		/* (non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
@@ -249,6 +263,14 @@ public class ResidentialSatisfactionWeight {
 		ArrayList<Short> result = new ArrayList<Short>(householdPrefs.size());
 		for (HouseholdPrefs prefs : householdPrefs) {
 			result.add(prefs.getPrefTransportAccess());
+		}
+		return result;
+	}
+
+	public ArrayList<Short> getPrefSocialPrestige() {
+		ArrayList<Short> result = new ArrayList<Short>(householdPrefs.size());
+		for (HouseholdPrefs prefs : householdPrefs) {
+			result.add(prefs.getPrefSocialPrestige());
 		}
 		return result;
 	}

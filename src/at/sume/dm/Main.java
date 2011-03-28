@@ -319,22 +319,24 @@ public class Main {
 				UDPPublicTransportAccessibility.getInstance(Common.getSpatialUnitLevel());
 				// TODO: save residential satisfaction result for later use
 				short residential_satisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, modelYear);
-				assert (residential_satisfaction >= 0) && (residential_satisfaction <= 1000) : "residential satisfaction out of range (" + residential_satisfaction + ")";
-				household.setCurrentResidentialSatisfaction(residential_satisfaction);
-				if (residential_satisfaction + household.getResidentialSatisfactionThreshMod() < Common.getResidentialSatisfactionThreshold()) {
-					// TODO: add the household to a random position in the ArrayList
-					potentialMovers.add(household);
-					if (household.getMovingDecisionYear() == 0) {
-						if (modelYear == modelStartYear) {
-							// In first model year, household may already have decided earlier
-							Random r = new Random();
-							int movingDecisionYear = Common.getMovingDecisionMin() + r.nextInt(modelYear - Common.getMovingDecisionMin() + 1);
-							household.setMovingDecisionYear((short) movingDecisionYear);
-						} else {
-							household.setMovingDecisionYear((short) modelYear);
+				assert (residential_satisfaction >= -1) && (residential_satisfaction <= 1000) : "residential satisfaction out of range (" + residential_satisfaction + ")";
+				if (residential_satisfaction != -1) {
+					household.setCurrentResidentialSatisfaction(residential_satisfaction);
+					if (residential_satisfaction + household.getResidentialSatisfactionThreshMod() < Common.getResidentialSatisfactionThreshold()) {
+						// TODO: add the household to a random position in the ArrayList
+						potentialMovers.add(household);
+						if (household.getMovingDecisionYear() == 0) {
+							if (modelYear == modelStartYear) {
+								// In first model year, household may already have decided earlier
+								Random r = new Random();
+								int movingDecisionYear = Common.getMovingDecisionMin() + r.nextInt(modelYear - Common.getMovingDecisionMin() + 1);
+								household.setMovingDecisionYear((short) movingDecisionYear);
+							} else {
+								household.setMovingDecisionYear((short) modelYear);
+							}
 						}
+						// TODO: add potential mover to the indicators
 					}
-					// TODO: add potential mover to the indicators
 				}
 				
 				// Add household for cohabitation processing

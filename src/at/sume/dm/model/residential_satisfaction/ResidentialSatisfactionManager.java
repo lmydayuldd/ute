@@ -12,9 +12,9 @@ import at.sume.dm.entities.SpatialUnitRow;
  *
  */
 public enum ResidentialSatisfactionManager {
-	SOCIALPRESTIGE(new SocialPrestige(), false),
-	COSTEFFECTIVENESS(new CostEffectiveness(), ResidentialSatisfactionWeight.getInstance().getPrefCosts(), true),
-	DESIREDLIVINGSPACE(new DesiredLivingSpace(), ResidentialSatisfactionWeight.getInstance().getPrefLivingSpace(), true),
+	SOCIALPRESTIGE(new SocialPrestige(), ResidentialSatisfactionWeight.getInstance().getPrefSocialPrestige(), false),
+//	COSTEFFECTIVENESS(new CostEffectiveness(), ResidentialSatisfactionWeight.getInstance().getPrefCosts(), true),
+//	DESIREDLIVINGSPACE(new DesiredLivingSpace(), ResidentialSatisfactionWeight.getInstance().getPrefLivingSpace(), true),
 	ENVIRONMENTALAMENITIES(new EnvironmentalAmenities(), ResidentialSatisfactionWeight.getInstance().getPrefEnvAmen(), true),
 	UDPCENTRALITY(UDPCentrality.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefCentrality(), true),
 	UDPTRANSPORT(UDPPublicTransportAccessibility.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefTransportAccess(), true);
@@ -67,7 +67,7 @@ public enum ResidentialSatisfactionManager {
 	 *  
 	 * @param household
 	 * @param dwelling
-	 * @return Overall residential satisfaction in thousandth part
+	 * @return Overall residential satisfaction in thousandth part ranging from 0 to 1000. A value of -1 indicates that the household shall not be included in any activity depending on residential satisfaction calculation.
 	 */
 	public static short calcResidentialSatisfaction(ResidentialSatisfactionHouseholdProperties household, SpatialUnitRow spatialUnit, int modelYear) {
 		long rv = 0;
@@ -84,7 +84,11 @@ public enum ResidentialSatisfactionManager {
 			rv += value;
 			weightSum += weight;
 		}
-		long result = rv / weightSum;
+		long result = 0;
+		if (weightSum != 0)
+			result = rv / weightSum;
+		else
+			return -1; // don't include household in any activity depending on residential satisfaction calculation
 		assert (result >= 0) && (result <= 32767) : "Residential satisfaction out of range (" + result + ")";
 		return (short) result;
 	}
@@ -93,7 +97,7 @@ public enum ResidentialSatisfactionManager {
 	 *  
 	 * @param household
 	 * @param dwelling
-	 * @return Overall residential satisfaction in thousandth part
+	 * @return Overall residential satisfaction in thousandth part ranging from 0 to 1000. A value of -1 indicates that the household shall not be included in any activity depending on residential satisfaction calculation.
 	 */
 	public static short calcResidentialSatisfaction(ResidentialSatisfactionHouseholdProperties household, ResidentialSatisfactionDwellingProperties dwelling, int modelYear) {
 		long rv = 0;
@@ -109,7 +113,11 @@ public enum ResidentialSatisfactionManager {
 			rv += value;
 			weightSum += weight;
 		}
-		long result = rv / weightSum;
+		long result = 0;
+		if (weightSum != 0)
+			result = rv / weightSum;
+		else
+			return -1; // don't include household in any activity depending on residential satisfaction calculation
 		assert (result >= 0) && (result <= 32767) : "Residential satisfaction out of range (" + result + ")";
 		return (short) result;
 	}
