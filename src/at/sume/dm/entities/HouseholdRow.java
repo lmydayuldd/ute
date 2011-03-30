@@ -8,10 +8,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Random;
 
 import net.remesch.db.Sequence;
 import net.remesch.db.schema.Ignore;
+import net.remesch.util.Random;
 import at.sume.db.RecordSetRowFileable;
 import at.sume.dm.Common;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
@@ -102,7 +102,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	private int dwellingIdInp;
 	private ArrayList<PersonRow> members;
 	private DwellingRow dwelling;
-	private float residentialSatisfactionThreshMod;
+	private double residentialSatisfactionThreshMod;
 	private HouseholdType householdType;
 	private short movingDecisionYear = 0;
 //	private ReasonForMoving movingDecisionReason;
@@ -158,6 +158,10 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		if (householdIdSeq != null) {
 			setHouseholdId(householdIdSeq.getNext());
 		}
+		Random r = new Random();
+		int min = Common.getResidentialSatisfactionThresholdMod() * -1;
+		int max = Common.getResidentialSatisfactionThresholdMod();
+		setResidentialSatisfactionThreshMod(r.triangular(min, max, 0));
 	}
 
 	/**
@@ -277,7 +281,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	/**
 	 * @return the residentialSatisfactionThreshMod
 	 */
-	public float getResidentialSatisfactionThreshMod() {
+	public double getResidentialSatisfactionThreshMod() {
 		return residentialSatisfactionThreshMod;
 	}
 
@@ -285,23 +289,24 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * @param residentialSatisfactionThreshMod the residentialSatisfactionThreshMod to set
 	 */
 	public void setResidentialSatisfactionThreshMod(
-			float residentialSatisfactionThreshMod) {
+			double residentialSatisfactionThreshMod) {
+		assert (residentialSatisfactionThreshMod >= -500) && (residentialSatisfactionThreshMod <= 500) : "residentialSatisfactionThreshMod out of range (" + residentialSatisfactionThreshMod + ")"; 
 		this.residentialSatisfactionThreshMod = residentialSatisfactionThreshMod;
 	}
 
-	/**
-	 * @param socialPrestigeThreshMod the socialPrestigeThreshMod to set
-	 */
-	public void setSocialPrestigeThreshMod(float socialPrestigeThreshMod) {
-		this.residentialSatisfactionThreshMod = socialPrestigeThreshMod;
-	}
-
-	/**
-	 * @return the socialPrestigeThreshMod
-	 */
-	public double getSocialPrestigeThreshMod() {
-		return residentialSatisfactionThreshMod;
-	}
+//	/**
+//	 * @param socialPrestigeThreshMod the socialPrestigeThreshMod to set
+//	 */
+//	public void setSocialPrestigeThreshMod(float socialPrestigeThreshMod) {
+//		this.residentialSatisfactionThreshMod = socialPrestigeThreshMod;
+//	}
+//
+//	/**
+//	 * @return the socialPrestigeThreshMod
+//	 */
+//	public double getSocialPrestigeThreshMod() {
+//		return residentialSatisfactionThreshMod;
+//	}
 
 	public void countAdults() {
 		if (householdType == null) {	// first time counting based on age only
@@ -703,6 +708,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 //			setLivingSpaceGroupId(rs.getShort(name));
 //		} else if (name.equals("CostOfResidenceGroupId")) {
 //			setCostOfResidenceGroupId(rs.getShort(name));
+		} else if (name.equals("ResidentialSatisfactionThreshMod")) {
+			setResidentialSatisfactionThreshMod(rs.getDouble(name));
 		} else {
 			throw new AssertionError("Unknown field name " + name);
 		}

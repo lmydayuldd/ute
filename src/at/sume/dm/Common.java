@@ -23,6 +23,7 @@ public class Common {
 	public static Database db, odb;
 	private static short scenarioId;
 	private static int residentialSatisfactionThreshold;
+	private static int residentialSatisfactionThresholdMod;
 	private static int searchAreaSize;
 	private static int searchAreaSizeIncrement;
 	private static int dwellingsConsideredPerYear;
@@ -72,6 +73,13 @@ public class Common {
 	 */
 	public static int getResidentialSatisfactionThreshold() {
 		return residentialSatisfactionThreshold;
+	}
+
+	/**
+	 * @return the residentialSatisfactionThresholdMod
+	 */
+	public static int getResidentialSatisfactionThresholdMod() {
+		return residentialSatisfactionThresholdMod;
 	}
 
 	/**
@@ -259,6 +267,7 @@ public class Common {
 	public static void init() {
 		scenarioId = Short.parseShort(getSysParam("DefaultScenario"));
 		residentialSatisfactionThreshold = Integer.parseInt(getSysParam("THR_ResSatisfaction"));
+		residentialSatisfactionThresholdMod = Integer.parseInt(getSysParam("ResidentialSatisfactionThreshMod"));
 		dwellingsConsideredPerYear = Integer.parseInt(getSysParam("HouseholdDwellingsConsideredPerYear"));
 		dwellingsOnMarketShare = Integer.parseInt(getSysParam("DwellingsOnMarketShare"));
 		alwaysLookForDwellings = Integer.parseInt(getSysParam("AlwaysLookForDwellings"));

@@ -52,6 +52,7 @@ import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionWeight;
 import at.sume.dm.model.residential_satisfaction.UDPCentrality;
 import at.sume.dm.model.residential_satisfaction.UDPPublicTransportAccessibility;
 import at.sume.dm.scenario_handling.Scenario;
+import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.MigrationRealm;
 
 /**
@@ -242,6 +243,11 @@ public class Main {
 		int modelStartYear = Common.getModelStartYear();
 		int modelEndYear = modelStartYear + iterations;
 		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
+			// for breakpoints in a certain year
+			if (modelYear == 2012) {
+				int xy = 0;
+			}
+			
 			// Clear migration indicators
 			// TODO: include these three into the OutputManager (which might need to have a function for output of data at the end of a model year)
 			migrationPerSpatialUnit.clearIndicatorList();
@@ -289,7 +295,6 @@ public class Main {
 				if (j % 100000 == 0) {
 					System.out.println(printInfo() + ": Processing household " + j + " of " + households.size() + " in year " + modelYear + ", nr. of persons: " + persons.size());
 				}
-				
 				// Process demographic events for all household members
 				ArrayList<PersonRow> p_helper = (ArrayList<PersonRow>) ((ArrayList<PersonRow>) household.getMembers()).clone();
 				for (PersonRow person : p_helper) {
@@ -305,6 +310,11 @@ public class Main {
 				if (household.getMovingDecisionYear() != 0) {
 					potentialMovers.add(household);
 					continue;
+				}
+				
+				// for breakpoints
+				if ((household.getHouseholdType() == HouseholdType.LARGE_FAMILY) && (household.getSpatialunitId() == 91905)) {
+					int xy = 0;
 				}
 				
 				// Process household decisions
@@ -324,7 +334,6 @@ public class Main {
 					household.setCurrentResidentialSatisfaction(residential_satisfaction);
 					if (residential_satisfaction + household.getResidentialSatisfactionThreshMod() < Common.getResidentialSatisfactionThreshold()) {
 						// add the household to a random position in the ArrayList
-						potentialMovers.add(household);
 						potentialMovers.add((int)(Math.random() * potentialMovers.size()), household);
 						if (household.getMovingDecisionYear() == 0) {
 							if (modelYear == modelStartYear) {
@@ -371,6 +380,10 @@ public class Main {
 				boolean notMoving = false;
 				if (j % 10000 == 0) {
 					System.out.println(printInfo() + ": Processing potential mover " + j + " of " + potentialMovers.size() + " in year " + modelYear);
+				}
+				// for breakpoints
+				if ((household.getHouseholdType() == HouseholdType.LARGE_FAMILY) && (household.getSpatialunitId() == 91905)) {
+					int xy = 0;
 				}
 				// 1) estimate the aspiration region: 
 				//    a) needed living space - by household size 
