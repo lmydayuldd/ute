@@ -14,6 +14,7 @@ import at.sume.dm.indicators.IncomePercentiles;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
 import at.sume.dm.policy.MinimumYearlyIncome;
 import at.sume.dm.types.AgeGroup;
+import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.MigrationRealm;
 import at.sume.sampling.ExactDistribution;
 
@@ -195,7 +196,12 @@ public class SampleMigratingHouseholds {
 				}
 			}
 			for (int i = 0; i != numHouseholds; i++) {
-				result.add(sampleHousehold((short) (householdSize + 1), modelYear));
+				HouseholdRow household = sampleHousehold((short) (householdSize + 1), modelYear);
+				while (household.getHouseholdType() == HouseholdType.OTHER) {
+					// TODO: Ignore OTHER households - this must be eliminated by the sampling algorithm in future
+					household = sampleHousehold((short) (householdSize + 1), modelYear);
+				}
+				result.add(household);
 			}
 		}
 		
