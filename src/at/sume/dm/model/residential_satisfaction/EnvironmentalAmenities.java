@@ -21,7 +21,7 @@ public class EnvironmentalAmenities extends ResidentialSatisfactionComponent {
 			SpatialUnitRow spatialUnit, int ModelYear) {
 		int envAmenitiesSum = spatialUnit.getAreaShareArtificialVegetation() + spatialUnit.getAreaShareAgricultural() +
 			spatialUnit.getAreaShareForest() + spatialUnit.getAreaShareWater();
-		int result = envAmenitiesSum * 10 / 4;
+		int result = envAmenitiesSum * 10;
 		if (result > 1000)
 			return 1000;
 		assert result >= 0 : "Environmental amenities score is out of range: " + result;
