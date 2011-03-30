@@ -323,8 +323,9 @@ public class Main {
 				if (residential_satisfaction != -1) {
 					household.setCurrentResidentialSatisfaction(residential_satisfaction);
 					if (residential_satisfaction + household.getResidentialSatisfactionThreshMod() < Common.getResidentialSatisfactionThreshold()) {
-						// TODO: add the household to a random position in the ArrayList
+						// add the household to a random position in the ArrayList
 						potentialMovers.add(household);
+						potentialMovers.add((int)(Math.random() * potentialMovers.size()), household);
 						if (household.getMovingDecisionYear() == 0) {
 							if (modelYear == modelStartYear) {
 								// In first model year, household may already have decided earlier
