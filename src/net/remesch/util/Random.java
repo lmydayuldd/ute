@@ -25,4 +25,24 @@ public class Random extends java.util.Random {
 		} while ((result > range) || (result < -range));
 		return result;
 	}
+	/**
+	 * Returns the next pseudorandom, triangular distributed double value, ranging from min to max with mode as the most frequent value. 
+	 * @param min Minimum return value
+	 * @param max Maximum return value
+	 * @param mode Most frequent return value
+	 * @return
+	 */
+	public double triangular(double min, double max, double mode) {
+		double bound = (mode - min) / (max - min);
+		double r = nextDouble();
+		double result = 0;
+		if (r < bound) {
+			result = min + Math.sqrt(r * (max - min) * (mode - min));
+		} else {
+			result = max - Math.sqrt((1 - r) * (max - min) * (max - mode));
+		}
+		assert min <= result : "Result " + result + " < min " + min;
+		assert result <= max : "Result " + result + " > max " + max;
+		return result;
+	}
 }
