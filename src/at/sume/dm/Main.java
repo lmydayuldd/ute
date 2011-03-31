@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -290,6 +291,8 @@ public class Main {
 	        // the following clone() is necessary because otherwise it wouldn't be possible to remove households from
 	        // the original list while iterating through it
 	        Households hh_helper = (Households) households.clone();
+	        // bring the households into a random order
+	        Collections.shuffle(hh_helper.getRowList());
 			// Loop through all households to find potential movers, process demographic events
 			for (HouseholdRow household : hh_helper) {
 				if (j % 100000 == 0) {
@@ -410,16 +413,23 @@ public class Main {
 					for (int spatialUnitId : preferredSpatialUnits) {
 						SpatialUnitRow spatialUnit = spatialUnits.getSpatialUnit(spatialUnitId);
 						if (spatialUnit.isFreeDwellingsAlwaysAvailable()) {
-							// Household moves away
-							if (Common.getMovingOutProbability().occurs()) {
-								hhMovedAway++;
-								hhMovedAwayMemberCount += household.getMemberCount();
-								household.emigrate(dwellingsOnMarket, MigrationRealm.NATIONAL);
-								dwelling = null;
-								break;
+							// Check if the household can afford to live there
+							long yearlyRentPer100Sqm = rentPerSpatialUnit.getYearlyAverageRentPer100Sqm(spatialUnitId);
+							if (yearlyRentPer100Sqm / 100 <= household.getAspirationRegionMaxCosts()) {
+								// Household moves to the surroundings
+								if (Common.getMovingOutProbability().occurs()) {
+									hhMovedAway++;
+									hhMovedAwayMemberCount += household.getMemberCount();
+									household.emigrate(dwellingsOnMarket, MigrationRealm.NATIONAL);
+									dwelling = null;
+									break;
+								} else {
+									notMoving = true;
+									break; // don't continue after moving probability check
+								}
 							} else {
 								notMoving = true;
-								break; // don't continue after moving probability check
+								noDwellingFoundReason = NoDwellingFoundReason.NO_SUITABLE_DWELLING;
 							}
 						} else {
 							dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, household, true, modelYear);

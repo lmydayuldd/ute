@@ -5,8 +5,8 @@ package at.sume.dm.migration;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Random;
 
+import net.remesch.util.Random;
 import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
@@ -213,6 +213,7 @@ public class SampleMigratingHouseholds {
 	 * @param householdSize
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private HouseholdRow sampleHousehold(short householdSize, int modelYear) {
 		ArrayList<PersonRow> persons = new ArrayList<PersonRow>(householdSize);
 		HouseholdRow result = new HouseholdRow();
@@ -234,31 +235,45 @@ public class SampleMigratingHouseholds {
 		// calculate income for each household member
 		for (PersonRow person : result.getMembers()) {
 			int yearlyIncome = 0;
-			// TODO: put this data into the database (but how?)
-			// since Austria only seems to have statistics about origin, age, sex and destination of immigrants,
-			// all of the data here comes from Germany:
-			// Statistisches Bundesamt, Diehl, Claudia; Grobecker, Claire: Neuzuwanderer in Deutschland. Ergebnisse des Mikrozensus 2000 bis 2003, 2006, URL: http://www.destatis.de/jetspeed/portal/cms/Sites/destatis/Internet/DE/Content/Publikationen/Querschnittsveroeffentlichungen/WirtschaftStatistik/Bevoelkerung/NeuzuwandererDeutschland,property=file.pdf [11.11.2010]
-			if ((person.getAge() >= 20) && (person.getAge() <= 70)) { // should be between 20 & 40, but we assume this to be similiar for simplicity in that larger age-group
-				// 47,7% are employed
-				Random r = new Random();
-				if (r.nextInt(100) <= 48) {
-					// estimates: 33% from western europe have a high income, 66% from the rest of the world have a low income (we would need more data here)
-					// so: the 33% have a income in the range of the top 20% of the residents and the 66% have a income in the range of the lowest 20% of the residents
-					int maxIncome, minIncome;
-					if (r.nextInt(100) <= 33) {
-						minIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 80);
-						maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 100);
-						assert maxIncome - minIncome > 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
-						yearlyIncome = minIncome + r.nextInt((int) (maxIncome - minIncome));
-					} else {
-						MinimumYearlyIncome minimumYearlyIncome = MinimumYearlyIncome.getInstance();
-						minIncome = minimumYearlyIncome.get(modelYear, (byte) result.getAdultsCount(), (byte) (result.getMemberCount() - result.getAdultsCount()));
-						maxIncome = Math.max(minIncome, ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 20));
-						if (maxIncome <= minIncome) {
-							yearlyIncome = minIncome;
-						} else {
-//							assert maxIncome - minIncome >= 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
+			if (true) {
+				// Alternative income calculation - just get the income from the income distribution of the present population as a quick solution to
+				// have the income distribution of the current residents for the immigrants
+				if (person.getAge() > 15) {
+					Random r = new Random();
+					int minIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 0);
+					int maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 100);
+					// TODO: mode = median - not fully correct!
+					int modeIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 50);
+					assert maxIncome - minIncome > 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
+					yearlyIncome = (int) r.triangular(minIncome, maxIncome, modeIncome);
+				}
+			} else {
+				// TODO: put this data into the database (but how?)
+				// since Austria only seems to have statistics about origin, age, sex and destination of immigrants,
+				// all of the data here comes from Germany:
+				// Statistisches Bundesamt, Diehl, Claudia; Grobecker, Claire: Neuzuwanderer in Deutschland. Ergebnisse des Mikrozensus 2000 bis 2003, 2006, URL: http://www.destatis.de/jetspeed/portal/cms/Sites/destatis/Internet/DE/Content/Publikationen/Querschnittsveroeffentlichungen/WirtschaftStatistik/Bevoelkerung/NeuzuwandererDeutschland,property=file.pdf [11.11.2010]
+				if ((person.getAge() >= 20) && (person.getAge() <= 70)) { // should be between 20 & 40, but we assume this to be similiar for simplicity in that larger age-group
+					// 47,7% are employed
+					Random r = new Random();
+					if (r.nextInt(100) <= 48) {
+						// estimates: 33% from western europe have a high income, 66% from the rest of the world have a low income (we would need more data here)
+						// so: the 33% have a income in the range of the top 20% of the residents and the 66% have a income in the range of the lowest 20% of the residents
+						int maxIncome, minIncome;
+						if (r.nextInt(100) <= 33) {
+							minIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 80);
+							maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 100);
+							assert maxIncome - minIncome > 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
 							yearlyIncome = minIncome + r.nextInt((int) (maxIncome - minIncome));
+						} else {
+							MinimumYearlyIncome minimumYearlyIncome = MinimumYearlyIncome.getInstance();
+							minIncome = minimumYearlyIncome.get(modelYear, (byte) result.getAdultsCount(), (byte) (result.getMemberCount() - result.getAdultsCount()));
+							maxIncome = Math.max(minIncome, ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 20));
+							if (maxIncome <= minIncome) {
+								yearlyIncome = minIncome;
+							} else {
+	//							assert maxIncome - minIncome >= 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
+								yearlyIncome = minIncome + r.nextInt((int) (maxIncome - minIncome));
+							}
 						}
 					}
 				}
