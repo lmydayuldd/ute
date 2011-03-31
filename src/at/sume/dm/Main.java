@@ -375,10 +375,11 @@ public class Main {
 			MoversIndicatorManager.resetIndicators();
 			outputFreeDwellings(modelYear, "before moving households + after demographic changes");
 			// Loop through potential movers
-			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0, hhZeroIncome = 0, hhLowIncome = 0, hhMovedAway = 0;
+			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0, hhZeroIncome = 0, hhLowIncome = 0, hhMovedAway = 0, persMovedAway = 0;
 			int hhNotMoving = 0, hhMovedAwayMemberCount = 0;
 			j = 0;
 	        System.out.println(printInfo() + ": free dwellings before moving: " + dwellingsOnMarket.getFreeDwellingsCount());
+	        int maxOutMigrationNational = sampleMigratingHouseholds.getOutMigrationNational(modelYear);
 			for (HouseholdRow household : potentialMovers) {
 				boolean notMoving = false;
 				if (j % 10000 == 0) {
@@ -418,18 +419,22 @@ public class Main {
 							if (yearlyRentPer100Sqm / 100 <= household.getAspirationRegionMaxCosts()) {
 								// Household moves to the surroundings
 								if (Common.getMovingOutProbability().occurs()) {
-									hhMovedAway++;
-									hhMovedAwayMemberCount += household.getMemberCount();
-									household.emigrate(dwellingsOnMarket, MigrationRealm.NATIONAL);
-									dwelling = null;
-									break;
+									// Maximum number of moving out households in demographic forecast already reached?
+									if (hhMovedAwayMemberCount <  sampleMigratingHouseholds.getOutMigrationNational(modelYear)) {
+										hhMovedAway++;
+										hhMovedAwayMemberCount += household.getMemberCount();
+										household.emigrate(dwellingsOnMarket, MigrationRealm.NATIONAL);
+										dwelling = null;
+										break;
+									}
+									// let the household find another alternative (?)
 								} else {
 									notMoving = true;
 									break; // don't continue after moving probability check
 								}
-							} else {
-								notMoving = true;
-								noDwellingFoundReason = NoDwellingFoundReason.NO_SUITABLE_DWELLING;
+//							} else {
+//								notMoving = true;
+//								noDwellingFoundReason = NoDwellingFoundReason.NO_SUITABLE_DWELLING;
 							}
 						} else {
 							dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, household, true, modelYear);
