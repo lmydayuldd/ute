@@ -133,7 +133,7 @@ public class BuildingProjectsPerYear {
 		
 		// calculate the new dwellings per year
 		for (BuildingProjectRow b : buildingProjects) {
-			b.setDwellingCountPerYear(b.getDwellingCount() / (b.getModelYearFinish() - b.getModelYearStart()));
+			b.setDwellingCountPerYear(Math.round((float)b.getDwellingCount() / (b.getModelYearFinish() - b.getModelYearStart())));
 		}
 	}
 	/**

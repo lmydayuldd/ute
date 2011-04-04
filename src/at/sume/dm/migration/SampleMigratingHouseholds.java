@@ -10,6 +10,7 @@ import net.remesch.util.Random;
 import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
+import at.sume.dm.entities.Persons;
 import at.sume.dm.indicators.IncomePercentiles;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
 import at.sume.dm.policy.MinimumYearlyIncome;
@@ -135,8 +136,9 @@ public class SampleMigratingHouseholds {
 	private ExactDistribution<MigrationsPerAgeSex> migrationsPerAgeSex;
 	private ArrayList<MigrationHouseholdSize> migrationHouseholdSize;
 	private long migrationHouseholdSizeShareTotal = 0;
+	private Persons persons;
 	
-	public SampleMigratingHouseholds(String migrationScenarioName, String migrationHouseholdSizeScenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
+	public SampleMigratingHouseholds(String migrationScenarioName, String migrationHouseholdSizeScenarioName, Persons persons) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
 		selectStatement = "SELECT id, ageGroupId, sex, share " +
 			"FROM _DM_MigrationAgeSex " +
@@ -153,6 +155,7 @@ public class SampleMigratingHouseholds {
 		assert migrationHouseholdSize.size() > 0 : "No rows selected from _DM_MigrationHouseholdSize (scenarioName = " + migrationScenarioName + ")";
 		migrationHouseholdSizeShareTotal = Math.round((Double)Common.db.lookupSql("select sum(share) from _DM_MigrationHouseholdSize where scenarioName = '" + migrationHouseholdSizeScenarioName + "'"));
 		totalMigrationsPerYear = new TotalMigrationPerYear(migrationScenarioName);
+		this.persons = persons;
 	}
 	
 	public ArrayList<HouseholdRow> sample(int modelYear, MigrationRealm migrationRealm) {
@@ -215,7 +218,7 @@ public class SampleMigratingHouseholds {
 	 */
 	@SuppressWarnings("unused")
 	private HouseholdRow sampleHousehold(short householdSize, int modelYear) {
-		ArrayList<PersonRow> persons = new ArrayList<PersonRow>(householdSize);
+		ArrayList<PersonRow> members = new ArrayList<PersonRow>(householdSize);
 		HouseholdRow result = new HouseholdRow();
 		result.setMovingDecisionYear((short) modelYear);
 		// sample persons
@@ -228,9 +231,9 @@ public class SampleMigratingHouseholds {
 			person.setAge(AgeGroup.sampleAge(person.getAgeGroupId()));
 			person.setSex(m.getSex());
 			person.setHousehold(result);
-			persons.add(person);
+			members.add(person);
 		}
-		result.addMembers(persons);
+		result.addMembers(members);
 		result.determineInitialHouseholdType(false);	// countAdults() was already done in addMembers()
 		// calculate income for each household member
 		for (PersonRow person : result.getMembers()) {
@@ -239,13 +242,23 @@ public class SampleMigratingHouseholds {
 				// Alternative income calculation - just get the income from the income distribution of the present population as a quick solution to
 				// have the income distribution of the current residents for the immigrants
 				if (person.getAge() > 15) {
+					// The following calculation has a bias for very high household incomes (after 50 yrs.) about 70% of all households have an income > 200.000 €
+					// Solution: calculate income by choosing an existing person and taking their income (each person has the same chance to be picked)
 					Random r = new Random();
-					int minIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 0);
-					int maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 100);
-					// TODO: mode = median - not fully correct!
-					int modeIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 50);
-					assert maxIncome - minIncome > 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
-					yearlyIncome = (int) r.triangular(minIncome, maxIncome, modeIncome);
+//					int minIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 0);
+//					int maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 100);
+//					// TODO: mode = median - not fully correct!
+//					int modeIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 50);
+//					assert maxIncome - minIncome > 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
+//					yearlyIncome = (int) r.triangular(minIncome, maxIncome, modeIncome);
+					int numPersons = persons.size();
+					int index = r.nextInt(numPersons);
+					PersonRow t = persons.get(index);
+					while (t.getAge() < 15) {
+						index = r.nextInt(numPersons);
+						t = persons.get(index);
+					}
+					yearlyIncome = t.getYearlyIncome(); 
 				}
 			} else {
 				// TODO: put this data into the database (but how?)
