@@ -10,12 +10,12 @@ import net.remesch.util.Random;
 import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
-import at.sume.dm.entities.Persons;
 import at.sume.dm.indicators.IncomePercentiles;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
 import at.sume.dm.policy.MinimumYearlyIncome;
 import at.sume.dm.types.AgeGroup;
 import at.sume.dm.types.HouseholdType;
+import at.sume.dm.types.IncomeGroup;
 import at.sume.dm.types.MigrationRealm;
 import at.sume.sampling.ExactDistribution;
 
@@ -132,13 +132,41 @@ public class SampleMigratingHouseholds {
 			return ((Integer)id).compareTo(o.id);
 		}
 	}
+	public static class MigrationIncomeRow {
+		private byte incomeGroupId;
+		public double probability;
+		/**
+		 * @return the incomeGroupId
+		 */
+		public byte getIncomeGroupId() {
+			return incomeGroupId;
+		}
+		/**
+		 * @param incomeGroupId the incomeGroupId to set
+		 */
+		public void setIncomeGroupId(byte incomeGroupId) {
+			this.incomeGroupId = incomeGroupId;
+		}
+		/**
+		 * @return the probability
+		 */
+		public double getProbability() {
+			return probability;
+		}
+		/**
+		 * @param probability the probability to set
+		 */
+		public void setProbability(double probability) {
+			this.probability = probability;
+		}
+	}
 	private TotalMigrationPerYear totalMigrationsPerYear;
 	private ExactDistribution<MigrationsPerAgeSex> migrationsPerAgeSex;
+	private ExactDistribution<MigrationIncomeRow> migrationIncome;
 	private ArrayList<MigrationHouseholdSize> migrationHouseholdSize;
 	private long migrationHouseholdSizeShareTotal = 0;
-	private Persons persons;
 	
-	public SampleMigratingHouseholds(String migrationScenarioName, String migrationHouseholdSizeScenarioName, Persons persons) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
+	public SampleMigratingHouseholds(String migrationScenarioName, String migrationHouseholdSizeScenarioName, String migrationIncomeScenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
 		selectStatement = "SELECT id, ageGroupId, sex, share " +
 			"FROM _DM_MigrationAgeSex " +
@@ -154,8 +182,12 @@ public class SampleMigratingHouseholds {
 		migrationHouseholdSize = Common.db.select(MigrationHouseholdSize.class, selectStatement);
 		assert migrationHouseholdSize.size() > 0 : "No rows selected from _DM_MigrationHouseholdSize (scenarioName = " + migrationScenarioName + ")";
 		migrationHouseholdSizeShareTotal = Math.round((Double)Common.db.lookupSql("select sum(share) from _DM_MigrationHouseholdSize where scenarioName = '" + migrationHouseholdSizeScenarioName + "'"));
+		
 		totalMigrationsPerYear = new TotalMigrationPerYear(migrationScenarioName);
-		this.persons = persons;
+		
+		selectStatement = "SELECT incomeGroupId, probability from _DM_MigrationIncome " + 
+			"where scenarioName = '" + migrationIncomeScenarioName + "' order by incomeGroupId";
+		migrationIncome = new ExactDistribution<MigrationIncomeRow>(Common.db.select(MigrationIncomeRow.class, selectStatement), "probability");
 	}
 	
 	public ArrayList<HouseholdRow> sample(int modelYear, MigrationRealm migrationRealm) {
@@ -166,6 +198,7 @@ public class SampleMigratingHouseholds {
 		long numImmigrants = totalMigrationsPerYear.getImmigration(modelYear, migrationRealm);
 		//    and calculate the exact age & sex distribution
 		migrationsPerAgeSex.buildExactThresholds(numImmigrants);
+		migrationIncome.buildExactThresholds(numImmigrants);
 		
 		// 2) Calculate the number of households per household size
 		int numHouseholds = 0;
@@ -251,14 +284,16 @@ public class SampleMigratingHouseholds {
 //					int modeIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 50);
 //					assert maxIncome - minIncome > 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
 //					yearlyIncome = (int) r.triangular(minIncome, maxIncome, modeIncome);
-					int numPersons = persons.size();
-					int index = r.nextInt(numPersons);
-					PersonRow t = persons.get(index);
-					while (t.getAge() <= 17) {
-						index = r.nextInt(numPersons);
-						t = persons.get(index);
-					}
-					yearlyIncome = t.getYearlyIncome() * (100 + Common.getImmigrationIncomeModifier()) / 100; 
+//					int numPersons = persons.size();
+//					int index = r.nextInt(numPersons);
+//					PersonRow t = persons.get(index);
+//					while (t.getAge() <= 17) {
+//						index = r.nextInt(numPersons);
+//						t = persons.get(index);
+//					}
+//					yearlyIncome = t.getYearlyIncome() * (100 + Common.getImmigrationIncomeModifier()) / 100;
+					int index = migrationIncome.randomExactSample();
+					yearlyIncome = IncomeGroup.sampleIncome(migrationIncome.get(index).getIncomeGroupId());
 				}
 			} else {
 				// TODO: put this data into the database (but how?)

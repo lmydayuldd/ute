@@ -24,6 +24,7 @@ public class Scenario {
 	private String newDwellingSizeScenario;
 	private String rentScenario;
 	private String fertilityScenario;
+	private String migrationIncomeScenario;
 	
 	public Scenario(Database db, short scenarioId) throws SQLException {
 		String sql = "select * from _DM_Scenarios where scenarioId = ?";
@@ -38,6 +39,7 @@ public class Scenario {
 			buildingProjectScenario = rs.getString("BuildingProjectScenarioName");
 			additionalDwellingsScenario = rs.getString("AdditionalDwellingsScenarioName");
 			newDwellingSizeScenario = rs.getString("NewDwellingSizeScenarioName");
+			migrationIncomeScenario = rs.getString("MigrationIncomeScenarioName");
 			rentScenario = rs.getString("RentScenarioName");
 			if (rentScenario == null) rentScenario = "NULL";
 			fertilityScenario = rs.getString("FertilityScenarioName");
@@ -107,5 +109,12 @@ public class Scenario {
 	 */
 	public String getFertilityScenario() {
 		return fertilityScenario;
+	}
+
+	/**
+	 * @return the migrationIncomeScenario
+	 */
+	public String getMigrationIncomeScenario() {
+		return migrationIncomeScenario;
 	}
 }

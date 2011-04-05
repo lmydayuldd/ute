@@ -234,7 +234,7 @@ public class Main {
 		PersonDeath personDeath = new PersonDeath(db, personEventManager, Common.getPersonMaxAge(), Common.getDeathAdjustment());
 		@SuppressWarnings("unused")
 		ChildBirth childBirth = new ChildBirth(db, scenario.getFertilityScenario(), personEventManager, Common.getBirthAdjustment());
-		SampleMigratingHouseholds sampleMigratingHouseholds = new SampleMigratingHouseholds(scenario.getMigrationScenario(), scenario.getMigrationHouseholdSizeScenario(), persons);
+		SampleMigratingHouseholds sampleMigratingHouseholds = new SampleMigratingHouseholds(scenario.getMigrationScenario(), scenario.getMigrationHouseholdSizeScenario(), scenario.getMigrationIncomeScenario());
 		SampleBuildingProjects sampleBuildingProjects = new SampleBuildingProjects(scenario.getBuildingProjectScenario(), scenario.getNewDwellingSizeScenario(), spatialUnits);
 		AdditionalDwellingsPerYear additionalDwellingsPerYear = new AdditionalDwellingsPerYear(scenario.getAdditionalDwellingsScenario());
 		
@@ -375,7 +375,7 @@ public class Main {
 			MoversIndicatorManager.resetIndicators();
 			outputFreeDwellings(modelYear, "before moving households + after demographic changes");
 			// Loop through potential movers
-			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0, hhZeroIncome = 0, hhLowIncome = 0, hhMovedAway = 0, persMovedAway = 0;
+			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0, hhZeroIncome = 0, hhLowIncome = 0, hhMovedAway = 0;
 			int hhNotMoving = 0, hhMovedAwayMemberCount = 0;
 			j = 0;
 	        System.out.println(printInfo() + ": free dwellings before moving: " + dwellingsOnMarket.getFreeDwellingsCount());
@@ -420,7 +420,7 @@ public class Main {
 								// Household moves to the surroundings
 								if (Common.getMovingOutProbability().occurs()) {
 									// Maximum number of moving out households in demographic forecast already reached?
-									if (hhMovedAwayMemberCount <  sampleMigratingHouseholds.getOutMigrationNational(modelYear)) {
+									if (hhMovedAwayMemberCount <  maxOutMigrationNational) {
 										hhMovedAway++;
 										hhMovedAwayMemberCount += household.getMemberCount();
 										household.emigrate(dwellingsOnMarket, MigrationRealm.NATIONAL);

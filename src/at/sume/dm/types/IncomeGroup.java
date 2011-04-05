@@ -6,6 +6,7 @@ package at.sume.dm.types;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.remesch.util.Random;
 import at.sume.dm.Common;
 
 /**
@@ -62,5 +63,33 @@ public class IncomeGroup {
 		assert incomeGroupId > 0 : "incomeGroupId <= 0";
 		assert incomeGroupId <= incomeGroups.size() : "incomeGroupId > " + incomeGroups.size();
 		return incomeGroups.get(incomeGroupId - 1).incomeGroup;
+	}
+	private static IncomeGroupRow lookupIncomeGroup(byte incomeGroupId) {
+		for (IncomeGroupRow i : incomeGroups) {
+			if (i.id == incomeGroupId)
+				return i;
+		}
+		return null;
+	}
+	/**
+	 * Sample a income for a given income group id
+	 * @param incomeGroupId
+	 * @return
+	 */
+	public static int sampleIncome(byte incomeGroupId) {
+		IncomeGroupRow incomeGroupRow = lookupIncomeGroup(incomeGroupId);
+		Random r = new Random();
+		int result = 0;
+		int index = incomeGroups.indexOf(incomeGroupRow);
+		if (index == incomeGroups.size() - 1) {
+			// Last element
+			result = (int) r.triangular(incomeGroupRow.minincome, incomeGroupRow.minincome * 5, incomeGroupRow.minincome);
+		} else if (index == 0) {
+			// First element
+			result = (int) r.triangular(incomeGroupRow.minincome, incomeGroupRow.maxincome, incomeGroupRow.maxincome);
+		} else {
+			result = incomeGroupRow.minincome + r.nextInt(incomeGroupRow.maxincome - incomeGroupRow.minincome);
+		}
+		return result;
 	}
 }
