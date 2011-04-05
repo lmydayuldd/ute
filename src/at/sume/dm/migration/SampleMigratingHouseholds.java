@@ -241,7 +241,7 @@ public class SampleMigratingHouseholds {
 			if (true) {
 				// Alternative income calculation - just get the income from the income distribution of the present population as a quick solution to
 				// have the income distribution of the current residents for the immigrants
-				if (person.getAge() > 15) {
+				if (person.getAge() > 17) {
 					// The following calculation has a bias for very high household incomes (after 50 yrs.) about 70% of all households have an income > 200.000 €
 					// Solution: calculate income by choosing an existing person and taking their income (each person has the same chance to be picked)
 					Random r = new Random();
@@ -254,7 +254,7 @@ public class SampleMigratingHouseholds {
 					int numPersons = persons.size();
 					int index = r.nextInt(numPersons);
 					PersonRow t = persons.get(index);
-					while (t.getAge() < 15) {
+					while (t.getAge() <= 17) {
 						index = r.nextInt(numPersons);
 						t = persons.get(index);
 					}
