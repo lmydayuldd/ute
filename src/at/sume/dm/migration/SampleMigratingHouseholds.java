@@ -258,7 +258,7 @@ public class SampleMigratingHouseholds {
 						index = r.nextInt(numPersons);
 						t = persons.get(index);
 					}
-					yearlyIncome = t.getYearlyIncome(); 
+					yearlyIncome = t.getYearlyIncome() * (100 + Common.getImmigrationIncomeModifier()) / 100; 
 				}
 			} else {
 				// TODO: put this data into the database (but how?)

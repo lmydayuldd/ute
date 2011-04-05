@@ -46,6 +46,7 @@ public class Common {
 	private static byte dwellingsOnMarketAutoAdjust;
 	private static byte deathAdjustment;
 	private static byte birthAdjustment;
+	private static byte immigrationIncomeModifier;
 	
 	/**
 	 * @return the iniFilename
@@ -223,6 +224,13 @@ public class Common {
 	}
 
 	/**
+	 * @return the immigrationIncomeModifier
+	 */
+	public static byte getImmigrationIncomeModifier() {
+		return immigrationIncomeModifier;
+	}
+
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -300,6 +308,7 @@ public class Common {
 		dwellingsOnMarketAutoAdjust = Byte.parseByte(getSysParam("DwellingsOnMarketAutoAdjust"));
 		birthAdjustment = Byte.parseByte(getSysParam("BirthProbabilityAdjustment"));
 		deathAdjustment = Byte.parseByte(getSysParam("DeathProbabilityAdjustment"));
+		immigrationIncomeModifier = Byte.parseByte(getSysParam("ImmigrationIncomeMod"));
 	}
 	
 	/**
