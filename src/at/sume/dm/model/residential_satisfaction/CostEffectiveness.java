@@ -60,19 +60,24 @@ public class CostEffectiveness extends ResidentialSatisfactionComponent {
 					result = Math.round(potentialCostOfResidence * 10 / currentCostOfResidence);
 				}
 			} else {
-				long costOfNewDwelling = dwelling.getTotalYearlyDwellingCosts();
-				if (household.getDwelling() == null) {
+				if (household.getDwelling() == null) { 
 					// Calculate cost effectiveness satisfaction for a given dwelling without considering the households current dwelling
 					// There is no need to calculate this since new dwellings always get (about) the average price of the spatial unit
 					// TODO: maybe we could calculate the price before and include some random part
 					result = 1000;
+					// How can this happen at all? The household must have a dwelling to get here!
+					throw new AssertionError();
 				} else {
+					long costOfNewDwelling = dwelling.getTotalYearlyDwellingCosts();
 					// Calculate cost effectiveness satisfaction for a given dwelling with considering the households current dwelling
 					currentCostOfResidence = household.getDwelling().getTotalYearlyDwellingCosts();
 					// TODO: this is a bad workaround (probably) for prices going to 0 in a spatial unit!!!!
 					if (costOfNewDwelling == 0) {
 						costOfNewDwelling = 1;
 					}
+					// Logic is turned around here because at this point we want to calculate the potential satisfaction with a new
+					// dwelling compared with the current dwelling
+					// TODO: for clarification bring this in line with the behavior above and calculate 1/x in the calling function when needed!!! 
 					result = Math.round(currentCostOfResidence * 1000 / costOfNewDwelling);
 				}
 			}
