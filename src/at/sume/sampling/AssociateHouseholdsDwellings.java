@@ -3,6 +3,7 @@
  */
 package at.sume.sampling;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,8 +43,11 @@ public class AssociateHouseholdsDwellings {
 	
 	/**
 	 * @param args
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
 		DwellingRow lookupDwelling = new DwellingRow();
 		Database db = Common.openDatabase();
 		Common.init();

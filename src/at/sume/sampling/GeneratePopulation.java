@@ -1,5 +1,6 @@
 package at.sume.sampling;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -77,8 +78,16 @@ public class GeneratePopulation {
 	/**
 	 * Generate synthetic population for the SUME decision model
 	 * @param args
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
+	 * @throws NoSuchFieldException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws IllegalArgumentException 
+	 * @throws SecurityException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, SecurityException, IllegalArgumentException, InstantiationException, IllegalAccessException, NoSuchFieldException {
 		int ret = JOptionPane.showConfirmDialog(null, "Do you really want to start the generation of the synthetic population of the SUME model? " +
 				" All currently existing population data will be lost.", "Generate Population", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null);
 		if (ret != 0)
@@ -86,46 +95,16 @@ public class GeneratePopulation {
 		
         System.out.println(Common.printInfo() + ": start");
 		Database db = Common.openDatabase();
-		try {
-			db.con.setAutoCommit(false);
-		} catch (SQLException e2) {
-			e2.printStackTrace();
-			System.exit(101);
-		}
+		db.con.setAutoCommit(false);
 		Common.init();
 
 		// TODO: put into a table-class, method truncate
 		db.execute("delete * from _DM_Households");
 		db.execute("delete * from _DM_Persons");
-		try {
 //			db.con.setAutoCommit(false);
-			db.con.commit();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-			System.exit(102);
-		}
+		db.con.commit();
 		
-		try {
-			GenerateHouseholds(db);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(103);
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			System.exit(103);
-		} catch (SecurityException e) {
-			e.printStackTrace();
-			System.exit(103);
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			System.exit(103);
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-			System.exit(103);
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-			System.exit(103);
-		}
+		GenerateHouseholds(db);
 		
 		System.out.println(Common.printInfo() + ": created " + householdCount + " households and " + personCount + " persons");
 		
