@@ -3,6 +3,7 @@
  */
 package net.remesch.db;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,40 +28,67 @@ import net.remesch.util.Reflection;
  *
  */
 public class Database {
+	private final static boolean USE_JDBC = true;
 	private String url;
 	public Connection con;
+//	public com.healthmarketscience.jackcess.Database db_jackcess;
 
 	/**
-	 * Construct class and open a database
+	 * Construct class and open the database pointed to by pathname
 	 * @param pathname
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
+	 * @throws IOException 
 	 */
-	public Database(String pathname)
+	public Database(String pathname) throws SQLException, ClassNotFoundException
 	{
 		open(pathname);
 	}
-
+	/**
+	 * Construct class and open the database with ODBC DSN "SUME"
+	 * @param pathname
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public Database() throws SQLException, ClassNotFoundException
+	{
+		open();
+	}
 	/**
 	 * Open a database
 	 * @param pathname
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
+	 * @throws IOException 
 	 */
-	public void open(String pathname)
-	{
-        url = "jdbc:odbc:DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + pathname + ";";
+	public void open(String pathname) throws SQLException, ClassNotFoundException {
+		if (USE_JDBC) {
+	        url = "jdbc:odbc:DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + pathname + ";";
 
-        try {
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-        } catch(java.lang.ClassNotFoundException e) {
-            System.err.println("Treiber-Klasse " + e + " konnte nicht geladen werden!");
-            System.err.println(e.getMessage());
-            return;
-        }
 
-        try {
             con = DriverManager.getConnection(url);
-        } catch(SQLException e) {
-            System.err.println("Datenbank Verbindungsfehler!\n" + e);
-            return;
-        }
+		} else {
+//			url = pathname;
+//			db_jackcess = com.healthmarketscience.jackcess.Database.open(new File(pathname));
+		}
+	}
+	/**
+	 * Open a database with ODBC DSN "SUME"
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public void open() throws SQLException, ClassNotFoundException {
+		if (USE_JDBC) {
+	        url = "jdbc:odbc:SUME";
+
+            Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+
+            con = DriverManager.getConnection(url);
+		} else {
+//			url = pathname;
+//			db_jackcess = com.healthmarketscience.jackcess.Database.open(new File(pathname));
+		}
 	}
 	
 	/**
@@ -69,9 +97,15 @@ public class Database {
 	public void close()
 	{
 		try {
-	        con.close();
+			if (USE_JDBC) {
+		        con.close();
+			} else {
+//				db_jackcess.close();
+			}
 		} catch(SQLException e) {
 			System.err.println("Error closing database " + url + "\n" + e);
+//		} catch (IOException e) {
+//			System.err.println("Error closing database " + url + "\n" + e);
 		}
 	}
 	
