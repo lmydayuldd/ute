@@ -246,8 +246,9 @@ public class Common {
 		return null;
 	}
 
-	public static Database openDatabase() {
-		db = new Database(Common.getDbLocation());
+	public static Database openDatabase() throws SQLException, ClassNotFoundException {
+//		db = new Database(Common.getDbLocation());
+		db = new Database();
 		return(db);
 	}
 
@@ -267,7 +268,7 @@ public class Common {
 		return null;
 	}
 	
-	public static Database openOutputDatabase() {
+	public static Database openOutputDatabase() throws SQLException, ClassNotFoundException {
 		odb = new Database(Common.getOutputDbLocation());
 		return(odb);
 	}
