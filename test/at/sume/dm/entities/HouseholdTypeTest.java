@@ -1,6 +1,9 @@
 package at.sume.dm.entities;
 
 import static org.junit.Assert.assertEquals;
+
+import java.sql.SQLException;
+
 import net.remesch.db.Database;
 
 import org.junit.Before;
@@ -20,7 +23,7 @@ public class HouseholdTypeTest {
 	}
 
 	@Before
-	public void setUp() {
+	public void setUp() throws SQLException, ClassNotFoundException {
 		db = Common.openDatabase();
 		Common.init();
 		hh = new HouseholdRow();

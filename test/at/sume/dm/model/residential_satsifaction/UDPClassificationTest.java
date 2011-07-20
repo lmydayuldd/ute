@@ -41,9 +41,10 @@ public class UDPClassificationTest {
 	/**
 	 * Setup for unit test of {@link at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager#IndicatorManager(java.lang.String, java.lang.Class)}.
 	 * @throws SQLException
+	 * @throws ClassNotFoundException 
 	 */
 	@Before
-	public void setUp() throws SQLException {
+	public void setUp() throws SQLException, ClassNotFoundException {
 		db = Common.openDatabase();
 		Common.init();
 		// Household 1: 2 persons, 30000 + 20000

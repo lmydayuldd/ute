@@ -23,7 +23,7 @@ public class DwellingsTest {
 	Database db;
 
 	@Before
-	public void setUp() throws SQLException {
+	public void setUp() throws SQLException, ClassNotFoundException {
 		db = Common.openDatabase();
 		Common.init();
 	}

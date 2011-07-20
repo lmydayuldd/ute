@@ -25,7 +25,7 @@ public class SampleImmigrationsHouseholdsTest {
 	SampleMigratingHouseholds sampleImmigratingHouseholds; 
 
 	@Before
-	public void setUp() throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+	public void setUp() throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
 		@SuppressWarnings("unused")
 		Database db = Common.openDatabase();
 		Common.init();

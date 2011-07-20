@@ -44,9 +44,10 @@ public class ResidentialSatisfactionManagerTest {
 	 * @throws SQLException
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException 
 	 */
 	@Before
-	public void setUp() throws SQLException, InstantiationException, IllegalAccessException {
+	public void setUp() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
 		db = Common.openDatabase();
 		Common.init();
 		// Household 1: 2 persons, 30000 + 20000
