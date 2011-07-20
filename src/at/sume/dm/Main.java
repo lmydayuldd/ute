@@ -84,8 +84,11 @@ public class Main {
 	}
 	/**
 	 * @param args
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
         System.out.println(printInfo() + ": start");
 		Database db = Common.openDatabase();
 //		Database odb = Common.openOutputDatabase();
