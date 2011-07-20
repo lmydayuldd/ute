@@ -20,13 +20,13 @@ import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
  *  
  * @author Alexander Remesch
  */
-public class Cohabitation {
+public class MovingTogether {
 	private int numCohabitations;
 	private int modelYear;
 	private DwellingsOnMarket dwellingsOnMarket;
 	private ArrayList<HouseholdRow> maleHouseholds, femaleHouseholds;
 	
-	public Cohabitation(int numCohabitations, int modelYear, DwellingsOnMarket dwellingsOnMarket) {
+	public MovingTogether(int numCohabitations, int modelYear, DwellingsOnMarket dwellingsOnMarket) {
 		this.numCohabitations = numCohabitations;
 		this.modelYear = modelYear;
 		this.dwellingsOnMarket = dwellingsOnMarket;

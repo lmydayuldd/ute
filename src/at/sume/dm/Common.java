@@ -40,7 +40,7 @@ public class Common {
 	private static SingleProbability movingOutProbability;
 	private static boolean outputFullData = false;
 	private static byte dwellingPriceRange;
-	private static byte cohabitationRate;
+	private static byte movingTogetherRate;
 	private static SingleProbability leavingParentsProbability;
 	private static byte childrenMaxAge;
 	private static byte dwellingsOnMarketAutoAdjust;
@@ -177,8 +177,8 @@ public class Common {
 	/**
 	 * @return the cohabitationRate
 	 */
-	public static byte getCohabitationRate() {
-		return cohabitationRate;
+	public static byte getMovingTogetherRate() {
+		return movingTogetherRate;
 	}
 
 	/**
@@ -303,7 +303,7 @@ public class Common {
 			outputFullData = true;
 		}
 		dwellingPriceRange = Byte.parseByte(getSysParam("DwellingPriceRange"));
-		cohabitationRate = Byte.parseByte(getSysParam("CohabitationRate"));
+		movingTogetherRate = Byte.parseByte(getSysParam("MoveTogetherRate"));
 		leavingParentsProbability = new SingleProbability(Byte.parseByte(getSysParam("ProbabilityLeavingParents")), 100);
 		setChildrenMaxAge(Byte.parseByte(getSysParam("ChildrenMaxAge")));
 		dwellingsOnMarketAutoAdjust = Byte.parseByte(getSysParam("DwellingsOnMarketAutoAdjust"));

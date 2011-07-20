@@ -20,7 +20,7 @@ import net.remesch.util.FileUtil;
 import at.sume.dm.buildingprojects.AdditionalDwellingsPerYear;
 import at.sume.dm.buildingprojects.SampleBuildingProjects;
 import at.sume.dm.demography.events.ChildBirth;
-import at.sume.dm.demography.events.Cohabitation;
+import at.sume.dm.demography.events.MovingTogether;
 import at.sume.dm.demography.events.EventManager;
 import at.sume.dm.demography.events.LeavingParents;
 import at.sume.dm.demography.events.PersonDeath;
@@ -284,8 +284,8 @@ public class Main {
 		        dwellingsOnMarket.addAll(newDwellings);
 	        }
 
-	        int cohabitationCount = Common.getCohabitationRate() * (persons.size() / 1000);
-	        Cohabitation cohabitation = new Cohabitation(cohabitationCount, modelYear, dwellingsOnMarket);
+	        int movingTogetherCount = Common.getMovingTogetherRate() * (persons.size() / 1000);
+	        MovingTogether movingTogether = new MovingTogether(movingTogetherCount, modelYear, dwellingsOnMarket);
 	        
 	        LeavingParents leavingParents = new LeavingParents(Common.getLeavingParentsProbability(), Common.getChildrenMaxAge(), modelYear);
 	        
@@ -356,7 +356,7 @@ public class Main {
 				}
 				
 				// Add household for cohabitation processing
-				cohabitation.addHousehold(household);
+				movingTogether.addHousehold(household);
 				
 				// Add children leaving parents
 				leavingParents.addHousehold(household);
@@ -486,9 +486,9 @@ public class Main {
 	        System.out.println(printInfo() + ": free dwellings after moving: " + dwellingsOnMarket.getFreeDwellingsCount());
 			outputFreeDwellings(modelYear, "after moving households, before immigration");
 
-			// Cohabitating households
-			int numCohabitations = cohabitation.randomJoinHouseholds();
-			System.out.println(printInfo() + ": " + numCohabitations + " of "+ cohabitationCount + " projected household cohabitations/marriages took place");
+			// households moving together
+			int numMovingTogether = movingTogether.randomJoinHouseholds();
+			System.out.println(printInfo() + ": " + numMovingTogether + " of "+ movingTogetherCount + " projected household move-togethers/marriages took place");
 	        System.out.println(printInfo() + ": free dwellings after cohabitation: " + dwellingsOnMarket.getFreeDwellingsCount());
 			
 			// Out-Migration: randomly remove households
