@@ -3,6 +3,7 @@
  */
 package at.sume.data_preparations;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,6 +24,8 @@ public class DataConversion {
 	/***
 	 * Conversion of table "VZ_2001_Alter_Geschlecht_Familienstand (ZB)" to "VZ_2001_Alter_Geschlecht_Familienstand (ZB) relational" 
 	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
+	 * @throws IOException 
 	 */
 //	private static void Convert_VZ2001_HH_Age() throws SQLException {
 //		Database db = new Database(Common.getDbLocation());
@@ -63,7 +66,7 @@ public class DataConversion {
 //		}
 //	}
 	
-	public static void Convert_VZ2001_HH_Size() throws SQLException {
+	public static void Convert_VZ2001_HH_Size() throws SQLException, ClassNotFoundException, IOException {
 		Database db = new Database(Common.getDbLocation());
 		ResultSet res = db.executeQuery("select *, val([Oestat]) AS GKZnum from [VZ_2001_Haushalte (ZB)] where len(Oestat) = 6");
 		String sqlx = "insert into [VZ_2001_Haushalte (ZB) relational] (ID, SpatialunitId, HouseholdSize, HouseholdCount, PersonCount) " + 
@@ -109,16 +112,14 @@ public class DataConversion {
 	
 	/**
 	 * @param args
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
 	 */
-	public static void main(String[] args) {
-		try {
-			//Convert_VZ2001_HH_Age();
-			Convert_VZ2001_HH_Size();
-			JOptionPane.showMessageDialog(null, "Erstellung abgeschlossen", "VZ2001 Age, Sex", JOptionPane.OK_OPTION);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
+		//Convert_VZ2001_HH_Age();
+		Convert_VZ2001_HH_Size();
+		JOptionPane.showMessageDialog(null, "Erstellung abgeschlossen", "VZ2001 Age, Sex", JOptionPane.OK_OPTION);
 	}
 
 }

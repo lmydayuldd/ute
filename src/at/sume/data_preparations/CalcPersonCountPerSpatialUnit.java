@@ -1,5 +1,6 @@
 package at.sume.data_preparations;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -45,9 +46,11 @@ public class CalcPersonCountPerSpatialUnit {
 
 	/**
 	 * @param args
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 * @throws SQLException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
 		Database db = new Database(Common.getDbLocation());
 
 		// a) determine array size
