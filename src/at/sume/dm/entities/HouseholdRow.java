@@ -1019,8 +1019,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 */
 	public void join(HouseholdRow household) {
 		// Count the members of the moving household here only
-		notifyCohabitation(household.getDwelling().getSpatialunit().getSpatialUnitId(), getDwelling().getSpatialunit().getSpatialUnitId());
-		notifyMigration(household.getDwelling().getSpatialunit().getSpatialUnitId(), getDwelling().getSpatialunit().getSpatialUnitId(), MigrationRealm.COHABITATION, household);		
+		notifyMovingTogether(household.getDwelling().getSpatialunit().getSpatialUnitId(), getDwelling().getSpatialunit().getSpatialUnitId());
+		notifyMigration(household.getDwelling().getSpatialunit().getSpatialUnitId(), getDwelling().getSpatialunit().getSpatialUnitId(), MigrationRealm.MOVETOGETHER, household);		
 		addMembers(household.getMembers());
 		household.members = null;
 		determineInitialHouseholdType(false); //countAdults has already been done in addMembers()
@@ -1250,10 +1250,10 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	}
 
 	@Override
-	public void notifyCohabitation(Integer srcSpatialUnitId,
+	public void notifyMovingTogether(Integer srcSpatialUnitId,
 			Integer destSpatialUnitId) {
 		for (MigrationObserver obs : migrationObservers) {
-			obs.addCohabitation(srcSpatialUnitId, destSpatialUnitId, getHouseholdSize());
+			obs.addMoveTogether(srcSpatialUnitId, destSpatialUnitId, getHouseholdSize());
 		}
 	}
 

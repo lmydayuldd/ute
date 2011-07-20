@@ -28,11 +28,11 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 	// Children leaving parents counters
 	private int leftParentsOriginCount;
 	private int leftParentsDestinationCount;
-	// Household/person cohabitation counters
-	private int householdCohabitationOriginCount;
-	private int personCohabitationOriginCount;
-	private int householdCohabitationDestinationCount;
-	private int personCohabitationDestinationCount;
+	// Household/person move together counters
+	private int householdMovingTogetherOriginCount;
+	private int personMovingTogetherOriginCount;
+	private int householdMovingTogetherDestinationCount;
+	private int personMovingTogetherDestinationCount;
 	// Counters of potential immigration
 	private int householdPotentialNationalImmigrationCount;
 	private int personPotentialNationalImmigrationCount;
@@ -85,13 +85,13 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 	public void addChildLeftParentsDestination() {
 		leftParentsDestinationCount++;
 	}
-	public void addCohabitationOrigin(byte householdMemberCount) {
-		householdCohabitationOriginCount++;
-		personCohabitationOriginCount += householdMemberCount;
+	public void addMovingTogetherOrigin(byte householdMemberCount) {
+		householdMovingTogetherOriginCount++;
+		personMovingTogetherOriginCount += householdMemberCount;
 	}
-	public void addCohabitationDestination(byte householdMemberCount) {
-		householdCohabitationDestinationCount++;
-		personCohabitationDestinationCount += householdMemberCount;
+	public void addMovingTogetherDestination(byte householdMemberCount) {
+		householdMovingTogetherDestinationCount++;
+		personMovingTogetherDestinationCount += householdMemberCount;
 	}
 	public void addPotentialImmigrationCounters(int householdCount, int householdMemberCount, MigrationRealm migrationRealm) {
 		switch (migrationRealm) {
@@ -116,8 +116,8 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 			"PersFromLocal" + delimiter + "PersFromCountry" + delimiter + "PersFromIntl" + delimiter +
 			"HHtoLocal" + delimiter + "HHtoCountry" + delimiter + "HHtoIntl" + delimiter +
 			"PersToLocal" + delimiter + "PersToCountry" + delimiter + "PersToIntl" + delimiter + "LeftParentsFrom" + delimiter +
-			"LeftParentsTo" + delimiter + "HHCohabitationFrom" + delimiter + "HHCohabitationTo" + delimiter + "PersCohabitationFrom" +
-			delimiter + "PersCohabitationTo" + delimiter + "PotentialHHfromCountry" + delimiter + "PotentialHHfromIntl" + delimiter +
+			"LeftParentsTo" + delimiter + "HHMoveTogetherFrom" + delimiter + "HHMoveTogetherTo" + delimiter + "PersMoveTogetherFrom" +
+			delimiter + "PersMoveTogetherTo" + delimiter + "PotentialHHfromCountry" + delimiter + "PotentialHHfromIntl" + delimiter +
 			"PotentialPersFromCountry" + delimiter + "PotentialPersFromIntl" + delimiter + "PotentialLeftParentsFrom";
 	}
 	@Override
@@ -126,8 +126,8 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 			personLocalImmigrationCount + delimiter + personNationalImmigrationCount + delimiter + personIntlImmigrationCount + delimiter +
 			householdLocalEmigrationCount + delimiter + householdNationalEmigrationCount + delimiter + householdIntlEmigrationCount + delimiter +
 			personLocalEmigrationCount + delimiter + personNationalEmigrationCount + delimiter + personIntlEmigrationCount + delimiter + leftParentsOriginCount + delimiter +
-			leftParentsDestinationCount + delimiter + householdCohabitationOriginCount + delimiter + personCohabitationOriginCount + delimiter + householdCohabitationDestinationCount +
-			delimiter + personCohabitationDestinationCount + delimiter + householdPotentialNationalImmigrationCount + delimiter + householdPotentialIntlImmigrationCount + delimiter +
+			leftParentsDestinationCount + delimiter + householdMovingTogetherOriginCount + delimiter + personMovingTogetherOriginCount + delimiter + householdMovingTogetherDestinationCount +
+			delimiter + personMovingTogetherDestinationCount + delimiter + householdPotentialNationalImmigrationCount + delimiter + householdPotentialIntlImmigrationCount + delimiter +
 			personPotentialNationalImmigrationCount + delimiter + personPotentialIntlImmigrationCount + delimiter + potentialLeftParentsOriginCount;
 	}
 

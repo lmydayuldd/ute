@@ -16,5 +16,5 @@ public interface MigrationObservable {
 	public void notifyEmigration(Integer srcSpatialUnitId, MigrationRealm migrationRealm);
 	public void notifyImmigration(Integer destSpatialUnitId, MigrationRealm migrationRealm);
 	public void notifyLeavingParents(Integer srcSpatialUnitId, Integer destSpatialUnitId);
-	public void notifyCohabitation(Integer srcSpatialUnitId, Integer destSpatialUnitId);
+	public void notifyMovingTogether(Integer srcSpatialUnitId, Integer destSpatialUnitId);
 }

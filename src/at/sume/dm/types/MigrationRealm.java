@@ -10,7 +10,7 @@ public enum MigrationRealm {
 	NATIONAL,
 	INTERNATIONAL,
 	LEAVING_PARENTS,
-	COHABITATION;
-	// TODO: LeavingParents and cohabitation don't really fit into a type "migration realm" - Probably it would be
+	MOVETOGETHER;
+	// TODO: LeavingParents and moving together don't really fit into a type "migration realm" - Probably it would be
 	// best to create another type for these two?
 }

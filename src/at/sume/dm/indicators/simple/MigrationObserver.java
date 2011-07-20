@@ -32,7 +32,7 @@ public interface MigrationObserver {
 	 * @param destSpatialUnitId
 	 * @param householdMemberCount
 	 */
-	public void addCohabitation(Integer srcSpatialUnitId, Integer destSpatialUnitId, byte householdMemberCount);
+	public void addMoveTogether(Integer srcSpatialUnitId, Integer destSpatialUnitId, byte householdMemberCount);
 	/**
 	 * Count one household that is emigrating from the model area
 	 * 

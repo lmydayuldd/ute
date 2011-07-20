@@ -21,13 +21,13 @@ import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
  * @author Alexander Remesch
  */
 public class MovingTogether {
-	private int numCohabitations;
+	private int numMovesTogether;
 	private int modelYear;
 	private DwellingsOnMarket dwellingsOnMarket;
 	private ArrayList<HouseholdRow> maleHouseholds, femaleHouseholds;
 	
-	public MovingTogether(int numCohabitations, int modelYear, DwellingsOnMarket dwellingsOnMarket) {
-		this.numCohabitations = numCohabitations;
+	public MovingTogether(int numMovesTogether, int modelYear, DwellingsOnMarket dwellingsOnMarket) {
+		this.numMovesTogether = numMovesTogether;
 		this.modelYear = modelYear;
 		this.dwellingsOnMarket = dwellingsOnMarket;
 		maleHouseholds = new ArrayList<HouseholdRow>();
@@ -35,7 +35,7 @@ public class MovingTogether {
 	}
 	/**
 	 * Add a household to the internal lists of male/female households if it is a single adult household
-	 * (= a candidate for cohabitation)
+	 * (= a candidate for moving together)
 	 * 
 	 * @param household
 	 */
@@ -53,7 +53,7 @@ public class MovingTogether {
 		}
 	}
 	/**
-	 * Join the given number of households from the potential candidates for cohabitation found earlier.
+	 * Join the given number of households from the potential candidates for moving together found earlier.
 	 * Choose the dwelling kept by comparison of residential satisfaction. Put the dwelling left on the
 	 * housing market.
 	 * 
@@ -61,9 +61,9 @@ public class MovingTogether {
 	 */
 	public int randomJoinHouseholds() {
 		int index = 0;
-		numCohabitations = Math.min(numCohabitations, maleHouseholds.size());
-		numCohabitations = Math.min(numCohabitations, femaleHouseholds.size());
-		for (int i = 0; i != numCohabitations; i++) {
+		numMovesTogether = Math.min(numMovesTogether, maleHouseholds.size());
+		numMovesTogether = Math.min(numMovesTogether, femaleHouseholds.size());
+		for (int i = 0; i != numMovesTogether; i++) {
 			index = (int) (Math.random() * maleHouseholds.size());
 			HouseholdRow maleHousehold = maleHouseholds.get(index);
 			maleHouseholds.remove(index);
@@ -94,6 +94,6 @@ public class MovingTogether {
 				assert maleHousehold.hasDwelling() == true : "New household has no dwelling!";
 			}
 		}
-		return numCohabitations;
+		return numMovesTogether;
 	}
 }

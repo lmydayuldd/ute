@@ -175,7 +175,7 @@ public class Common {
 	}
 
 	/**
-	 * @return the cohabitationRate
+	 * @return the movingTogetherRate
 	 */
 	public static byte getMovingTogetherRate() {
 		return movingTogetherRate;

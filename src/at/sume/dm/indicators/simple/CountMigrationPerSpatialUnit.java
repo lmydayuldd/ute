@@ -146,7 +146,7 @@ public class CountMigrationPerSpatialUnit implements MigrationObserver {
 		}
 	}
 	@Override
-	public void addCohabitation(Integer srcSpatialUnitId,
+	public void addMoveTogether(Integer srcSpatialUnitId,
 			Integer destSpatialUnitId, byte householdMemberCount) {
 		int pos = Collections.binarySearch(indicatorList, srcSpatialUnitId);
 		if (pos < 0) {
@@ -154,12 +154,12 @@ public class CountMigrationPerSpatialUnit implements MigrationObserver {
 			pos = (pos + 1) * -1;
 			MigrationPerSpatialUnitRow emigrationRow = new MigrationPerSpatialUnitRow();
 			emigrationRow.setSpatialUnidId(srcSpatialUnitId);
-			emigrationRow.addCohabitationOrigin(householdMemberCount);
+			emigrationRow.addMovingTogetherOrigin(householdMemberCount);
 			indicatorList.add(pos, emigrationRow);
 		} else {
 			// available at position pos
 			MigrationPerSpatialUnitRow emigrationRow = indicatorList.get(pos);
-			emigrationRow.addCohabitationOrigin(householdMemberCount);
+			emigrationRow.addMovingTogetherOrigin(householdMemberCount);
 			indicatorList.set(pos, emigrationRow);
 		}
 		pos = Collections.binarySearch(indicatorList, destSpatialUnitId);
@@ -168,12 +168,12 @@ public class CountMigrationPerSpatialUnit implements MigrationObserver {
 			pos = (pos + 1) * -1;
 			MigrationPerSpatialUnitRow emigrationRow = new MigrationPerSpatialUnitRow();
 			emigrationRow.setSpatialUnidId(destSpatialUnitId);
-			emigrationRow.addCohabitationDestination(householdMemberCount);
+			emigrationRow.addMovingTogetherDestination(householdMemberCount);
 			indicatorList.add(pos, emigrationRow);
 		} else {
 			// available at position pos
 			MigrationPerSpatialUnitRow emigrationRow = indicatorList.get(pos);
-			emigrationRow.addCohabitationDestination(householdMemberCount);
+			emigrationRow.addMovingTogetherDestination(householdMemberCount);
 			indicatorList.set(pos, emigrationRow);
 		}
 	}

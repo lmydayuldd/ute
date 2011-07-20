@@ -355,7 +355,7 @@ public class Main {
 					}
 				}
 				
-				// Add household for cohabitation processing
+				// Add household for moving together processing
 				movingTogether.addHousehold(household);
 				
 				// Add children leaving parents
@@ -489,7 +489,7 @@ public class Main {
 			// households moving together
 			int numMovingTogether = movingTogether.randomJoinHouseholds();
 			System.out.println(printInfo() + ": " + numMovingTogether + " of "+ movingTogetherCount + " projected household move-togethers/marriages took place");
-	        System.out.println(printInfo() + ": free dwellings after cohabitation: " + dwellingsOnMarket.getFreeDwellingsCount());
+	        System.out.println(printInfo() + ": free dwellings after moving together: " + dwellingsOnMarket.getFreeDwellingsCount());
 			
 			// Out-Migration: randomly remove households
 			int numOutMigrationInternational = sampleMigratingHouseholds.getOutMigrationInternational(modelYear) + sampleMigratingHouseholds.getOutMigrationNational(modelYear) - hhMovedAwayMemberCount;
