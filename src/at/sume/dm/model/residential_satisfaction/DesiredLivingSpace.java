@@ -41,7 +41,18 @@ public class DesiredLivingSpace extends ResidentialSatisfactionComponent {
 			}
 		}
 		assert currentLivingSpace >= 0 : "Current living space < 0 (" + currentLivingSpace + ")";
-		result = (short) Math.round(currentLivingSpace * 1000 / desiredLivingSpace);
+		// TODO: should the satisfaction with the living space go down again if the dwelling is much larger than desired?
+		if (currentLivingSpace != 0) {
+//			if (currentLivingSpace <= desiredLivingSpace) {
+				result = (short) Math.round(currentLivingSpace * 1000 / desiredLivingSpace);
+//			} else {
+//				// Satisfaction goes down again if the dwelling is too large
+//				// TODO: define region where the difference doesn't matter as sysparam
+//				result = (short) Math.round(desiredLivingSpace * 1000 / currentLivingSpace);
+//			}
+		} else {
+			result = 0;
+		}
 		if (result > 1000)
 			return 1000;
 		assert result >= 0 : "rsDesiredLivingSpace out of range (" + result + ")";
