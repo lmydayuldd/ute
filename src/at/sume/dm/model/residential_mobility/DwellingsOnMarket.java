@@ -292,6 +292,12 @@ public class DwellingsOnMarket {
 		}
 		return null;
 	}
+	
+	private long spatialUnitId;
+	private HouseholdRow household;
+	private boolean compareDwellingCosts;
+	private int modelYear;
+	private int currentDwellingIndex;
 	/**
 	 * Get the first available (free) dwelling that matches the given parameters
 	 * 
@@ -303,7 +309,43 @@ public class DwellingsOnMarket {
 	 */
 	public DwellingRow getFirstMatchingDwelling(long spatialUnitId, HouseholdRow household, boolean compareDwellingCosts, int modelYear) {
 		ArrayList<DwellingRow> allDwellingsPerArea = getDwellingsOnMarket(spatialUnitId);
-		for (DwellingRow dwelling : allDwellingsPerArea) {
+		
+		// save parameters for later use by getNextMatchingDwelling()
+		this.spatialUnitId = spatialUnitId;
+		this.household = household;
+		this.compareDwellingCosts = compareDwellingCosts;
+		this.modelYear = modelYear;
+		
+//		for (DwellingRow dwelling : allDwellingsPerArea) {
+		for (currentDwellingIndex = 0; currentDwellingIndex != allDwellingsPerArea.size(); currentDwellingIndex++) {
+			DwellingRow dwelling = allDwellingsPerArea.get(currentDwellingIndex);
+			if ((household.getAspirationRegionLivingSpaceMin() <= dwelling.getDwellingSize()) && 
+					(dwelling.getDwellingSize() <= household.getAspirationRegionLivingSpaceMax()) && 
+					((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= household.getAspirationRegionMaxCosts()) || (!compareDwellingCosts)) {
+				if (household.getCurrentResidentialSatisfaction() < household.calcResidentialSatisfaction(dwelling, modelYear)) {
+					return dwelling;
+				} else {
+					noDwellingFoundReason = NoDwellingFoundReason.NO_SATISFACTION;
+				}
+			}
+		}
+		if (noDwellingFoundReason == NoDwellingFoundReason.NO_REASON)
+			noDwellingFoundReason = NoDwellingFoundReason.NO_SUITABLE_DWELLING;
+		return null;
+	}
+	/**
+	 * Get the next available (free) dwelling that matches the parameters passed to a previous call to
+	 * getFirstMatchingDwelling()
+	 * 
+	 * @return The next available (free) dwelling that matches the given parameters
+	 */
+	public DwellingRow getNextMatchingDwelling() {
+		ArrayList<DwellingRow> allDwellingsPerArea = getDwellingsOnMarket(spatialUnitId);
+		if (currentDwellingIndex >= allDwellingsPerArea.size())
+			return null;
+//		assert currentDwellingIndex < allDwellingsPerArea.size() : "currentDwellingIndex (" + currentDwellingIndex + ") out of range (max = " + allDwellingsPerArea.size() + ")";
+		for (;currentDwellingIndex != allDwellingsPerArea.size(); currentDwellingIndex++) {
+			DwellingRow dwelling = allDwellingsPerArea.get(currentDwellingIndex);
 			if ((household.getAspirationRegionLivingSpaceMin() <= dwelling.getDwellingSize()) && 
 					(dwelling.getDwellingSize() <= household.getAspirationRegionLivingSpaceMax()) && 
 					((dwelling.getTotalYearlyDwellingCosts() / dwelling.getDwellingSize()) <= household.getAspirationRegionMaxCosts()) || (!compareDwellingCosts)) {

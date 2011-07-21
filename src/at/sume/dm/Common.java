@@ -27,6 +27,7 @@ public class Common {
 	private static int searchAreaSize;
 	private static int searchAreaSizeIncrement;
 	private static int dwellingsConsideredPerYear;
+//	private static int dwellingsConsideredPerCell;
 	private static int dwellingsOnMarketShare;
 	private static int alwaysLookForDwellings = 0;
 	private static short modelStartYear;
@@ -101,6 +102,14 @@ public class Common {
 		return dwellingsConsideredPerYear;
 	}
 
+//	/**
+//	 * 
+//	 * @return the dwellingsConsideredPerCell
+//	 */
+//	public static int getDwellingsConsideredPerCell() {
+//		return dwellingsConsideredPerCell;
+//	}
+	
 	/**
 	 * @return the dwellingsOnMarketShare
 	 */
@@ -278,6 +287,7 @@ public class Common {
 		residentialSatisfactionThreshold = Integer.parseInt(getSysParam("THR_ResSatisfaction"));
 		residentialSatisfactionThresholdMod = Integer.parseInt(getSysParam("ResidentialSatisfactionThreshMod"));
 		dwellingsConsideredPerYear = Integer.parseInt(getSysParam("HouseholdDwellingsConsideredPerYear"));
+//		dwellingsConsideredPerCell = Integer.parseInt(getSysParam("HouseholdDwellingsConsideredPerCell"));
 		dwellingsOnMarketShare = Integer.parseInt(getSysParam("DwellingsOnMarketShare"));
 		alwaysLookForDwellings = Integer.parseInt(getSysParam("AlwaysLookForDwellings"));
 		modelStartYear = Short.parseShort(getSysParam("ModelStartYear"));

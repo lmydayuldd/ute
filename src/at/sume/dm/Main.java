@@ -454,6 +454,23 @@ public class Main {
 									noDwellingFoundReason = dwellingsOnMarket.getNoDwellingFoundReason();
 								}
 							}
+//							int dwellingsConsideredPerCell = Common.getDwellingsConsideredPerCell();
+//							for (int i = 0; i != dwellingsConsideredPerCell; i++) {
+//								if (dwelling != null) {
+//									if (Common.getMovingProbability().occurs()) {
+//										break;
+//									} else {
+//										notMoving = true;
+//										dwelling = null;
+//										break;	// don't continue after moving probability check
+//									}
+//								} else {
+//									dwelling = dwellingsOnMarket.getNextMatchingDwelling();
+//									if (dwellingsOnMarket.getNoDwellingFoundReason() != NoDwellingFoundReason.NO_SUITABLE_DWELLING) {
+//										noDwellingFoundReason = dwellingsOnMarket.getNoDwellingFoundReason();
+//									}
+//								}
+//							}
 						}
 					}
 					household.clearResidentialSatisfactionEstimate();
