@@ -12,15 +12,23 @@ import at.sume.dm.entities.SpatialUnitRow;
  *
  */
 public enum ResidentialSatisfactionManager {
-	SOCIALPRESTIGE(new SocialPrestige(), ResidentialSatisfactionWeight.getInstance().getPrefSocialPrestige(), false),
-	COSTEFFECTIVENESS(new CostEffectiveness(), ResidentialSatisfactionWeight.getInstance().getPrefCosts(), true),
-	DESIREDLIVINGSPACE(new DesiredLivingSpace(), ResidentialSatisfactionWeight.getInstance().getPrefLivingSpace(), true),
-	ENVIRONMENTALAMENITIES(new EnvironmentalAmenities(), ResidentialSatisfactionWeight.getInstance().getPrefEnvAmen(), true),
-	UDPCENTRALITY(UDPCentrality.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefCentrality(), true),
-	UDPTRANSPORT(UDPPublicTransportAccessibility.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefTransportAccess(), true);
+	// TODO: Implement the Zucha-weights as class/scenario similar to ResidentialSatisfactionWeight (using Table _DM_RS_Component_Weight)
+	SOCIALPRESTIGE(new SocialPrestige(), ResidentialSatisfactionWeight.getInstance().getPrefSocialPrestige(), 408, false),
+	COSTEFFECTIVENESS(new CostEffectiveness(), ResidentialSatisfactionWeight.getInstance().getPrefCosts(), 93, true),
+	DESIREDLIVINGSPACE(new DesiredLivingSpace(), ResidentialSatisfactionWeight.getInstance().getPrefLivingSpace(), 90, true),
+	ENVIRONMENTALAMENITIES(new EnvironmentalAmenities(), ResidentialSatisfactionWeight.getInstance().getPrefEnvAmen(), 435, true),
+	UDPCENTRALITY(UDPCentrality.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefCentrality(), 294, true),
+	UDPTRANSPORT(UDPPublicTransportAccessibility.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefTransportAccess(), 294, true);
+//	SOCIALPRESTIGE(new SocialPrestige(), ResidentialSatisfactionWeight.getInstance().getPrefSocialPrestige(), false),
+//	COSTEFFECTIVENESS(new CostEffectiveness(), ResidentialSatisfactionWeight.getInstance().getPrefCosts(), true),
+//	DESIREDLIVINGSPACE(new DesiredLivingSpace(), ResidentialSatisfactionWeight.getInstance().getPrefLivingSpace(), true),
+//	ENVIRONMENTALAMENITIES(new EnvironmentalAmenities(), ResidentialSatisfactionWeight.getInstance().getPrefEnvAmen(), true),
+//	UDPCENTRALITY(UDPCentrality.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefCentrality(), true),
+//	UDPTRANSPORT(UDPPublicTransportAccessibility.getInstance(), ResidentialSatisfactionWeight.getInstance().getPrefTransportAccess(), true);
 
 	private ResidentialSatisfactionComponent component;
 	private ArrayList<Short> weightList;
+	private int componentWeight = 1;						// Weight according to Zucha, et al. 2005, p.50
 	private static short maxWeight = 4;
 	private boolean calcForFreeDwellingsAlwaysAvailable;
 	/**
@@ -42,6 +50,19 @@ public enum ResidentialSatisfactionManager {
 	ResidentialSatisfactionManager(ResidentialSatisfactionComponent component, ArrayList<Short> weightList, boolean calcForFreeDwellingsAlwaysAvailable) {
 		this.component = component;
 		this.weightList = weightList;
+		this.calcForFreeDwellingsAlwaysAvailable = calcForFreeDwellingsAlwaysAvailable;
+	}
+	/**
+	 * 
+	 * @param component
+	 * @param weightList
+	 * @param componentWeight
+	 * @param calcForFreeDwellingsAlwaysAvailable Calculate this part of residential satisfaction for spatial units where dwellings are not managed (= always available)
+	 */
+	ResidentialSatisfactionManager(ResidentialSatisfactionComponent component, ArrayList<Short> weightList, int componentWeight, boolean calcForFreeDwellingsAlwaysAvailable) {
+		this.component = component;
+		this.weightList = weightList;
+		this.componentWeight = componentWeight;
 		this.calcForFreeDwellingsAlwaysAvailable = calcForFreeDwellingsAlwaysAvailable;
 	}
 	/**
@@ -71,13 +92,13 @@ public enum ResidentialSatisfactionManager {
 	 */
 	public static short calcResidentialSatisfaction(ResidentialSatisfactionHouseholdProperties household, SpatialUnitRow spatialUnit, int modelYear) {
 		long rv = 0;
-		short weight = maxWeight;
+		int weight = maxWeight;
 		int weightSum = 0;
 		for (ResidentialSatisfactionManager rs : values()) {
 			if (!rs.calcForFreeDwellingsAlwaysAvailable && spatialUnit.isFreeDwellingsAlwaysAvailable())
 				continue;
 			if (rs.weightList != null)
-				weight = rs.weightList.get(household.getHouseholdType().getId() - 1);
+				weight = rs.weightList.get(household.getHouseholdType().getId() - 1) * rs.componentWeight;
 			if (weight == 0)
 				continue;
 			int value = rs.component.calc(household, spatialUnit, modelYear) * weight;
@@ -89,7 +110,7 @@ public enum ResidentialSatisfactionManager {
 			result = rv / weightSum;
 		else
 			return -1; // don't include household in any activity depending on residential satisfaction calculation
-		assert (result >= 0) && (result <= 32767) : "Residential satisfaction out of range (" + result + ")";
+		assert (result >= 0) && (result <= 1000) : "Residential satisfaction out of range (" + result + ")";
 		return (short) result;
 	}
 	/**
@@ -101,12 +122,12 @@ public enum ResidentialSatisfactionManager {
 	 */
 	public static short calcResidentialSatisfaction(ResidentialSatisfactionHouseholdProperties household, ResidentialSatisfactionDwellingProperties dwelling, int modelYear) {
 		long rv = 0;
-		short weight = maxWeight;
+		int weight = maxWeight;
 		int weightSum = 0;
 		for (ResidentialSatisfactionManager rs : values()) {
 			// isFreeDwellingsAlwaysAvailable() is ignored here since we always have a dwelling at this point
 			if (rs.weightList != null)
-				weight = rs.weightList.get(household.getHouseholdType().getId() - 1);
+				weight = rs.weightList.get(household.getHouseholdType().getId() - 1) * rs.componentWeight;
 			if (weight == 0)
 				continue;
 			int value = rs.component.calc(household, dwelling, modelYear) * weight;
@@ -118,7 +139,7 @@ public enum ResidentialSatisfactionManager {
 			result = rv / weightSum;
 		else
 			return -1; // don't include household in any activity depending on residential satisfaction calculation
-		assert (result >= 0) && (result <= 32767) : "Residential satisfaction out of range (" + result + ")";
+		assert (result >= 0) && (result <= 1000) : "Residential satisfaction out of range (" + result + ")";
 		return (short) result;
 	}
 	public ResidentialSatisfactionComponent getComponent() {
