@@ -48,6 +48,7 @@ public class Common {
 	private static byte deathAdjustment;
 	private static byte birthAdjustment;
 	private static byte immigrationIncomeModifier;
+	private static boolean demographyOnly;
 	
 	/**
 	 * @return the iniFilename
@@ -239,6 +240,10 @@ public class Common {
 		return immigrationIncomeModifier;
 	}
 
+	public static boolean isDemographyOnly() {
+		return demographyOnly;
+	}
+
 	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
@@ -320,6 +325,11 @@ public class Common {
 		birthAdjustment = Byte.parseByte(getSysParam("BirthProbabilityAdjustment"));
 		deathAdjustment = Byte.parseByte(getSysParam("DeathProbabilityAdjustment"));
 		immigrationIncomeModifier = Byte.parseByte(getSysParam("ImmigrationIncomeMod"));
+		if (Short.parseShort(getSysParam("DemographyOnly")) == 0) {
+			demographyOnly = false;
+		} else {
+			demographyOnly = true;
+		}
 	}
 	
 	/**

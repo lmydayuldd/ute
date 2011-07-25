@@ -249,6 +249,7 @@ public class Main {
 		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
 			// for breakpoints in a certain year
 			if (modelYear == 2012) {
+				@SuppressWarnings("unused")
 				int xy = 0;
 			}
 			
@@ -311,56 +312,58 @@ public class Main {
 					household.remove(dwellingsOnMarket);
 					continue;
 				}
-				
-				// Add household if it already made a moving decision previously
-				if (household.getMovingDecisionYear() != 0) {
-					potentialMovers.add(household);
-					continue;
-				}
-				
-				// for breakpoints
-				if ((household.getHouseholdType() == HouseholdType.LARGE_FAMILY) && (household.getSpatialunitId() == 91905)) {
-					int xy = 0;
-				}
-				
-				// Process household decisions
-				// (minimum income, minimum living space, calculation of residential satisfaction)
-//				householdDecisionManager.process(household);
-				// TODO: add to potential_movers if this is the result of householdDecisionManager
-
-				// Calculate residential mobility depending on previous decisions
-				// - set scenario for residential satisfaction weight to be used in ResidentialSatisfactionManager
-				ResidentialSatisfactionWeight.getInstance(scenario.getHouseholdPrefsScenario());
-				UDPCentrality.getInstance(Common.getSpatialUnitLevel());
-				UDPPublicTransportAccessibility.getInstance(Common.getSpatialUnitLevel());
-				// TODO: save residential satisfaction result for later use
-				short residential_satisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, modelYear);
-				assert (residential_satisfaction >= -1) && (residential_satisfaction <= 1000) : "residential satisfaction out of range (" + residential_satisfaction + ")";
-				if (residential_satisfaction != -1) {
-					household.setCurrentResidentialSatisfaction(residential_satisfaction);
-					if (residential_satisfaction + household.getResidentialSatisfactionThreshMod() < Common.getResidentialSatisfactionThreshold()) {
-						// add the household to a random position in the ArrayList
-						potentialMovers.add((int)(Math.random() * potentialMovers.size()), household);
-						if (household.getMovingDecisionYear() == 0) {
-							if (modelYear == modelStartYear) {
-								// In first model year, household may already have decided earlier
-								Random r = new Random();
-								int movingDecisionYear = Common.getMovingDecisionMin() + r.nextInt(modelYear - Common.getMovingDecisionMin() + 1);
-								household.setMovingDecisionYear((short) movingDecisionYear);
-							} else {
-								household.setMovingDecisionYear((short) modelYear);
-							}
-						}
-						// TODO: add potential mover to the indicators
+					
+				if (Common.isDemographyOnly() == false) {
+					// Add household if it already made a moving decision previously
+					if (household.getMovingDecisionYear() != 0) {
+						potentialMovers.add(household);
+						continue;
 					}
+					
+					// for breakpoints
+					if ((household.getHouseholdType() == HouseholdType.LARGE_FAMILY) && (household.getSpatialunitId() == 91905)) {
+						@SuppressWarnings("unused")
+						int xy = 0;
+					}
+					
+					// Process household decisions
+					// (minimum income, minimum living space, calculation of residential satisfaction)
+	//				householdDecisionManager.process(household);
+					// TODO: add to potential_movers if this is the result of householdDecisionManager
+	
+					// Calculate residential mobility depending on previous decisions
+					// - set scenario for residential satisfaction weight to be used in ResidentialSatisfactionManager
+					ResidentialSatisfactionWeight.getInstance(scenario.getHouseholdPrefsScenario());
+					UDPCentrality.getInstance(Common.getSpatialUnitLevel());
+					UDPPublicTransportAccessibility.getInstance(Common.getSpatialUnitLevel());
+					// TODO: save residential satisfaction result for later use
+					short residential_satisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(household, modelYear);
+					assert (residential_satisfaction >= -1) && (residential_satisfaction <= 1000) : "residential satisfaction out of range (" + residential_satisfaction + ")";
+					if (residential_satisfaction != -1) {
+						household.setCurrentResidentialSatisfaction(residential_satisfaction);
+						if (residential_satisfaction + household.getResidentialSatisfactionThreshMod() < Common.getResidentialSatisfactionThreshold()) {
+							// add the household to a random position in the ArrayList
+							potentialMovers.add((int)(Math.random() * potentialMovers.size()), household);
+							if (household.getMovingDecisionYear() == 0) {
+								if (modelYear == modelStartYear) {
+									// In first model year, household may already have decided earlier
+									Random r = new Random();
+									int movingDecisionYear = Common.getMovingDecisionMin() + r.nextInt(modelYear - Common.getMovingDecisionMin() + 1);
+									household.setMovingDecisionYear((short) movingDecisionYear);
+								} else {
+									household.setMovingDecisionYear((short) modelYear);
+								}
+							}
+							// TODO: add potential mover to the indicators
+						}
+					}
+					
+					// Add household for moving together processing
+					movingTogether.addHousehold(household);
+					
+					// Add children leaving parents
+					leavingParents.addHousehold(household);
 				}
-				
-				// Add household for moving together processing
-				movingTogether.addHousehold(household);
-				
-				// Add children leaving parents
-				leavingParents.addHousehold(household);
-				
 				j++;
 			}
 			// Update rent prices for each spatial unit from last years data (from the movers indicators)
@@ -390,6 +393,7 @@ public class Main {
 				}
 				// for breakpoints
 				if ((household.getHouseholdType() == HouseholdType.LARGE_FAMILY) && (household.getSpatialunitId() == 91905)) {
+					@SuppressWarnings("unused")
 					int xy = 0;
 				}
 				// 1) estimate the aspiration region: 
@@ -518,14 +522,22 @@ public class Main {
 			
 			// Immigrating households + Children moving out from home
 			System.out.println(printInfo() + ": generating immigrating households and new single households form children moving out of parents homes");
-			ArrayList<HouseholdRow> childrenHouseholds = leavingParents.getNewSingleHouseholds();
+			ArrayList<HouseholdRow> childrenHouseholds = null;
+			if (Common.isDemographyOnly() == false) {
+				childrenHouseholds = leavingParents.getNewSingleHouseholds();
+			}
 			ArrayList<HouseholdRow> immigratingHouseholdsNational = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.NATIONAL);
 			ArrayList<HouseholdRow> immigratingHouseholdsIntl = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.INTERNATIONAL);
 
 			int dwellingExcessShare = Common.getDwellingsOnMarketAutoAdjust();
 			if (dwellingExcessShare >= 0) {
 				// Auto-adjust dwellings if necessary
-				int dwellingsDemandCount = childrenHouseholds.size() + immigratingHouseholdsNational.size() + immigratingHouseholdsIntl.size();
+				int dwellingsDemandCount = 0;
+				if (Common.isDemographyOnly() == false) {
+					dwellingsDemandCount = childrenHouseholds.size() + immigratingHouseholdsNational.size() + immigratingHouseholdsIntl.size();
+				} else {
+					dwellingsDemandCount = immigratingHouseholdsNational.size() + immigratingHouseholdsIntl.size();
+				}
 				int dwellingsAvailableCount = dwellingsOnMarket.getFreeDwellingsCount();
 				int dwellingsExcessSupplyCount = (dwellingsDemandCount * (100 + dwellingExcessShare)) / 100;
 				System.out.println(printInfo() + ": number of dwellings needed for immigration + children leaving parents: " + dwellingsDemandCount);
@@ -541,8 +553,10 @@ public class Main {
 			}
 
 			// Now move the immigrating households + children leaving parents
-			forcedMoves(childrenHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.LEAVING_PARENTS, cheapestSpatialUnits);
-	        System.out.println(printInfo() + ": free dwellings after " + childrenHouseholds.size() + " children leaving parents homes: " + dwellingsOnMarket.getFreeDwellingsCount());
+			if (Common.isDemographyOnly() == false) {
+				forcedMoves(childrenHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.LEAVING_PARENTS, cheapestSpatialUnits);
+		        System.out.println(printInfo() + ": free dwellings after " + childrenHouseholds.size() + " children leaving parents homes: " + dwellingsOnMarket.getFreeDwellingsCount());
+			}
 			forcedMoves(immigratingHouseholdsNational, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL, cheapestSpatialUnits);
 	        System.out.println(printInfo() + ": free dwellings after " + immigratingHouseholdsNational.size() + " immigrating households (national): " + dwellingsOnMarket.getFreeDwellingsCount());
 			forcedMoves(immigratingHouseholdsIntl, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.INTERNATIONAL, cheapestSpatialUnits);
@@ -551,7 +565,9 @@ public class Main {
 			//if (modelYear == modelEndYear - 1)
 			outputFreeDwellings(modelYear, "after immigration");
 			outputMigrationCount(modelYear);
-			outputDemographicMovementCount(modelYear);
+			if (Common.isDemographyOnly() == false) {
+				outputDemographicMovementCount(modelYear);
+			}
 			outputMigrationDetailsCount(modelYear);
 			
 			// Aging of persons (household-wise)
