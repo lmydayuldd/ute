@@ -137,7 +137,7 @@ public class SampleDbHouseholds {
 				// Larger households still available
 				Random r = new Random();
 				memberCount = avgHouseholdSize;
-				for (int i = avgHouseholdSize; i != surplusPersonCount; i++) {
+				for (int i = 0; i != surplusPersonCount; i++) {
 					memberCount += r.nextInt(2);
 				}
 				if (memberCount > avgHouseholdSize + surplusPersonCount) {

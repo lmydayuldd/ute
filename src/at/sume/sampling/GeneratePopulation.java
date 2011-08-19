@@ -8,6 +8,8 @@ import javax.swing.JOptionPane;
 
 import net.remesch.db.Database;
 import at.sume.dm.Common;
+import at.sume.dm.entities.SpatialUnitLevel;
+import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
 import at.sume.sampling.entities.DbHouseholdRow;
 import at.sume.sampling.entities.DbPersonRow;
@@ -103,6 +105,8 @@ public class GeneratePopulation {
 		Database db = Common.openDatabase();
 		db.con.setAutoCommit(false);
 		Common.init();
+		@SuppressWarnings("unused")
+		RentPerSpatialUnit rentPerSpatialUnit = RentPerSpatialUnit.getInstance("", SpatialUnitLevel.ZB);
 
 		// TODO: put into a table-class, method truncate
 		db.execute("delete * from _DM_Households");

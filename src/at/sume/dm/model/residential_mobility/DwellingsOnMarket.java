@@ -12,6 +12,7 @@ import at.sume.dm.Common;
 import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.Dwellings;
 import at.sume.dm.entities.HouseholdRow;
+import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.types.LivingSpaceGroup6;
 
@@ -73,7 +74,8 @@ public class DwellingsOnMarket {
 		this(dwellings, spatialUnits, Common.getDwellingsOnMarketShare());
 	}
 	private int spatialUnitArrayPosition(long spatialUnitId) {
-		return spatialUnits.indexOf(spatialUnits.lookup(spatialUnitId));
+		SpatialUnitRow su = spatialUnits.lookup(spatialUnitId);
+		return spatialUnits.indexOf(su);
 	}
 	public ArrayList<DwellingRow> getDwellingsOnMarket(long spatialUnitId) {
 		return dwellingsOnMarketList[spatialUnitArrayPosition(spatialUnitId)];
@@ -229,7 +231,9 @@ public class DwellingsOnMarket {
 	 * @return
 	 */
 	public DwellingRow getFirstMatchingDwelling(long spatialUnitId, byte livingSpaceGroup6Id) {
-		ArrayList<DwellingRow> dwellings =  dwellingsOnMarketList[spatialUnitArrayPosition(spatialUnitId)];
+		int index = spatialUnitArrayPosition(spatialUnitId);
+		assert index != -1 : "Spatial unit id " + spatialUnitId + " not found - maybe the model is running in the wrong spatial resolution (SGT instead of ZB)?";
+		ArrayList<DwellingRow> dwellings =  dwellingsOnMarketList[index];
 		for (DwellingRow dwelling : dwellings) {
 			if (dwelling.getLivingSpaceGroup6Id() == livingSpaceGroup6Id)
 				return dwelling;
