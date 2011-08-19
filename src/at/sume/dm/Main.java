@@ -565,9 +565,7 @@ public class Main {
 			//if (modelYear == modelEndYear - 1)
 			outputFreeDwellings(modelYear, "after immigration");
 			outputMigrationCount(modelYear);
-			if (Common.isDemographyOnly() == false) {
-				outputDemographicMovementCount(modelYear);
-			}
+			outputDemographicMovementCount(modelYear);
 			outputMigrationDetailsCount(modelYear);
 			
 			// Aging of persons (household-wise)
