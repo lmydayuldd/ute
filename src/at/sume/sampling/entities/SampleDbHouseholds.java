@@ -135,7 +135,7 @@ public class SampleDbHouseholds {
 				// Larger households still available
 				Random r = new Random();
 				memberCount = avgHouseholdSize;
-				for (int i = householdsPerSpatialUnit.householdSize; i != surplusPersonCount; i++) {
+				for (int i = avgHouseholdSize; i != surplusPersonCount; i++) {
 					memberCount += r.nextInt(2);
 				}
 				if (memberCount > avgHouseholdSize + surplusPersonCount) {
@@ -144,9 +144,8 @@ public class SampleDbHouseholds {
 			}
 			householdsPerSpatialUnit.personCount -= memberCount;
 		}
-		// TODO: the upper limit of 255 members will be a problem for institutional households!
-		assert (memberCount > 0) && (memberCount <= 255) : "Household member count out of range (" + memberCount + ")";
-		result.setHouseholdSize((byte)memberCount);
+		assert (memberCount > 0) && (memberCount <= 1000) : "Household member count out of range (" + memberCount + ")";
+		result.setHouseholdSize((short)memberCount);
 		int yearlyHouseholdIncome = 0;
 		for (byte j = 0; j != memberCount; j++) {
 			DbPersonRow person = sampleDbPersons.randomSample(result.getHouseholdId(), (j == 0));
