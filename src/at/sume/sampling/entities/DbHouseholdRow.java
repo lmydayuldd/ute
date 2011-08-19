@@ -15,7 +15,7 @@ public class DbHouseholdRow {
 	private short livingSpace;		// actually part of the dwelling but sampled here
 	private int costOfResidence;	// sample this here, put last cost of residence in DwellingRow to be able
 									// to calculate costs of dwelling for the next household
-	private short residentialSatisfactionThreshMod;
+//	private short residentialSatisfactionThreshMod;
 	private short householdSize;		// only for ease-of-use, not really needed
 	private byte householdType;
 	
@@ -89,20 +89,20 @@ public class DbHouseholdRow {
 		this.costOfResidence = costOfResidence;
 	}
 
-	/**
-	 * @return the residentialSatisfactionThreshMod
-	 */
-	public short getResidentialSatisfactionThreshMod() {
-		return residentialSatisfactionThreshMod;
-	}
-
-	/**
-	 * @param residentialSatisfactionThreshMod the residentialSatisfactionThreshMod to set
-	 */
-	public void setResidentialSatisfactionThreshMod(
-			short residentialSatisfactionThreshMod) {
-		this.residentialSatisfactionThreshMod = residentialSatisfactionThreshMod;
-	}
+//	/**
+//	 * @return the residentialSatisfactionThreshMod
+//	 */
+//	public short getResidentialSatisfactionThreshMod() {
+//		return residentialSatisfactionThreshMod;
+//	}
+//
+//	/**
+//	 * @param residentialSatisfactionThreshMod the residentialSatisfactionThreshMod to set
+//	 */
+//	public void setResidentialSatisfactionThreshMod(
+//			short residentialSatisfactionThreshMod) {
+//		this.residentialSatisfactionThreshMod = residentialSatisfactionThreshMod;
+//	}
 
 	/**
 	 * @return the householdSize

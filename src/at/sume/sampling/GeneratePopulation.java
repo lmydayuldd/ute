@@ -35,7 +35,7 @@ public class GeneratePopulation {
 	 */
 	private static void GenerateHouseholds(Database db) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		byte householdSizeGroups = Byte.parseByte(Common.getSysParam("HouseholdSizeGroups"));
-		int residentialSatisfactionThresholdRange = Integer.parseInt(Common.getSysParamDataPreparation("THR_ResSatisfactionRange"));
+//		int residentialSatisfactionThresholdRange = Integer.parseInt(Common.getSysParamDataPreparation("THR_ResSatisfactionRange"));
 		byte dwellingsOnMarketShare = Byte.parseByte(Common.getSysParamDataPreparation("DwellingsOnMarketShare"));
 		int sampleInstitutionalHouseholds = Integer.parseInt(Common.getSysParamDataPreparation("SampleInstitutionalHouseholds"));
 		
@@ -47,8 +47,8 @@ public class GeneratePopulation {
 			sampleHouseholds = new SampleHouseholds(db);
 		}
 		SampleDbHouseholds sampleDbHouseholds = new SampleDbHouseholds(db, householdSizeGroups, dwellingsOnMarketShare);
-		if (residentialSatisfactionThresholdRange != 0)
-			sampleDbHouseholds.setResidentialSatisfactionThresholdRange(residentialSatisfactionThresholdRange);
+//		if (residentialSatisfactionThresholdRange != 0)
+//			sampleDbHouseholds.setResidentialSatisfactionThresholdRange(residentialSatisfactionThresholdRange);
 		
 		// Sample households including persons
 		for (HouseholdsPerSpatialUnit householdsPerSpatialUnit : sampleHouseholds) {
@@ -73,7 +73,7 @@ public class GeneratePopulation {
 			personCount += persons.size();
 			if (households.size() > 0) {
 //				System.out.println(Common.printInfo() + ": writing " + households.size() + " households and " + persons.size() + " persons to the db");
-				db.insertFieldMap(households, "select HouseholdId, HouseholdSize, SpatialUnitId, DwellingId, LivingSpace, CostOfResidence, ResidentialSatisfactionThreshMod from _DM_Households", true);
+				db.insertFieldMap(households, "select HouseholdId, HouseholdSize, SpatialUnitId, DwellingId, LivingSpace, CostOfResidence, HouseholdType from _DM_Households", true);
 				db.con.commit();
 				db.insertFieldMap(persons, "select PersonId, HouseholdId, Sex, Age, YearlyIncome from _DM_Persons", true);
 				db.con.commit();

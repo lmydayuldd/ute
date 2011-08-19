@@ -34,7 +34,7 @@ public class SampleDbHouseholds {
 	private SpatialUnits spatialUnits;
 	private Dwellings dwellings;
 	private DwellingsOnMarket dwellingsOnMarket;
-	private int residentialSatisfactionThresholdRange = 100;
+//	private int residentialSatisfactionThresholdRange = 100;
 	private byte householdSizeGroups;
 	private SampleHouseholdCostOfResidence householdCostOfResidence;
 	
@@ -91,15 +91,15 @@ public class SampleDbHouseholds {
 		sampleDbPersons.setSpatialUnit(spatialUnitId);
 		sampleLivingSpace = new SampleHouseholdLivingSpace(db, spatialUnitId, householdSizeGroups);
 	}
-	/**
-	 * Set the range for the sampling of the residential satisfaction threshold modifier that 
-	 * attempts to include individual deviations and unknown variance in the residential satisfaction
-	 * calculation
-	 * @param residentialSatisfactionThresholdRange
-	 */
-	public void setResidentialSatisfactionThresholdRange(int residentialSatisfactionThresholdRange) {
-		this.residentialSatisfactionThresholdRange = residentialSatisfactionThresholdRange;
-	}
+//	/**
+//	 * Set the range for the sampling of the residential satisfaction threshold modifier that 
+//	 * attempts to include individual deviations and unknown variance in the residential satisfaction
+//	 * calculation
+//	 * @param residentialSatisfactionThresholdRange
+//	 */
+//	public void setResidentialSatisfactionThresholdRange(int residentialSatisfactionThresholdRange) {
+//		this.residentialSatisfactionThresholdRange = residentialSatisfactionThresholdRange;
+//	}
 	/**
 	 * Return a sampled household (excluding the household members)
 	 * @param householdsPerSpatialUnit
@@ -113,6 +113,7 @@ public class SampleDbHouseholds {
 		result.setHouseholdId(householdNr.getNext());
 		// Household spatial unit
 		result.setSpatialUnitId(spatialUnitId);
+		result.setHouseholdType((byte)1); // mark as private household
 		// Persons: age, sex & income
 		members = new ArrayList<DbPersonRow>();
 		int memberCount = 1;
@@ -124,6 +125,7 @@ public class SampleDbHouseholds {
 			int avgHouseholdSize = householdSizeGroups;
 			if (householdsPerSpatialUnit.householdSize > householdSizeGroups) {
 				// sample an institutional household (indicated by a special value for household size - currently = 10)
+				result.setHouseholdType((byte) 2); // mark as institutional household
 				avgHouseholdSize = householdsPerSpatialUnit.personCount / ((householdsPerSpatialUnit.householdCount - alreadySampledHouseholdsCount));
 			}
 //			int surplusPersonCount = (householdsPerSpatialUnit.personCount) % ((householdsPerSpatialUnit.householdCount - alreadySampledHouseholdsCount) * householdsPerSpatialUnit.householdSize);
@@ -175,8 +177,8 @@ public class SampleDbHouseholds {
 		result.setLivingSpace(livingSpace);
 		dwellingsOnMarket.removeDwellingFromMarket(dwelling);
 		// Residential satisfaction threshold modifier
-		Random r = new Random();
-		result.setResidentialSatisfactionThreshMod((short) Math.round(r.nextGaussian() * residentialSatisfactionThresholdRange));
+//		Random r = new Random();
+//		result.setResidentialSatisfactionThreshMod((short) Math.round(r.nextGaussian() * residentialSatisfactionThresholdRange));
 		// Cost of residence
 		result.setCostOfResidence(householdCostOfResidence.randomSample(yearlyHouseholdIncome) * result.getLivingSpace() / 100);
 		
