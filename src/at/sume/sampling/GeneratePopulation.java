@@ -37,9 +37,15 @@ public class GeneratePopulation {
 		byte householdSizeGroups = Byte.parseByte(Common.getSysParam("HouseholdSizeGroups"));
 		int residentialSatisfactionThresholdRange = Integer.parseInt(Common.getSysParamDataPreparation("THR_ResSatisfactionRange"));
 		byte dwellingsOnMarketShare = Byte.parseByte(Common.getSysParamDataPreparation("DwellingsOnMarketShare"));
+		int sampleInstitutionalHouseholds = Integer.parseInt(Common.getSysParamDataPreparation("SampleInstitutionalHouseholds"));
 		
 //		SampleHouseholds sampleHouseholds = new SampleHouseholds(db, "SpatialUnitId = 91101 or SpatialUnitId = 91001");
-		SampleHouseholds sampleHouseholds = new SampleHouseholds(db);
+		SampleHouseholds sampleHouseholds = null;
+		if (sampleInstitutionalHouseholds == 0) {
+			sampleHouseholds = new SampleHouseholds(db, "HouseholdSize <= " + householdSizeGroups);
+		} else {
+			sampleHouseholds = new SampleHouseholds(db);
+		}
 		SampleDbHouseholds sampleDbHouseholds = new SampleDbHouseholds(db, householdSizeGroups, dwellingsOnMarketShare);
 		if (residentialSatisfactionThresholdRange != 0)
 			sampleDbHouseholds.setResidentialSatisfactionThresholdRange(residentialSatisfactionThresholdRange);
