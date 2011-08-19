@@ -149,7 +149,7 @@ public class SampleDbHouseholds {
 		assert (memberCount > 0) && (memberCount <= 1000) : "Household member count out of range (" + memberCount + ")";
 		result.setHouseholdSize((short)memberCount);
 		int yearlyHouseholdIncome = 0;
-		for (byte j = 0; j != memberCount; j++) {
+		for (short j = 0; j != memberCount; j++) {
 			DbPersonRow person = sampleDbPersons.randomSample(result.getHouseholdId(), (j == 0));
 			members.add(person);
 			yearlyHouseholdIncome += person.getYearlyIncome();
