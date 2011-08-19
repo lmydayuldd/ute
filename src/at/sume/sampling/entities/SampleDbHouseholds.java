@@ -102,7 +102,8 @@ public class SampleDbHouseholds {
 	}
 	/**
 	 * Return a sampled household (excluding the household members)
-	 * @param householdSize
+	 * @param householdsPerSpatialUnit
+	 * @param alreadySampledHouseholdsCount Number of households that were already sampled and therefore reduce the number of newly generated households
 	 * @return
 	 * @throws SQLException
 	 */
@@ -119,25 +120,31 @@ public class SampleDbHouseholds {
 			// sample given household size
 			memberCount = householdsPerSpatialUnit.householdSize;
 		} else if (householdsPerSpatialUnit.householdSize >= householdSizeGroups) {
-			// sample a household size that might be larger or an institutional household
-			int surplusPersonCount = householdsPerSpatialUnit.personCount % ((householdsPerSpatialUnit.householdCount - alreadySampledHouseholdsCount) * householdsPerSpatialUnit.householdSize);
-			if (surplusPersonCount <= 0) {
+			// sample a potentially larger household (>= householdSizeGroups members) or an institutional household
+			int avgHouseholdSize = householdSizeGroups;
+			if (householdsPerSpatialUnit.householdSize > householdSizeGroups) {
+				// sample an institutional household (indicated by a special value for household size - currently = 10)
+				avgHouseholdSize = householdsPerSpatialUnit.personCount / ((householdsPerSpatialUnit.householdCount - alreadySampledHouseholdsCount));
+			}
+//			int surplusPersonCount = (householdsPerSpatialUnit.personCount) % ((householdsPerSpatialUnit.householdCount - alreadySampledHouseholdsCount) * householdsPerSpatialUnit.householdSize);
+			int surplusPersonCount = householdsPerSpatialUnit.personCount % avgHouseholdSize;
+			if (surplusPersonCount == 0) {
 				// No households larger than householdSizeGroups persons left
-				memberCount = householdsPerSpatialUnit.householdSize;
+				memberCount = avgHouseholdSize;
 			} else {
 				// Larger households still available
 				Random r = new Random();
-				memberCount = householdsPerSpatialUnit.householdSize;
-				// TODO: maximum number of household members: 10 - put into system parameters
-				for (int i = householdsPerSpatialUnit.householdSize; i != 11; i++) {
+				memberCount = avgHouseholdSize;
+				for (int i = householdsPerSpatialUnit.householdSize; i != surplusPersonCount; i++) {
 					memberCount += r.nextInt(2);
 				}
-				if (memberCount > surplusPersonCount) {
-					memberCount = surplusPersonCount;
+				if (memberCount > avgHouseholdSize + surplusPersonCount) {
+					memberCount = avgHouseholdSize + surplusPersonCount;
 				}
 			}
 			householdsPerSpatialUnit.personCount -= memberCount;
 		}
+		// TODO: the upper limit of 255 members will be a problem for institutional households!
 		assert (memberCount > 0) && (memberCount <= 255) : "Household member count out of range (" + memberCount + ")";
 		result.setHouseholdSize((byte)memberCount);
 		int yearlyHouseholdIncome = 0;
