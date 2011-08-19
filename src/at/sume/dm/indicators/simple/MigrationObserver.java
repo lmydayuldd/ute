@@ -17,7 +17,7 @@ public interface MigrationObserver {
 	 * @param destSpatialUnitId Spatial unit the household immigrates to
 	 * @param householdMemberCount Number of household members
 	 */
-	public void addLocalMigration(Integer srcSpatialUnitId, Integer destSpatialUnitId, byte householdMemberCount);
+	public void addLocalMigration(Integer srcSpatialUnitId, Integer destSpatialUnitId, short householdMemberCount);
 	/**
 	 * Count one newly founded household by a child leaving her/his parents
 	 * 
@@ -32,7 +32,7 @@ public interface MigrationObserver {
 	 * @param destSpatialUnitId
 	 * @param householdMemberCount
 	 */
-	public void addMoveTogether(Integer srcSpatialUnitId, Integer destSpatialUnitId, byte householdMemberCount);
+	public void addMoveTogether(Integer srcSpatialUnitId, Integer destSpatialUnitId, short householdMemberCount);
 	/**
 	 * Count one household that is emigrating from the model area
 	 * 
@@ -40,7 +40,7 @@ public interface MigrationObserver {
 	 * @param householdMemberCount Number of household members
 	 * @param migrationRealm Specifies whether the household moves within the model area, to another place within the same country or to another country
 	 */
-	public void addEmigration(Integer srcSpatialUnitId, byte householdMemberCount, MigrationRealm migrationRealm);
+	public void addEmigration(Integer srcSpatialUnitId, short householdMemberCount, MigrationRealm migrationRealm);
 	/**
 	 * Count one household that is immigrating to the model area
 	 * 
@@ -48,5 +48,5 @@ public interface MigrationObserver {
 	 * @param householdMemberCount Number of household members
 	 * @param migrationRealm Specifies whether the household moves within the model area, to another place within the same country or to another country
 	 */
-	public void addImmigration(Integer destSpatialUnitId, byte householdMemberCount, MigrationRealm migrationRealm);
+	public void addImmigration(Integer destSpatialUnitId, short householdMemberCount, MigrationRealm migrationRealm);
 }

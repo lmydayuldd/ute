@@ -59,7 +59,7 @@ public class CountMigrationPerSpatialUnit implements MigrationObserver {
 	 * @param householdMemberCount Number of household members
 	 */
 	@Override
-	public void addLocalMigration(Integer srcSpatialUnitId, Integer destSpatialUnitId, byte householdMemberCount) {
+	public void addLocalMigration(Integer srcSpatialUnitId, Integer destSpatialUnitId, short householdMemberCount) {
 		// Count the emigration of the household
 		addEmigration(srcSpatialUnitId, householdMemberCount, MigrationRealm.LOCAL);
 		// Count the immigration of the household
@@ -73,7 +73,7 @@ public class CountMigrationPerSpatialUnit implements MigrationObserver {
 	 * @param migrationRealm Specifies whether the household moves within the model area, to another place within the same country or to another country
 	 */
 	@Override
-	public void addEmigration(Integer srcSpatialUnitId, byte householdMemberCount, MigrationRealm migrationRealm) {
+	public void addEmigration(Integer srcSpatialUnitId, short householdMemberCount, MigrationRealm migrationRealm) {
 		int pos = Collections.binarySearch(indicatorList, srcSpatialUnitId);
 		if (pos < 0) {
 			// insert at position pos
@@ -97,7 +97,7 @@ public class CountMigrationPerSpatialUnit implements MigrationObserver {
 	 * @param migrationRealm Specifies whether the household moves within the model area, to another place within the same country or to another country
 	 */
 	@Override
-	public void addImmigration(Integer destSpatialUnitId, byte householdMemberCount, MigrationRealm migrationRealm) {
+	public void addImmigration(Integer destSpatialUnitId, short householdMemberCount, MigrationRealm migrationRealm) {
 		int pos = Collections.binarySearch(indicatorList, destSpatialUnitId);
 		if (pos < 0) {
 			// insert at position pos
@@ -147,7 +147,7 @@ public class CountMigrationPerSpatialUnit implements MigrationObserver {
 	}
 	@Override
 	public void addMoveTogether(Integer srcSpatialUnitId,
-			Integer destSpatialUnitId, byte householdMemberCount) {
+			Integer destSpatialUnitId, short householdMemberCount) {
 		int pos = Collections.binarySearch(indicatorList, srcSpatialUnitId);
 		if (pos < 0) {
 			// insert at position pos

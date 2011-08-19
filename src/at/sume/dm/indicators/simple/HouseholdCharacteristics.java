@@ -11,5 +11,5 @@ import at.sume.dm.types.HouseholdType;
  */
 public interface HouseholdCharacteristics {
 	public HouseholdType getHouseholdType();
-	public byte getHouseholdSize();
+	public short getHouseholdSize();
 }

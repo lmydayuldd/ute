@@ -16,7 +16,7 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 	private byte sex;
 	private byte ageGroupId;
 	private boolean livingWithParents;
-	private byte householdSize6;
+	private short householdSize6;
 	private int personCount;
 	
 	/**
@@ -92,14 +92,14 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 	/**
 	 * @return the householdSize6
 	 */
-	public byte getHouseholdSize6() {
+	public short getHouseholdSize6() {
 		return householdSize6;
 	}
 
 	/**
 	 * @param householdSize6 the householdSize6 to set
 	 */
-	public void setHouseholdSize6(byte householdSize6) {
+	public void setHouseholdSize6(short householdSize6) {
 		this.householdSize6 = householdSize6;
 	}
 
@@ -149,7 +149,7 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 		if (result != 0) return(result);
 		result = ((Boolean)livingWithParents).compareTo(o.livingWithParents);
 		if (result != 0) return(result);
-		result = ((Byte)householdSize6).compareTo(o.householdSize6);
+		result = ((Short)householdSize6).compareTo(o.householdSize6);
 		if (result != 0) return(result);
 		return 0;
 	}

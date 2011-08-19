@@ -25,7 +25,7 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 	@Override
 	public void add(HouseholdRow household) {
 		for (PersonRow person : household.getMembers()) {
-			byte householdSize6 = person.getHousehold().getHouseholdSize();
+			short householdSize6 = person.getHousehold().getHouseholdSize();
 			if (householdSize6 > 6) householdSize6 = 6;
 			int pos = lookupIndicator(household.getSpatialunitId(), IncomeGroup.getIncomeGroupId(person.getYearlyIncome()), person.getSex(), 
 					AgeGroup.getAgeGroupId(person.getAge()), person.isLivingWithParents(), householdSize6);
@@ -60,7 +60,7 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 		indicatorList.clear();
 	}
 	
-	private int lookupIndicator(int spatialUnitId, byte incomeGroupId, byte sex, byte ageGroupId, boolean livingWithParents, byte householdSize6) {
+	private int lookupIndicator(int spatialUnitId, byte incomeGroupId, byte sex, byte ageGroupId, boolean livingWithParents, short householdSize6) {
 		AggregatedPersonRow lookup = new AggregatedPersonRow();
 		lookup.setSpatialUnitId(spatialUnitId);
 		lookup.setIncomeGroupId(incomeGroupId);

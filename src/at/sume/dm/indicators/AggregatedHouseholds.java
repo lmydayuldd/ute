@@ -55,7 +55,7 @@ public class AggregatedHouseholds implements Indicator<HouseholdRow> {
 		indicatorList.clear();
 	}
 
-	private int lookupIndicator(int spatialUnitId, byte incomeGroupId, byte livingSpaceGroupId, byte householdSize, HouseholdType householdType) {
+	private int lookupIndicator(int spatialUnitId, byte incomeGroupId, byte livingSpaceGroupId, short householdSize, HouseholdType householdType) {
 		AggregatedHouseholdRow lookup = new AggregatedHouseholdRow();
 		lookup.setSpatialUnitId(spatialUnitId);
 		lookup.setIncomeGroupId(incomeGroupId);

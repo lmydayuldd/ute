@@ -10,7 +10,7 @@ package at.sume.dm.demography;
  */
 public class FertilityProbabilityRow implements Comparable<FertilityProbabilityRow> {
 	private byte ageGroupId;
-	private byte householdSize;
+	private short householdSize;
 	private double probabilityBirth;
 	
 	/**
@@ -30,14 +30,14 @@ public class FertilityProbabilityRow implements Comparable<FertilityProbabilityR
 	/**
 	 * @param householdSize the householdSize to set
 	 */
-	public void setHouseholdSize(byte householdSize) {
+	public void setHouseholdSize(short householdSize) {
 		this.householdSize = householdSize;
 	}
 
 	/**
 	 * @return the householdSize
 	 */
-	public byte getHouseholdSize() {
+	public short getHouseholdSize() {
 		return householdSize;
 	}
 
@@ -89,7 +89,7 @@ public class FertilityProbabilityRow implements Comparable<FertilityProbabilityR
 	public int compareTo(FertilityProbabilityRow o) {
 		int result = ((Byte)ageGroupId).compareTo(o.ageGroupId);
 		if (result == 0) {
-			return ((Byte)householdSize).compareTo(o.householdSize);
+			return ((Short)householdSize).compareTo(o.householdSize);
 		}
 		return result;
 	}

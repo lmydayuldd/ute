@@ -15,7 +15,7 @@ public class AggregatedHouseholdRow implements Comparable<AggregatedHouseholdRow
 	private int spatialUnitId;
 	private byte incomeGroupId;
 	private byte livingSpaceGroupId;
-	private byte householdSize;
+	private short householdSize;
 	private HouseholdType householdType;
 	private int householdCount;
 	private int personCount;
@@ -72,7 +72,7 @@ public class AggregatedHouseholdRow implements Comparable<AggregatedHouseholdRow
 	/**
 	 * @param householdSize the householdSize to set
 	 */
-	public void setHouseholdSize(byte householdSize) {
+	public void setHouseholdSize(short householdSize) {
 		this.householdSize = householdSize;
 	}
 
@@ -139,7 +139,7 @@ public class AggregatedHouseholdRow implements Comparable<AggregatedHouseholdRow
 		if (result != 0) return(result);
 		result = ((Byte)livingSpaceGroupId).compareTo(o.livingSpaceGroupId);
 		if (result != 0) return(result);
-		result = ((Byte)householdSize).compareTo(o.householdSize);
+		result = ((Short)householdSize).compareTo(o.householdSize);
 		if (result != 0) return(result);
 		result = householdType.compareTo(o.householdType);
 		if (result != 0) return(result);

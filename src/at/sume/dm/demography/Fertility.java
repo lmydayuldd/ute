@@ -39,7 +39,7 @@ public class Fertility {
 	 * @param ageGroupId
 	 * @return
 	 */
-	public double probability(byte ageGroupId, byte householdSize) {
+	public double probability(byte ageGroupId, short householdSize) {
 		FertilityProbabilityRow lookup = new FertilityProbabilityRow();
 		lookup.setAgeGroupId(ageGroupId);
 		lookup.setHouseholdSize(householdSize);

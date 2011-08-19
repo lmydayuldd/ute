@@ -47,7 +47,7 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 	public int getSpatialUnitId() {
 		return spatialUnitId;
 	}
-	public void addImmigratingHousehold(byte householdMemberCount, MigrationRealm migrationRealm) {
+	public void addImmigratingHousehold(short householdMemberCount, MigrationRealm migrationRealm) {
 		switch (migrationRealm) {
 		case LOCAL:
 			householdLocalImmigrationCount++;
@@ -63,7 +63,7 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 			break;
 		}
 	}
-	public void addEmigratingHousehold(byte householdMemberCount, MigrationRealm migrationRealm) {
+	public void addEmigratingHousehold(short householdMemberCount, MigrationRealm migrationRealm) {
 		switch (migrationRealm) {
 		case LOCAL:
 			householdLocalEmigrationCount++;
@@ -85,11 +85,11 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 	public void addChildLeftParentsDestination() {
 		leftParentsDestinationCount++;
 	}
-	public void addMovingTogetherOrigin(byte householdMemberCount) {
+	public void addMovingTogetherOrigin(short householdMemberCount) {
 		householdMovingTogetherOriginCount++;
 		personMovingTogetherOriginCount += householdMemberCount;
 	}
-	public void addMovingTogetherDestination(byte householdMemberCount) {
+	public void addMovingTogetherDestination(short householdMemberCount) {
 		householdMovingTogetherDestinationCount++;
 		personMovingTogetherDestinationCount += householdMemberCount;
 	}

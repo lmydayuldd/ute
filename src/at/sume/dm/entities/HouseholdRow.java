@@ -192,8 +192,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	/**
 	 * @return the number of members in the household
 	 */
-	public byte getHouseholdSize() {
-		return (byte) members.size();
+	public short getHouseholdSize() {
+		return (short) members.size();
 	}
 
 //	/**
