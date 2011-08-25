@@ -123,13 +123,16 @@ public class SampleDbHouseholds {
 		} else if (householdsPerSpatialUnit.householdSize >= householdSizeGroups) {
 			// sample a potentially larger household (>= householdSizeGroups members) or an institutional household
 			int avgHouseholdSize = householdSizeGroups;
+			int surplusPersonCount = 0;
 			if (householdsPerSpatialUnit.householdSize > householdSizeGroups) {
 				// sample an institutional household (indicated by a special value for household size - currently = 10)
 				result.setHouseholdType((byte) 2); // mark as institutional household
 				avgHouseholdSize = householdsPerSpatialUnit.personCount / ((householdsPerSpatialUnit.householdCount - alreadySampledHouseholdsCount));
+				surplusPersonCount = householdsPerSpatialUnit.personCount % avgHouseholdSize;
+			} else {
+				// sample households with more members than householdSizeGroups
+				surplusPersonCount = (householdsPerSpatialUnit.personCount) % ((householdsPerSpatialUnit.householdCount - alreadySampledHouseholdsCount) * avgHouseholdSize);
 			}
-//			int surplusPersonCount = (householdsPerSpatialUnit.personCount) % ((householdsPerSpatialUnit.householdCount - alreadySampledHouseholdsCount) * householdsPerSpatialUnit.householdSize);
-			int surplusPersonCount = householdsPerSpatialUnit.personCount % avgHouseholdSize;
 			if (surplusPersonCount == 0) {
 				// No households larger than householdSizeGroups persons left
 				memberCount = avgHouseholdSize;
