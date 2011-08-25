@@ -47,6 +47,7 @@ public class Common {
 	private static byte deathAdjustment;
 	private static byte birthAdjustment;
 	private static byte immigrationIncomeModifier;
+	private static byte modelRuns;
 	
 	/**
 	 * @return the iniFilename
@@ -230,6 +231,10 @@ public class Common {
 		return immigrationIncomeModifier;
 	}
 
+	public static byte getModelRuns() {
+		return modelRuns;
+	}
+
 	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
@@ -302,13 +307,14 @@ public class Common {
 			outputFullData = true;
 		}
 		dwellingPriceRange = Byte.parseByte(getSysParam("DwellingPriceRange"));
-		cohabitationRate = Byte.parseByte(getSysParam("CohabitationRate"));
+		cohabitationRate = Byte.parseByte(getSysParam("MoveTogetherRate"));
 		leavingParentsProbability = new SingleProbability(Byte.parseByte(getSysParam("ProbabilityLeavingParents")), 100);
 		setChildrenMaxAge(Byte.parseByte(getSysParam("ChildrenMaxAge")));
 		dwellingsOnMarketAutoAdjust = Byte.parseByte(getSysParam("DwellingsOnMarketAutoAdjust"));
 		birthAdjustment = Byte.parseByte(getSysParam("BirthProbabilityAdjustment"));
 		deathAdjustment = Byte.parseByte(getSysParam("DeathProbabilityAdjustment"));
 		immigrationIncomeModifier = Byte.parseByte(getSysParam("ImmigrationIncomeMod"));
+		modelRuns = Byte.parseByte(getSysParam("ModelRuns"));
 	}
 	
 	/**

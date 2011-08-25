@@ -98,115 +98,119 @@ public class Main {
 		
         rentPerSpatialUnit = RentPerSpatialUnit.getInstance(scenario.getRentScenario(), Common.getSpatialUnitLevel());
 
-		// Load entity sets from database
-		try {
-			spatialUnits = new SpatialUnits(db, Common.getSpatialUnitLevel());
-	        System.out.println(printInfo() + ": loaded " + spatialUnits.size() + " spatial units");
-			dwellings = new Dwellings(db, Common.getSpatialUnitLevel());
-			dwellingSeq = new Sequence(dwellings.get(dwellings.size() - 1).getDwellingId() + 1);
-			DwellingRow.setDwellingIdSeq(dwellingSeq);
-	        System.out.println(printInfo() + ": loaded " + dwellings.size() + " dwellings");
-			households = new Households(db);
-	        System.out.println(printInfo() + ": loaded " + households.size() + " households");
-	        // TODO: sequence generation could be completely put into RecordSetRow class
-	        householdSeq = new Sequence(households.get(households.size() - 1).getHouseholdId() + 1);
-	        HouseholdRow.setHouseholdIdSeq(householdSeq);
-	        persons = new Persons(db);
-	        personSeq = new Sequence(persons.get(persons.size() - 1).getPersonId() + 1);
-	        PersonRow.setPersonIdSeq(personSeq);
-	        System.out.println(printInfo() + ": loaded " + persons.size() + " persons");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-
-		// Link dwellings to spatial units
-		dwellings.linkSpatialUnits(spatialUnits);
-        System.out.println(printInfo() + ": linked dwellings + spatial units");
-        // Link households to dwellings
-        households.linkDwellings(dwellings);
-        System.out.println(printInfo() + ": linked households + dwellings");
-        households.setSpatialunits(spatialUnits);
-        // Inter-link persons and households
-        persons.linkHouseholds(households);
-        System.out.println(printInfo() + ": linked households + persons");
-
-        // create migration counter + register with households (once!)
-        migrationPerSpatialUnit = new CountMigrationPerSpatialUnit();
-        migrationDetails = new CountMigrationDetails();
-        // TODO: find a way to make this registration out of the MigrationPerSpatialUnit() class directly (but only once!!!)
-        households.get(0).registerMigrationObserver(migrationPerSpatialUnit);
-        households.get(0).registerMigrationObserver(migrationDetails);
-        demographicMovementsPerSpatialUnit = new CountDemographicMovements();
-        persons.get(0).registerDemographyObserver(demographicMovementsPerSpatialUnit);
-        
-        // get all dwellings on the housing market
-        dwellingsOnMarket = new DwellingsOnMarket(dwellings, spatialUnits);
-        System.out.println(printInfo() + ": determined all available dwellings on the housing market (" + dwellingsOnMarket.getFreeDwellingsCount() + " out of " + dwellingsOnMarket.getGrossFreeDwellingTotal() + " total free dwellings)");
-        // determine household-types
-        households.determineHouseholdTypes(true);
-        System.out.println(printInfo() + ": determined all household types");
-
-        List<List<? extends Fileable>> fileableList = new ArrayList<List<? extends Fileable>>();
-        List<String> fileNameList = new ArrayList<String>();
-        if (Common.isOutputFullData()) {
-	        fileableList.add(households.getRowList());
-	        fileNameList.add("Households");
-	        fileableList.add(dwellings.getRowList());
-	        fileNameList.add("Dwellings");
-	        fileableList.add(persons.getRowList());
-	        fileNameList.add("Persons");
+        int modelRuns = Common.getModelRuns();
+        for (int modelRun = 0; modelRun != modelRuns; modelRun++) {
+            System.out.println(printInfo() + ": ======================= model run " + (modelRun + 1) + " of " + modelRuns);
+			// Load entity sets from database
+			try {
+				spatialUnits = new SpatialUnits(db, Common.getSpatialUnitLevel());
+		        System.out.println(printInfo() + ": loaded " + spatialUnits.size() + " spatial units");
+				dwellings = new Dwellings(db, Common.getSpatialUnitLevel());
+				dwellingSeq = new Sequence(dwellings.get(dwellings.size() - 1).getDwellingId() + 1);
+				DwellingRow.setDwellingIdSeq(dwellingSeq);
+		        System.out.println(printInfo() + ": loaded " + dwellings.size() + " dwellings");
+				households = new Households(db);
+		        System.out.println(printInfo() + ": loaded " + households.size() + " households");
+		        // TODO: sequence generation could be completely put into RecordSetRow class
+		        householdSeq = new Sequence(households.get(households.size() - 1).getHouseholdId() + 1);
+		        HouseholdRow.setHouseholdIdSeq(householdSeq);
+		        persons = new Persons(db);
+		        personSeq = new Sequence(persons.get(persons.size() - 1).getPersonId() + 1);
+		        PersonRow.setPersonIdSeq(personSeq);
+		        System.out.println(printInfo() + ": loaded " + persons.size() + " persons");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+	
+			// Link dwellings to spatial units
+			dwellings.linkSpatialUnits(spatialUnits);
+	        System.out.println(printInfo() + ": linked dwellings + spatial units");
+	        // Link households to dwellings
+	        households.linkDwellings(dwellings);
+	        System.out.println(printInfo() + ": linked households + dwellings");
+	        households.setSpatialunits(spatialUnits);
+	        // Inter-link persons and households
+	        persons.linkHouseholds(households);
+	        System.out.println(printInfo() + ": linked households + persons");
+	
+	        // create migration counter + register with households (once!)
+	        migrationPerSpatialUnit = new CountMigrationPerSpatialUnit();
+	        migrationDetails = new CountMigrationDetails();
+	        // TODO: find a way to make this registration out of the MigrationPerSpatialUnit() class directly (but only once!!!)
+	        households.get(0).registerMigrationObserver(migrationPerSpatialUnit);
+	        households.get(0).registerMigrationObserver(migrationDetails);
+	        demographicMovementsPerSpatialUnit = new CountDemographicMovements();
+	        persons.get(0).registerDemographyObserver(demographicMovementsPerSpatialUnit);
+	        
+	        // get all dwellings on the housing market
+	        dwellingsOnMarket = new DwellingsOnMarket(dwellings, spatialUnits);
+	        System.out.println(printInfo() + ": determined all available dwellings on the housing market (" + dwellingsOnMarket.getFreeDwellingsCount() + " out of " + dwellingsOnMarket.getGrossFreeDwellingTotal() + " total free dwellings)");
+	        // determine household-types
+	        households.determineHouseholdTypes(true);
+	        System.out.println(printInfo() + ": determined all household types");
+	
+	        List<List<? extends Fileable>> fileableList = new ArrayList<List<? extends Fileable>>();
+	        List<String> fileNameList = new ArrayList<String>();
+	        if (Common.isOutputFullData()) {
+		        fileableList.add(households.getRowList());
+		        fileNameList.add("Households");
+		        fileableList.add(dwellings.getRowList());
+		        fileNameList.add("Dwellings");
+		        fileableList.add(persons.getRowList());
+		        fileNameList.add("Persons");
+	        }
+	        fileableList.add(rentPerSpatialUnit.getRentPerSpatialUnit());
+	        fileNameList.add("RentPerSpatialUnit");
+	        fileableList.add(AllHouseholdsIndicatorManager.INDICATORS_PER_HOUSEHOLDTYPE_AND_INCOME.getIndicator().getIndicatorList());
+	        fileNameList.add("IndicatorsPerHouseholdTypeAndIncome");
+	        fileableList.add(AllHouseholdsIndicatorManager.AGGREGATED_HOUSEHOLDS.getIndicator().getIndicatorList());
+	        fileNameList.add("AggregatedHouseholds");
+	        fileableList.add(AllHouseholdsIndicatorManager.AGGREGATED_PERSONS.getIndicator().getIndicatorList());
+	        fileNameList.add("AggregatedPersons");
+	        aggregatedDwellings = new AggregatedDwellings();
+	        fileableList.add(aggregatedDwellings.getIndicatorList());
+	        fileNameList.add("AggregatedDwellings");
+	//        fileableList.add(migrationPerSpatialUnit.getIndicatorList());
+	//        fileNameList.add("Migrations");
+	        outputManager = new OutputManager(Common.getPathOutput(), fileNameList, fileableList);
+	        initSimpleOutputFiles();
+	        
+			// Model main loop
+			// - Biographical events for all persons/households
+			// - Find unsatisfied households
+			// - Simulate moves of unsatisfied households
+	        try {
+	        	short modelIterations = Short.parseShort(Common.getSysParam("ModelIterations"));
+				runModel(db, modelIterations);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchFieldException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
-        fileableList.add(rentPerSpatialUnit.getRentPerSpatialUnit());
-        fileNameList.add("RentPerSpatialUnit");
-        fileableList.add(AllHouseholdsIndicatorManager.INDICATORS_PER_HOUSEHOLDTYPE_AND_INCOME.getIndicator().getIndicatorList());
-        fileNameList.add("IndicatorsPerHouseholdTypeAndIncome");
-        fileableList.add(AllHouseholdsIndicatorManager.AGGREGATED_HOUSEHOLDS.getIndicator().getIndicatorList());
-        fileNameList.add("AggregatedHouseholds");
-        fileableList.add(AllHouseholdsIndicatorManager.AGGREGATED_PERSONS.getIndicator().getIndicatorList());
-        fileNameList.add("AggregatedPersons");
-        aggregatedDwellings = new AggregatedDwellings();
-        fileableList.add(aggregatedDwellings.getIndicatorList());
-        fileNameList.add("AggregatedDwellings");
-//        fileableList.add(migrationPerSpatialUnit.getIndicatorList());
-//        fileNameList.add("Migrations");
-        outputManager = new OutputManager(Common.getPathOutput(), fileNameList, fileableList);
-        initSimpleOutputFiles();
-        
-		// Model main loop
-		// - Biographical events for all persons/households
-		// - Find unsatisfied households
-		// - Simulate moves of unsatisfied households
-        try {
-        	short modelIterations = Short.parseShort(Common.getSysParam("ModelIterations"));
-			runModel(db, modelIterations);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
         System.out.println(printInfo() + ": end");
         System.exit(0);
