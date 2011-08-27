@@ -210,6 +210,7 @@ public class Main {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			outputManager.close();
         }
 		
         System.out.println(printInfo() + ": end");

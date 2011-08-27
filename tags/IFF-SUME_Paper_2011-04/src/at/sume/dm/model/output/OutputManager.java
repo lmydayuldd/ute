@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.remesch.db.Database;
+import net.remesch.util.FileUtil;
 import at.sume.dm.entities.Dwellings;
 import at.sume.dm.entities.Households;
 import at.sume.dm.entities.Persons;
@@ -103,5 +104,11 @@ public class OutputManager {
 			dbOutput(modelYear);
 		else
 			fileOutput(modelYear);
+	}
+	
+	public void close() {
+		for (FileOutput fileOutput : fileOutputList) {
+			fileOutput.close();
+		}
 	}
 }
