@@ -79,7 +79,7 @@ public class SamplePersonIncome extends SamplingDistribution<IncomeDistributionR
 	 */
 	@Override
 	public String selectStatement() {
-		return "SELECT SpatialunitId_AD, Sex, AgeGroupId, IncomeGroupId, MinIncome, MaxIncome, PersonCount FROM [_DM_Income per age, sex, spatial unit] AS distr INNER JOIN _DM_IncomeGroup AS ig ON (distr.IncomeGroupId = ig.ID) " + 
+		return "SELECT SpatialunitId_AD, Sex, AgeGroupId, IncomeGroupId, MinIncome, MaxIncome, PersonCount FROM [_DM_Income per age, sex, spatial unit] AS distr INNER JOIN _DM_IncomeGroup_PopGen AS ig ON (distr.IncomeGroupId = ig.ID) " + 
 			"WHERE SpatialunitId_AD = ? AND Sex = ? AND AgeGroupId = ? " +
 			"ORDER BY IncomeGroupId"; 
 	}
