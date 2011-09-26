@@ -140,6 +140,9 @@ public class SampleDbHouseholds {
 				// Larger households still available
 				Random r = new Random();
 				memberCount = avgHouseholdSize;
+				// TODO: this results in a normal distribution where an exponential distribution is needed!!!
+				// either use http://www.honeylocust.com/RngPack/ or http://introcs.cs.princeton.edu/java/stdlib/StdRandom.java.html
+				// see net.remesch.util.StdRandom.java for exp(lambda)!!!
 				if (householdsPerSpatialUnit.householdSize > householdSizeGroups) {
 					// institutional households
 					for (int i = 0; i != surplusPersonCount; i++) {
