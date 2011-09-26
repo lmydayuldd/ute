@@ -5,7 +5,7 @@ package at.sume.sampling.entities;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Random;
+import net.remesch.util.Random;
 
 import net.remesch.db.Database;
 import net.remesch.db.Sequence;
@@ -122,7 +122,7 @@ public class SampleDbHouseholds {
 			memberCount = householdsPerSpatialUnit.householdSize;
 		} else if (householdsPerSpatialUnit.householdSize >= householdSizeGroups) {
 			// sample a potentially larger household (>= householdSizeGroups members) or an institutional household
-			int avgHouseholdSize = householdSizeGroups;
+			int avgHouseholdSize = 0;
 			int surplusPersonCount = 0;
 			if (householdsPerSpatialUnit.householdSize > householdSizeGroups) {
 				// sample an institutional household (indicated by a special value for household size - currently = 10)
@@ -131,7 +131,8 @@ public class SampleDbHouseholds {
 				surplusPersonCount = householdsPerSpatialUnit.personCount % avgHouseholdSize;
 			} else {
 				// sample households with more members than householdSizeGroups
-				surplusPersonCount = (householdsPerSpatialUnit.personCount) % ((householdsPerSpatialUnit.householdCount - alreadySampledHouseholdsCount) * avgHouseholdSize);
+				surplusPersonCount = (householdsPerSpatialUnit.personCount) % ((householdsPerSpatialUnit.householdCount - alreadySampledHouseholdsCount) * householdsPerSpatialUnit.householdSize);
+				avgHouseholdSize = (int) Math.round(((double)householdsPerSpatialUnit.personCount) / ((householdsPerSpatialUnit.householdCount - alreadySampledHouseholdsCount)));
 			}
 			if (surplusPersonCount == 0) {
 				// No households larger than householdSizeGroups persons left
@@ -140,20 +141,18 @@ public class SampleDbHouseholds {
 				// Larger households still available
 				Random r = new Random();
 				memberCount = avgHouseholdSize;
-				// TODO: this results in a normal distribution where an exponential distribution is needed!!!
+				// TODO: this results in a triangular distribution where an exponential distribution is needed!!!
 				// either use http://www.honeylocust.com/RngPack/ or http://introcs.cs.princeton.edu/java/stdlib/StdRandom.java.html
 				// see net.remesch.util.StdRandom.java for exp(lambda)!!!
 				if (householdsPerSpatialUnit.householdSize > householdSizeGroups) {
 					// institutional households
-					for (int i = 0; i != surplusPersonCount; i++) {
-						memberCount += r.nextInt(2);
-					}
+					// TODO: this is untested but it should work well! distribution is normal
+					memberCount = (int) (r.triangular(1, surplusPersonCount, avgHouseholdSize));
 				} else {
 					// households with more members than householdSizeGroups
-					// TODO: make restriction to 11 members a system parameter
-					for (int i = avgHouseholdSize; i != 11; i++) {
-						memberCount += r.nextInt(2);
-					}
+					// TODO: make restriction to 11 members a system parameter (or it might become obsolete with a exponential function?)
+					// Math.round makes 7 the most frequent number (?)
+					memberCount = (int) (r.triangular(householdsPerSpatialUnit.householdSize, avgHouseholdSize, householdsPerSpatialUnit.householdSize));
 				}	
 				if (memberCount > avgHouseholdSize + surplusPersonCount) {
 					memberCount = avgHouseholdSize + surplusPersonCount;
