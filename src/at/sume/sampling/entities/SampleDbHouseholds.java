@@ -140,9 +140,18 @@ public class SampleDbHouseholds {
 				// Larger households still available
 				Random r = new Random();
 				memberCount = avgHouseholdSize;
-				for (int i = 0; i != surplusPersonCount; i++) {
-					memberCount += r.nextInt(2);
-				}
+				if (householdsPerSpatialUnit.householdSize > householdSizeGroups) {
+					// institutional households
+					for (int i = 0; i != surplusPersonCount; i++) {
+						memberCount += r.nextInt(2);
+					}
+				} else {
+					// households with more members than householdSizeGroups
+					// TODO: make restriction to 11 members a system parameter
+					for (int i = avgHouseholdSize; i != 11; i++) {
+						memberCount += r.nextInt(2);
+					}
+				}	
 				if (memberCount > avgHouseholdSize + surplusPersonCount) {
 					memberCount = avgHouseholdSize + surplusPersonCount;
 				}
