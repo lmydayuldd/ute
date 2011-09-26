@@ -56,4 +56,9 @@ public class FileOutput {
 			psOut.println(orow);
 		}
 	}
+
+	public void close() {
+		psOut.close();
+		psOut = null;
+	}
 }

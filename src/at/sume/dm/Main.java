@@ -82,6 +82,11 @@ public class Main {
 	private static String printInfo() {
 		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)";
 	}
+
+	private static String printInfo(int modelRun) {
+		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)@" + (modelRun + 1);
+	}
+
 	/**
 	 * @param args
 	 * @throws ClassNotFoundException 
@@ -101,115 +106,120 @@ public class Main {
 		
         rentPerSpatialUnit = RentPerSpatialUnit.getInstance(scenario.getRentScenario(), Common.getSpatialUnitLevel());
 
-		// Load entity sets from database
-		try {
-			spatialUnits = new SpatialUnits(db, Common.getSpatialUnitLevel());
-	        System.out.println(printInfo() + ": loaded " + spatialUnits.size() + " spatial units");
-			dwellings = new Dwellings(db, Common.getSpatialUnitLevel());
-			dwellingSeq = new Sequence(dwellings.get(dwellings.size() - 1).getDwellingId() + 1);
-			DwellingRow.setDwellingIdSeq(dwellingSeq);
-	        System.out.println(printInfo() + ": loaded " + dwellings.size() + " dwellings");
-			households = new Households(db);
-	        System.out.println(printInfo() + ": loaded " + households.size() + " households");
-	        // TODO: sequence generation could be completely put into RecordSetRow class
-	        householdSeq = new Sequence(households.get(households.size() - 1).getHouseholdId() + 1);
-	        HouseholdRow.setHouseholdIdSeq(householdSeq);
-	        persons = new Persons(db);
-	        personSeq = new Sequence(persons.get(persons.size() - 1).getPersonId() + 1);
-	        PersonRow.setPersonIdSeq(personSeq);
-	        System.out.println(printInfo() + ": loaded " + persons.size() + " persons");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-
-		// Link dwellings to spatial units
-		dwellings.linkSpatialUnits(spatialUnits);
-        System.out.println(printInfo() + ": linked dwellings + spatial units");
-        // Link households to dwellings
-        households.linkDwellings(dwellings);
-        System.out.println(printInfo() + ": linked households + dwellings");
-        households.setSpatialunits(spatialUnits);
-        // Inter-link persons and households
-        persons.linkHouseholds(households);
-        System.out.println(printInfo() + ": linked households + persons");
-
-        // create migration counter + register with households (once!)
-        migrationPerSpatialUnit = new CountMigrationPerSpatialUnit();
-        migrationDetails = new CountMigrationDetails();
-        // TODO: find a way to make this registration out of the MigrationPerSpatialUnit() class directly (but only once!!!)
-        households.get(0).registerMigrationObserver(migrationPerSpatialUnit);
-        households.get(0).registerMigrationObserver(migrationDetails);
-        demographicMovementsPerSpatialUnit = new CountDemographicMovements();
-        persons.get(0).registerDemographyObserver(demographicMovementsPerSpatialUnit);
-        
-        // get all dwellings on the housing market
-        dwellingsOnMarket = new DwellingsOnMarket(dwellings, spatialUnits);
-        System.out.println(printInfo() + ": determined all available dwellings on the housing market (" + dwellingsOnMarket.getFreeDwellingsCount() + " out of " + dwellingsOnMarket.getGrossFreeDwellingTotal() + " total free dwellings)");
-        // determine household-types
-        households.determineHouseholdTypes(true);
-        System.out.println(printInfo() + ": determined all household types");
-
-        List<List<? extends Fileable>> fileableList = new ArrayList<List<? extends Fileable>>();
-        List<String> fileNameList = new ArrayList<String>();
-        if (Common.isOutputFullData()) {
-	        fileableList.add(households.getRowList());
-	        fileNameList.add("Households");
-	        fileableList.add(dwellings.getRowList());
-	        fileNameList.add("Dwellings");
-	        fileableList.add(persons.getRowList());
-	        fileNameList.add("Persons");
+        int modelRuns = Common.getModelRuns();
+        for (int modelRun = 0; modelRun != modelRuns; modelRun++) {
+            System.out.println(printInfo(modelRun) + ": ======================= model run " + (modelRun + 1) + " of " + modelRuns);
+			// Load entity sets from database
+			try {
+				spatialUnits = new SpatialUnits(db, Common.getSpatialUnitLevel());
+		        System.out.println(printInfo(modelRun) + ": loaded " + spatialUnits.size() + " spatial units");
+				dwellings = new Dwellings(db, Common.getSpatialUnitLevel());
+				dwellingSeq = new Sequence(dwellings.get(dwellings.size() - 1).getDwellingId() + 1);
+				DwellingRow.setDwellingIdSeq(dwellingSeq);
+		        System.out.println(printInfo(modelRun) + ": loaded " + dwellings.size() + " dwellings");
+				households = new Households(db);
+		        System.out.println(printInfo(modelRun) + ": loaded " + households.size() + " households");
+		        // TODO: sequence generation could be completely put into RecordSetRow class
+		        householdSeq = new Sequence(households.get(households.size() - 1).getHouseholdId() + 1);
+		        HouseholdRow.setHouseholdIdSeq(householdSeq);
+		        persons = new Persons(db);
+		        personSeq = new Sequence(persons.get(persons.size() - 1).getPersonId() + 1);
+		        PersonRow.setPersonIdSeq(personSeq);
+		        System.out.println(printInfo(modelRun) + ": loaded " + persons.size() + " persons");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+	
+			// Link dwellings to spatial units
+			dwellings.linkSpatialUnits(spatialUnits);
+	        System.out.println(printInfo(modelRun) + ": linked dwellings + spatial units");
+	        // Link households to dwellings
+	        households.linkDwellings(dwellings);
+	        System.out.println(printInfo(modelRun) + ": linked households + dwellings");
+	        households.setSpatialunits(spatialUnits);
+	        // Inter-link persons and households
+	        persons.linkHouseholds(households);
+	        System.out.println(printInfo(modelRun) + ": linked households + persons");
+	
+	        // create migration counter + register with households (once!)
+	        migrationPerSpatialUnit = new CountMigrationPerSpatialUnit();
+	        migrationDetails = new CountMigrationDetails();
+	        // TODO: find a way to make this registration out of the MigrationPerSpatialUnit() class directly (but only once!!!)
+	        households.get(0).registerMigrationObserver(migrationPerSpatialUnit);
+	        households.get(0).registerMigrationObserver(migrationDetails);
+	        demographicMovementsPerSpatialUnit = new CountDemographicMovements();
+	        persons.get(0).registerDemographyObserver(demographicMovementsPerSpatialUnit);
+	        
+	        // get all dwellings on the housing market
+	        dwellingsOnMarket = new DwellingsOnMarket(dwellings, spatialUnits);
+	        System.out.println(printInfo(modelRun) + ": determined all available dwellings on the housing market (" + dwellingsOnMarket.getFreeDwellingsCount() + " out of " + dwellingsOnMarket.getGrossFreeDwellingTotal() + " total free dwellings)");
+	        // determine household-types
+	        households.determineHouseholdTypes(true);
+	        System.out.println(printInfo(modelRun) + ": determined all household types");
+	
+	        List<List<? extends Fileable>> fileableList = new ArrayList<List<? extends Fileable>>();
+	        List<String> fileNameList = new ArrayList<String>();
+	        if (Common.isOutputFullData()) {
+		        fileableList.add(households.getRowList());
+		        fileNameList.add("Households");
+		        fileableList.add(dwellings.getRowList());
+		        fileNameList.add("Dwellings");
+		        fileableList.add(persons.getRowList());
+		        fileNameList.add("Persons");
+	        }
+	        fileableList.add(rentPerSpatialUnit.getRentPerSpatialUnit());
+	        fileNameList.add("RentPerSpatialUnit");
+	        fileableList.add(AllHouseholdsIndicatorManager.INDICATORS_PER_HOUSEHOLDTYPE_AND_INCOME.getIndicator().getIndicatorList());
+	        fileNameList.add("IndicatorsPerHouseholdTypeAndIncome");
+	        fileableList.add(AllHouseholdsIndicatorManager.AGGREGATED_HOUSEHOLDS.getIndicator().getIndicatorList());
+	        fileNameList.add("AggregatedHouseholds");
+	        fileableList.add(AllHouseholdsIndicatorManager.AGGREGATED_PERSONS.getIndicator().getIndicatorList());
+	        fileNameList.add("AggregatedPersons");
+	        aggregatedDwellings = new AggregatedDwellings();
+	        fileableList.add(aggregatedDwellings.getIndicatorList());
+	        fileNameList.add("AggregatedDwellings");
+	//        fileableList.add(migrationPerSpatialUnit.getIndicatorList());
+	//        fileNameList.add("Migrations");
+	        outputManager = new OutputManager(Common.getPathOutput(), fileNameList, fileableList);
+	        initSimpleOutputFiles();
+	        
+			// Model main loop
+			// - Biographical events for all persons/households
+			// - Find unsatisfied households
+			// - Simulate moves of unsatisfied households
+	        try {
+	        	short modelIterations = Short.parseShort(Common.getSysParam("ModelIterations"));
+				runModel(db, modelIterations, modelRun);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchFieldException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			outputManager.close();
         }
-        fileableList.add(rentPerSpatialUnit.getRentPerSpatialUnit());
-        fileNameList.add("RentPerSpatialUnit");
-        fileableList.add(AllHouseholdsIndicatorManager.INDICATORS_PER_HOUSEHOLDTYPE_AND_INCOME.getIndicator().getIndicatorList());
-        fileNameList.add("IndicatorsPerHouseholdTypeAndIncome");
-        fileableList.add(AllHouseholdsIndicatorManager.AGGREGATED_HOUSEHOLDS.getIndicator().getIndicatorList());
-        fileNameList.add("AggregatedHouseholds");
-        fileableList.add(AllHouseholdsIndicatorManager.AGGREGATED_PERSONS.getIndicator().getIndicatorList());
-        fileNameList.add("AggregatedPersons");
-        aggregatedDwellings = new AggregatedDwellings();
-        fileableList.add(aggregatedDwellings.getIndicatorList());
-        fileNameList.add("AggregatedDwellings");
-//        fileableList.add(migrationPerSpatialUnit.getIndicatorList());
-//        fileNameList.add("Migrations");
-        outputManager = new OutputManager(Common.getPathOutput(), fileNameList, fileableList);
-        initSimpleOutputFiles();
-        
-		// Model main loop
-		// - Biographical events for all persons/households
-		// - Find unsatisfied households
-		// - Simulate moves of unsatisfied households
-        try {
-        	short modelIterations = Short.parseShort(Common.getSysParam("ModelIterations"));
-			runModel(db, modelIterations);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
         System.out.println(printInfo() + ": end");
         System.exit(0);
@@ -228,7 +238,7 @@ public class Main {
 	 * @throws SecurityException 
 	 */
 	@SuppressWarnings("unchecked")
-	public static void runModel(Database db, short iterations) throws SQLException, FileNotFoundException, IOException, SecurityException, IllegalArgumentException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+	public static void runModel(Database db, short iterations, int modelRun) throws SQLException, FileNotFoundException, IOException, SecurityException, IllegalArgumentException, InstantiationException, IllegalAccessException, NoSuchFieldException {
 		EventManager<PersonRow> personEventManager = new EventManager<PersonRow>();
 		// TODO: how can the events be constructed at another place to have this class/function independent of the
 		//       concrete event types??? Maybe put into its own static class or a ModelMain class?
@@ -268,18 +278,18 @@ public class Main {
 	        
 	        // Create new-built dwellings
 	        List<DwellingRow> newDwellings = sampleBuildingProjects.sample(modelYear);
-        	System.out.println(printInfo() + ": adding " + newDwellings.size() + " new built dwellings from building projects and putting them on the market");
+        	System.out.println(printInfo(modelRun) + ": adding " + newDwellings.size() + " new built dwellings from building projects and putting them on the market");
 	        dwellings.addAll(newDwellings);
 	        dwellingsOnMarket.addAll(newDwellings);
 	        int additionalDwellingsOnMarket = additionalDwellingsPerYear.getAdditionalDwellingsOnMarket(modelYear);
 	        if (additionalDwellingsOnMarket > 0) {
-	        	System.out.println(printInfo() + ": putting additional " + additionalDwellingsOnMarket + " existing dwellings on the market");
+	        	System.out.println(printInfo(modelRun) + ": putting additional " + additionalDwellingsOnMarket + " existing dwellings on the market");
 	        	int result = dwellingsOnMarket.increase(additionalDwellingsOnMarket);
-	        	System.out.println(printInfo() + ": " + result + " dwellings were put on the market");
+	        	System.out.println(printInfo(modelRun) + ": " + result + " dwellings were put on the market");
 	        }
 	        int newRandomDwellingCount = additionalDwellingsPerYear.getNewlyBuiltDwellings(modelYear);
 	        if (newRandomDwellingCount > 0) {
-	        	System.out.println(printInfo() + ": adding " + newRandomDwellingCount + " new built dwellings and putting them on the market");
+	        	System.out.println(printInfo(modelRun) + ": adding " + newRandomDwellingCount + " new built dwellings and putting them on the market");
 		        newDwellings = sampleBuildingProjects.sampleRandomDwellings(newRandomDwellingCount);
 		        dwellings.addAll(newDwellings);
 		        dwellingsOnMarket.addAll(newDwellings);
@@ -300,7 +310,7 @@ public class Main {
 			// Loop through all households to find potential movers, process demographic events
 			for (HouseholdRow household : hh_helper) {
 				if (j % 100000 == 0) {
-					System.out.println(printInfo() + ": Processing household " + j + " of " + households.size() + " in year " + modelYear + ", nr. of persons: " + persons.size());
+					System.out.println(printInfo(modelRun) + ": Processing household " + j + " of " + households.size() + " in year " + modelYear + ", nr. of persons: " + persons.size());
 				}
 				// Process demographic events for all household members
 				ArrayList<PersonRow> p_helper = (ArrayList<PersonRow>) ((ArrayList<PersonRow>) household.getMembers()).clone();
@@ -376,7 +386,7 @@ public class Main {
 				rentPerSpatialUnit.updateRentPerSpatialUnit(spatialUnits, modelYear);
 			int lowestYearlyRentPer100Sqm = rentPerSpatialUnit.getLowestYearlyRentPer100Sqm();
 			int highestYearlyRentPer100Sqm = rentPerSpatialUnit.getHighestYearlyRentPer100Sqm();
-			System.out.println(printInfo() + ": lowest rent (€/100m²/yr.): " + lowestYearlyRentPer100Sqm + ", highest rent: " + highestYearlyRentPer100Sqm);
+			System.out.println(printInfo(modelRun) + ": lowest rent (€/100m²/yr.): " + lowestYearlyRentPer100Sqm + ", highest rent: " + highestYearlyRentPer100Sqm);
 			// Reset the movers indicators
 			MoversIndicatorManager.resetIndicators();
 			outputFreeDwellings(modelYear, "before moving households + after demographic changes");
@@ -384,12 +394,12 @@ public class Main {
 			int hhFoundNoDwellings = 0, hhNoSatisfaction = 0, hhNoAspiration = 0, hhZeroIncome = 0, hhLowIncome = 0, hhMovedAway = 0;
 			int hhNotMoving = 0, hhMovedAwayMemberCount = 0;
 			j = 0;
-	        System.out.println(printInfo() + ": free dwellings before moving: " + dwellingsOnMarket.getFreeDwellingsCount());
+	        System.out.println(printInfo(modelRun) + ": free dwellings before moving: " + dwellingsOnMarket.getFreeDwellingsCount());
 	        int maxOutMigrationNational = sampleMigratingHouseholds.getOutMigrationNational(modelYear);
 			for (HouseholdRow household : potentialMovers) {
 				boolean notMoving = false;
 				if (j % 10000 == 0) {
-					System.out.println(printInfo() + ": Processing potential mover " + j + " of " + potentialMovers.size() + " in year " + modelYear);
+					System.out.println(printInfo(modelRun) + ": Processing potential mover " + j + " of " + potentialMovers.size() + " in year " + modelYear);
 				}
 				// for breakpoints
 				if ((household.getHouseholdType() == HouseholdType.LARGE_FAMILY) && (household.getSpatialunitId() == 91905)) {
@@ -497,31 +507,31 @@ public class Main {
 				}
 				j++;
 			}
-			System.out.println(printInfo() + ": " + hhNoAspiration + " out of " + potentialMovers.size() + " potential moving households found no spatial unit within their aspiration region. " + 
+			System.out.println(printInfo(modelRun) + ": " + hhNoAspiration + " out of " + potentialMovers.size() + " potential moving households found no spatial unit within their aspiration region. " + 
 					"Out of these " + hhZeroIncome + " households can afford a dwelling with costs <= 0 " +
 					"and " + hhLowIncome + " households can afford a dwelling with costs <= 63 per m²/year only");
-			System.out.println(printInfo() + ": " + hhNoSatisfaction + " out of " + potentialMovers.size() + " potential moving households would not improve their estimated residential satisfaction");
-			System.out.println(printInfo() + ": " + hhFoundNoDwellings + " out of " + potentialMovers.size() + " potential moving households found no dwelling");
-			System.out.println(printInfo() + ": " + hhMovedAway + " out of " + potentialMovers.size() + " potential moving households moved away (" + hhMovedAwayMemberCount + " persons)");
-			System.out.println(printInfo() + ": " + hhNotMoving + " out of " + potentialMovers.size() + " potential moving households decided not to move to a dwelling/an area that suited their needs");
-	        System.out.println(printInfo() + ": free dwellings after moving: " + dwellingsOnMarket.getFreeDwellingsCount());
+			System.out.println(printInfo(modelRun) + ": " + hhNoSatisfaction + " out of " + potentialMovers.size() + " potential moving households would not improve their estimated residential satisfaction");
+			System.out.println(printInfo(modelRun) + ": " + hhFoundNoDwellings + " out of " + potentialMovers.size() + " potential moving households found no dwelling");
+			System.out.println(printInfo(modelRun) + ": " + hhMovedAway + " out of " + potentialMovers.size() + " potential moving households moved away (" + hhMovedAwayMemberCount + " persons)");
+			System.out.println(printInfo(modelRun) + ": " + hhNotMoving + " out of " + potentialMovers.size() + " potential moving households decided not to move to a dwelling/an area that suited their needs");
+	        System.out.println(printInfo(modelRun) + ": free dwellings after moving: " + dwellingsOnMarket.getFreeDwellingsCount());
 			outputFreeDwellings(modelYear, "after moving households, before immigration");
 
 			// households moving together
 			int numMovingTogether = movingTogether.randomJoinHouseholds();
-			System.out.println(printInfo() + ": " + numMovingTogether + " of "+ movingTogetherCount + " projected household move-togethers/marriages took place");
-	        System.out.println(printInfo() + ": free dwellings after moving together: " + dwellingsOnMarket.getFreeDwellingsCount());
+			System.out.println(printInfo(modelRun) + ": " + numMovingTogether + " of "+ movingTogetherCount + " projected household move-togethers/marriages took place");
+	        System.out.println(printInfo(modelRun) + ": free dwellings after moving together: " + dwellingsOnMarket.getFreeDwellingsCount());
 			
 			// Out-Migration: randomly remove households
 			int numOutMigrationInternational = sampleMigratingHouseholds.getOutMigrationInternational(modelYear) + sampleMigratingHouseholds.getOutMigrationNational(modelYear) - hhMovedAwayMemberCount;
 			if (numOutMigrationInternational > 0) {
 				int numOutMigrationIntlHouseholds = households.randomRemoveHouseholds(dwellingsOnMarket, numOutMigrationInternational, MigrationRealm.INTERNATIONAL);
-				System.out.println(printInfo() + ": " + numOutMigrationInternational + " persons (" + numOutMigrationIntlHouseholds + " households) out-migrated internationally");
+				System.out.println(printInfo(modelRun) + ": " + numOutMigrationInternational + " persons (" + numOutMigrationIntlHouseholds + " households) out-migrated internationally");
 			}
-	        System.out.println(printInfo() + ": free dwellings after out-migration: " + dwellingsOnMarket.getFreeDwellingsCount());
+	        System.out.println(printInfo(modelRun) + ": free dwellings after out-migration: " + dwellingsOnMarket.getFreeDwellingsCount());
 			
 			// Immigrating households + Children moving out from home
-			System.out.println(printInfo() + ": generating immigrating households and new single households form children moving out of parents homes");
+			System.out.println(printInfo(modelRun) + ": generating immigrating households and new single households form children moving out of parents homes");
 			ArrayList<HouseholdRow> childrenHouseholds = null;
 			if (Common.isDemographyOnly() == false) {
 				childrenHouseholds = leavingParents.getNewSingleHouseholds();
@@ -549,18 +559,18 @@ public class Main {
 			        dwellings.addAll(newDwellings);
 			        dwellingsOnMarket.addAll(newDwellings);
 				}
-		        System.out.println(printInfo() + ": free dwellings after auto-adjustment: " + dwellingsOnMarket.getFreeDwellingsCount());
+		        System.out.println(printInfo(modelRun) + ": free dwellings after auto-adjustment: " + dwellingsOnMarket.getFreeDwellingsCount());
 			}
 
 			// Now move the immigrating households + children leaving parents
 			if (Common.isDemographyOnly() == false) {
 				forcedMoves(childrenHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.LEAVING_PARENTS, cheapestSpatialUnits);
-		        System.out.println(printInfo() + ": free dwellings after " + childrenHouseholds.size() + " children leaving parents homes: " + dwellingsOnMarket.getFreeDwellingsCount());
+		        System.out.println(printInfo(modelRun) + ": free dwellings after " + childrenHouseholds.size() + " children leaving parents homes: " + dwellingsOnMarket.getFreeDwellingsCount());
 			}
 			forcedMoves(immigratingHouseholdsNational, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL, cheapestSpatialUnits);
-	        System.out.println(printInfo() + ": free dwellings after " + immigratingHouseholdsNational.size() + " immigrating households (national): " + dwellingsOnMarket.getFreeDwellingsCount());
+	        System.out.println(printInfo(modelRun) + ": free dwellings after " + immigratingHouseholdsNational.size() + " immigrating households (national): " + dwellingsOnMarket.getFreeDwellingsCount());
 			forcedMoves(immigratingHouseholdsIntl, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.INTERNATIONAL, cheapestSpatialUnits);
-	        System.out.println(printInfo() + ": free dwellings after " + immigratingHouseholdsIntl.size() + " immigrating households (international): " + dwellingsOnMarket.getFreeDwellingsCount());
+	        System.out.println(printInfo(modelRun) + ": free dwellings after " + immigratingHouseholdsIntl.size() + " immigrating households (international): " + dwellingsOnMarket.getFreeDwellingsCount());
 		
 			//if (modelYear == modelEndYear - 1)
 			outputFreeDwellings(modelYear, "after immigration");

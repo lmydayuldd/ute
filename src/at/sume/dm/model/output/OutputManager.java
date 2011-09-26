@@ -104,4 +104,10 @@ public class OutputManager {
 		else
 			fileOutput(modelYear);
 	}
+
+	public void close() {
+		for (FileOutput fileOutput : fileOutputList) {
+			fileOutput.close();
+		}
+	}
 }
