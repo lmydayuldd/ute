@@ -152,7 +152,9 @@ public class SampleDbHouseholds {
 					// households with more members than householdSizeGroups
 					// TODO: make restriction to 11 members a system parameter (or it might become obsolete with a exponential function?)
 					// Math.round makes 7 the most frequent number (?)
-					memberCount = (int) (r.triangular(householdsPerSpatialUnit.householdSize, avgHouseholdSize, householdsPerSpatialUnit.householdSize));
+					//memberCount = (int) (r.triangular(householdsPerSpatialUnit.householdSize, avgHouseholdSize, householdsPerSpatialUnit.householdSize));
+					// above function is more realistic but returns very large households (e.g. 62 members) that are not useful in the model!
+					memberCount = (int) (r.triangular(householdsPerSpatialUnit.householdSize, 11, householdsPerSpatialUnit.householdSize));
 				}	
 				if (memberCount > avgHouseholdSize + surplusPersonCount) {
 					memberCount = avgHouseholdSize + surplusPersonCount;
