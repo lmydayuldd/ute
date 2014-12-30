@@ -266,8 +266,8 @@ public class Common {
 	}
 
 	public static Database openDatabase() throws SQLException, ClassNotFoundException {
-//		db = new Database(Common.getDbLocation());
-		db = new Database();
+		db = new Database(Common.getDbLocation());
+//		db = new Database();
 		return(db);
 	}
 
