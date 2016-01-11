@@ -61,6 +61,8 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 			householdIntlImmigrationCount++;
 			personIntlImmigrationCount += householdMemberCount;
 			break;
+		default:
+			throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
 		}
 	}
 	public void addEmigratingHousehold(short householdMemberCount, MigrationRealm migrationRealm) {
@@ -77,6 +79,8 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 			householdIntlEmigrationCount++;
 			personIntlEmigrationCount += householdMemberCount;
 			break;
+		default:
+			throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
 		}
 	}
 	public void addChildLeftParentsOrigin() {
@@ -105,6 +109,8 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 			householdPotentialIntlImmigrationCount += householdCount;
 			personPotentialIntlImmigrationCount += householdMemberCount;
 			break;
+		default:
+			throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
 		}
 	}
 	public void addPotentialLeftParentsOriginCount(int personCount) {

@@ -594,6 +594,8 @@ public class Main {
 				// TODO: doesn't work because spatialUnit is not known in advance for an immigrant household
 //				migrationPerSpatialUnit.addPotentialImmigrationCounters(household.getDwelling().getSpatialunit().getSpatialUnitId(), 1, household.getMemberCount(), migrationRealm);
 				break;
+			default:
+				throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
 			}
 			residentialMobility.estimateAspirationRegion(household, modelYear, modelStartYear, highestYearlyRentPer100Sqm);
 			DwellingRow dwelling = dwellingsOnMarket.getFirstMatchingDwelling((short) 0, household.getAspirationRegionLivingSpaceMax(), household.getAspirationRegionMaxCosts());
@@ -614,6 +616,8 @@ public class Main {
 				case INTERNATIONAL:
 					household.relocate(dwellingsOnMarket, dwelling, migrationRealm);
 					break;
+				default:
+					throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
 				}
 				assert household.getDwelling() != null : "No dwelling for household found";
 			} else {
@@ -639,6 +643,8 @@ public class Main {
 					case INTERNATIONAL:
 						household.relocate(dwellingsOnMarket, dwelling, migrationRealm);
 						break;
+					default:
+						throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
 					}
 					assert household.getDwelling() != null : "No dwelling for household found";
 				}

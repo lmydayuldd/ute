@@ -499,6 +499,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 				householdType = HouseholdType.COUPLE_OLD;
 			}
 			break;
+		default:
+			throw new IllegalArgumentException("Unexpected household type " + householdType.toString());
 		}
 	}
 	
@@ -527,6 +529,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			// TODO: if a female <= 45 dies and leaves a male > 45 then he would be SINGLE_OLD
 			householdType = HouseholdType.SINGLE_YOUNG;
 			break;
+		default:
+			throw new IllegalArgumentException("Unexpected household type " + householdType.toString());
 		}
 	}
 	
@@ -547,6 +551,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		case SINGLE_OLD:
 			householdType = HouseholdType.SINGLE_PARENT;
 			break;
+		default:
+			throw new IllegalArgumentException("Unexpected household type " + householdType.toString());
 		}
 	}
 	

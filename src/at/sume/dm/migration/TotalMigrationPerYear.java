@@ -164,8 +164,9 @@ public class TotalMigrationPerYear {
 			return m.getImmigrationNational();
 		case INTERNATIONAL:
 			return m.getImmigrationInternational();
+		default:
+			throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
 		}
-		throw new AssertionError();
 	}
 //	private long get_v3(int modelYear) {
 //		MigrationsPerYear m = new MigrationsPerYear();

@@ -63,9 +63,9 @@ public class Database {
 	 */
 	public void open(String pathname) throws SQLException, ClassNotFoundException {
 		if (USE_JDBC) {
-	        url = "jdbc:odbc:DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" + pathname + ";";
+	        url = "jdbc:sqlite:" + pathname + ";";
 
-            Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+            Class.forName("org.sqlite.JDBC");
 
             con = DriverManager.getConnection(url);
 		} else {
@@ -80,9 +80,9 @@ public class Database {
 	 */
 	public void open() throws SQLException, ClassNotFoundException {
 		if (USE_JDBC) {
-	        url = "jdbc:odbc:SUME";
+	        url = "jdbc:sqlite:SUME";
 
-            Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+            Class.forName("org.sqlite.JDBC");
 
             con = DriverManager.getConnection(url);
 		} else {
