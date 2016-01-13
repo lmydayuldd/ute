@@ -10,6 +10,12 @@ package net.remesch.util;
 public class Random extends java.util.Random {
 	private static final long serialVersionUID = 1300771848132560485L;
 
+	public Random() {
+		super();
+	}
+	public Random(long seed) {
+		super(seed);
+	}
 	/**
 	 * Use nextGaussian() to return the next pseudorandom, Gaussian ("normally") distributed double value within the given range.
 	 * See: http://stackoverflow.com/questions/629798/problem-with-random-nextgaussian

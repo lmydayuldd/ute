@@ -3,7 +3,7 @@
  */
 package net.remesch.probability;
 
-import java.util.Random;
+import net.remesch.util.Random;
 
 /**
  * @author Alexander Remesch

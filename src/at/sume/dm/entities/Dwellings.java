@@ -5,7 +5,7 @@ package at.sume.dm.entities;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Random;
+import net.remesch.util.Random;
 
 import net.remesch.db.Database;
 import at.sume.db.RecordSet;

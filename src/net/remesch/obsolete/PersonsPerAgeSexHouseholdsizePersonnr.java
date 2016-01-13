@@ -1,6 +1,6 @@
 package net.remesch.obsolete;
 
-import java.util.Random;
+import net.remesch.util.Random;
 
 /**
  * This class contains the number of persons in a spatial unit that have a certain sex, age and live in a household of a certain

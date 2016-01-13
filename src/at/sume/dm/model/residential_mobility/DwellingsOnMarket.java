@@ -6,7 +6,7 @@ package at.sume.dm.model.residential_mobility;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import net.remesch.util.Random;
 
 import at.sume.dm.Common;
 import at.sume.dm.entities.DwellingRow;

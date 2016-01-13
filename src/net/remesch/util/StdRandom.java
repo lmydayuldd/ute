@@ -47,7 +47,7 @@ package net.remesch.util;
  *
  *************************************************************************/
 
-import java.util.Random;
+import net.remesch.util.Random;
 
 /**
  *  <i>Standard random</i>. This class provides methods for generating
