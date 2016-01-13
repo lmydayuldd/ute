@@ -42,8 +42,7 @@ public class LeavingParents {
 					}
 				}
 			}
-		default:
-			throw new IllegalArgumentException("Unexpected household type " + existingHousehold.getHouseholdType().toString());
+		default: // no children in household -> do nothing
 		}
 	}
 	

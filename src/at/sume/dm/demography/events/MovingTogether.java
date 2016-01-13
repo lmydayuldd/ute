@@ -50,8 +50,7 @@ public class MovingTogether {
 			else
 				maleHouseholds.add(household);
 			break;
-		default:
-			throw new IllegalArgumentException("Unexpected household type " + household.getHouseholdType().toString());
+		default: // no single household -> do nothing
 		}
 	}
 	/**

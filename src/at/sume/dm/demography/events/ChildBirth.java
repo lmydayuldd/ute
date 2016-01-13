@@ -35,7 +35,7 @@ public class ChildBirth extends Event<PersonRow> {
 		fertilityDistribution = new Fertility(db, scenarioName);
 		// set sex proportion here
 		// TODO: find a better place for this
-		sexProportion = (Double) db.lookupSql("select SexProp from StatA_SexProp_W where Jahr = 2009");
+		sexProportion = Double.parseDouble(db.lookupSql("select SexProp from StatA_SexProp_W where Jahr = 2009").toString());
 		if (sexProportion == null)
 			sexProportion = 1000.0;
 		if (birthAdjustment == 0)

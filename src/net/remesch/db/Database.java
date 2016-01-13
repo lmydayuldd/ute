@@ -63,7 +63,7 @@ public class Database {
 	 */
 	public void open(String pathname) throws SQLException, ClassNotFoundException {
 		if (USE_JDBC) {
-	        url = "jdbc:sqlite:" + pathname + ";";
+	        url = "jdbc:sqlite:" + pathname;
 
             Class.forName("org.sqlite.JDBC");
 

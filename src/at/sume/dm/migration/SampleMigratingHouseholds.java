@@ -181,7 +181,7 @@ public class SampleMigratingHouseholds {
 			"ORDER BY householdSize";
 		migrationHouseholdSize = Common.db.select(MigrationHouseholdSize.class, selectStatement);
 		assert migrationHouseholdSize.size() > 0 : "No rows selected from _DM_MigrationHouseholdSize (scenarioName = " + migrationScenarioName + ")";
-		migrationHouseholdSizeShareTotal = Math.round((Double)Common.db.lookupSql("select sum(share) from _DM_MigrationHouseholdSize where scenarioName = '" + migrationHouseholdSizeScenarioName + "'"));
+		migrationHouseholdSizeShareTotal = (Integer)Common.db.lookupSql("select sum(share) from _DM_MigrationHouseholdSize where scenarioName = '" + migrationHouseholdSizeScenarioName + "'");
 		
 		totalMigrationsPerYear = new TotalMigrationPerYear(migrationScenarioName);
 		
