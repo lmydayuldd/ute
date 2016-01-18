@@ -3,11 +3,13 @@
  */
 package net.remesch.util;
 
+import ec.util.MersenneTwisterFast;
+
 /**
  * @author Alexander Remesch
  *
  */
-public class Random extends java.util.Random {
+public class Random extends MersenneTwisterFast {
 	private static final long serialVersionUID = 1300771848132560485L;
 
 	public Random() {
