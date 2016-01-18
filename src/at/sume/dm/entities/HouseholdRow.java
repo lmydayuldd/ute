@@ -897,6 +897,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * @return highest residential satisfaction found
 	 */
 	public int estimateResidentialSatisfaction(ArrayList<SpatialUnitRow> spatialUnitList, int modelYear, int residentialSatisfactionEstimateRange) {
+		Random r = new Random();
 		int result = 0;
 		assert spatialUnitList.size() > 0 : "spatialUnitList must be initialized (size > 0)";
 		residentialSatisfactionEstimate = new ArrayList<SpatialUnitScore>(spatialUnitList.size());
@@ -906,7 +907,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			// TODO: introduce random factor into score (sysparam ~10%?)
 			int residentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(this, spatialUnit, modelYear); 
 			s.setScore(residentialSatisfaction);
-			s.setModifier((int) Math.round(Math.random() * residentialSatisfactionEstimateRange * 2 - residentialSatisfactionEstimateRange));
+			s.setModifier((int) Math.round(r.nextDouble() * residentialSatisfactionEstimateRange * 2 - residentialSatisfactionEstimateRange));
 			residentialSatisfactionEstimate.add(s);
 			if (residentialSatisfaction > result)
 				result = residentialSatisfaction;

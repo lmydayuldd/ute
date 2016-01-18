@@ -6,10 +6,10 @@ package at.sume.sampling;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Random;
 
-import net.remesch.db.Database;
 import at.sume.sampling.distributions.IncomeDistributionRow;
+import net.remesch.db.Database;
+import net.remesch.util.Random;
 
 
 /**

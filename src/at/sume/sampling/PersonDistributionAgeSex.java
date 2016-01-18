@@ -2,11 +2,11 @@ package at.sume.sampling;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Random;
 
-import net.remesch.db.Database;
 import at.sume.dm.types.AgeGroup;
 import at.sume.sampling.distributions.PersonsPerAgeSex;
+import net.remesch.db.Database;
+import net.remesch.util.Random;
 
 public class PersonDistributionAgeSex {
 	private Distribution<PersonsPerAgeSex> personsPerAgeSexRepr, personsPerAgeSexNonRepr;

@@ -6,6 +6,7 @@ package at.sume.dm.demography.events;
 import java.util.ArrayList;
 
 import net.remesch.probability.SingleProbability;
+import net.remesch.util.Random;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
 
@@ -66,9 +67,10 @@ public class LeavingParents {
 	}
 	
 	private HouseholdRow createNewSingleHousehold(PersonRow person) {
+		Random r = new Random();
 		HouseholdRow parentHousehold = person.getHousehold();
 		int yearlyIncome = 0;
-		if (Math.random() < 0.5) {
+		if (r.nextDouble() < 0.5) {
 			// take lowest adult income as new household income
 			yearlyIncome = parentHousehold.getLowestAdultIncome();
 		} else {

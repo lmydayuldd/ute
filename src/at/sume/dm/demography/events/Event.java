@@ -3,14 +3,16 @@
  */
 package at.sume.dm.demography.events;
 
-import net.remesch.db.Database;
 import at.sume.db.RecordSetRow;
+import net.remesch.db.Database;
+import net.remesch.util.Random;
 
 /**
  * @author Alexander Remesch
  *
  */
 public abstract class Event<T extends RecordSetRow<?>> {
+	Random r = new Random();
 	public Event(Database db, EventManager<T> eventManager) {
 		eventManager.register(this);
 	}
@@ -19,7 +21,7 @@ public abstract class Event<T extends RecordSetRow<?>> {
 	
 	public void occur(T entity) {
 		// generate random number for sampling
-		double rand = Math.random();
+		double rand = r.nextDouble();
 		double p = probability(entity);
 		if (rand < p) {
 			action(entity);

@@ -6,7 +6,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+
+import net.remesch.util.Random;
 
 /**
  * General handling of distributions for random ("Monte Carlo") sampling.

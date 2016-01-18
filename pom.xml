@@ -29,5 +29,10 @@
   		<version>4.12</version>
   		<scope>test</scope>
   	</dependency>
+    <dependency >
+        <groupId>fr.irit.smac.thirdparty.edu.gmu.cs</groupId>
+        <artifactId>mason</artifactId>
+        <version>18</version>
+    </dependency >
   </dependencies>
 </project>

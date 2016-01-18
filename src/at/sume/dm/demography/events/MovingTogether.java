@@ -9,6 +9,7 @@ import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
+import net.remesch.util.Random;
 
 /**
  * This is a very simple implementation of a strategy to cohabitate households. It just builds a list of 
@@ -61,14 +62,15 @@ public class MovingTogether {
 	 * @return the number of households joined
 	 */
 	public int randomJoinHouseholds() {
+		Random r = new Random();
 		int index = 0;
 		numMovesTogether = Math.min(numMovesTogether, maleHouseholds.size());
 		numMovesTogether = Math.min(numMovesTogether, femaleHouseholds.size());
 		for (int i = 0; i != numMovesTogether; i++) {
-			index = (int) (Math.random() * maleHouseholds.size());
+			index = (int) (r.nextDouble() * maleHouseholds.size());
 			HouseholdRow maleHousehold = maleHouseholds.get(index);
 			maleHouseholds.remove(index);
-			index = (int) (Math.random() * femaleHouseholds.size());
+			index = (int) (r.nextDouble() * femaleHouseholds.size());
 			HouseholdRow femaleHousehold = femaleHouseholds.get(index);
 			femaleHouseholds.remove(index);
 			// Create a fictive household to determine the direction of the move

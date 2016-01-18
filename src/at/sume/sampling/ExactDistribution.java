@@ -5,7 +5,8 @@ package at.sume.sampling;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
+
+import net.remesch.util.Random;
 
 /**
  * This class can be used to sample elements according to a distribution using the "Monte Carlo" method.

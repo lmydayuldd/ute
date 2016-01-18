@@ -276,7 +276,8 @@ public class DwellingsOnMarket {
 	 * @return
 	 */
 	public DwellingRow getFirstMatchingDwelling(short minSize, short maxSize, long maxYearlyPricePerSqm) {
-		int startPos = (int)(Math.random() * dwellingsOnMarketFullList.size());
+		Random r = new Random();
+		int startPos = (int)(r.nextDouble() * dwellingsOnMarketFullList.size());
 		int endPos = dwellingsOnMarketFullList.size();
 		for (int i = startPos; i != endPos; i++) {
 			DwellingRow dwelling = dwellingsOnMarketFullList.get(i);

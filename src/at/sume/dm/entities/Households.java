@@ -7,12 +7,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import net.remesch.db.Database;
-import net.remesch.util.MathUtil;
 import at.sume.db.RecordSetClonable;
 import at.sume.db.RecordSetRow;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.types.MigrationRealm;
+import net.remesch.db.Database;
+import net.remesch.util.MathUtil;
+import net.remesch.util.Random;
 
 /**
  * @author Alexander Remesch
@@ -206,9 +207,10 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	 * @return Number of households that were removed
 	 */
 	public int randomRemoveHouseholds(DwellingsOnMarket dwellingsOnMarket, int numPersons, MigrationRealm migrationRealm) {
+		Random r = new Random();
 		int i = 0, result = 0;
 		while (i <= numPersons) {
-			int householdNr = (int) (Math.random() * rowList.size());
+			int householdNr = (int) (r.nextDouble() * rowList.size());
 			HouseholdRow household = rowList.get(householdNr);
 			i += household.getMemberCount();
 			household.emigrate(dwellingsOnMarket, migrationRealm);

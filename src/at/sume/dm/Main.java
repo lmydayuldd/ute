@@ -239,6 +239,7 @@ public class Main {
 	 */
 	@SuppressWarnings("unchecked")
 	public static void runModel(Database db, short iterations, int modelRun) throws SQLException, FileNotFoundException, IOException, SecurityException, IllegalArgumentException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+		Random r = new Random();
 		EventManager<PersonRow> personEventManager = new EventManager<PersonRow>();
 		// TODO: how can the events be constructed at another place to have this class/function independent of the
 		//       concrete event types??? Maybe put into its own static class or a ModelMain class?
@@ -330,12 +331,6 @@ public class Main {
 						continue;
 					}
 					
-					// for breakpoints
-					if ((household.getHouseholdType() == HouseholdType.LARGE_FAMILY) && (household.getSpatialunitId() == 91905)) {
-						@SuppressWarnings("unused")
-						int xy = 0;
-					}
-					
 					// Process household decisions
 					// (minimum income, minimum living space, calculation of residential satisfaction)
 	//				householdDecisionManager.process(household);
@@ -353,11 +348,10 @@ public class Main {
 						household.setCurrentResidentialSatisfaction(residential_satisfaction);
 						if (residential_satisfaction + household.getResidentialSatisfactionThreshMod() < Common.getResidentialSatisfactionThreshold()) {
 							// add the household to a random position in the ArrayList
-							potentialMovers.add((int)(Math.random() * potentialMovers.size()), household);
+							potentialMovers.add((int)(r.nextDouble() * potentialMovers.size()), household);
 							if (household.getMovingDecisionYear() == 0) {
 								if (modelYear == modelStartYear) {
 									// In first model year, household may already have decided earlier
-									Random r = new Random();
 									int movingDecisionYear = Common.getMovingDecisionMin() + r.nextInt(modelYear - Common.getMovingDecisionMin() + 1);
 									household.setMovingDecisionYear((short) movingDecisionYear);
 								} else {
