@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.1.9" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
+  realizations="true" associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
+  <class id="1" language="java" name="at.sume.sampling.GeneratePopulation" project="UTE" 
+    file="/UTE/src/at/sume/sampling/GeneratePopulation.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="116" y="89"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="2" language="java" name="at.sume.sampling.SampleHouseholds" project="UTE" 
+    file="/UTE/src/at/sume/sampling/SampleHouseholds.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1221" y="71"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="3" language="java" name="at.sume.sampling.distributions.HouseholdsPerSpatialUnit" project="UTE" 
+    file="/UTE/src/at/sume/sampling/distributions/HouseholdsPerSpatialUnit.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1255" y="588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="at.sume.sampling.entities.SampleDbHouseholds" project="UTE" 
+    file="/UTE/src/at/sume/sampling/entities/SampleDbHouseholds.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="877" y="143"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="5" language="java" name="at.sume.sampling.entities.DbHouseholdRow" project="UTE" 
+    file="/UTE/src/at/sume/sampling/entities/DbHouseholdRow.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="586" y="242"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="6" language="java" name="at.sume.sampling.entities.DbPersonRow" project="UTE" 
+    file="/UTE/src/at/sume/sampling/entities/DbPersonRow.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="784" y="547"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="7" language="java" name="at.sume.sampling.distributions.CostOfResidenceDistributionRow" project="UTE" 
+    file="/UTE/src/at/sume/sampling/distributions/CostOfResidenceDistributionRow.java" binary="false" 
+    corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="128" y="367"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="8" language="java" name="at.sume.sampling.SampleHouseholdCostOfResidence" project="UTE" 
+    file="/UTE/src/at/sume/sampling/SampleHouseholdCostOfResidence.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="545" y="561"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="9" language="java" name="at.sume.sampling.entities.SampleDbPersons" project="UTE" 
+    file="/UTE/src/at/sume/sampling/entities/SampleDbPersons.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1014" y="597"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="10" language="java" name="at.sume.dm.buildingprojects.SampleBuildingProjects" project="UTE" 
+    file="/UTE/src/at/sume/dm/buildingprojects/SampleBuildingProjects.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="348" y="869"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="11" language="java" name="at.sume.sampling.SampleHouseholdLivingSpace" project="UTE" 
+    file="/UTE/src/at/sume/sampling/SampleHouseholdLivingSpace.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="248" y="561"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="12" language="java" name="at.sume.sampling.SamplePersonIncome" project="UTE" 
+    file="/UTE/src/at/sume/sampling/SamplePersonIncome.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1025" y="1051"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="13" language="java" name="at.sume.sampling.Distribution" project="UTE" 
+    file="/UTE/src/at/sume/sampling/Distribution.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="496" y="1386"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="14" language="java" name="at.sume.sampling.ExactDistribution" project="UTE" 
+    file="/UTE/src/at/sume/sampling/ExactDistribution.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="751" y="1526"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="15" language="java" name="at.sume.sampling.AssociateHouseholdsDwellings" project="UTE" 
+    file="/UTE/src/at/sume/sampling/AssociateHouseholdsDwellings.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="360" y="62"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="16" language="java" name="at.sume.sampling.PersonDistributionAgeSex" project="UTE" 
+    file="/UTE/src/at/sume/sampling/PersonDistributionAgeSex.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="704" y="878"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="17" language="java" name="at.sume.sampling.distributions.LivingSpaceDistributionRow" project="UTE" 
+    file="/UTE/src/at/sume/sampling/distributions/LivingSpaceDistributionRow.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="347" y="197"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="18" language="java" name="at.sume.sampling.distributions.PersonsPerAgeSex" project="UTE" 
+    file="/UTE/src/at/sume/sampling/distributions/PersonsPerAgeSex.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="742" y="1215"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <association id="19">    
+    <end type="SOURCE" refId="16" navigable="false">      
+      <attribute id="20" name="personsPerAgeSexRepr"/>      
+      <multiplicity id="21" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="22">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="23" name="members"/>      
+      <multiplicity id="24" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="25">    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="26" name="newDwellingSize"/>      
+      <multiplicity id="27" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="28">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="29" name="householdCostOfResidence"/>      
+      <multiplicity id="30" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="31">    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="32" name="distributionPersonAgeSex"/>      
+      <multiplicity id="33" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="16" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="34">    
+    <end type="SOURCE" refId="16" navigable="false">      
+      <attribute id="35" name="personsPerAgeSexNonRepr"/>      
+      <multiplicity id="36" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="37">    
+    <bendpoint x="450" y="903"/>    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="38" name="costOfResidencePerIncomeGroup"/>      
+      <multiplicity id="39" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="40">    
+    <bendpoint x="126" y="903"/>    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="41" name="livingSpacePerHouseholdSize"/>      
+      <multiplicity id="42" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="43">    
+    <end type="SOURCE" refId="14"/>    
+    <end type="TARGET" refId="13"/>  
+  </generalization>  
+  <association id="44">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="45" name="householdsPerSpatialUnit"/>      
+      <multiplicity id="46" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="47">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="48" name="sampleDbPersons"/>      
+      <multiplicity id="49" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="9" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="50">    
+    <end type="SOURCE" refId="16" navigable="false">      
+      <attribute id="51" name="result"/>      
+      <multiplicity id="52" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="18" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="53">    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="54" name="income"/>      
+      <multiplicity id="55" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="56">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="57" name="sampleLivingSpace"/>      
+      <multiplicity id="58" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="11" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    sort-features="false" accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true" static="true"/>    
+    <operations public="true" package="true" protected="true" private="true" static="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

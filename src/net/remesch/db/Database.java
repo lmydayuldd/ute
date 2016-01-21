@@ -351,14 +351,14 @@ public class Database {
 		Field fields[] = Reflection.getFieldNames(c);
 		assert fields.length > 0 : "No fields in class " + c.getName() + " or in its superclasses";
 		con.setAutoCommit(false); // if auto-commit is set to true, the connection has to be closed to really write the records into the table
-		Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+		Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 		ResultSet rs = stmt.executeQuery(sqlStatement);
 		int j = 0;
 		for (T row : rowList) {
 			if ((j % 10000 == 0) && (j != 0)) {
 				System.out.println(DateUtil.now() + ": Adding row " + j + " of " + rowList.size());
 			}
-			rs.moveToInsertRow();
+//			rs.moveToInsertRow();
 			for (Field field : fields) {
 				if (field.isAnnotationPresent(net.remesch.db.schema.Ignore.class))
 					continue;
@@ -418,7 +418,7 @@ public class Database {
 		assert fields.size() > 0 : "No fields in class " + c.getName() + " or in its superclasses";
 		if (!autoCommit)
 			con.setAutoCommit(false); // if auto-commit is set to true, the connection has to be closed to really write the records into the table
-		Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+		Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 		ResultSet rs = stmt.executeQuery(sqlStatement);
 		// Prepare field accessibility
 		for (DatabaseFieldMap fieldMap : fields) {
@@ -434,7 +434,8 @@ public class Database {
 			if ((j % 10000 == 0) && (j != 0)) {
 				System.out.println(DateUtil.now() + ": Adding row " + j + " of " + rowList.size());
 			}
-			rs.moveToInsertRow();
+			stmt.execute("");
+//			rs.moveToInsertRow();
 			for (DatabaseFieldMap fieldMap : fields) {
 				Field field = fieldMap.getField();
 				if (fieldMap.isIgnore())

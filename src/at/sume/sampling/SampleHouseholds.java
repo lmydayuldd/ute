@@ -46,6 +46,7 @@ public class SampleHouseholds implements Iterable<HouseholdsPerSpatialUnit> {
 	 */
 	public SampleHouseholds(Database db, String whereClause) throws SQLException, InstantiationException, IllegalAccessException
 	{
+		// TODO: in order to generate households per SGT, this table would have to be changed!!!!
 		String sqlStatement = "select SpatialUnitId, HouseholdSize, HouseholdCount, PersonCount " + 
 			"from [VZ_2001_Haushalte (ZB) relational] " +
 			"where " + whereClause +

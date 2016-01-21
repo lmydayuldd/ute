@@ -50,7 +50,7 @@ public class SampleHouseholdLivingSpace {
 				sqlStatement = "select " + (i + 1) + " as HouseholdSize, LivingSpaceGroupId as LivingSpaceGroup, sum(HhDwCount) as HouseholdCount " + 
 					"from [_DM_Living space per spatial unit, household size] " + 
 					"where HouseholdSize >= " + (i + 1) + " and SpatialUnitId = " + spatialUnitId +
-					" group by " + (i + 1) + ", LivingSpaceGroupId " +
+					" group by LivingSpaceGroupId " +
 					"order by LivingSpaceGroupId";
 			}
 			ArrayList<LivingSpaceDistributionRow> livingSpaceDistribution = db.select(LivingSpaceDistributionRow.class, sqlStatement);

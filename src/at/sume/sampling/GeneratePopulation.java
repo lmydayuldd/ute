@@ -6,14 +6,13 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
-import net.remesch.db.Database;
 import at.sume.dm.Common;
-import at.sume.dm.entities.SpatialUnitLevel;
 import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
 import at.sume.sampling.entities.DbHouseholdRow;
 import at.sume.sampling.entities.DbPersonRow;
 import at.sume.sampling.entities.SampleDbHouseholds;
+import net.remesch.db.Database;
 
 /**
  * Class for generation of synthetic population
@@ -75,9 +74,11 @@ public class GeneratePopulation {
 			personCount += persons.size();
 			if (households.size() > 0) {
 //				System.out.println(Common.printInfo() + ": writing " + households.size() + " households and " + persons.size() + " persons to the db");
-				db.insertFieldMap(households, "select HouseholdId, HouseholdSize, SpatialUnitId, DwellingId, LivingSpace, CostOfResidence, HouseholdType from _DM_Households", true);
+//				db.insertFieldMap(households, "select HouseholdId, HouseholdSize, SpatialUnitId, DwellingId, LivingSpace, CostOfResidence, HouseholdType from _DM_Households", true);
+				db.insertSql(households, "_DM_Households");
 				db.con.commit();
-				db.insertFieldMap(persons, "select PersonId, HouseholdId, Sex, Age, YearlyIncome from _DM_Persons", true);
+//				db.insertFieldMap(persons, "select PersonId, HouseholdId, Sex, Age, YearlyIncome from _DM_Persons", true);
+				db.insertSql(persons, "_DM_Persons");
 				db.con.commit();
 			}
 		}
@@ -106,7 +107,7 @@ public class GeneratePopulation {
 		db.con.setAutoCommit(false);
 		Common.init();
 		@SuppressWarnings("unused")
-		RentPerSpatialUnit rentPerSpatialUnit = RentPerSpatialUnit.getInstance("", SpatialUnitLevel.ZB);
+		RentPerSpatialUnit rentPerSpatialUnit = RentPerSpatialUnit.getInstance("", Common.getSpatialUnitLevel());
 
 		// TODO: put into a table-class, method truncate
 		db.execute("delete from _DM_Households");

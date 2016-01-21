@@ -26,7 +26,7 @@ public class PersonDistributionAgeSex {
 	{
 		// Load distribution for household representatives
 		String sqlStatement = "select SpatialUnitId, Sex, AgeGroupId, HouseholdRepresentative, PersCount " + 
-			"from [_DM_Persons per age, sex, hh-repr, spatial unit] where SpatialUnitId = " + spatialUnitId + " and HouseholdRepresentative = -1;";
+			"from [_DM_Persons per age, sex, hh-repr, spatial unit] where SpatialUnitId = " + spatialUnitId + " and HouseholdRepresentative <> 0;";
 		ArrayList<PersonsPerAgeSex> p = db.select(PersonsPerAgeSex.class, sqlStatement);
 		personsPerAgeSexRepr = new Distribution<PersonsPerAgeSex>(p, "persCount");
 		// Load distribution for non-representatives
