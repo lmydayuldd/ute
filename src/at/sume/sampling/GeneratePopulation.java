@@ -109,8 +109,8 @@ public class GeneratePopulation {
 		RentPerSpatialUnit rentPerSpatialUnit = RentPerSpatialUnit.getInstance("", SpatialUnitLevel.ZB);
 
 		// TODO: put into a table-class, method truncate
-		db.execute("delete * from _DM_Households");
-		db.execute("delete * from _DM_Persons");
+		db.execute("delete from _DM_Households");
+		db.execute("delete from _DM_Persons");
 //			db.con.setAutoCommit(false);
 		db.con.commit();
 		
