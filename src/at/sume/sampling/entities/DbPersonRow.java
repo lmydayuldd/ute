@@ -14,6 +14,7 @@ public class DbPersonRow {
 	private byte sex;
 	private short age;
 	private int yearlyIncome;
+	private int workplaceId;		// spatial unit id of workplace
 	
 	/**
 	 * @return the personId
@@ -74,5 +75,19 @@ public class DbPersonRow {
 	 */
 	public void setYearlyIncome(int yearlyIncome) {
 		this.yearlyIncome = yearlyIncome;
+	}
+
+	/**
+	 * @return the workplaceId
+	 */
+	public int getWorkplaceId() {
+		return workplaceId;
+	}
+
+	/**
+	 * @param workplaceId the workplaceId to set
+	 */
+	public void setWorkplaceId(int workplaceId) {
+		this.workplaceId = workplaceId;
 	}
 }

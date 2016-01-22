@@ -5,10 +5,12 @@ package at.sume.sampling.entities;
 
 import java.sql.SQLException;
 
-import net.remesch.db.Database;
-import net.remesch.db.Sequence;
+import at.sume.dm.Common;
 import at.sume.sampling.PersonDistributionAgeSex;
 import at.sume.sampling.SamplePersonIncome;
+import at.sume.sampling.SampleWorkplaces;
+import net.remesch.db.Database;
+import net.remesch.db.Sequence;
 
 /**
  * @author Alexander Remesch
@@ -20,15 +22,22 @@ public class SampleDbPersons {
 	private SamplePersonIncome income;
 	private int spatialUnitId;
 	private Database db;
+	private SampleWorkplaces sampleWorkplaces;
+	private int minIncomeForWorkplace;
 	
-	public SampleDbPersons(Database db) throws SQLException  {
+	public SampleDbPersons(Database db) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException  {
 		income = new SamplePersonIncome(db);
 		this.db = db;
+		// Sampling of workplaces
+		sampleWorkplaces = new SampleWorkplaces(db);
+		minIncomeForWorkplace = Integer.parseInt(Common.getSysParamDataPreparation("MinIncomeForWorkplace"));
 	}
 
 	public void setSpatialUnit(int spatialUnitId) throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException {
 		distributionPersonAgeSex = new PersonDistributionAgeSex(db, spatialUnitId);
 		this.spatialUnitId = spatialUnitId;
+		// Workplace sampling: Load commuter matrix for current residential spatial unit
+		sampleWorkplaces.loadCommuterMatrix(db, spatialUnitId);
 	}
 	
 	public DbPersonRow randomSample(int householdId, boolean householdRepresentative) throws SQLException {
@@ -41,6 +50,9 @@ public class SampleDbPersons {
 		// Yearly income
 		income.loadDistribution(spatialUnitId, result.getSex(), distributionPersonAgeSex.getSampledAgeGroupId());
 		result.setYearlyIncome(income.determineIncome());
+		// TODO: Work place (matching income & age!)
+		if (result.getYearlyIncome() >= minIncomeForWorkplace) 
+			result.setWorkplaceId(sampleWorkplaces.randomSample());
 		return result;
 	}
 }

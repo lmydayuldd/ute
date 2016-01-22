@@ -5,10 +5,7 @@ package at.sume.sampling.entities;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import net.remesch.util.Random;
 
-import net.remesch.db.Database;
-import net.remesch.db.Sequence;
 import at.sume.dm.Common;
 import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.Dwellings;
@@ -18,6 +15,9 @@ import at.sume.dm.types.LivingSpaceGroup6;
 import at.sume.sampling.SampleHouseholdCostOfResidence;
 import at.sume.sampling.SampleHouseholdLivingSpace;
 import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
+import net.remesch.db.Database;
+import net.remesch.db.Sequence;
+import net.remesch.util.Random;
 
 /**
  * This class includes the complete household sampling.
