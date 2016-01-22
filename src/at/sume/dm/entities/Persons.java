@@ -42,7 +42,7 @@ public class Persons extends RecordSetClonable<PersonRow> {
 	 */
 	@Override
 	public String[] fieldnames() {
-		String s[] = { "PersonId", "HouseholdId", "Sex", "Age", "AgeGroupId", "HouseholdRepresentative", "YearlyIncome", "PersonNrInHousehold" };
+		String s[] = { "PersonId", "HouseholdId", "Sex", "Age", "AgeGroupId", "HouseholdRepresentative", "YearlyIncome", "PersonNrInHousehold", "WorkplaceId" };
 		return s;
 	}
 

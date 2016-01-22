@@ -28,6 +28,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	private int yearlyIncome;
 	private HouseholdRow household;
 //	private short personNrInHousehold;
+	private int workplaceId;
 	@Ignore
 	private boolean livingWithParents;	// is the person a child living with her/his parents
 										// necessary to be able to move the child out of the parental home 
@@ -205,6 +206,20 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	}
 
 	/**
+	 * @return the workplaceId
+	 */
+	public int getWorkplaceId() {
+		return workplaceId;
+	}
+
+	/**
+	 * @param workplaceId the workplaceId to set
+	 */
+	public void setWorkplaceId(int workplaceId) {
+		this.workplaceId = workplaceId;
+	}
+
+	/**
 	 * @return the persons
 	 */
 	public Persons getPersons() {
@@ -234,6 +249,8 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 			setYearlyIncome(rs.getInt(name));
 		} else if (name.equals("PersonNrInHousehold")) {
 //			setPersonNrInHousehold(rs.getShort(name));
+		} else if (name.equals("WorkplaceId")) {
+			setWorkplaceId(rs.getInt("WorkplaceId"));
 		} else {
 			throw new UnsupportedOperationException("Unknown field name " + name);
 		}
