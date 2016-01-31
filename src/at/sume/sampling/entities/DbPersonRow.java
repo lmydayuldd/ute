@@ -3,6 +3,9 @@
  */
 package at.sume.sampling.entities;
 
+import java.util.List;
+
+import net.remesch.db.schema.Ignore;
 
 /**
  * @author Alexander Remesch
@@ -14,7 +17,10 @@ public class DbPersonRow {
 	private byte sex;
 	private short age;
 	private int yearlyIncome;
-	private int workplaceId;		// spatial unit id of workplace
+	private int workplaceId;				// spatial unit id of workplace
+	private int travelModeCommuting;		// travel mode for commuting (if the person commutes)
+	@Ignore
+	private List<DbTimeUseRow> timeUse;		// time use of person
 	
 	/**
 	 * @return the personId
@@ -89,5 +95,29 @@ public class DbPersonRow {
 	 */
 	public void setWorkplaceId(int workplaceId) {
 		this.workplaceId = workplaceId;
+	}
+	/**
+	 * @return the travelModeCommuting
+	 */
+	public int getTravelModeCommuting() {
+		return travelModeCommuting;
+	}
+	/**
+	 * @param travelModeCommuting the travelModeCommuting to set
+	 */
+	public void setTravelModeCommuting(int travelModeCommuting) {
+		this.travelModeCommuting = travelModeCommuting;
+	}
+	/**
+	 * @return the timeUse
+	 */
+	public List<DbTimeUseRow> getTimeUse() {
+		return timeUse;
+	}
+	/**
+	 * @param timeUse the timeUse to set
+	 */
+	public void setTimeUse(List<DbTimeUseRow> timeUse) {
+		this.timeUse = timeUse;
 	}
 }

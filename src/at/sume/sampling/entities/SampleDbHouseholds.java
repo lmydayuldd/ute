@@ -5,6 +5,7 @@ package at.sume.sampling.entities;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import at.sume.dm.Common;
 import at.sume.dm.entities.DwellingRow;
@@ -28,7 +29,6 @@ public class SampleDbHouseholds {
 	private SampleDbPersons sampleDbPersons;
 	private Sequence householdNr = new Sequence();
 	private int spatialUnitId;
-	private ArrayList<DbPersonRow> members;
 	private SampleHouseholdLivingSpace sampleLivingSpace;
 	private Database db;
 	private SpatialUnits spatialUnits;
@@ -115,7 +115,8 @@ public class SampleDbHouseholds {
 		result.setSpatialUnitId(spatialUnitId);
 		result.setHouseholdType((byte)1); // mark as private household
 		// Persons: age, sex & income
-		members = new ArrayList<DbPersonRow>();
+		List<DbPersonRow> members = new ArrayList<DbPersonRow>();
+		result.setMembers(members);
 		int memberCount = 1;
 		if (householdsPerSpatialUnit.householdSize < householdSizeGroups) {
 			// sample given household size
@@ -199,12 +200,5 @@ public class SampleDbHouseholds {
 		result.setCostOfResidence(householdCostOfResidence.randomSample(yearlyHouseholdIncome) * result.getLivingSpace() / 100);
 		
 		return result;
-	}
-	/**
-	 * Return the members of the previously sampled household
-	 * @return
-	 */
-	public ArrayList<DbPersonRow> getSampledMembers() {
-		return members;
 	}
 }
