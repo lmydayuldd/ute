@@ -39,10 +39,10 @@ public class SampleWorkplaces {
 		String sqlStatement = "SELECT DISTINCT WorkplaceAD FROM _DM_Workplaces_ZB ORDER BY WorkplaceAD";
 		ResultSet resultSet = db.executeQuery(sqlStatement);
 		List<Integer> districts = new ArrayList<Integer>();
-		assert districts.size() > 0 : "No records found from '" + sqlStatement + "'";
 		while (resultSet.next()) {
 			districts.add(resultSet.getInt(1));
 		}
+		assert districts.size() > 0 : "No records found from '" + sqlStatement + "'";
 		// load workplaces per Zählbezirk (this doesn't change with the residenceId, so it could be done only once, on the other hand it shouldn't be so costly...)
 		workplaceADtoZB = new HashMap<Integer,Distribution<WorkplacesPerZBRow>>();
 		for (Integer d : districts) {

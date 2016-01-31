@@ -3,6 +3,9 @@
  */
 package at.sume.sampling.entities;
 
+import java.util.List;
+
+import net.remesch.db.schema.Ignore;
 
 /**
  * @author Alexander Remesch
@@ -18,6 +21,8 @@ public class DbHouseholdRow {
 //	private short residentialSatisfactionThreshMod;
 	private short householdSize;		// only for ease-of-use, not really needed
 	private byte householdType;
+	@Ignore
+	private List<DbPersonRow> members;
 	
 	/**
 	 * @param householdId the householdId to set
@@ -130,5 +135,19 @@ public class DbHouseholdRow {
 	 */
 	public void setHouseholdType(byte householdType) {
 		this.householdType = householdType;
+	}
+
+	/**
+	 * @return the members
+	 */
+	public List<DbPersonRow> getMembers() {
+		return members;
+	}
+
+	/**
+	 * @param members the members to set
+	 */
+	public void setMembers(List<DbPersonRow> members) {
+		this.members = members;
 	}
 }

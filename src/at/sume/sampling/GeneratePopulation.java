@@ -3,6 +3,7 @@ package at.sume.sampling;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -11,6 +12,7 @@ import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
 import at.sume.sampling.entities.DbHouseholdRow;
 import at.sume.sampling.entities.DbPersonRow;
+import at.sume.sampling.entities.DbTimeUseRow;
 import at.sume.sampling.entities.SampleDbHouseholds;
 import net.remesch.db.Database;
 
@@ -53,8 +55,9 @@ public class GeneratePopulation {
 		
 		// Sample households including persons
 		for (HouseholdsPerSpatialUnit householdsPerSpatialUnit : sampleHouseholds) {
-			ArrayList<DbHouseholdRow> households = new ArrayList<DbHouseholdRow>();
-			ArrayList<DbPersonRow> persons = new ArrayList<DbPersonRow>();
+			List<DbHouseholdRow> households = new ArrayList<DbHouseholdRow>();
+			List<DbPersonRow> persons = new ArrayList<DbPersonRow>();
+			List<DbTimeUseRow> timeUse = new ArrayList<DbTimeUseRow>();
 			
 			if (householdsPerSpatialUnit.householdSize > householdSizeGroups)
 				System.out.println(Common.printInfo() + ": creating " + householdsPerSpatialUnit.householdCount + " households for spatial unit " + householdsPerSpatialUnit.spatialUnitId + " (institutional households)");
@@ -64,8 +67,12 @@ public class GeneratePopulation {
 			for (int i = 0; i != householdsPerSpatialUnit.householdCount; i++) {
 				DbHouseholdRow household = sampleDbHouseholds.randomSample(householdsPerSpatialUnit, i);
 				households.add(household);
-				ArrayList<DbPersonRow> members = sampleDbHouseholds.getSampledMembers();
-				persons.addAll(members);
+				persons.addAll(household.getMembers());
+				for (DbPersonRow p : persons) {
+					List<DbTimeUseRow> t = p.getTimeUse();
+					if (t != null)
+						timeUse.addAll(t);
+				}
 //				if ((i % 1000 == 0) && (i > 0)) {
 //					System.out.println(Common.printInfo() + ": creating household " + i + " of " + householdsPerSpatialUnit.householdCount);
 //				}
@@ -80,6 +87,7 @@ public class GeneratePopulation {
 //				db.insertFieldMap(persons, "select PersonId, HouseholdId, Sex, Age, YearlyIncome from _DM_Persons", true);
 				db.insertSql(persons, "_DM_Persons");
 				db.con.commit();
+				db.insertSql(timeUse, "_DM_TimeUse");
 			}
 		}
 	}
@@ -112,6 +120,7 @@ public class GeneratePopulation {
 		// TODO: put into a table-class, method truncate
 		db.execute("delete from _DM_Households");
 		db.execute("delete from _DM_Persons");
+		db.execute("delete from _DM_TimeUse");
 //			db.con.setAutoCommit(false);
 		db.con.commit();
 		
