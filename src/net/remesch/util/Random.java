@@ -41,6 +41,8 @@ public class Random extends MersenneTwisterFast {
 	 * @return
 	 */
 	public double triangular(double min, double max, double mode) {
+		if (mode < min || mode > max || min > max)
+			throw new IllegalArgumentException("Invalid arguments to triangular(min, max, mode): " + min + ", " + max + ", " + mode);
 		double bound = (mode - min) / (max - min);
 		double r = nextDouble();
 		double result = 0;

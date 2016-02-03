@@ -68,7 +68,7 @@ public class GeneratePopulation {
 				DbHouseholdRow household = sampleDbHouseholds.randomSample(householdsPerSpatialUnit, i);
 				households.add(household);
 				persons.addAll(household.getMembers());
-				for (DbPersonRow p : persons) {
+				for (DbPersonRow p : household.getMembers()) {
 					List<DbTimeUseRow> t = p.getTimeUse();
 					if (t != null)
 						timeUse.addAll(t);

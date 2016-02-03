@@ -148,7 +148,7 @@ public class SampleDbHouseholds {
 				if (householdsPerSpatialUnit.householdSize > householdSizeGroups) {
 					// institutional households
 					// TODO: this is untested but it should work well! distribution is normal
-					memberCount = (int) (r.triangular(1, surplusPersonCount, avgHouseholdSize));
+					memberCount = (int) (r.triangular(1, surplusPersonCount, Math.min(surplusPersonCount, avgHouseholdSize)));
 				} else {
 					// households with more members than householdSizeGroups
 					// TODO: make restriction to 11 members a system parameter (or it might become obsolete with a exponential function?)
