@@ -16,6 +16,7 @@ import at.sume.dm.types.LivingSpaceGroup6;
 import at.sume.sampling.SampleHouseholdCostOfResidence;
 import at.sume.sampling.SampleHouseholdLivingSpace;
 import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
+import at.sume.sampling.timeuse.SampleDbTimeUse;
 import net.remesch.db.Database;
 import net.remesch.db.Sequence;
 import net.remesch.util.Random;
@@ -27,6 +28,7 @@ import net.remesch.util.Random;
  */
 public class SampleDbHouseholds {
 	private SampleDbPersons sampleDbPersons;
+	private SampleDbTimeUse sampleDbTimeUse;
 	private Sequence householdNr = new Sequence();
 	private int spatialUnitId;
 	private SampleHouseholdLivingSpace sampleLivingSpace;
@@ -73,6 +75,8 @@ public class SampleDbHouseholds {
 		
 		sampleDbPersons = new SampleDbPersons(db);
 
+		sampleDbTimeUse = new SampleDbTimeUse(db);
+		
 		// Preparation of sampling of cost of residence from the living space
 		householdCostOfResidence = new SampleHouseholdCostOfResidence(db);
 	}
@@ -89,6 +93,7 @@ public class SampleDbHouseholds {
 	public void setSpatialUnit(int spatialUnitId) throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException {
 		this.spatialUnitId = spatialUnitId;
 		sampleDbPersons.setSpatialUnit(spatialUnitId);
+		sampleDbTimeUse.setCommutingOrigin(spatialUnitId);
 		sampleLivingSpace = new SampleHouseholdLivingSpace(db, spatialUnitId, householdSizeGroups);
 	}
 //	/**
@@ -166,10 +171,15 @@ public class SampleDbHouseholds {
 		assert (memberCount > 0) && (memberCount <= 1000) : "Household member count out of range (" + memberCount + ")";
 		result.setHouseholdSize((short)memberCount);
 		int yearlyHouseholdIncome = 0;
+		int childrenBelow15 = 0;
 		for (short j = 0; j != memberCount; j++) {
 			DbPersonRow person = sampleDbPersons.randomSample(result.getHouseholdId(), (j == 0));
 			members.add(person);
 			yearlyHouseholdIncome += person.getYearlyIncome();
+			// Collect some information for later sampling of time use
+			if (person.getAge() < 15) {
+				childrenBelow15++;
+			}
 		}
 		// Living space - find a suitable dwelling
 		DwellingRow dwelling = null;
@@ -198,7 +208,22 @@ public class SampleDbHouseholds {
 //		result.setResidentialSatisfactionThreshMod((short) Math.round(r.nextGaussian() * residentialSatisfactionThresholdRange));
 		// Cost of residence
 		result.setCostOfResidence(householdCostOfResidence.randomSample(yearlyHouseholdIncome) * result.getLivingSpace() / 100);
-		
+
+		// Sample time use per person
+		for (DbPersonRow person : members) {
+			sampleDbTimeUse.setHouseholdWithChildren(childrenBelow15 > 0);
+			if (person.isInEducation()) {
+				sampleDbTimeUse.setInEducation(true);
+				sampleDbTimeUse.setCommutingDestination(person.getWorkplaceId());
+				
+			} else if (person.getWorkplaceId() != 0) {
+				sampleDbTimeUse.setWorking(true);
+				sampleDbTimeUse.setCommutingDestination(person.getWorkplaceId());
+			}
+			sampleDbTimeUse.setGender(person.getSex());
+			sampleDbTimeUse.setPersonId(person.getPersonId());
+			person.setTimeUse(sampleDbTimeUse.randomSample());
+		}
 		return result;
 	}
 }
