@@ -5,6 +5,7 @@ package at.sume.sampling.entities;
 
 import java.util.List;
 
+import at.sume.dm.types.TravelMode;
 import net.remesch.db.schema.Ignore;
 
 /**
@@ -18,9 +19,11 @@ public class DbPersonRow {
 	private short age;
 	private int yearlyIncome;
 	private int workplaceId;				// spatial unit id of workplace
-	private int travelModeCommuting;		// travel mode for commuting (if the person commutes)
+	private TravelMode travelModeCommuting;	// travel mode for commuting (if the person commutes)
 	@Ignore
 	private List<DbTimeUseRow> timeUse;		// time use of person
+	@Ignore
+	private boolean inEducation;
 	
 	/**
 	 * @return the personId
@@ -99,13 +102,13 @@ public class DbPersonRow {
 	/**
 	 * @return the travelModeCommuting
 	 */
-	public int getTravelModeCommuting() {
+	public TravelMode getTravelModeCommuting() {
 		return travelModeCommuting;
 	}
 	/**
 	 * @param travelModeCommuting the travelModeCommuting to set
 	 */
-	public void setTravelModeCommuting(int travelModeCommuting) {
+	public void setTravelModeCommuting(TravelMode travelModeCommuting) {
 		this.travelModeCommuting = travelModeCommuting;
 	}
 	/**
@@ -119,5 +122,17 @@ public class DbPersonRow {
 	 */
 	public void setTimeUse(List<DbTimeUseRow> timeUse) {
 		this.timeUse = timeUse;
+	}
+	/**
+	 * @return the inEducation
+	 */
+	public boolean isInEducation() {
+		return inEducation;
+	}
+	/**
+	 * @param inEducation the inEducation to set
+	 */
+	public void setInEducation(boolean inEducation) {
+		this.inEducation = inEducation;
 	}
 }

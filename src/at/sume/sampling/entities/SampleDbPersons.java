@@ -4,14 +4,12 @@
 package at.sume.sampling.entities;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import at.sume.dm.Common;
 import at.sume.sampling.PersonDistributionAgeSex;
 import at.sume.sampling.SamplePersonIncome;
-import at.sume.sampling.SampleTravelTimes;
 import at.sume.sampling.SampleWorkplaces;
+import at.sume.sampling.timeuse.SampleTravelTimesByDistance;
 import net.remesch.db.Database;
 import net.remesch.db.Sequence;
 
@@ -26,9 +24,8 @@ public class SampleDbPersons {
 	private int spatialUnitId;
 	private Database db;
 	private SampleWorkplaces sampleWorkplaces;
-	private SampleTravelTimes sampleTravelTimes;
+	private SampleTravelTimesByDistance sampleTravelTimes;
 	private int minIncomeForWorkplace;
-	private List<DbTimeUseRow> timeUse;
 	
 	public SampleDbPersons(Database db) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException  {
 		income = new SamplePersonIncome(db);
@@ -37,7 +34,7 @@ public class SampleDbPersons {
 		sampleWorkplaces = new SampleWorkplaces(db);
 		minIncomeForWorkplace = Integer.parseInt(Common.getSysParamDataPreparation("MinIncomeForWorkplace"));
 		// Sampling of commuting times & mode
-		sampleTravelTimes = new SampleTravelTimes(db);
+		sampleTravelTimes = new SampleTravelTimesByDistance(db);
 	}
 
 	public void setSpatialUnit(int spatialUnitId) throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException {
@@ -57,7 +54,6 @@ public class SampleDbPersons {
 	 */
 	public DbPersonRow randomSample(int householdId, boolean householdRepresentative) throws SQLException {
 		DbPersonRow result = new DbPersonRow();
-		timeUse = new ArrayList<DbTimeUseRow>();
 		result.setPersonId(personNr.getNext());
 		result.setHouseholdId(householdId);
 		distributionPersonAgeSex.randomSample(householdRepresentative);
@@ -68,18 +64,13 @@ public class SampleDbPersons {
 		result.setYearlyIncome(income.determineIncome());
 		// TODO: Work place (matching income & age!)
 		if (result.getYearlyIncome() >= minIncomeForWorkplace) { 
+			result.setInEducation(false);
 			// set workplace
 			result.setWorkplaceId(sampleWorkplaces.randomSample());
-			// calculate commuting time
-			// TODO: reduce class inter-dependence here!
-			DbTimeUseRow timeUseRow = new DbTimeUseRow();
-			timeUseRow.setActivity("travel work");
-			timeUseRow.setPersonId(result.getPersonId());
-			timeUseRow.setMinutesPerDay((int) sampleTravelTimes.estimateTravelTime(result.getWorkplaceId()));
-			timeUse.add(timeUseRow);
-			result.setTimeUse(timeUse);
-			result.setTravelModeCommuting(sampleTravelTimes.getTravelMode());
-		}
+		} else  if (result.getAge() >= 6 && result.getAge() <= 18) {
+			result.setInEducation(true);
+			result.setWorkplaceId(sampleWorkplaces.randomSample());
+		}	
 		return result;
 	}
 }

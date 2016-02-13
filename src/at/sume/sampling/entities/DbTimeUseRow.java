@@ -11,6 +11,19 @@ public class DbTimeUseRow {
 	private int personId;
 	private String activity;
 	private int minutesPerDay;
+	
+	public DbTimeUseRow() {
+	}
+	public DbTimeUseRow(int personId, String activity, int minutesPerDay) {
+		this.personId = personId;
+		this.activity = activity;
+		this.minutesPerDay = minutesPerDay;
+	}
+	public DbTimeUseRow(int personId, String activity, double hoursPerDay) {
+		this.personId = personId;
+		this.activity = activity;
+		this.minutesPerDay = (int) Math.round(hoursPerDay * 60);
+	}
 	/**
 	 * @return the personId
 	 */

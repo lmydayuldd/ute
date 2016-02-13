@@ -1,20 +1,23 @@
-package at.sume.sampling;
+package at.sume.sampling.timeuse;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import at.sume.dm.types.TravelMode;
 import at.sume.sampling.distributions.TravelTimeRow;
+import at.sume.sampling.entities.DbTimeUseRow;
 import ec.util.MersenneTwisterFast;
 import net.remesch.db.Database;
 
-public class SampleTravelTimes {
+public class SampleTravelTimesByDistance {
 	private Database db;
 	private HashMap<Integer,Double> travelTimesMIT;
 	private HashMap<Integer,Double> travelTimesPublic;
-	private int travelMode;
+	private TravelMode travelMode;
+	private static final String timeUseTag = "travel work";
 	
-	public SampleTravelTimes(Database db) {
+	public SampleTravelTimesByDistance(Database db) {
 		this.db = db;
 	}
 	
@@ -29,13 +32,10 @@ public class SampleTravelTimes {
 		travelTimesMIT = new HashMap<Integer,Double>();
 		travelTimesPublic = new HashMap<Integer,Double>();
 		for (TravelTimeRow t : travelTimes) {
-			switch (t.mode) {
-			case 1: // public
+			if (t.mode == TravelMode.PUBLIC_TRANSPORT.getValue()) {
 				travelTimesPublic.put(t.destination, t.hours);
-				break;
-			case 2: // MIT
+			} else if (t.mode == TravelMode.MOTORIZED_INDIVIDUAL_TRANSPORT.getValue()) {
 				travelTimesMIT.put(t.destination, t.hours);
-				break;
 			}
 		}
 	}
@@ -48,7 +48,7 @@ public class SampleTravelTimes {
 	public long estimateTravelTime(int destination) {
 		//TODO: don't know at the moment what to do with commutings out of Vienna
 		if ((destination == 3) || (destination == 1)) {
-			travelMode = 2;
+			travelMode = TravelMode.MOTORIZED_INDIVIDUAL_TRANSPORT;
 			return 60;
 		}
 		MersenneTwisterFast r = new MersenneTwisterFast();
@@ -59,10 +59,10 @@ public class SampleTravelTimes {
 			pTravelMIT = (travelTimeMIT - travelTimePublic) / travelTimeMIT;
 		}
 		if (r.nextDouble() < pTravelMIT) {
-			travelMode = 2;
+			travelMode = TravelMode.MOTORIZED_INDIVIDUAL_TRANSPORT;
 			return travelTimeMIT;
 		} else {
-			travelMode = 1;
+			travelMode = TravelMode.PUBLIC_TRANSPORT;
 			return travelTimePublic;
 		}
 	}
@@ -73,23 +73,29 @@ public class SampleTravelTimes {
 	 * @param mode
 	 * @return
 	 */
-	public long estimateTravelTime(int destination, int mode) {
+	public long estimateTravelTime(int destination, TravelMode mode) {
 		long travelTime = -1;
 		switch (mode) {
-		case 1:
+		case PUBLIC_TRANSPORT:
 			travelTime = Math.round(travelTimesPublic.get(destination) * 60);
 			break;
-		case 2:
+		case MOTORIZED_INDIVIDUAL_TRANSPORT:
 			travelTime = Math.round(travelTimesMIT.get(destination) * 60);
 			break;
 		}
 		return travelTime;
 	}
+	public DbTimeUseRow estimateTravelTime(int personId, int destination) {
+		return new DbTimeUseRow(personId, timeUseTag, estimateTravelTime(destination));
+	}
+	public DbTimeUseRow estimateTravelTime(int personId, int destination, TravelMode mode) {
+		return new DbTimeUseRow(personId, timeUseTag, estimateTravelTime(destination, mode));
+	}
 	/**
 	 * Return the travel mode previously determined by estimateTravelTime()
 	 * @return
 	 */
-	public int getTravelMode() {
+	public TravelMode getTravelMode() {
 		return travelMode;
 	}
 }
