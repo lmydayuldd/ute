@@ -43,7 +43,7 @@ public class SampleTravelTimesByDistance {
 	 * Calculate the travel time to destination & determine the travel mode.
 	 * The travel mode can be fetched with getTravelMode()
 	 * @param destination
-	 * @return
+	 * @return Travel time in minutes
 	 */
 	public long estimateTravelTime(int destination) {
 		//TODO: don't know at the moment what to do with commutings out of Vienna
@@ -71,9 +71,14 @@ public class SampleTravelTimesByDistance {
 	 * The travel mode can be fetched with getTravelMode()
 	 * @param destination
 	 * @param mode
-	 * @return
+	 * @return Travel time in minutes
 	 */
 	public long estimateTravelTime(int destination, TravelMode mode) {
+		//TODO: don't know at the moment what to do with commutings out of Vienna
+		if ((destination == 3) || (destination == 1)) {
+			travelMode = mode;
+			return 60;
+		}
 		long travelTime = -1;
 		switch (mode) {
 		case PUBLIC_TRANSPORT:
@@ -86,10 +91,10 @@ public class SampleTravelTimesByDistance {
 		return travelTime;
 	}
 	public DbTimeUseRow estimateTravelTime(int personId, int destination) {
-		return new DbTimeUseRow(personId, timeUseTag, estimateTravelTime(destination));
+		return new DbTimeUseRow(personId, timeUseTag, (int) estimateTravelTime(destination));
 	}
 	public DbTimeUseRow estimateTravelTime(int personId, int destination, TravelMode mode) {
-		return new DbTimeUseRow(personId, timeUseTag, estimateTravelTime(destination, mode));
+		return new DbTimeUseRow(personId, timeUseTag, (int) estimateTravelTime(destination, mode));
 	}
 	/**
 	 * Return the travel mode previously determined by estimateTravelTime()

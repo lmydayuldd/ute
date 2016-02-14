@@ -5,7 +5,6 @@ package at.sume.sampling.entities;
 
 import java.util.List;
 
-import at.sume.dm.types.TravelMode;
 import net.remesch.db.schema.Ignore;
 
 /**
@@ -19,7 +18,7 @@ public class DbPersonRow {
 	private short age;
 	private int yearlyIncome;
 	private int workplaceId;				// spatial unit id of workplace
-	private TravelMode travelModeCommuting;	// travel mode for commuting (if the person commutes)
+	private int travelModeCommuting;	// travel mode for commuting (if the person commutes)
 	@Ignore
 	private List<DbTimeUseRow> timeUse;		// time use of person
 	@Ignore
@@ -102,13 +101,13 @@ public class DbPersonRow {
 	/**
 	 * @return the travelModeCommuting
 	 */
-	public TravelMode getTravelModeCommuting() {
+	public int getTravelModeCommuting() {
 		return travelModeCommuting;
 	}
 	/**
 	 * @param travelModeCommuting the travelModeCommuting to set
 	 */
-	public void setTravelModeCommuting(TravelMode travelModeCommuting) {
+	public void setTravelModeCommuting(int travelModeCommuting) {
 		this.travelModeCommuting = travelModeCommuting;
 	}
 	/**

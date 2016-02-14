@@ -3,6 +3,9 @@
  */
 package at.sume.sampling.entities;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
 /**
  * @author Alexander Remesch
  *
@@ -59,5 +62,11 @@ public class DbTimeUseRow {
 	 */
 	public void setMinutesPerDay(int minutesPerDay) {
 		this.minutesPerDay = minutesPerDay;
+	}
+	
+	public String toString() {
+		DecimalFormat df = new DecimalFormat("#.##");
+		df.setRoundingMode(RoundingMode.CEILING);
+		return activity + " - " + minutesPerDay + " min - " + df.format((double)minutesPerDay / 60) + " h";
 	}
 }

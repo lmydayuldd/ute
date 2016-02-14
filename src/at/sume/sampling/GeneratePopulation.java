@@ -88,6 +88,7 @@ public class GeneratePopulation {
 				db.insertSql(persons, "_DM_Persons");
 				db.con.commit();
 				db.insertSql(timeUse, "_DM_TimeUse");
+				db.con.commit();
 			}
 		}
 	}

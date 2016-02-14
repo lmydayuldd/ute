@@ -114,14 +114,16 @@ public class SampleDbTimeUse {
 //				}
 //			} while (retry);
 			t = sampleCaringTimes.randomSample(personId, householdWithChildren);
-			if (t.getMinutesPerDay() > 0)
+			if (t.getMinutesPerDay() > 0) {
 				result.add(t);
-			totalTimeUse += t.getMinutesPerDay();
-			// Travel caring
-			t = sampleTravelCaringTimes.randomSample(personId, householdWithChildren);
-			if (t.getMinutesPerDay() > 0)
-				result.add(t);
-			totalTimeUse += t.getMinutesPerDay();
+				totalTimeUse += t.getMinutesPerDay();
+				// Travel caring - only when caring time is there
+				t = sampleTravelCaringTimes.randomSample(personId, householdWithChildren);
+				if (t.getMinutesPerDay() > 0) {
+					result.add(t);
+					totalTimeUse += t.getMinutesPerDay();
+				}
+			}
 			// Commuting
 			if (working) {
 				t = sampleTravelTimesByDistance.estimateTravelTime(personId, commutingDest);
@@ -141,43 +143,48 @@ public class SampleDbTimeUse {
 			totalTimeUse += t.getMinutesPerDay();
 			// Household
 			t = sampleHouseholdTimes.randomSample(personId, gender);
-			if (t.getMinutesPerDay() > 0)
+			if (t.getMinutesPerDay() > 0) {
 				result.add(t);
-			totalTimeUse += t.getMinutesPerDay();
-			// Travel household
-			t = sampleTravelHouseholdTimes.randomSample(personId, gender);
-			if (t.getMinutesPerDay() > 0)
-				result.add(t);
-			totalTimeUse += t.getMinutesPerDay();
+				totalTimeUse += t.getMinutesPerDay();
+				// Travel household - only when household time is there
+				t = sampleTravelHouseholdTimes.randomSample(personId, gender);
+				if (t.getMinutesPerDay() > 0) {
+					result.add(t);
+					totalTimeUse += t.getMinutesPerDay();
+				}
+			}
 			// Leisure
 			t = sampleLeisureTimes.randomSample(personId, gender);
-			if (t.getMinutesPerDay() > 0)
+			if (t.getMinutesPerDay() > 0) {
 				result.add(t);
-			totalTimeUse += t.getMinutesPerDay();
-			// Travel leisure
-			t = sampleTravelLeisureTimes.randomSample(personId, gender);
-			if (t.getMinutesPerDay() > 0)
-				result.add(t);
-			totalTimeUse += t.getMinutesPerDay();
+				totalTimeUse += t.getMinutesPerDay();
+				// Travel leisure - only with leisure time
+				t = sampleTravelLeisureTimes.randomSample(personId, gender);
+				if (t.getMinutesPerDay() > 0) {
+					result.add(t);
+					totalTimeUse += t.getMinutesPerDay();
+				}
+			}
 			// Personal
 			t = samplePersonalTimes.randomSample(personId);
-			if (t.getMinutesPerDay() > 0)
+			if (t.getMinutesPerDay() > 0) {
 				result.add(t);
-			totalTimeUse += t.getMinutesPerDay();
-			// Travel personal
-			t = sampleTravelPersonalTimes.randomSample(personId);
-			if (t.getMinutesPerDay() > 0)
-				result.add(t);
-			totalTimeUse += t.getMinutesPerDay();
-			// Personal
+				totalTimeUse += t.getMinutesPerDay();
+				// Travel personal - only with personal time
+				t = sampleTravelPersonalTimes.randomSample(personId);
+				if (t.getMinutesPerDay() > 0) {
+					result.add(t);
+					totalTimeUse += t.getMinutesPerDay();
+				}
+			}
+			// Travel
 			t = sampleTravelTimes.randomSample(personId);
 			if (t.getMinutesPerDay() > 0)
 				result.add(t);
 			totalTimeUse += t.getMinutesPerDay();
 			
 			// total time use between 24 and 40 hrs?
-//			if ((totalTimeUse > 1440) && (totalTimeUse < 2400)) {
-			if (totalTimeUse > 1440) {
+			if ((totalTimeUse > 1440) && (totalTimeUse < 2400)) {
 				// Check total average time use before adding the record
 				timeUseTargetAvg.addActualTimeUse(result);
 				sampleOk = true;
