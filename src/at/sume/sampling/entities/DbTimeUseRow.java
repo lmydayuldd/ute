@@ -6,26 +6,37 @@ package at.sume.sampling.entities;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
+import net.remesch.db.schema.Ignore;
+
 /**
  * @author Alexander Remesch
  *
  */
 public class DbTimeUseRow {
+	private int id;
 	private int personId;
 	private String activity;
 	private int minutesPerDay;
+
+	@Ignore
+	private static int nextid = 1;
 	
 	public DbTimeUseRow() {
 	}
 	public DbTimeUseRow(int personId, String activity, int minutesPerDay) {
+		id = nextid++;
 		this.personId = personId;
 		this.activity = activity;
 		this.minutesPerDay = minutesPerDay;
 	}
 	public DbTimeUseRow(int personId, String activity, double hoursPerDay) {
+		id = nextid++;
 		this.personId = personId;
 		this.activity = activity;
 		this.minutesPerDay = (int) Math.round(hoursPerDay * 60);
+	}
+	public int getId() {
+		return id;
 	}
 	/**
 	 * @return the personId
@@ -67,6 +78,6 @@ public class DbTimeUseRow {
 	public String toString() {
 		DecimalFormat df = new DecimalFormat("#.##");
 		df.setRoundingMode(RoundingMode.CEILING);
-		return activity + " - " + minutesPerDay + " min - " + df.format((double)minutesPerDay / 60) + " h";
+		return "(" + id + ") " + activity + " - " + minutesPerDay + " min - " + df.format((double)minutesPerDay / 60) + " h";
 	}
 }
