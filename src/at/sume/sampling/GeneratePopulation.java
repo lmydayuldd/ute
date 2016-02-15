@@ -69,9 +69,11 @@ public class GeneratePopulation {
 				households.add(household);
 				persons.addAll(household.getMembers());
 				for (DbPersonRow p : household.getMembers()) {
-					List<DbTimeUseRow> t = p.getTimeUse();
-					if (t != null)
-						timeUse.addAll(t);
+					if (p.getAge() >= 10) { // ZVE 2008/2009 covers only persons of age 10 and above
+						List<DbTimeUseRow> t = p.getTimeUse();
+						if (t != null)
+							timeUse.addAll(t);
+					}
 				}
 //				if ((i % 1000 == 0) && (i > 0)) {
 //					System.out.println(Common.printInfo() + ": creating household " + i + " of " + householdsPerSpatialUnit.householdCount);

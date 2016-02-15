@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import at.sume.dm.Common;
 import at.sume.dm.types.TravelMode;
 import at.sume.sampling.entities.DbTimeUseRow;
 import net.remesch.db.Database;
@@ -36,8 +35,6 @@ public class SampleDbTimeUse {
 	private boolean householdWithChildren = false, inEducation = false, working = false;
 	private int personId = 0, gender = 1;
 	
-	private int maxTries = 100;
-	
 	public SampleDbTimeUse(Database db) throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
 		// Create all activity-related sampling classes & load the sampling distributions
 		// Sampling of commuting times & mode
@@ -54,8 +51,6 @@ public class SampleDbTimeUse {
 		sampleTravelTimes = new SampleTravelTimes(db);
 		
 		timeUseTargetAvg = new TimeUseTargetCheck(db);
-		
-		maxTries = Byte.parseByte(Common.getSysParamDataPreparation("MaxTriesKeepTimeUseInRange"));
 	}
 
 	public void setCommutingOrigin(int origin) throws InstantiationException, IllegalAccessException, SQLException {
@@ -87,38 +82,19 @@ public class SampleDbTimeUse {
 	 * @return
 	 */
 	public List<DbTimeUseRow> randomSample() {
-		int tries = 0;
 		List<DbTimeUseRow> result = null;
-		boolean sampleOk = false, retry = false;
+		boolean sampleOk = false;
 		while (!sampleOk) {
 			int totalTimeUse = 0;
 			result = new ArrayList<DbTimeUseRow>();
-			DbTimeUseRow t = null, best = null;
+			DbTimeUseRow t = null;
 			// Caring time
-			// TODO: put this into SampleCaringTimes class
-//			tries = 0;
-//			do {
-//				retry = false;
-//				t = sampleCaringTimes.randomSample(personId, householdWithChildren);
-//				if (tries++ >= maxTries)
-//					break;
-//				if (timeUseTargetAvg.belowTargetRange(t)) {
-//					retry = true;
-//					if (best == null || best.getMinutesPerDay() < t.getMinutesPerDay()) // t is higher -> new best
-//						best = t;
-//				}
-//				if (timeUseTargetAvg.abowTargetRange(t)) {
-//					retry = true;
-//					if (best == null || best.getMinutesPerDay() > t.getMinutesPerDay()) // t is lower -> new best
-//						best = t;
-//				}
-//			} while (retry);
-			t = sampleCaringTimes.randomSample(personId, householdWithChildren);
+			t = sampleCaringTimes.randomSample(personId, householdWithChildren, gender);
 			if (t.getMinutesPerDay() > 0) {
 				result.add(t);
 				totalTimeUse += t.getMinutesPerDay();
 				// Travel caring - only when caring time is there
-				t = sampleTravelCaringTimes.randomSample(personId, householdWithChildren);
+				t = sampleTravelCaringTimes.randomSample(personId);
 				if (t.getMinutesPerDay() > 0) {
 					result.add(t);
 					totalTimeUse += t.getMinutesPerDay();
@@ -147,7 +123,7 @@ public class SampleDbTimeUse {
 				result.add(t);
 				totalTimeUse += t.getMinutesPerDay();
 				// Travel household - only when household time is there
-				t = sampleTravelHouseholdTimes.randomSample(personId, gender);
+				t = sampleTravelHouseholdTimes.randomSample(personId);
 				if (t.getMinutesPerDay() > 0) {
 					result.add(t);
 					totalTimeUse += t.getMinutesPerDay();
