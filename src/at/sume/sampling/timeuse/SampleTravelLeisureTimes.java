@@ -18,38 +18,22 @@ import net.remesch.db.Database;
 public class SampleTravelLeisureTimes {
 	private static final String timeUseTag = "travel leisure";
 	
-	private Distribution<TimeUseDistributionRow> timeDistrMale, timeDistrFemale;
+	private Distribution<TimeUseDistributionRow> timeDistr;
 	
 	public SampleTravelLeisureTimes(Database db) throws InstantiationException, IllegalAccessException, SQLException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String sqlStatement = "SELECT Time, Share FROM _UTE_TimeUseDistributions " +
-				"WHERE TimeUse = '" + timeUseTag + "' AND Condition = 'male' " +
+				"WHERE TimeUse = '" + timeUseTag + "' " +
 				"ORDER BY Time;";
-		List<TimeUseDistributionRow> timeDistr = db.select(TimeUseDistributionRow.class, sqlStatement);
-		assert timeDistr.size() > 0 : "No records found from '" + sqlStatement + "'";
-		timeDistrMale = new Distribution<TimeUseDistributionRow>(timeDistr, "share");
-		sqlStatement = "SELECT Time, Share FROM _UTE_TimeUseDistributions " +
-				"WHERE TimeUse = '" + timeUseTag + "' AND Condition = 'female' " +
-				"ORDER BY Time;";
-		timeDistr = db.select(TimeUseDistributionRow.class, sqlStatement);
-		assert timeDistr.size() > 0 : "No records found from '" + sqlStatement + "'";
-		timeDistrFemale = new Distribution<TimeUseDistributionRow>(timeDistr, "share");
+		List<TimeUseDistributionRow> t = db.select(TimeUseDistributionRow.class, sqlStatement);
+		assert t.size() > 0 : "No records found from '" + sqlStatement + "'";
+		timeDistr = new Distribution<TimeUseDistributionRow>(t, "share");
 	}
 
-	public double randomSample(int gender) {
-		TimeUseDistributionRow result;
-		switch (gender) {
-		case 1:
-			result = timeDistrMale.get(timeDistrMale.randomSample());
-			break;
-		case 2:
-			result = timeDistrFemale.get(timeDistrFemale.randomSample());
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid gender given in " + this.getClass().getName() + ".randomSample: " + gender);
-		}
+	public double randomSample() {
+		TimeUseDistributionRow result = timeDistr.get(timeDistr.randomSample());
 		return result.time;
 	}
-	public DbTimeUseRow randomSample(int personId, int gender) {
-		return new DbTimeUseRow(personId, timeUseTag, randomSample(gender));
+	public DbTimeUseRow randomSample(int personId) {
+		return new DbTimeUseRow(personId, timeUseTag, randomSample());
 	}
 }

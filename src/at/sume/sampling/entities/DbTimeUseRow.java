@@ -68,6 +68,9 @@ public class DbTimeUseRow {
 	public int getMinutesPerDay() {
 		return minutesPerDay;
 	}
+	public double getHoursPerDay() {
+		return (double)minutesPerDay / 60;
+	}
 	/**
 	 * @param minutesPerDay the minutesPerDay to set
 	 */
@@ -78,6 +81,6 @@ public class DbTimeUseRow {
 	public String toString() {
 		DecimalFormat df = new DecimalFormat("#.##");
 		df.setRoundingMode(RoundingMode.CEILING);
-		return "(" + id + ") " + activity + " - " + minutesPerDay + " min - " + df.format((double)minutesPerDay / 60) + " h";
+		return "(" + id + ") " + activity + " - " + minutesPerDay + " min - " + df.format(getHoursPerDay()) + " h";
 	}
 }

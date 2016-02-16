@@ -29,7 +29,7 @@ public class SampleDbTimeUse {
 	private SampleTravelPersonalTimes sampleTravelPersonalTimes;
 	private SampleTravelTimes sampleTravelTimes;
 	
-	private TimeUseTargetCheck timeUseTargetAvg;
+//	private TimeUseTargetCheck timeUseTargetAvg;
 
 	private int commutingDest;
 	private boolean householdWithChildren = false, inEducation = false, working = false;
@@ -50,7 +50,7 @@ public class SampleDbTimeUse {
 		sampleTravelPersonalTimes = new SampleTravelPersonalTimes(db);
 		sampleTravelTimes = new SampleTravelTimes(db);
 		
-		timeUseTargetAvg = new TimeUseTargetCheck(db);
+//		timeUseTargetAvg = new TimeUseTargetCheck(db);
 	}
 
 	public void setCommutingOrigin(int origin) throws InstantiationException, IllegalAccessException, SQLException {
@@ -117,8 +117,9 @@ public class SampleDbTimeUse {
 			if (t.getMinutesPerDay() > 0)
 				result.add(t);
 			totalTimeUse += t.getMinutesPerDay();
+			double other = t.getHoursPerDay();
 			// Household
-			t = sampleHouseholdTimes.randomSample(personId, gender);
+			t = sampleHouseholdTimes.randomSample(personId, other);
 			if (t.getMinutesPerDay() > 0) {
 				result.add(t);
 				totalTimeUse += t.getMinutesPerDay();
@@ -130,12 +131,12 @@ public class SampleDbTimeUse {
 				}
 			}
 			// Leisure
-			t = sampleLeisureTimes.randomSample(personId, gender);
+			t = sampleLeisureTimes.randomSample(personId, other);
 			if (t.getMinutesPerDay() > 0) {
 				result.add(t);
 				totalTimeUse += t.getMinutesPerDay();
 				// Travel leisure - only with leisure time
-				t = sampleTravelLeisureTimes.randomSample(personId, gender);
+				t = sampleTravelLeisureTimes.randomSample(personId);
 				if (t.getMinutesPerDay() > 0) {
 					result.add(t);
 					totalTimeUse += t.getMinutesPerDay();
@@ -162,7 +163,7 @@ public class SampleDbTimeUse {
 			// total time use between 24 and 40 hrs?
 			if ((totalTimeUse > 1440) && (totalTimeUse < 2400)) {
 				// Check total average time use before adding the record
-				timeUseTargetAvg.addActualTimeUse(result);
+//				timeUseTargetAvg.addActualTimeUse(result);
 				sampleOk = true;
 			}
 		}
