@@ -6,13 +6,16 @@ package at.sume.dm.entities;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
-import net.remesch.db.Sequence;
-import net.remesch.db.schema.Ignore;
 import at.sume.db.RecordSetRowFileable;
 import at.sume.dm.indicators.simple.DemographyObservable;
 import at.sume.dm.indicators.simple.DemographyObserver;
 import at.sume.dm.types.AgeGroup;
+import at.sume.sampling.entities.DbTimeUseRow;
+import net.remesch.db.Database;
+import net.remesch.db.Sequence;
+import net.remesch.db.schema.Ignore;
 
 /**
  * @author Alexander Remesch
@@ -34,6 +37,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 										// necessary to be able to move the child out of the parental home 
 	@Ignore
 	private static Sequence personIdSeq = null;
+	private List<DbTimeUseRow> timeUse;
 	
 	public PersonRow() {
 		super();
@@ -378,5 +382,31 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 		for (DemographyObserver obs : demographyObservers) {
 			obs.addDeath(spatialUnitId);
 		}
+	}
+	
+	/**
+	 * Load the time use for this person from the database
+	 * @param db
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws SQLException
+	 */
+	public void loadTimeUse(Database db) throws InstantiationException, IllegalAccessException, SQLException {
+		String sqlStatement = "SELECT ID, PersonId, Activity, MinutesPerDay FROM _DM_TimeUse WHERE PersonId = " + id + " ORDER BY ID;";
+		setTimeUse(db.select(DbTimeUseRow.class, sqlStatement));
+	}
+
+	/**
+	 * @return the timeUse
+	 */
+	public List<DbTimeUseRow> getTimeUse() {
+		return timeUse;
+	}
+
+	/**
+	 * @param timeUse the timeUse to set
+	 */
+	public void setTimeUse(List<DbTimeUseRow> timeUse) {
+		this.timeUse = timeUse;
 	}
 }

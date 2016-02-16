@@ -126,6 +126,10 @@ public class Main {
 		        personSeq = new Sequence(persons.get(persons.size() - 1).getPersonId() + 1);
 		        PersonRow.setPersonIdSeq(personSeq);
 		        System.out.println(printInfo(modelRun) + ": loaded " + persons.size() + " persons");
+		        for (PersonRow p : persons) {
+		        	p.loadTimeUse(db);
+		        }
+		        System.out.println(printInfo(modelRun) + ": loaded time-use records for " + persons.size() + " persons");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} catch (InstantiationException e) {
