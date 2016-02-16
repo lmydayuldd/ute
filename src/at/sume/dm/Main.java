@@ -657,36 +657,25 @@ public class Main {
 		}
 	}
 
-	public static String createPathName(String fileName) {
-		String path = Common.getPathOutput();
-		if (path == null) path = "";
-		String pathName;
-		if (path.endsWith("\\") || (path == ""))
-			pathName = path + fileName;
-		else
-			pathName = path + "\\" + fileName;
-		return pathName;
-	}
-	
 	private static String freeDwellingsFileName = "FreeDwellings.csv";
 	private static String migrationCountFileName = "Migrations.csv";
 	private static String migrationDetailsCountFileName = "MigrationDetails.csv";
 	private static String demographicMovementsFileName = "DemographicMovements.csv";
 	
 	public static void initSimpleOutputFiles() {
-		String pathName = createPathName(freeDwellingsFileName);
+		String pathName = Common.createPathName(freeDwellingsFileName);
 		// TODO: put this in an extra class and delete the file once per model run
 		FileUtil.rotateFile(pathName);
-		pathName = createPathName(migrationCountFileName);
+		pathName = Common.createPathName(migrationCountFileName);
 		FileUtil.rotateFile(pathName);
-		pathName = createPathName(demographicMovementsFileName);
+		pathName = Common.createPathName(demographicMovementsFileName);
 		FileUtil.rotateFile(pathName);
-		pathName = createPathName(migrationDetailsCountFileName);
+		pathName = Common.createPathName(migrationDetailsCountFileName);
 		FileUtil.rotateFile(pathName);
 	}
 	
 	public static void outputFreeDwellings(int modelYear, String label) throws FileNotFoundException {
-		String pathName = createPathName(freeDwellingsFileName);
+		String pathName = Common.createPathName(freeDwellingsFileName);
 		// TODO: put this in an extra class and delete the file once per model run
 		FileOutputStream freeDwellingsFile = new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(freeDwellingsFile);
@@ -704,19 +693,19 @@ public class Main {
 	 * @throws FileNotFoundException
 	 */
 	public static void outputMigrationCount(int modelYear) throws FileNotFoundException {
-		String pathName = createPathName(migrationCountFileName);
+		String pathName = Common.createPathName(migrationCountFileName);
 		FileOutputStream migrationCountFile= new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(migrationCountFile);
 		migrationPerSpatialUnit.output(ps, modelYear);
 	}
 	public static void outputDemographicMovementCount(int modelYear) throws FileNotFoundException {
-		String pathName = createPathName(demographicMovementsFileName);
+		String pathName = Common.createPathName(demographicMovementsFileName);
 		FileOutputStream demographicMovementCountFile= new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(demographicMovementCountFile);
 		demographicMovementsPerSpatialUnit.output(ps, modelYear);
 	}
 	public static void outputMigrationDetailsCount(int modelYear) throws FileNotFoundException {
-		String pathName = createPathName(migrationDetailsCountFileName);
+		String pathName = Common.createPathName(migrationDetailsCountFileName);
 		FileOutputStream outputFile = new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(outputFile);
 		migrationDetails.output(ps, modelYear);

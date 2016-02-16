@@ -377,4 +377,19 @@ public class Common {
 	public static String printInfo() {
 		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)";
 	}
+
+	public static String printInfo(int modelRun) {
+		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)@" + (modelRun + 1);
+	}
+
+	public static String createPathName(String fileName) {
+		String path = Common.getPathOutput();
+		if (path == null) path = "";
+		String pathName;
+		if (path.endsWith("\\") || (path == ""))
+			pathName = path + fileName;
+		else
+			pathName = path + "\\" + fileName;
+		return pathName;
+	}
 }

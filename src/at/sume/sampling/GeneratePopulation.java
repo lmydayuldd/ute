@@ -1,9 +1,14 @@
 package at.sume.sampling;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 
@@ -14,7 +19,9 @@ import at.sume.sampling.entities.DbHouseholdRow;
 import at.sume.sampling.entities.DbPersonRow;
 import at.sume.sampling.entities.DbTimeUseRow;
 import at.sume.sampling.entities.SampleDbHouseholds;
+import at.sume.sampling.timeuse.TimeUseRow;
 import net.remesch.db.Database;
+import net.remesch.util.FileUtil;
 
 /**
  * Class for generation of synthetic population
@@ -22,11 +29,17 @@ import net.remesch.db.Database;
  * @author Alexander Remesch
  */
 public class GeneratePopulation {
-//	private static ArrayList<DbHouseholdRow> households;
-//	private static ArrayList<DbPersonRow> persons;
+	private static List<DbHouseholdRow> households;
+	private static List<DbPersonRow> persons;
+	private static List<DbTimeUseRow> timeUse;
 	private static int householdCount = 0;
 	private static int personCount = 0;
 	
+	private static int modelRuns;
+	private static int modelRun;
+
+	private static String timeUseSummaryFileName = "TimeUseSummary.csv";
+
 	/**
 	 * Generate synthetic households and persons for the SUME decision model
 	 * @throws SQLException 
@@ -38,11 +51,9 @@ public class GeneratePopulation {
 	 */
 	private static void GenerateHouseholds(Database db) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		byte householdSizeGroups = Byte.parseByte(Common.getSysParam("HouseholdSizeGroups"));
-//		int residentialSatisfactionThresholdRange = Integer.parseInt(Common.getSysParamDataPreparation("THR_ResSatisfactionRange"));
 		byte dwellingsOnMarketShare = Byte.parseByte(Common.getSysParamDataPreparation("DwellingsOnMarketShare"));
 		int sampleInstitutionalHouseholds = Integer.parseInt(Common.getSysParamDataPreparation("SampleInstitutionalHouseholds"));
 		
-//		SampleHouseholds sampleHouseholds = new SampleHouseholds(db, "SpatialUnitId = 91101 or SpatialUnitId = 91001");
 		SampleHouseholds sampleHouseholds = null;
 		if (sampleInstitutionalHouseholds == 0) {
 			sampleHouseholds = new SampleHouseholds(db, "HouseholdSize <= " + householdSizeGroups);
@@ -50,19 +61,16 @@ public class GeneratePopulation {
 			sampleHouseholds = new SampleHouseholds(db);
 		}
 		SampleDbHouseholds sampleDbHouseholds = new SampleDbHouseholds(db, householdSizeGroups, dwellingsOnMarketShare);
-//		if (residentialSatisfactionThresholdRange != 0)
-//			sampleDbHouseholds.setResidentialSatisfactionThresholdRange(residentialSatisfactionThresholdRange);
-		
 		// Sample households including persons
 		for (HouseholdsPerSpatialUnit householdsPerSpatialUnit : sampleHouseholds) {
-			List<DbHouseholdRow> households = new ArrayList<DbHouseholdRow>();
-			List<DbPersonRow> persons = new ArrayList<DbPersonRow>();
-			List<DbTimeUseRow> timeUse = new ArrayList<DbTimeUseRow>();
+			households = new ArrayList<DbHouseholdRow>();
+			persons = new ArrayList<DbPersonRow>();
+			timeUse = new ArrayList<DbTimeUseRow>();
 			
 			if (householdsPerSpatialUnit.householdSize > householdSizeGroups)
-				System.out.println(Common.printInfo() + ": creating " + householdsPerSpatialUnit.householdCount + " households for spatial unit " + householdsPerSpatialUnit.spatialUnitId + " (institutional households)");
+				System.out.println(Common.printInfo(modelRun) + ": creating " + householdsPerSpatialUnit.householdCount + " households for spatial unit " + householdsPerSpatialUnit.spatialUnitId + " (institutional households)");
 			else
-				System.out.println(Common.printInfo() + ": creating " + householdsPerSpatialUnit.householdCount + " households for spatial unit " + householdsPerSpatialUnit.spatialUnitId + ", size " + householdsPerSpatialUnit.householdSize);
+				System.out.println(Common.printInfo(modelRun) + ": creating " + householdsPerSpatialUnit.householdCount + " households for spatial unit " + householdsPerSpatialUnit.spatialUnitId + ", size " + householdsPerSpatialUnit.householdSize);
 			sampleDbHouseholds.setSpatialUnit(householdsPerSpatialUnit.spatialUnitId);
 			for (int i = 0; i != householdsPerSpatialUnit.householdCount; i++) {
 				DbHouseholdRow household = sampleDbHouseholds.randomSample(householdsPerSpatialUnit, i);
@@ -75,18 +83,12 @@ public class GeneratePopulation {
 							timeUse.addAll(t);
 					}
 				}
-//				if ((i % 1000 == 0) && (i > 0)) {
-//					System.out.println(Common.printInfo() + ": creating household " + i + " of " + householdsPerSpatialUnit.householdCount);
-//				}
 			}
 			householdCount += households.size();
 			personCount += persons.size();
 			if (households.size() > 0) {
-//				System.out.println(Common.printInfo() + ": writing " + households.size() + " households and " + persons.size() + " persons to the db");
-//				db.insertFieldMap(households, "select HouseholdId, HouseholdSize, SpatialUnitId, DwellingId, LivingSpace, CostOfResidence, HouseholdType from _DM_Households", true);
 				db.insertSql(households, "_DM_Households");
 				db.con.commit();
-//				db.insertFieldMap(persons, "select PersonId, HouseholdId, Sex, Age, YearlyIncome from _DM_Persons", true);
 				db.insertSql(persons, "_DM_Persons");
 				db.con.commit();
 				db.insertSql(timeUse, "_DM_TimeUse");
@@ -112,26 +114,41 @@ public class GeneratePopulation {
 				" All currently existing population data will be lost.", "Generate Population", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null);
 		if (ret != 0)
 			return;
-		
-        System.out.println(Common.printInfo() + ": start");
+
+	    System.out.println(Common.printInfo() + ": start");
+
+		String pathName = Common.createPathName(timeUseSummaryFileName);
+		FileUtil.rotateFile(pathName);
+		Path timeUseSummaryFile = Paths.get(pathName);
+	    
 		Database db = Common.openDatabase();
 		db.con.setAutoCommit(false);
 		Common.init();
-		@SuppressWarnings("unused")
-		RentPerSpatialUnit rentPerSpatialUnit = RentPerSpatialUnit.getInstance("", Common.getSpatialUnitLevel());
-
-		// TODO: put into a table-class, method truncate
-		db.execute("delete from _DM_Households");
-		db.execute("delete from _DM_Persons");
-		db.execute("delete from _DM_TimeUse");
-//			db.con.setAutoCommit(false);
-		db.con.commit();
+	    modelRuns = Integer.parseInt(Common.getSysParamDataPreparation("ParmeterizationRuns"));
+        for (modelRun = 0; modelRun != modelRuns; modelRun++) {
+            System.out.println(Common.printInfo(modelRun) + ": ======================= paremterization run " + (modelRun + 1) + " of " + modelRuns);
+			@SuppressWarnings("unused")
+			RentPerSpatialUnit rentPerSpatialUnit = RentPerSpatialUnit.getInstance("", Common.getSpatialUnitLevel());
 		
-		GenerateHouseholds(db);
-		
-		System.out.println(Common.printInfo() + ": created " + householdCount + " households and " + personCount + " persons");
-		
-        System.out.println(Common.printInfo() + ": end");
+			// TODO: put into a table-class, method truncate
+			db.execute("delete from _DM_Households");
+			db.execute("delete from _DM_Persons");
+			db.execute("delete from _DM_TimeUse");
+			db.con.commit();
+			
+			GenerateHouseholds(db);
+			
+			// TODO: save summary population & time use values here
+			// - time use per activity
+			String sqlStatement = "SELECT Activity, SUM(MinutesPerDay) AS avgTimeUse FROM _DM_TimeUse GROUP BY Activity;";
+			List<String> timeUse = db.select(TimeUseRow.class, sqlStatement).stream().map(e -> modelRun + ":" + e.toString()).collect(Collectors.toList());
+			Files.write(timeUseSummaryFile, timeUse, Charset.defaultCharset());
+			// - persons per cell
+			// - households per cell
+			
+			System.out.println(Common.printInfo(modelRun) + ": created " + householdCount + " households and " + personCount + " persons");
+        }
+	    System.out.println(Common.printInfo() + ": end");
         System.exit(0);
 	}
 
