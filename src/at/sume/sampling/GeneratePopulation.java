@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,7 +143,7 @@ public class GeneratePopulation {
 			// - time use per activity
 			String sqlStatement = "SELECT Activity, SUM(MinutesPerDay) AS avgTimeUse FROM _DM_TimeUse GROUP BY Activity;";
 			List<String> timeUse = db.select(TimeUseRow.class, sqlStatement).stream().map(e -> modelRun + ":" + e.toString()).collect(Collectors.toList());
-			Files.write(timeUseSummaryFile, timeUse, Charset.defaultCharset());
+			Files.write(timeUseSummaryFile, timeUse, Charset.defaultCharset(), StandardOpenOption.APPEND);
 			// - persons per cell
 			// - households per cell
 			
