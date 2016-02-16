@@ -167,6 +167,7 @@ public class SampleDbHouseholds {
 				}
 			}
 			householdsPerSpatialUnit.personCount -= memberCount;
+			assert (memberCount > 0) && (memberCount <= 1000) : "Household member count out of range (" + memberCount + ")";
 		}
 		assert (memberCount > 0) && (memberCount <= 1000) : "Household member count out of range (" + memberCount + ")";
 		result.setHouseholdSize((short)memberCount);
