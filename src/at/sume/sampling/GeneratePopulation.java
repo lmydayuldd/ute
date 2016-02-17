@@ -118,10 +118,6 @@ public class GeneratePopulation {
 
 	    System.out.println(Common.printInfo() + ": start");
 
-		String pathName = Common.createPathName(timeUseSummaryFileName);
-		FileUtil.rotateFile(pathName);
-		Path timeUseSummaryFile = Paths.get(pathName);
-	    
 		Database db = Common.openDatabase();
 		db.con.setAutoCommit(false);
 		Common.init();
@@ -142,8 +138,8 @@ public class GeneratePopulation {
 			// TODO: save summary population & time use values here
 			// - time use per activity
 			String sqlStatement = "SELECT Activity, SUM(MinutesPerDay) AS avgTimeUse FROM _DM_TimeUse GROUP BY Activity;";
-			List<String> timeUse = db.select(TimeUseRow.class, sqlStatement).stream().map(e -> modelRun + ":" + e.toString()).collect(Collectors.toList());
-			Files.write(timeUseSummaryFile, timeUse, Charset.defaultCharset(), StandardOpenOption.APPEND);
+			List<TimeUseRow> timeUse = db.select(TimeUseRow.class, sqlStatement);
+			saveTimeUseSummary(timeUseSummaryFileName, timeUse);
 			// - persons per cell
 			// - households per cell
 			
@@ -153,4 +149,11 @@ public class GeneratePopulation {
         System.exit(0);
 	}
 
+	public static void saveTimeUseSummary(String timeUseSummaryFileName, List<TimeUseRow> timeUse) throws IOException {
+		String pathName = Common.createPathName(timeUseSummaryFileName);
+		FileUtil.rotateFile(pathName);
+		Path timeUseSummaryFile = Paths.get(pathName);
+		List<String> sl = timeUse.stream().map(e -> modelRun + ":" + e.toString()).collect(Collectors.toList());
+		Files.write(timeUseSummaryFile, sl, Charset.defaultCharset(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+	}
 }

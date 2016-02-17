@@ -20,7 +20,8 @@ public class TimeUseRow {
 
 	public String toString() {
 		DecimalFormat df = new DecimalFormat("#.##");
+		DecimalFormat df2 = new DecimalFormat("#");
 		df.setRoundingMode(RoundingMode.CEILING);
-		return activity + " - " + avgTimeUse + " min - " + df.format(getHoursPerDay()) + " h";
+		return activity + " - " + df2.format(avgTimeUse) + " min - " + df.format(getHoursPerDay()) + " h";
 	}
 }
