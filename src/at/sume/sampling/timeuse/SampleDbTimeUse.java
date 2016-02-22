@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.dm.types.TravelMode;
 import at.sume.sampling.entities.DbTimeUseRow;
 import net.remesch.db.Database;

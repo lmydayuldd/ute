@@ -52,6 +52,7 @@ import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionWeight;
 import at.sume.dm.model.residential_satisfaction.UDPCentrality;
 import at.sume.dm.model.residential_satisfaction.UDPPublicTransportAccessibility;
+import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.dm.scenario_handling.Scenario;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.MigrationRealm;
@@ -78,6 +79,7 @@ public class Main {
 	private static AggregatedDwellings aggregatedDwellings;
 	private static RentPerSpatialUnit rentPerSpatialUnit;
 	private static Scenario scenario;
+	private static SampleTravelTimesByDistance sampleTravelTimesByDistance;
 
 	private static String printInfo() {
 		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)";
@@ -126,10 +128,15 @@ public class Main {
 		        personSeq = new Sequence(persons.get(persons.size() - 1).getPersonId() + 1);
 		        PersonRow.setPersonIdSeq(personSeq);
 		        System.out.println(printInfo(modelRun) + ": loaded " + persons.size() + " persons");
+		        int j = 0;
 		        for (PersonRow p : persons) {
 		        	p.loadTimeUse(db);
+					if (j % 100000 == 0) {
+						System.out.println(printInfo(modelRun) + ": Processing person " + j + " of " + persons.size());
+					}
 		        }
 		        System.out.println(printInfo(modelRun) + ": loaded time-use records for " + persons.size() + " persons");
+		        sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} catch (InstantiationException e) {
@@ -487,7 +494,7 @@ public class Main {
 					}
 					household.clearResidentialSatisfactionEstimate();
 					if (dwelling != null) {
-						household.relocate(dwellingsOnMarket, dwelling, MigrationRealm.LOCAL);
+						household.relocate(dwellingsOnMarket, dwelling, MigrationRealm.LOCAL, sampleTravelTimesByDistance);
 					} else {
 						if (notMoving) {
 							hhNotMoving++;
@@ -612,7 +619,7 @@ public class Main {
 					break;
 				case NATIONAL:
 				case INTERNATIONAL:
-					household.relocate(dwellingsOnMarket, dwelling, migrationRealm);
+					household.relocate(dwellingsOnMarket, dwelling, migrationRealm, sampleTravelTimesByDistance);
 					break;
 				default:
 					throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
@@ -639,7 +646,7 @@ public class Main {
 						break;
 					case NATIONAL:
 					case INTERNATIONAL:
-						household.relocate(dwellingsOnMarket, dwelling, migrationRealm);
+						household.relocate(dwellingsOnMarket, dwelling, migrationRealm, sampleTravelTimesByDistance);
 						break;
 					default:
 						throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());

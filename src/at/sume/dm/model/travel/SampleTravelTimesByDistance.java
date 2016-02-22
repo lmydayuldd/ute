@@ -1,4 +1,4 @@
-package at.sume.sampling.timeuse;
+package at.sume.dm.model.travel;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

@@ -11,6 +11,7 @@ import java.util.List;
 import at.sume.db.RecordSetRowFileable;
 import at.sume.dm.indicators.simple.DemographyObservable;
 import at.sume.dm.indicators.simple.DemographyObserver;
+import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.dm.types.AgeGroup;
 import at.sume.sampling.entities.DbTimeUseRow;
 import net.remesch.db.Database;
@@ -31,7 +32,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	private int yearlyIncome;
 	private HouseholdRow household;
 //	private short personNrInHousehold;
-	private int workplaceId;
+	private int workplaceCellId;
 	@Ignore
 	private boolean livingWithParents;	// is the person a child living with her/his parents
 										// necessary to be able to move the child out of the parental home 
@@ -211,17 +212,17 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	}
 
 	/**
-	 * @return the workplaceId
+	 * @return the workplace location (spatial unit id)
 	 */
-	public int getWorkplaceId() {
-		return workplaceId;
+	public int getWorkplaceCellId() {
+		return workplaceCellId;
 	}
 
 	/**
-	 * @param workplaceId the workplaceId to set
+	 * @param workplaceCellId the workplace location (spatial unit id) to set
 	 */
-	public void setWorkplaceId(int workplaceId) {
-		this.workplaceId = workplaceId;
+	public void setWorkplaceCellId(int workplaceId) {
+		this.workplaceCellId = workplaceId;
 	}
 
 	/**
@@ -255,7 +256,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 		} else if (name.equals("PersonNrInHousehold")) {
 //			setPersonNrInHousehold(rs.getShort(name));
 		} else if (name.equals("WorkplaceId")) {
-			setWorkplaceId(rs.getInt("WorkplaceId"));
+			setWorkplaceCellId(rs.getInt("WorkplaceId"));
 		} else {
 			throw new UnsupportedOperationException("Unknown field name " + name);
 		}
@@ -409,5 +410,11 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	 */
 	public void setTimeUse(List<DbTimeUseRow> timeUse) {
 		this.timeUse = timeUse;
+	}
+	/**
+	 * Update person travel times (e.g. after residential relocation or workplace change)
+	 */
+	public void updateTravelTimes(SampleTravelTimesByDistance sampleTravelTimes) {
+		
 	}
 }

@@ -9,9 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import net.remesch.db.Sequence;
-import net.remesch.db.schema.Ignore;
-import net.remesch.util.Random;
 import at.sume.db.RecordSetRowFileable;
 import at.sume.dm.Common;
 import at.sume.dm.indicators.AllHouseholdsIndicatorsPerHouseholdTypeAndIncome;
@@ -25,9 +22,13 @@ import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionDwellingProperties;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionHouseholdProperties;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
+import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
 import at.sume.dm.types.MigrationRealm;
+import net.remesch.db.Sequence;
+import net.remesch.db.schema.Ignore;
+import net.remesch.util.Random;
 
 /**
  * @author Alexander Remesch
@@ -986,7 +987,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * 
 	 * @param dwelling
 	 */
-	public void relocate(DwellingsOnMarket dwellingsOnMarket, DwellingRow dwelling, MigrationRealm migrationRealm) {
+	public void relocate(DwellingsOnMarket dwellingsOnMarket, DwellingRow dwelling, MigrationRealm migrationRealm, SampleTravelTimesByDistance sampleTravelTimesByDistance) {
 		if (hasDwelling()) {
 			DwellingRow oldDwelling = getDwelling();
 			dwellingsOnMarket.putDwellingOnMarket(oldDwelling);
@@ -1003,6 +1004,12 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		dwelling.setHousehold(this);
 		// Update indicators
 		MoversIndicatorManager.addHousehold(this);
+		// Update commuting time
+		for (PersonRow p : members) {
+			if (p.getWorkplaceCellId() != 0) {
+				p.updateTravelTimes(sampleTravelTimesByDistance);
+			}
+		}
 	}
 	/**
 	 * 

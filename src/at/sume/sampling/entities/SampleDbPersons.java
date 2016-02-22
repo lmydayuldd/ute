@@ -6,10 +6,10 @@ package at.sume.sampling.entities;
 import java.sql.SQLException;
 
 import at.sume.dm.Common;
+import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.sampling.PersonDistributionAgeSex;
 import at.sume.sampling.SamplePersonIncome;
 import at.sume.sampling.SampleWorkplaces;
-import at.sume.sampling.timeuse.SampleTravelTimesByDistance;
 import net.remesch.db.Database;
 import net.remesch.db.Sequence;
 
