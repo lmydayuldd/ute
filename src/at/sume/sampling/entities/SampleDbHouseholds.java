@@ -172,15 +172,15 @@ public class SampleDbHouseholds {
 		assert (memberCount > 0) && (memberCount <= 1000) : "Household member count out of range (" + memberCount + ")";
 		result.setHouseholdSize((short)memberCount);
 		int yearlyHouseholdIncome = 0;
-		int childrenBelow15 = 0;
+//		int childrenBelow15 = 0;
 		for (short j = 0; j != memberCount; j++) {
 			DbPersonRow person = sampleDbPersons.randomSample(result.getHouseholdId(), (j == 0));
 			members.add(person);
 			yearlyHouseholdIncome += person.getYearlyIncome();
 			// Collect some information for later sampling of time use
-			if (person.getAge() < 15) {
-				childrenBelow15++;
-			}
+//			if (person.getAge() < 15) {
+//				childrenBelow15++;
+//			}
 		}
 		// Living space - find a suitable dwelling
 		DwellingRow dwelling = null;
@@ -212,7 +212,7 @@ public class SampleDbHouseholds {
 
 		// Sample time use per person
 		for (DbPersonRow person : members) {
-			sampleDbTimeUse.setHouseholdWithChildren(childrenBelow15 > 0);
+//			sampleDbTimeUse.setHouseholdWithChildren(childrenBelow15 > 0);
 			if (person.isInEducation()) {
 				sampleDbTimeUse.setInEducation(true);
 				sampleDbTimeUse.setCommutingDestination(person.getWorkplaceId());
@@ -221,7 +221,7 @@ public class SampleDbHouseholds {
 				sampleDbTimeUse.setWorking(true);
 				sampleDbTimeUse.setCommutingDestination(person.getWorkplaceId());
 			}
-			sampleDbTimeUse.setGender(person.getSex());
+//			sampleDbTimeUse.setGender(person.getSex());
 			sampleDbTimeUse.setPersonId(person.getPersonId());
 			person.setTimeUse(sampleDbTimeUse.randomSample());
 		}

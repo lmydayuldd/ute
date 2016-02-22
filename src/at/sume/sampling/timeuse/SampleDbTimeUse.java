@@ -12,45 +12,38 @@ import at.sume.sampling.entities.DbTimeUseRow;
 import net.remesch.db.Database;
 
 /**
+ * Sample travel times & modes for each person
+ * - Commuting depends on distance of workplaces
+ * - Caring, Household, Leisure, Personal and other Travel depend on average distance to next local center
+ *   (estimated as 2km for outer districts, 1km for middle districts, 0.5km for inner districts)
+ * 
  * @author Alexander Remesch
  *
  */
 public class SampleDbTimeUse {
 	//TODO: implement interface and array here with kind-of observer registration, to enable easier expansion with more activities for sampling
 	private SampleTravelTimesByDistance sampleTravelTimesByDistance;
-	private SampleCaringTimes sampleCaringTimes;
-	private SampleTravelCaringTimes sampleTravelCaringTimes;
-	private SampleOtherTimes sampleOtherTimes;
-	private SampleHouseholdTimes sampleHouseholdTimes;
-	private SampleLeisureTimes sampleLeisureTimes;
-	private SampleTravelHouseholdTimes sampleTravelHouseholdTimes;
-	private SampleTravelLeisureTimes sampleTravelLeisureTimes;
-	private SamplePersonalTimes samplePersonalTimes;
-	private SampleTravelPersonalTimes sampleTravelPersonalTimes;
-	private SampleTravelTimes sampleTravelTimes;
+//	private SampleTravelCaringTimes sampleTravelCaringTimes;
+//	private SampleTravelHouseholdTimes sampleTravelHouseholdTimes;
+//	private SampleTravelLeisureTimes sampleTravelLeisureTimes;
+//	private SampleTravelPersonalTimes sampleTravelPersonalTimes;
+//	private SampleTravelTimes sampleTravelTimes;
 	
-//	private TimeUseTargetCheck timeUseTargetAvg;
-
 	private int commutingDest;
-	private boolean householdWithChildren = false, inEducation = false, working = false;
-	private int personId = 0, gender = 1;
+//	private boolean householdWithChildren = false;
+	private boolean inEducation = false, working = false;
+	private int personId = 0;
+//	private int gender = 1;
 	
 	public SampleDbTimeUse(Database db) throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
 		// Create all activity-related sampling classes & load the sampling distributions
 		// Sampling of commuting times & mode
 		sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db);
-		sampleCaringTimes = new SampleCaringTimes(db);
-		sampleTravelCaringTimes = new SampleTravelCaringTimes(db);
-		sampleOtherTimes = new SampleOtherTimes(db);
-		sampleHouseholdTimes = new SampleHouseholdTimes(db);
-		sampleLeisureTimes = new SampleLeisureTimes(db);
-		sampleTravelHouseholdTimes = new SampleTravelHouseholdTimes(db);
-		sampleTravelLeisureTimes = new SampleTravelLeisureTimes(db);
-		samplePersonalTimes = new SamplePersonalTimes(db);
-		sampleTravelPersonalTimes = new SampleTravelPersonalTimes(db);
-		sampleTravelTimes = new SampleTravelTimes(db);
-		
-//		timeUseTargetAvg = new TimeUseTargetCheck(db);
+//		sampleTravelCaringTimes = new SampleTravelCaringTimes(db);
+//		sampleTravelHouseholdTimes = new SampleTravelHouseholdTimes(db);
+//		sampleTravelLeisureTimes = new SampleTravelLeisureTimes(db);
+//		sampleTravelPersonalTimes = new SampleTravelPersonalTimes(db);
+//		sampleTravelTimes = new SampleTravelTimes(db);
 	}
 
 	public void setCommutingOrigin(int origin) throws InstantiationException, IllegalAccessException, SQLException {
@@ -68,12 +61,12 @@ public class SampleDbTimeUse {
 	public void setWorking(boolean working) {
 		this.working = working;
 	}
-	public void setGender(int gender) {
-		this.gender = gender;
-	}
-	public void setHouseholdWithChildren(boolean householdWithChilren) {
-		this.householdWithChildren = householdWithChilren;
-	}
+//	public void setGender(int gender) {
+//		this.gender = gender;
+//	}
+//	public void setHouseholdWithChildren(boolean householdWithChilren) {
+//		this.householdWithChildren = householdWithChilren;
+//	}
 
 	/**
 	 * Perform sampling of daily activities for one person. Sampling result will be an ArrayList of activities and
@@ -83,90 +76,28 @@ public class SampleDbTimeUse {
 	 */
 	public List<DbTimeUseRow> randomSample() {
 		List<DbTimeUseRow> result = null;
-		boolean sampleOk = false;
-		while (!sampleOk) {
-			int totalTimeUse = 0;
+//		boolean sampleOk = false;
+//		while (!sampleOk) {
 			result = new ArrayList<DbTimeUseRow>();
 			DbTimeUseRow t = null;
-			// Caring time
-			t = sampleCaringTimes.randomSample(personId, householdWithChildren, gender);
-			if (t.getMinutesPerDay() > 0) {
-				result.add(t);
-				totalTimeUse += t.getMinutesPerDay();
-				// Travel caring - only when caring time is there
-				t = sampleTravelCaringTimes.randomSample(personId);
-				if (t.getMinutesPerDay() > 0) {
-					result.add(t);
-					totalTimeUse += t.getMinutesPerDay();
-				}
-			}
 			// Commuting
 			if (working) {
 				t = sampleTravelTimesByDistance.estimateTravelTime(personId, commutingDest);
 				if (t.getMinutesPerDay() > 0)
 					result.add(t);
-				totalTimeUse += t.getMinutesPerDay();
 			} else if (inEducation) {
 				t = sampleTravelTimesByDistance.estimateTravelTime(personId, commutingDest, TravelMode.PUBLIC_TRANSPORT);
 				if (t.getMinutesPerDay() > 0)
 					result.add(t);
-				totalTimeUse += t.getMinutesPerDay();
 			}
-			// Other (mainly work/education)
-			t = sampleOtherTimes.randomSample(personId, inEducation, working);
-			if (t.getMinutesPerDay() > 0)
-				result.add(t);
-			totalTimeUse += t.getMinutesPerDay();
-			double other = t.getHoursPerDay();
-			// Household
-			t = sampleHouseholdTimes.randomSample(personId, other);
-			if (t.getMinutesPerDay() > 0) {
-				result.add(t);
-				totalTimeUse += t.getMinutesPerDay();
-				// Travel household - only when household time is there
-				t = sampleTravelHouseholdTimes.randomSample(personId);
-				if (t.getMinutesPerDay() > 0) {
-					result.add(t);
-					totalTimeUse += t.getMinutesPerDay();
-				}
-			}
-			// Leisure
-			t = sampleLeisureTimes.randomSample(personId, other);
-			if (t.getMinutesPerDay() > 0) {
-				result.add(t);
-				totalTimeUse += t.getMinutesPerDay();
-				// Travel leisure - only with leisure time
-				t = sampleTravelLeisureTimes.randomSample(personId);
-				if (t.getMinutesPerDay() > 0) {
-					result.add(t);
-					totalTimeUse += t.getMinutesPerDay();
-				}
-			}
-			// Personal
-			t = samplePersonalTimes.randomSample(personId);
-			if (t.getMinutesPerDay() > 0) {
-				result.add(t);
-				totalTimeUse += t.getMinutesPerDay();
-				// Travel personal - only with personal time
-				t = sampleTravelPersonalTimes.randomSample(personId);
-				if (t.getMinutesPerDay() > 0) {
-					result.add(t);
-					totalTimeUse += t.getMinutesPerDay();
-				}
-			}
-			// Travel
-			t = sampleTravelTimes.randomSample(personId);
-			if (t.getMinutesPerDay() > 0)
-				result.add(t);
-			totalTimeUse += t.getMinutesPerDay();
-			
-			// total time use between 24 and 40 hrs?
-			if ((totalTimeUse > 1440) && (totalTimeUse < 2400)) {
-				// Check total average time use before adding the record
-//				timeUseTargetAvg.addActualTimeUse(result);
-				sampleOk = true;
-			}
-		}
+//		}
 		return result;
+	}
+	/**
+	 * Get the travel mode for the last sampled set of travel activities
+	 * @return public transport or motorized individual transport
+	 */
+	public TravelMode getTravelMode() {
+		return sampleTravelTimesByDistance.getTravelMode();
 	}
 }

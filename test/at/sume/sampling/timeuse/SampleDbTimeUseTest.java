@@ -38,12 +38,12 @@ public class SampleDbTimeUseTest {
 	@Test
 	public void testRandomSample() throws InstantiationException, IllegalAccessException, SQLException {
 		// 1st person
-		sampleDbTimeUse.setHouseholdWithChildren(true);
+//		sampleDbTimeUse.setHouseholdWithChildren(true);
 		sampleDbTimeUse.setInEducation(true);
 		sampleDbTimeUse.setCommutingOrigin(90101);
 		sampleDbTimeUse.setCommutingDestination(3);
 		sampleDbTimeUse.setWorking(false);
-		sampleDbTimeUse.setGender(2);
+//		sampleDbTimeUse.setGender(2);
 		sampleDbTimeUse.setPersonId(1);
 		List<DbTimeUseRow> result = sampleDbTimeUse.randomSample();
 		output(result);

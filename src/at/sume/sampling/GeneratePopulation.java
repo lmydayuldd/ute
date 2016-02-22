@@ -136,7 +136,7 @@ public class GeneratePopulation {
 			GenerateHouseholds(db);
 			
 			// TODO: save summary population & time use values here
-			// - time use per activity
+			// - time use per activity (travel only)
 			String sqlStatement = "SELECT Activity, SUM(MinutesPerDay) AS avgTimeUse FROM _DM_TimeUse GROUP BY Activity;";
 			List<TimeUseRow> timeUse = db.select(TimeUseRow.class, sqlStatement);
 			saveTimeUseSummary(timeUseSummaryFileName, timeUse);
