@@ -7,11 +7,13 @@ import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import at.sume.dm.Common;
+import at.sume.dm.entities.SpatialUnits;
 import at.sume.sampling.entities.DbTimeUseRow;
 import net.remesch.db.Database;
 
@@ -26,7 +28,8 @@ public class SampleDbTimeUseTest {
 	public void setUp() throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
 		Database db = Common.openDatabase();
 		Common.init();
-		sampleDbTimeUse = new SampleDbTimeUse(db);
+		SpatialUnits spatialUnits = new SpatialUnits(db, Common.getSpatialUnitLevel());
+		sampleDbTimeUse = new SampleDbTimeUse(db, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
 	}
 
 	/**
@@ -40,8 +43,7 @@ public class SampleDbTimeUseTest {
 		// 1st person
 //		sampleDbTimeUse.setHouseholdWithChildren(true);
 		sampleDbTimeUse.setInEducation(true);
-		sampleDbTimeUse.setCommutingOrigin(90101);
-		sampleDbTimeUse.setCommutingDestination(3);
+		sampleDbTimeUse.setCommutingRoute(90101, 3);
 		sampleDbTimeUse.setWorking(false);
 //		sampleDbTimeUse.setGender(2);
 		sampleDbTimeUse.setPersonId(1);

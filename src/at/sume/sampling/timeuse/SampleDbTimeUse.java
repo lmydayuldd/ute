@@ -30,16 +30,16 @@ public class SampleDbTimeUse {
 //	private SampleTravelPersonalTimes sampleTravelPersonalTimes;
 //	private SampleTravelTimes sampleTravelTimes;
 	
-	private int commutingDest;
+	private int commutingOrigin, commutingDest;
 //	private boolean householdWithChildren = false;
 	private boolean inEducation = false, working = false;
 	private int personId = 0;
 //	private int gender = 1;
 	
-	public SampleDbTimeUse(Database db) throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
+	public SampleDbTimeUse(Database db, List<Integer> cells) throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
 		// Create all activity-related sampling classes & load the sampling distributions
 		// Sampling of commuting times & mode
-		sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db);
+		sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, cells);
 //		sampleTravelCaringTimes = new SampleTravelCaringTimes(db);
 //		sampleTravelHouseholdTimes = new SampleTravelHouseholdTimes(db);
 //		sampleTravelLeisureTimes = new SampleTravelLeisureTimes(db);
@@ -47,10 +47,8 @@ public class SampleDbTimeUse {
 //		sampleTravelTimes = new SampleTravelTimes(db);
 	}
 
-	public void setCommutingOrigin(int origin) throws InstantiationException, IllegalAccessException, SQLException {
-		sampleTravelTimesByDistance.loadTravelTimes(origin);
-	}
-	public void setCommutingDestination(int destination) {
+	public void setCommutingRoute(int origin, int destination) {
+		commutingOrigin = origin;
 		commutingDest = destination;
 	}
 	public void setPersonId(int personId) {
@@ -83,11 +81,11 @@ public class SampleDbTimeUse {
 			DbTimeUseRow t = null;
 			// Commuting
 			if (working) {
-				t = sampleTravelTimesByDistance.estimateTravelTime(personId, commutingDest);
+				t = sampleTravelTimesByDistance.estimateTravelTime(personId, commutingOrigin, commutingDest);
 				if (t.getMinutesPerDay() > 0)
 					result.add(t);
 			} else if (inEducation) {
-				t = sampleTravelTimesByDistance.estimateTravelTime(personId, commutingDest, TravelMode.PUBLIC_TRANSPORT);
+				t = sampleTravelTimesByDistance.estimateTravelTime(personId, commutingOrigin, commutingDest, TravelMode.PUBLIC_TRANSPORT);
 				if (t.getMinutesPerDay() > 0)
 					result.add(t);
 			}

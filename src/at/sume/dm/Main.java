@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import net.remesch.util.Random;
 
 import net.remesch.db.Database;
@@ -128,15 +130,15 @@ public class Main {
 		        personSeq = new Sequence(persons.get(persons.size() - 1).getPersonId() + 1);
 		        PersonRow.setPersonIdSeq(personSeq);
 		        System.out.println(printInfo(modelRun) + ": loaded " + persons.size() + " persons");
-		        int j = 0;
+		        int j = 1;
 		        for (PersonRow p : persons) {
 		        	p.loadTimeUse(db);
-					if (j % 100000 == 0) {
+					if (j++ % 100000 == 0) {
 						System.out.println(printInfo(modelRun) + ": Processing person " + j + " of " + persons.size());
 					}
 		        }
 		        System.out.println(printInfo(modelRun) + ": loaded time-use records for " + persons.size() + " persons");
-		        sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db);
+		        sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} catch (InstantiationException e) {

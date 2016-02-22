@@ -6,7 +6,6 @@ package at.sume.sampling.entities;
 import java.sql.SQLException;
 
 import at.sume.dm.Common;
-import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.sampling.PersonDistributionAgeSex;
 import at.sume.sampling.SamplePersonIncome;
 import at.sume.sampling.SampleWorkplaces;
@@ -24,17 +23,14 @@ public class SampleDbPersons {
 	private int spatialUnitId;
 	private Database db;
 	private SampleWorkplaces sampleWorkplaces;
-	private SampleTravelTimesByDistance sampleTravelTimes;
 	private int minIncomeForWorkplace;
 	
-	public SampleDbPersons(Database db) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException  {
+	public SampleDbPersons(Database db) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		income = new SamplePersonIncome(db);
 		this.db = db;
 		// Sampling of workplaces
 		sampleWorkplaces = new SampleWorkplaces(db);
 		minIncomeForWorkplace = Integer.parseInt(Common.getSysParamDataPreparation("MinIncomeForWorkplace"));
-		// Sampling of commuting times & mode
-		sampleTravelTimes = new SampleTravelTimesByDistance(db);
 	}
 
 	public void setSpatialUnit(int spatialUnitId) throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException {
@@ -42,8 +38,6 @@ public class SampleDbPersons {
 		this.spatialUnitId = spatialUnitId;
 		// Workplace sampling: Load commuter matrix for current residential spatial unit
 		sampleWorkplaces.loadCommuterMatrix(db, spatialUnitId);
-		// Commuting time & mode sampling: Load travel time information
-		sampleTravelTimes.loadTravelTimes(spatialUnitId);
 	}
 	/**
 	 * Sample a single person including their time use

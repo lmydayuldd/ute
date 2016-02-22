@@ -12,4 +12,5 @@ public class TravelTimeRow {
 	public int destination;
 	public int mode;
 	public double hours;
+	public double distanceKm;
 }

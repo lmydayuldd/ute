@@ -6,6 +6,7 @@ package at.sume.sampling.entities;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import at.sume.dm.Common;
 import at.sume.dm.entities.DwellingRow;
@@ -75,7 +76,7 @@ public class SampleDbHouseholds {
 		
 		sampleDbPersons = new SampleDbPersons(db);
 
-		sampleDbTimeUse = new SampleDbTimeUse(db);
+		sampleDbTimeUse = new SampleDbTimeUse(db, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
 		
 		// Preparation of sampling of cost of residence from the living space
 		householdCostOfResidence = new SampleHouseholdCostOfResidence(db);
@@ -93,7 +94,6 @@ public class SampleDbHouseholds {
 	public void setSpatialUnit(int spatialUnitId) throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException {
 		this.spatialUnitId = spatialUnitId;
 		sampleDbPersons.setSpatialUnit(spatialUnitId);
-		sampleDbTimeUse.setCommutingOrigin(spatialUnitId);
 		sampleLivingSpace = new SampleHouseholdLivingSpace(db, spatialUnitId, householdSizeGroups);
 	}
 //	/**
@@ -215,11 +215,11 @@ public class SampleDbHouseholds {
 //			sampleDbTimeUse.setHouseholdWithChildren(childrenBelow15 > 0);
 			if (person.isInEducation()) {
 				sampleDbTimeUse.setInEducation(true);
-				sampleDbTimeUse.setCommutingDestination(person.getWorkplaceId());
+				sampleDbTimeUse.setCommutingRoute(spatialUnitId, person.getWorkplaceId());
 				
 			} else if (person.getWorkplaceId() != 0) {
 				sampleDbTimeUse.setWorking(true);
-				sampleDbTimeUse.setCommutingDestination(person.getWorkplaceId());
+				sampleDbTimeUse.setCommutingRoute(spatialUnitId, person.getWorkplaceId());
 			}
 //			sampleDbTimeUse.setGender(person.getSex());
 			sampleDbTimeUse.setPersonId(person.getPersonId());
