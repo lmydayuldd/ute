@@ -397,7 +397,15 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 		String sqlStatement = "SELECT ID, PersonId, Activity, MinutesPerDay FROM _DM_TimeUse WHERE PersonId = " + id + " ORDER BY ID;";
 		setTimeUse(db.select(DbTimeUseRow.class, sqlStatement));
 	}
-
+	/**
+	 * Add a time use record for this person
+	 * @param timeUseRow
+	 */
+	public void addTimeUse(DbTimeUseRow timeUseRow) {
+		if (timeUse == null) 
+			timeUse = new ArrayList<DbTimeUseRow>();
+		timeUse.add(timeUseRow);
+	}
 	/**
 	 * @return the timeUse
 	 */

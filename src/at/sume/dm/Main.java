@@ -13,18 +13,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.remesch.util.Random;
-
-import net.remesch.db.Database;
-import net.remesch.db.Sequence;
-import net.remesch.util.DateUtil;
-import net.remesch.util.FileUtil;
 import at.sume.dm.buildingprojects.AdditionalDwellingsPerYear;
 import at.sume.dm.buildingprojects.SampleBuildingProjects;
 import at.sume.dm.demography.events.ChildBirth;
-import at.sume.dm.demography.events.MovingTogether;
 import at.sume.dm.demography.events.EventManager;
 import at.sume.dm.demography.events.LeavingParents;
+import at.sume.dm.demography.events.MovingTogether;
 import at.sume.dm.demography.events.PersonDeath;
 import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.Dwellings;
@@ -58,6 +52,12 @@ import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.dm.scenario_handling.Scenario;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.MigrationRealm;
+import at.sume.sampling.entities.DbTimeUseRow;
+import net.remesch.db.Database;
+import net.remesch.db.Sequence;
+import net.remesch.util.DateUtil;
+import net.remesch.util.FileUtil;
+import net.remesch.util.Random;
 
 /**
  * @author Alexander Remesch
@@ -130,14 +130,20 @@ public class Main {
 		        personSeq = new Sequence(persons.get(persons.size() - 1).getPersonId() + 1);
 		        PersonRow.setPersonIdSeq(personSeq);
 		        System.out.println(printInfo(modelRun) + ": loaded " + persons.size() + " persons");
-		        int j = 1;
+		        // Load time use
+				String sqlStatement = "SELECT ID, PersonId, Activity, MinutesPerDay FROM _DM_TimeUse ORDER BY PersonId;";
+		        List<DbTimeUseRow> timeUseAll = db.select(DbTimeUseRow.class, sqlStatement);
+		        int j = 0;
 		        for (PersonRow p : persons) {
-		        	p.loadTimeUse(db);
-					if (j++ % 100000 == 0) {
-						System.out.println(printInfo(modelRun) + ": Processing person " + j + " of " + persons.size());
-					}
+		        	if (j >= timeUseAll.size())
+		        		break;
+		        	while (p.getId() == timeUseAll.get(j).getId()) {
+		        		p.addTimeUse(timeUseAll.get(j));
+			        	if (++j >= timeUseAll.size())
+			        		break;
+		        	}
 		        }
-		        System.out.println(printInfo(modelRun) + ": loaded time-use records for " + persons.size() + " persons");
+		        System.out.println(printInfo(modelRun) + ": loaded " + j + " time-use records for " + persons.size() + " persons");
 		        sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
 			} catch (SQLException e) {
 				e.printStackTrace();
