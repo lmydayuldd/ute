@@ -141,6 +141,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	public void aging() {
 		age++;
 		assert age >= 0 : "Age < 0 (" + age + ")";
+		ageGroupId = AgeGroup.getAgeGroupId(age);
 	}
 	
 //	/**
