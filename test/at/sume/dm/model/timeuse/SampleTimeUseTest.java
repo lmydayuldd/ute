@@ -1,11 +1,12 @@
 /**
  * 
  */
-package at.sume.sampling.timeuse;
+package at.sume.dm.model.timeuse;
 
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,8 @@ import org.junit.Test;
 
 import at.sume.dm.Common;
 import at.sume.dm.entities.SpatialUnits;
+import at.sume.dm.entities.TimeUseRow;
+import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.sampling.entities.DbTimeUseRow;
 import net.remesch.db.Database;
 
@@ -21,15 +24,18 @@ import net.remesch.db.Database;
  * @author Alexander Remesch
  *
  */
-public class SampleDbTimeUseTest {
-	private SampleDbTimeUse sampleDbTimeUse;
+public class SampleTimeUseTest {
+	private SampleTimeUse sampleTimeUse;
+	private SampleTravelTimesByDistance sampleTravelTimesByDistance;
 	
 	@Before
 	public void setUp() throws SecurityException, IllegalArgumentException, SQLException, InstantiationException, IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
 		Database db = Common.openDatabase();
 		Common.init();
 		SpatialUnits spatialUnits = new SpatialUnits(db, Common.getSpatialUnitLevel());
-		sampleDbTimeUse = new SampleDbTimeUse(db, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
+		sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
+		sampleTimeUse = new SampleTimeUse();
+		sampleTimeUse.registerSampleActivity(sampleTravelTimesByDistance);
 	}
 
 	/**
@@ -41,14 +47,19 @@ public class SampleDbTimeUseTest {
 	@Test
 	public void testRandomSample() throws InstantiationException, IllegalAccessException, SQLException {
 		// 1st person
-//		sampleDbTimeUse.setHouseholdWithChildren(true);
-		sampleDbTimeUse.setInEducation(true);
-		sampleDbTimeUse.setCommutingRoute(90101, 3);
-		sampleDbTimeUse.setWorking(false);
-//		sampleDbTimeUse.setGender(2);
-		sampleDbTimeUse.setPersonId(1);
-		List<DbTimeUseRow> result = sampleDbTimeUse.randomSample();
-		output(result);
+		TravelTimeSamplingParameters t = new TravelTimeSamplingParameters();
+		t.setInEducation(true);
+		t.setOrigin(90101);
+		t.setDestination(92310);
+		t.setEmployed(false);
+		t.setPersonId(1);
+		List<DbTimeUseRow> timeUse = new ArrayList<DbTimeUseRow>();
+		for (TimeUseRow row : sampleTimeUse.randomSample(t)) {
+			DbTimeUseRow dt = new DbTimeUseRow(1, row);
+			timeUse.add(dt);
+		}
+		output(timeUse);
+		System.out.println(sampleTravelTimesByDistance.getTravelMode());
 	}
 	
 	private void output(List<DbTimeUseRow> result) {

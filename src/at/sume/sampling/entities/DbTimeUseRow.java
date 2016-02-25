@@ -6,6 +6,7 @@ package at.sume.sampling.entities;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
+import at.sume.dm.entities.TimeUseRow;
 import net.remesch.db.schema.Ignore;
 
 /**
@@ -34,6 +35,12 @@ public class DbTimeUseRow {
 		this.personId = personId;
 		this.activity = activity;
 		this.minutesPerDay = (int) Math.round(hoursPerDay * 60);
+	}
+	public DbTimeUseRow(int personId, TimeUseRow timeUseRow) {
+		id = nextid++;
+		this.personId = personId;
+		this.activity = timeUseRow.activity;
+		this.minutesPerDay = timeUseRow.avgTimeUse;
 	}
 	public int getId() {
 		return id;

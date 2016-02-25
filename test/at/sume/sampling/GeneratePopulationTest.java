@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import at.sume.dm.Common;
-import at.sume.sampling.timeuse.TimeUseRow;
+import at.sume.dm.entities.TimeUseRow;
 import net.remesch.db.Database;
 
 /**

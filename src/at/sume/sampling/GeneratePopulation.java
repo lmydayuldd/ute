@@ -14,13 +14,13 @@ import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 
 import at.sume.dm.Common;
+import at.sume.dm.entities.TimeUseRow;
 import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
 import at.sume.sampling.entities.DbHouseholdRow;
 import at.sume.sampling.entities.DbPersonRow;
 import at.sume.sampling.entities.DbTimeUseRow;
 import at.sume.sampling.entities.SampleDbHouseholds;
-import at.sume.sampling.timeuse.TimeUseRow;
 import net.remesch.db.Database;
 import net.remesch.util.FileUtil;
 

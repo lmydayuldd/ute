@@ -12,12 +12,15 @@ import at.sume.dm.Common;
 import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.Dwellings;
 import at.sume.dm.entities.SpatialUnits;
+import at.sume.dm.entities.TimeUseRow;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
+import at.sume.dm.model.timeuse.SampleTimeUse;
+import at.sume.dm.model.timeuse.TravelTimeSamplingParameters;
+import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.dm.types.LivingSpaceGroup6;
 import at.sume.sampling.SampleHouseholdCostOfResidence;
 import at.sume.sampling.SampleHouseholdLivingSpace;
 import at.sume.sampling.distributions.HouseholdsPerSpatialUnit;
-import at.sume.sampling.timeuse.SampleDbTimeUse;
 import net.remesch.db.Database;
 import net.remesch.db.Sequence;
 import net.remesch.util.Random;
@@ -29,7 +32,6 @@ import net.remesch.util.Random;
  */
 public class SampleDbHouseholds {
 	private SampleDbPersons sampleDbPersons;
-	private SampleDbTimeUse sampleDbTimeUse;
 	private Sequence householdNr = new Sequence();
 	private int spatialUnitId;
 	private SampleHouseholdLivingSpace sampleLivingSpace;
@@ -40,6 +42,8 @@ public class SampleDbHouseholds {
 //	private int residentialSatisfactionThresholdRange = 100;
 	private byte householdSizeGroups;
 	private SampleHouseholdCostOfResidence householdCostOfResidence;
+	private static SampleTimeUse sampleTimeUse = new SampleTimeUse();
+	private static SampleTravelTimesByDistance sampleTravelTimesByDistance;
 	
 	/**
 	 * Constructor - loads the spatial units, the dwellings, links them and creates a list of free
@@ -76,7 +80,8 @@ public class SampleDbHouseholds {
 		
 		sampleDbPersons = new SampleDbPersons(db);
 
-		sampleDbTimeUse = new SampleDbTimeUse(db, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
+        sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
+        sampleTimeUse.registerSampleActivity(sampleTravelTimesByDistance);
 		
 		// Preparation of sampling of cost of residence from the living space
 		householdCostOfResidence = new SampleHouseholdCostOfResidence(db);
@@ -212,18 +217,23 @@ public class SampleDbHouseholds {
 
 		// Sample time use per person
 		for (DbPersonRow person : members) {
-//			sampleDbTimeUse.setHouseholdWithChildren(childrenBelow15 > 0);
+			TravelTimeSamplingParameters t = new TravelTimeSamplingParameters();
 			if (person.isInEducation()) {
-				sampleDbTimeUse.setInEducation(true);
-				sampleDbTimeUse.setCommutingRoute(spatialUnitId, person.getWorkplaceId());
-				
+				t.setInEducation(true);
+				t.setOrigin(spatialUnitId);
+				t.setDestination(person.getWorkplaceId());
 			} else if (person.getWorkplaceId() != 0) {
-				sampleDbTimeUse.setWorking(true);
-				sampleDbTimeUse.setCommutingRoute(spatialUnitId, person.getWorkplaceId());
+				t.setEmployed(true);
+				t.setOrigin(spatialUnitId);
+				t.setDestination(person.getWorkplaceId());
 			}
-//			sampleDbTimeUse.setGender(person.getSex());
-			sampleDbTimeUse.setPersonId(person.getPersonId());
-			person.setTimeUse(sampleDbTimeUse.randomSample());
+			t.setPersonId(person.getPersonId());
+			List<DbTimeUseRow> timeUse = new ArrayList<DbTimeUseRow>();
+			for (TimeUseRow row : sampleTimeUse.randomSample(t)) {
+				DbTimeUseRow dt = new DbTimeUseRow(person.getPersonId(), row);
+				timeUse.add(dt);
+			}
+			person.setTimeUse(timeUse);
 		}
 		return result;
 	}

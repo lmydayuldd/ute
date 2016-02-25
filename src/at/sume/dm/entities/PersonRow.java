@@ -11,9 +11,9 @@ import java.util.List;
 import at.sume.db.RecordSetRowFileable;
 import at.sume.dm.indicators.simple.DemographyObservable;
 import at.sume.dm.indicators.simple.DemographyObserver;
-import at.sume.dm.model.travel.SampleTravelTimesByDistance;
+import at.sume.dm.model.timeuse.SampleTimeUse;
+import at.sume.dm.model.timeuse.TravelTimeSamplingParameters;
 import at.sume.dm.types.AgeGroup;
-import at.sume.sampling.entities.DbTimeUseRow;
 import net.remesch.db.Database;
 import net.remesch.db.Sequence;
 import net.remesch.db.schema.Ignore;
@@ -38,7 +38,9 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 										// necessary to be able to move the child out of the parental home 
 	@Ignore
 	private static Sequence personIdSeq = null;
-	private List<DbTimeUseRow> timeUse;
+	private List<TimeUseRow> timeUse;
+	@Ignore
+	private static SampleTimeUse sampleTimeUse;
 	
 	public PersonRow() {
 		super();
@@ -48,6 +50,13 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 		livingWithParents = false;
 	}
 
+	/**
+	 * Set class for sampling time use for later use
+	 * @param sampleTimeUse
+	 */
+	public static void setSampleTravelTimes(SampleTimeUse sampleTimeUse) {
+		PersonRow.sampleTimeUse = sampleTimeUse;
+	}
 	/**
 	 * @return the personId
 	 */
@@ -179,8 +188,13 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	}
 
 	public void setHousehold(HouseholdRow household) {
+		boolean householdChange = false;
+		if (this.household != null)
+			householdChange = true;
 		this.household = household;
 //		household.addMember(this);
+		if (householdChange)
+			updateTimeUse();
 	}
 
 //	/**
@@ -394,35 +408,45 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	 * @throws SQLException
 	 */
 	public void loadTimeUse(Database db) throws InstantiationException, IllegalAccessException, SQLException {
-		String sqlStatement = "SELECT ID, PersonId, Activity, MinutesPerDay FROM _DM_TimeUse WHERE PersonId = " + id + " ORDER BY ID;";
-		setTimeUse(db.select(DbTimeUseRow.class, sqlStatement));
+		String sqlStatement = "SELECT Activity, MinutesPerDay FROM _DM_TimeUse WHERE PersonId = " + id + " ORDER BY ID;";
+		timeUse = db.select(TimeUseRow.class, sqlStatement);
 	}
 	/**
 	 * Add a time use record for this person
 	 * @param timeUseRow
 	 */
-	public void addTimeUse(DbTimeUseRow timeUseRow) {
+	public void addTimeUse(TimeUseRow timeUseRow) {
 		if (timeUse == null) 
-			timeUse = new ArrayList<DbTimeUseRow>();
+			timeUse = new ArrayList<TimeUseRow>();
 		timeUse.add(timeUseRow);
+	}
+	public static void setSampleTimeUse(SampleTimeUse sampleTimeUse) {
+		PersonRow.sampleTimeUse = sampleTimeUse;
 	}
 	/**
 	 * @return the timeUse
 	 */
-	public List<DbTimeUseRow> getTimeUse() {
+	public List<TimeUseRow> getTimeUse() {
 		return timeUse;
 	}
-
 	/**
-	 * @param timeUse the timeUse to set
+	 * Update person time use (e.g. after residential relocation or workplace change)
 	 */
-	public void setTimeUse(List<DbTimeUseRow> timeUse) {
-		this.timeUse = timeUse;
-	}
-	/**
-	 * Update person travel times (e.g. after residential relocation or workplace change)
-	 */
-	public void updateTravelTimes(SampleTravelTimesByDistance sampleTravelTimes) {
-		
+	public void updateTimeUse() {
+		if (age >= 10) {
+			// Prepare parameters for sampling
+			TravelTimeSamplingParameters p = new TravelTimeSamplingParameters();
+			p.setOrigin(household.getDwelling().getSpatialunitId());
+			p.setDestination(workplaceCellId);
+			p.setPersonId(getPersonId());
+			if (workplaceCellId != 0) {
+				p.setEmployed(true);
+				p.setInEducation(false);
+			} else {
+				p.setInEducation(true);
+				p.setEmployed(false);
+			}
+			timeUse = sampleTimeUse.randomSample(p);
+		}
 	}
 }

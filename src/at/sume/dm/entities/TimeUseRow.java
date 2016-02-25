@@ -1,10 +1,13 @@
 /**
  * 
  */
-package at.sume.sampling.timeuse;
+package at.sume.dm.entities;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+
+import at.sume.dm.model.timeuse.SampleActivity;
+import at.sume.sampling.entities.DbTimeUseRow;
 
 /**
  * @author Alexander Remesch
@@ -12,8 +15,16 @@ import java.text.DecimalFormat;
  */
 public class TimeUseRow {
 	public String activity;
-	public double avgTimeUse;
+	public int avgTimeUse;
 
+	public TimeUseRow(DbTimeUseRow row) {
+		activity = row.getActivity();
+		avgTimeUse = row.getMinutesPerDay();
+	}
+	public TimeUseRow(SampleActivity sampleActivity) {
+		activity = sampleActivity.getActivityName();
+		avgTimeUse = sampleActivity.sampleMinutesPerDay();
+	}
 	public double getHoursPerDay() {
 		return (double)avgTimeUse / 60;
 	}

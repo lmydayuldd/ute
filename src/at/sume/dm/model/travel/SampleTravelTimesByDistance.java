@@ -5,21 +5,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import at.sume.dm.model.timeuse.SampleActivity;
+import at.sume.dm.model.timeuse.TimeUseSamplingParameters;
 import at.sume.dm.types.TravelMode;
 import at.sume.sampling.distributions.TravelTimeRow;
-import at.sume.sampling.entities.DbTimeUseRow;
 import ec.util.MersenneTwisterFast;
 import net.remesch.db.Database;
 
-public class SampleTravelTimesByDistance {
+public class SampleTravelTimesByDistance implements SampleActivity {
+	//TODO: reduce to one HashMap with inner class
 	private HashMap<Integer,HashMap<Integer,Double>> travelTimesMIT;
 	private HashMap<Integer,HashMap<Integer,Double>> travelTimesPublic;
 	private HashMap<Integer,HashMap<Integer,Double>> travelDistances;
 	private TravelMode travelMode;
 	private static final String timeUseTag = "travel work";
+	private TimeUseSamplingParameters timeUseSamplingParameters;
 	
 	public SampleTravelTimesByDistance(Database db, List<Integer> cells) throws InstantiationException, IllegalAccessException, SQLException {
-		// TODO: make one out of the three HashMaps
 		travelTimesMIT = new HashMap<Integer,HashMap<Integer,Double>>();
 		travelTimesPublic = new HashMap<Integer,HashMap<Integer,Double>>();
 		travelDistances = new HashMap<Integer,HashMap<Integer,Double>>();
@@ -38,7 +40,7 @@ public class SampleTravelTimesByDistance {
 					"WHERE ScenarioName = 'SUME_TransportModel' AND origin = " + s +
 					" ORDER BY Mode, Destination;";
 			ArrayList<TravelTimeRow> travelTimes = db.select(TravelTimeRow.class, sqlStatement);
-			assert travelTimes.size() > 0 : "No records found from '" + sqlStatement + "'";
+			assert travelTimes.size() > 0 : "No records found from '" + sqlStatement + "' for cell " + s + " - maybe wrong SpatialUnitLevel?";
 			for (TravelTimeRow t : travelTimes) {
 				if (t.mode == TravelMode.PUBLIC_TRANSPORT.getValue()) {
 					tPublic.put(t.destination, t.hours);
@@ -55,7 +57,7 @@ public class SampleTravelTimesByDistance {
 	 * @param destination
 	 * @return Travel time in minutes
 	 */
-	public long estimateTravelTime(int origin, int destination) {
+	private int estimateTravelTime(int origin, int destination) {
 		//TODO: don't know at the moment what to do with commutings out of Vienna
 		if ((destination == 3) || (destination == 1)) {
 			travelMode = TravelMode.MOTORIZED_INDIVIDUAL_TRANSPORT;
@@ -63,9 +65,9 @@ public class SampleTravelTimesByDistance {
 		}
 		MersenneTwisterFast r = new MersenneTwisterFast();
 		HashMap<Integer,Double> t = travelTimesMIT.get(origin);
-		long travelTimeMIT = Math.round(t.get(destination) * 60);	      // convert to minutes
+		int travelTimeMIT = (int)Math.round(t.get(destination) * 60);	      // convert to minutes
 		t = travelTimesPublic.get(origin);
-		long travelTimePublic = Math.round(t.get(destination) * 60);  // convert to minutes
+		int travelTimePublic = (int)Math.round(t.get(destination) * 60);  // convert to minutes
 		double pTravelMIT = 0.1; // p for travel by car even if it takes longer than public transport
 		if (travelTimeMIT < travelTimePublic) {
 			pTravelMIT = (travelTimeMIT - travelTimePublic) / travelTimeMIT;
@@ -85,37 +87,60 @@ public class SampleTravelTimesByDistance {
 	 * @param mode
 	 * @return Travel time in minutes
 	 */
-	public long estimateTravelTime(int origin, int destination, TravelMode mode) {
+	private int estimateTravelTime(int origin, int destination, TravelMode mode) {
 		//TODO: don't know at the moment what to do with commutings out of Vienna
+		travelMode = mode;
 		if ((destination == 3) || (destination == 1)) {
-			travelMode = mode;
 			return 60;
 		}
-		long travelTime = -1;
+		int travelTime = -1;
 		HashMap<Integer,Double> t;
 		switch (mode) {
 		case PUBLIC_TRANSPORT:
 			t = travelTimesPublic.get(origin);
-			travelTime = Math.round(t.get(destination) * 60);
+			travelTime = (int)Math.round(t.get(destination) * 60);
 			break;
 		case MOTORIZED_INDIVIDUAL_TRANSPORT:
 			t = travelTimesMIT.get(origin);
-			travelTime = Math.round(t.get(destination) * 60);
+			travelTime = (int)Math.round(t.get(destination) * 60);
 			break;
 		}
 		return travelTime;
 	}
-	public DbTimeUseRow estimateTravelTime(int personId, int origin, int destination) {
-		return new DbTimeUseRow(personId, timeUseTag, (int) estimateTravelTime(origin, destination));
-	}
-	public DbTimeUseRow estimateTravelTime(int personId, int origin, int destination, TravelMode mode) {
-		return new DbTimeUseRow(personId, timeUseTag, (int) estimateTravelTime(origin, destination, mode));
-	}
+//	public DbTimeUseRow estimateTravelTime(int personId, int origin, int destination) {
+//		return new DbTimeUseRow(personId, timeUseTag, (int) estimateTravelTime(origin, destination));
+//	}
+//	public DbTimeUseRow estimateTravelTime(int personId, int origin, int destination, TravelMode mode) {
+//		return new DbTimeUseRow(personId, timeUseTag, (int) estimateTravelTime(origin, destination, mode));
+//	}
 	/**
 	 * Return the travel mode previously determined by estimateTravelTime()
 	 * @return
 	 */
 	public TravelMode getTravelMode() {
 		return travelMode;
+	}
+	@Override
+	public int sampleMinutesPerDay() {
+		if ((timeUseSamplingParameters.getOrigin() != 0) && (timeUseSamplingParameters.getDestination() != 0)) {
+			if (timeUseSamplingParameters.isEmployed()) {
+				return estimateTravelTime(timeUseSamplingParameters.getOrigin(), timeUseSamplingParameters.getDestination());
+			} else if (timeUseSamplingParameters.isInEducation()) {
+				return estimateTravelTime(timeUseSamplingParameters.getOrigin(), timeUseSamplingParameters.getDestination(), TravelMode.PUBLIC_TRANSPORT);
+			}
+		}
+		return 0;
+	}
+	@Override
+	public double sampleHoursPerDay() {
+		return ((double)sampleMinutesPerDay()) / 60;
+	}
+	@Override
+	public void setSamplingParameterSource(TimeUseSamplingParameters timeUseSamplingParameters) {
+		this.timeUseSamplingParameters = timeUseSamplingParameters;
+	}
+	@Override
+	public String getActivityName() {
+		return timeUseTag;
 	}
 }

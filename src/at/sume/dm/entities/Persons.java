@@ -63,8 +63,8 @@ public class Persons extends RecordSetClonable<PersonRow> {
 		for (PersonRow p : rowList) {
 			assert p.getHouseholdId() != 0 : "no household set for person " + p.getPersonId();
 			HouseholdRow hh = households.lookup(p.getHouseholdId());
-			p.setHousehold(hh);
 			hh.addMember(p);
+			//p.setHousehold(hh); - this is already done in hh.addMember()
 		}
 	}
 

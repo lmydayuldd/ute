@@ -22,7 +22,6 @@ import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionDwellingProperties;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionHouseholdProperties;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
-import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
 import at.sume.dm.types.MigrationRealm;
@@ -164,7 +163,6 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		int max = Common.getResidentialSatisfactionThresholdMod();
 		setResidentialSatisfactionThreshMod(r.triangular(min, max, 0));
 	}
-
 	/**
 	 * @return the householdId
 	 */
@@ -272,11 +270,17 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	}
 
 	/**
+	 * Relocate a household to a dwelling & update the travel times
 	 * @param dwelling the dwelling to set
 	 */
 	public void setDwelling(DwellingRow dwelling) {
+		boolean dwellingChange = false;
+		if (hasDwelling())
+			dwellingChange = true;
 		this.dwelling = dwelling;
 		setMovingDecisionYear((short) 0);
+		if (dwellingChange)
+			updateTimeUse();
 	}
 
 	/**
@@ -484,20 +488,21 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		switch (householdType) {
 		case SINGLE_YOUNG:		// single young -> single old
 			// TODO: make this threshold (45) configurable
-			if (members.get(0).getAge() > 45)
+			if (members.get(0).getAge() >= 65) {
 				householdType = HouseholdType.SINGLE_OLD;
+				updateTimeUse();
+			}
 			break;
 		case COUPLE_YOUNG:
 			// find maximum female age in household
-			int femAdultMaxAge = 0;
+			int maxAge = 0;
 			for (PersonRow member : members) {
-				if (member.getSex() == 1) {
-					if (member.getAge() > femAdultMaxAge)
-						femAdultMaxAge = member.getAge();
-				}
+				if (member.getAge() > maxAge)
+					maxAge = member.getAge();
 			}
-			if (femAdultMaxAge > 45) {
+			if (maxAge >= 65) {
 				householdType = HouseholdType.COUPLE_OLD;
+				updateTimeUse();
 			}
 			break;
 		default: // do nothing for other household types
@@ -505,7 +510,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	}
 	
 	public void updateHouseholdTypeAfterDeathOrMemberLeaving() {
-		// Singles are not covered since the household will be removed anyway
+		// Singles are not covered since the household will be removed anyway if the only member is dead
 		if ((householdType == HouseholdType.SINGLE_YOUNG) || (householdType == HouseholdType.SINGLE_OLD))
 			return;
 		countAdults();
@@ -531,6 +536,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			break;
 		default: // do nothing for other household types
 		}
+		updateTimeUse();
 	}
 	
 	public void updateHouseholdTypeAfterBirth() {
@@ -552,6 +558,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			break;
 		default: // do nothing for other household types
 		}
+		updateTimeUse();
 	}
 	
 //	/**
@@ -987,7 +994,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * 
 	 * @param dwelling
 	 */
-	public void relocate(DwellingsOnMarket dwellingsOnMarket, DwellingRow dwelling, MigrationRealm migrationRealm, SampleTravelTimesByDistance sampleTravelTimesByDistance) {
+	public void relocate(DwellingsOnMarket dwellingsOnMarket, DwellingRow dwelling, MigrationRealm migrationRealm) {
 		if (hasDwelling()) {
 			DwellingRow oldDwelling = getDwelling();
 			dwellingsOnMarket.putDwellingOnMarket(oldDwelling);
@@ -1004,11 +1011,13 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		dwelling.setHousehold(this);
 		// Update indicators
 		MoversIndicatorManager.addHousehold(this);
-		// Update commuting time
+	}
+	/**
+	 * Update time use for a household according to the current situation
+	 */
+	public void updateTimeUse() {
 		for (PersonRow p : members) {
-			if (p.getWorkplaceCellId() != 0) {
-				p.updateTravelTimes(sampleTravelTimesByDistance);
-			}
+			p.updateTimeUse();
 		}
 	}
 	/**
@@ -1035,6 +1044,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		addMembers(household.getMembers());
 		household.members = null;
 		determineInitialHouseholdType(false); //countAdults has already been done in addMembers()
+		updateTimeUse();
 	}
 	/**
 	 * Remove a household

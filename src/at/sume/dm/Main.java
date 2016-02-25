@@ -28,6 +28,7 @@ import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
+import at.sume.dm.entities.TimeUseRow;
 import at.sume.dm.indicators.AggregatedDwellings;
 import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
@@ -48,6 +49,7 @@ import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionWeight;
 import at.sume.dm.model.residential_satisfaction.UDPCentrality;
 import at.sume.dm.model.residential_satisfaction.UDPPublicTransportAccessibility;
+import at.sume.dm.model.timeuse.SampleTimeUse;
 import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.dm.scenario_handling.Scenario;
 import at.sume.dm.types.HouseholdType;
@@ -81,6 +83,7 @@ public class Main {
 	private static AggregatedDwellings aggregatedDwellings;
 	private static RentPerSpatialUnit rentPerSpatialUnit;
 	private static Scenario scenario;
+	private static SampleTimeUse sampleTimeUse = new SampleTimeUse();
 	private static SampleTravelTimesByDistance sampleTravelTimesByDistance;
 
 	private static String printInfo() {
@@ -138,13 +141,17 @@ public class Main {
 		        	if (j >= timeUseAll.size())
 		        		break;
 		        	while (p.getId() == timeUseAll.get(j).getId()) {
-		        		p.addTimeUse(timeUseAll.get(j));
+		        		DbTimeUseRow dt = timeUseAll.get(j);
+		        		TimeUseRow t = new TimeUseRow(dt);
+		        		p.addTimeUse(t);
 			        	if (++j >= timeUseAll.size())
 			        		break;
 		        	}
 		        }
 		        System.out.println(printInfo(modelRun) + ": loaded " + j + " time-use records for " + persons.size() + " persons");
 		        sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
+		        sampleTimeUse.registerSampleActivity(sampleTravelTimesByDistance);
+		        PersonRow.setSampleTimeUse(sampleTimeUse);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} catch (InstantiationException e) {
@@ -502,7 +509,7 @@ public class Main {
 					}
 					household.clearResidentialSatisfactionEstimate();
 					if (dwelling != null) {
-						household.relocate(dwellingsOnMarket, dwelling, MigrationRealm.LOCAL, sampleTravelTimesByDistance);
+						household.relocate(dwellingsOnMarket, dwelling, MigrationRealm.LOCAL);
 					} else {
 						if (notMoving) {
 							hhNotMoving++;
@@ -627,7 +634,7 @@ public class Main {
 					break;
 				case NATIONAL:
 				case INTERNATIONAL:
-					household.relocate(dwellingsOnMarket, dwelling, migrationRealm, sampleTravelTimesByDistance);
+					household.relocate(dwellingsOnMarket, dwelling, migrationRealm);
 					break;
 				default:
 					throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
@@ -654,7 +661,7 @@ public class Main {
 						break;
 					case NATIONAL:
 					case INTERNATIONAL:
-						household.relocate(dwellingsOnMarket, dwelling, migrationRealm, sampleTravelTimesByDistance);
+						household.relocate(dwellingsOnMarket, dwelling, migrationRealm);
 						break;
 					default:
 						throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
