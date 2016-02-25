@@ -152,6 +152,9 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 		age++;
 		assert age >= 0 : "Age < 0 (" + age + ")";
 		ageGroupId = AgeGroup.getAgeGroupId(age);
+		// Create time use data for all households becoming 10 yrs
+		if (age == 10)
+			updateTimeUse();
 	}
 	
 //	/**
@@ -189,7 +192,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 
 	public void setHousehold(HouseholdRow household) {
 		boolean householdChange = false;
-		if (this.household != null)
+		if (this.household != null && household.hasDwelling())
 			householdChange = true;
 		this.household = household;
 //		household.addMember(this);
