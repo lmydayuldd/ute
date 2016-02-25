@@ -118,7 +118,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	private short rsEnvironmentalAmenities;
 	private short rsSocialPrestige;
 	private short rsDesiredLivingSpace;
-	private short numAdults = 0, adultMaxAge = 0, adultMinAge = 255, femAdultMaxAge = 0, femAdultMinAge = 255;
+	private short numAdults = 0, adultMaxAge = 0, adultMinAge = 255;
+	private short femAdultMaxAge = 0, femAdultMinAge = 255;		// This is still necessary to identify children (age difference of >15 with mother)
 	private boolean adultMale = false, adultFemale = false;
 	
 	/**
@@ -315,7 +316,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 
 	public void countAdults() {
 		if (householdType == null) {	// first time counting based on age only
-			numAdults = 0; adultMaxAge = 0; adultMinAge = 255; femAdultMaxAge = 0; femAdultMinAge = 255;
+			numAdults = 0; adultMaxAge = 0; adultMinAge = 255; 
+			femAdultMaxAge = 0; femAdultMinAge = 255;
 			adultMale = false; adultFemale = false;
 			boolean child = false;
 			int childMinAge = 99;
@@ -346,17 +348,20 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 				if (femAdultMaxAge - childMinAge >= 15) {
 					// children are there!
 					for (PersonRow member : members) {
-						if ((member.getAge() < 18) && (member.getAge() <= femAdultMaxAge - 15)) {
+						if (member.getAge() < 18) {
+							member.setLivingWithParents(true);
+						} else if (member.getAge() <= femAdultMaxAge - 15) {
 							member.setLivingWithParents(true);
 						}
 					}
 				}
 			}
 		} else { // later counting based on child (livingWithParents) marker
+			// TODO: is it really correct to count someone >= 18yrs as a child just because he/she is living with her/his parents???
 			numAdults = 0; adultMaxAge = 0; adultMinAge = 255; femAdultMaxAge = 0; femAdultMinAge = 255;
 			adultMale = false; adultFemale = false;
 			for (PersonRow member : members) {
-				if (!member.isLivingWithParents()) {
+				if (!member.isLivingWithParents() && member.getAge() >= 18) {
 					numAdults++;
 					if (member.getAge() > adultMaxAge)
 						adultMaxAge = member.getAge();
@@ -374,6 +379,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 				}
 			}
 		}
+		assert (femAdultMinAge >= 18 && adultMinAge >= 18) : "Adult min age < 18";
 	}
 
 	
@@ -408,7 +414,6 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		if (forceCount || (householdType == null)) {
 			countAdults();
 		}
-		boolean mixedHousehold = adultMale && adultFemale;
 		switch (numAdults) {
 		case 0:
 //			System.out.println("Household " + getHouseholdId() + " unexpectedly consisting only of children (" + getHouseholdSize() + " persons).");
@@ -423,8 +428,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			if (getHouseholdSize() > 1) {
 				this.householdType = HouseholdType.SINGLE_PARENT;
 			} else {
-				// TODO: make this threshold (45) configurable
-				if (adultMaxAge <= 45)
+				if (adultMaxAge < Common.getYoungHouseholdAgeLimit())
 					this.householdType = HouseholdType.SINGLE_YOUNG;
 				else
 					this.householdType = HouseholdType.SINGLE_OLD;
@@ -433,24 +437,10 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		case 2:
 			assert getHouseholdSize() >= numAdults : "Counted " + numAdults + " adult(s) but household size = " + getHouseholdSize();
 			if (getHouseholdSize() == 2) {
-				if (!mixedHousehold) {
-					// heterosexuality is not seen as necessity for being a couple here - a flat-sharing
-					// community might be more common in that case, but don't have data to decide that
-					// currently
-					// TODO: make this threshold (45) configurable
-					if (adultMaxAge > 45) {
-						this.householdType = HouseholdType.COUPLE_OLD;
-					} else {
-						this.householdType = HouseholdType.COUPLE_YOUNG;
-					}
+				if (adultMaxAge >= Common.getYoungHouseholdAgeLimit()) {
+					this.householdType = HouseholdType.COUPLE_OLD;
 				} else {
-					// the age of the female determines whether it is a "young" or "old" couple, i.e. whether
-					// it can become a family or not
-					if (femAdultMaxAge > 45) {
-						this.householdType = HouseholdType.COUPLE_OLD;
-					} else {
-						this.householdType = HouseholdType.COUPLE_YOUNG;
-					}
+					this.householdType = HouseholdType.COUPLE_YOUNG;
 				}
 			} else {
 				if (getHouseholdSize() == 3)
@@ -487,20 +477,19 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	public void updateHouseholdTypeAfterAging() {
 		switch (householdType) {
 		case SINGLE_YOUNG:		// single young -> single old
-			// TODO: make this threshold (45) configurable
-			if (members.get(0).getAge() >= 65) {
+			if (members.get(0).getAge() >= Common.getYoungHouseholdAgeLimit()) {
 				householdType = HouseholdType.SINGLE_OLD;
 				updateTimeUse();
 			}
 			break;
 		case COUPLE_YOUNG:
-			// find maximum female age in household
+			// find maximum age in household
 			int maxAge = 0;
 			for (PersonRow member : members) {
 				if (member.getAge() > maxAge)
 					maxAge = member.getAge();
 			}
-			if (maxAge >= 65) {
+			if (maxAge >= Common.getYoungHouseholdAgeLimit()) {
 				householdType = HouseholdType.COUPLE_OLD;
 				updateTimeUse();
 			}
@@ -531,8 +520,9 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			householdType = HouseholdType.SINGLE_OLD;
 			break;
 		case COUPLE_YOUNG:
-			// TODO: if a female <= 45 dies and leaves a male > 45 then he would be SINGLE_OLD
 			householdType = HouseholdType.SINGLE_YOUNG;
+			// if a female <= 65 dies and leaves a male > 65 then he would be SINGLE_OLD (or similar)
+			determineInitialHouseholdType(true);
 			break;
 		default: // do nothing for other household types
 		}

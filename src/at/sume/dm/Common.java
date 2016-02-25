@@ -50,6 +50,7 @@ public class Common {
 	private static byte immigrationIncomeModifier;
 	private static boolean demographyOnly;
 	private static byte modelRuns;
+	private static byte youngHouseholdAgeLimit;
 	
 	/**
 	 * @return the iniFilename
@@ -250,6 +251,13 @@ public class Common {
 	}
 
 	/**
+	 * @return the youngHouseholdAgeLimit
+	 */
+	public static byte getYoungHouseholdAgeLimit() {
+		return youngHouseholdAgeLimit;
+	}
+
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -336,6 +344,7 @@ public class Common {
 			demographyOnly = true;
 		}
 		modelRuns = Byte.parseByte(getSysParam("ModelRuns"));
+		youngHouseholdAgeLimit = Byte.parseByte(getSysParam("YoungHouseholdAgeLimit"));
 	}
 	
 	/**
