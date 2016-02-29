@@ -37,7 +37,7 @@ public class SampleTravelTimesByDistance implements SampleActivity {
 			String sqlStatement = "SELECT Origin, Destination, HoursMIT, HoursPublic, DistanceKm, StartYear " +
 					"FROM _DM_TravelTimes " +
 					"WHERE ScenarioName = '" + scenario.getTravelTimesScenario() + "' AND origin = " + s +
-					" ORDER BY Destination, StartYear, Mode;";
+					" ORDER BY Destination, StartYear;";
 			ArrayList<TravelTimeRow> travelTimes = db.select(TravelTimeRow.class, sqlStatement);
 			assert travelTimes.size() > 0 : "No records found from '" + sqlStatement + "' for cell " + s + " - maybe wrong SpatialUnitLevel?";
 			int dest = 0;
@@ -88,14 +88,14 @@ public class SampleTravelTimesByDistance implements SampleActivity {
 	 * @param modelYear
 	 * @return
 	 */
-	private int estimateTravelTime(int origin, int destination, short modelYear) {
+	private int estimateTravelTime(int origin, int destination) {
 		//TODO: don't know at the moment what to do with commutings out of Vienna
 		if ((destination == 3) || (destination == 1)) {
 			travelMode = TravelMode.MOTORIZED_INDIVIDUAL_TRANSPORT;
 			return 60;
 		}
 		MersenneTwisterFast r = new MersenneTwisterFast();
-		TravelInfo ti = getTravelInfoYear(travelInfo.get(origin).get(destination), modelYear);
+		TravelInfo ti = getTravelInfoYear(travelInfo.get(origin).get(destination), Common.getModelYear());
 		int travelTimeMIT = (int)Math.round(ti.hoursMIT * 60);	      // convert to minutes
 		int travelTimePublic = (int)Math.round(ti.hoursPublic * 60);  // convert to minutes
 		double pTravelMIT = 0.1; // p for travel by car even if it takes longer than public transport
@@ -115,18 +115,17 @@ public class SampleTravelTimesByDistance implements SampleActivity {
 	 * The travel mode can be fetched with getTravelMode()
 	 * @param origin
 	 * @param destination
-	 * @param modelYear
 	 * @param mode
 	 * @return
 	 */
-	private int estimateTravelTime(int origin, int destination, short modelYear, TravelMode mode) {
+	private int estimateTravelTime(int origin, int destination, TravelMode mode) {
 		//TODO: don't know at the moment what to do with commutings out of Vienna
 		travelMode = mode;
 		if ((destination == 3) || (destination == 1)) {
 			return 60;
 		}
 		int travelTime = -1;
-		TravelInfo ti = getTravelInfoYear(travelInfo.get(origin).get(destination), modelYear);
+		TravelInfo ti = getTravelInfoYear(travelInfo.get(origin).get(destination), Common.getModelYear());
 		switch (mode) {
 		case PUBLIC_TRANSPORT:
 			travelTime = (int)Math.round(ti.hoursPublic * 60);
@@ -144,12 +143,12 @@ public class SampleTravelTimesByDistance implements SampleActivity {
 	 * @param modelYear
 	 * @return
 	 */
-	public double getTravelDistance(int origin, int destination, short modelYear) {
+	public double getTravelDistance(int origin, int destination) {
 		//TODO: don't know at the moment what to do with commutings out of Vienna
 		if ((destination == 3) || (destination == 1)) {
 			return 0;
 		}
-		TravelInfo ti = getTravelInfoYear(travelInfo.get(origin).get(destination), modelYear);
+		TravelInfo ti = getTravelInfoYear(travelInfo.get(origin).get(destination), Common.getModelYear());
 		return ti.distanceKm;
 	}
 //	public DbTimeUseRow estimateTravelTime(int personId, int origin, int destination) {
@@ -167,12 +166,11 @@ public class SampleTravelTimesByDistance implements SampleActivity {
 	}
 	@Override
 	public int sampleMinutesPerDay() {
-		short modelYear = Common.getModelYear();
 		if ((timeUseSamplingParameters.getOrigin() != 0) && (timeUseSamplingParameters.getDestination() != 0)) {
 			if (timeUseSamplingParameters.isEmployed()) {
-				return estimateTravelTime(timeUseSamplingParameters.getOrigin(), timeUseSamplingParameters.getDestination(), modelYear);
+				return estimateTravelTime(timeUseSamplingParameters.getOrigin(), timeUseSamplingParameters.getDestination());
 			} else if (timeUseSamplingParameters.isInEducation()) {
-				return estimateTravelTime(timeUseSamplingParameters.getOrigin(), timeUseSamplingParameters.getDestination(), modelYear, TravelMode.PUBLIC_TRANSPORT);
+				return estimateTravelTime(timeUseSamplingParameters.getOrigin(), timeUseSamplingParameters.getDestination(), TravelMode.PUBLIC_TRANSPORT);
 			}
 		}
 		return 0;

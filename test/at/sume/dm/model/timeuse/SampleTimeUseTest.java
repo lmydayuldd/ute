@@ -54,6 +54,7 @@ public class SampleTimeUseTest {
 		t.setDestination(92310);
 		t.setEmployed(false);
 		t.setPersonId(1);
+		t.setModelYear((short) 1950);
 		List<DbTimeUseRow> timeUse = new ArrayList<DbTimeUseRow>();
 		for (TimeUseRow row : sampleTimeUse.randomSample(t)) {
 			DbTimeUseRow dt = new DbTimeUseRow(1, row);
