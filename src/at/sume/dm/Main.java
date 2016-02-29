@@ -149,7 +149,7 @@ public class Main {
 		        	}
 		        }
 		        System.out.println(printInfo(modelRun) + ": loaded " + j + " time-use records for " + persons.size() + " persons");
-		        sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
+		        sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, scenario, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
 		        sampleTimeUse.registerSampleActivity(sampleTravelTimesByDistance);
 		        PersonRow.setSampleTimeUse(sampleTimeUse);
 			} catch (SQLException e) {
@@ -283,13 +283,9 @@ public class Main {
 		ResidentialMobility residentialMobility = new ResidentialMobility(minimumIncome);
 		int modelStartYear = Common.getModelStartYear();
 		int modelEndYear = modelStartYear + iterations;
-		for (int modelYear = modelStartYear; modelYear != modelEndYear; modelYear++) {
-			// for breakpoints in a certain year
-			if (modelYear == 2012) {
-				@SuppressWarnings("unused")
-				int xy = 0;
-			}
-			
+		for (short modelYear = (short) modelStartYear; modelYear != modelEndYear; modelYear++) {
+			// Set model year for time use sampling
+			Common.setModelYear(modelYear);
 			// Clear migration indicators
 			// TODO: include these three into the OutputManager (which might need to have a function for output of data at the end of a model year)
 			migrationPerSpatialUnit.clearIndicatorList();

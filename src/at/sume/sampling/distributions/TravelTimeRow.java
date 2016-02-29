@@ -10,7 +10,8 @@ package at.sume.sampling.distributions;
 public class TravelTimeRow {
 	public int origin;
 	public int destination;
-	public int mode;
-	public double hours;
+	public double hoursMit;
+	public double hoursPublic;
 	public double distanceKm;
+	public int startYear;
 }

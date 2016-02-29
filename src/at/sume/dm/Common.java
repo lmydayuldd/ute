@@ -51,6 +51,7 @@ public class Common {
 	private static boolean demographyOnly;
 	private static byte modelRuns;
 	private static byte youngHouseholdAgeLimit;
+	private static short modelYear;
 	
 	/**
 	 * @return the iniFilename
@@ -132,6 +133,20 @@ public class Common {
 	 */
 	public static short getModelStartYear() {
 		return modelStartYear;
+	}
+
+	/**
+	 * @return the modelYear
+	 */
+	public static short getModelYear() {
+		return modelYear;
+	}
+
+	/**
+	 * @param modelYear the modelYear to set
+	 */
+	public static void setModelYear(short modelYear) {
+		Common.modelYear = modelYear;
 	}
 
 	public static short getMovingDecisionMin() {

@@ -33,4 +33,8 @@ public interface TimeUseSamplingParameters {
 	 * @return
 	 */
 	public boolean isEmployed();
+	/**
+	 * Get the current model year();
+	 */
+	public short getModelYear();
 }

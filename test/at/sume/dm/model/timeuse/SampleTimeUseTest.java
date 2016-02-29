@@ -17,6 +17,7 @@ import at.sume.dm.Common;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.entities.TimeUseRow;
 import at.sume.dm.model.travel.SampleTravelTimesByDistance;
+import at.sume.dm.scenario_handling.Scenario;
 import at.sume.sampling.entities.DbTimeUseRow;
 import net.remesch.db.Database;
 
@@ -33,7 +34,7 @@ public class SampleTimeUseTest {
 		Database db = Common.openDatabase();
 		Common.init();
 		SpatialUnits spatialUnits = new SpatialUnits(db, Common.getSpatialUnitLevel());
-		sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
+		sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, new Scenario(db, Common.getScenarioId()), spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
 		sampleTimeUse = new SampleTimeUse();
 		sampleTimeUse.registerSampleActivity(sampleTravelTimesByDistance);
 	}

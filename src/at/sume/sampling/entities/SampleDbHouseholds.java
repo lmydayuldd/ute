@@ -17,6 +17,7 @@ import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.timeuse.SampleTimeUse;
 import at.sume.dm.model.timeuse.TravelTimeSamplingParameters;
 import at.sume.dm.model.travel.SampleTravelTimesByDistance;
+import at.sume.dm.scenario_handling.Scenario;
 import at.sume.dm.types.LivingSpaceGroup6;
 import at.sume.sampling.SampleHouseholdCostOfResidence;
 import at.sume.sampling.SampleHouseholdLivingSpace;
@@ -80,7 +81,7 @@ public class SampleDbHouseholds {
 		
 		sampleDbPersons = new SampleDbPersons(db);
 
-        sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
+        sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, new Scenario(db, Common.getScenarioId()), spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
         sampleTimeUse.registerSampleActivity(sampleTravelTimesByDistance);
 		
 		// Preparation of sampling of cost of residence from the living space

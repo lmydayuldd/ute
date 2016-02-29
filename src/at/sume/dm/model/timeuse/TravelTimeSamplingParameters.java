@@ -14,6 +14,7 @@ public class TravelTimeSamplingParameters implements TimeUseSamplingParameters {
 	private int personId;
 	private boolean inEducation;
 	private boolean employed;
+	private short modelYear;
 	
 	/**
 	 * @param emploayed the employed to set
@@ -88,6 +89,20 @@ public class TravelTimeSamplingParameters implements TimeUseSamplingParameters {
 	@Override
 	public boolean isEmployed() {
 		return employed;
+	}
+
+	/**
+	 * @return the modelYear
+	 */
+	public short getModelYear() {
+		return modelYear;
+	}
+
+	/**
+	 * @param modelYear the modelYear to set
+	 */
+	public void setModelYear(short modelYear) {
+		this.modelYear = modelYear;
 	}
 
 }

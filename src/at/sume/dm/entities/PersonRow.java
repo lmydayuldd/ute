@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import at.sume.db.RecordSetRowFileable;
+import at.sume.dm.Common;
 import at.sume.dm.indicators.simple.DemographyObservable;
 import at.sume.dm.indicators.simple.DemographyObserver;
 import at.sume.dm.model.timeuse.SampleTimeUse;
@@ -449,6 +450,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 				p.setInEducation(true);
 				p.setEmployed(false);
 			}
+			p.setModelYear(Common.getModelYear());
 			timeUse = sampleTimeUse.randomSample(p);
 		}
 	}
