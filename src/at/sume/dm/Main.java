@@ -50,6 +50,8 @@ import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionWeight;
 import at.sume.dm.model.residential_satisfaction.UDPCentrality;
 import at.sume.dm.model.residential_satisfaction.UDPPublicTransportAccessibility;
 import at.sume.dm.model.timeuse.SampleTimeUse;
+import at.sume.dm.model.timeuse.TimeUseTypeByGenderChildWork;
+import at.sume.dm.model.timeuse.TimeUseTypeByHouseholdType;
 import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.dm.scenario_handling.Scenario;
 import at.sume.dm.types.HouseholdType;
@@ -83,8 +85,6 @@ public class Main {
 	private static AggregatedDwellings aggregatedDwellings;
 	private static RentPerSpatialUnit rentPerSpatialUnit;
 	private static Scenario scenario;
-	private static SampleTimeUse sampleTimeUse = new SampleTimeUse();
-	private static SampleTravelTimesByDistance sampleTravelTimesByDistance;
 
 	private static String printInfo() {
 		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)";
@@ -149,9 +149,22 @@ public class Main {
 		        	}
 		        }
 		        System.out.println(printInfo(modelRun) + ": loaded " + j + " time-use records for " + persons.size() + " persons");
-		        sampleTravelTimesByDistance = new SampleTravelTimesByDistance(db, scenario, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList()));
-		        sampleTimeUse.registerSampleActivity(sampleTravelTimesByDistance);
+		        // TODO: put sampling of other travel times here!
+		        SampleTimeUse sampleTimeUse = new SampleTimeUse();
+		        sampleTimeUse.registerSampleActivity(new SampleTravelTimesByDistance(db, scenario, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList())));
 		        PersonRow.setSampleTimeUse(sampleTimeUse);
+		        // Time Use Types
+		        // TODO: put this in enum/class? TimeUseTypeScenario and just pass the Scenario string there!
+		        switch(scenario.getTimeUseTypeScenario()) {
+		        case "GenderChildWork":
+		        	PersonRow.setTimeUseTypeDesignator(new TimeUseTypeByGenderChildWork());
+		        	break;
+		        case "HouseholdType":
+		        	PersonRow.setTimeUseTypeDesignator(new TimeUseTypeByHouseholdType());
+		        	break;
+		        default:
+		        	throw new IllegalArgumentException("Unknown TimeUseTypeScenarioName " + scenario.getTimeUseTypeScenario());
+		        }
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} catch (InstantiationException e) {

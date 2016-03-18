@@ -13,6 +13,8 @@ import at.sume.dm.Common;
 import at.sume.dm.indicators.simple.DemographyObservable;
 import at.sume.dm.indicators.simple.DemographyObserver;
 import at.sume.dm.model.timeuse.SampleTimeUse;
+import at.sume.dm.model.timeuse.TimeUseType;
+import at.sume.dm.model.timeuse.TimeUseTypeDesignator;
 import at.sume.dm.model.timeuse.TravelTimeSamplingParameters;
 import at.sume.dm.types.AgeGroup;
 import net.remesch.db.Database;
@@ -42,6 +44,8 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	private List<TimeUseRow> timeUse;
 	@Ignore
 	private static SampleTimeUse sampleTimeUse;
+	@Ignore
+	private static TimeUseTypeDesignator determineTimeUseType;
 	
 	public PersonRow() {
 		super();
@@ -57,6 +61,20 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	 */
 	public static void setSampleTravelTimes(SampleTimeUse sampleTimeUse) {
 		PersonRow.sampleTimeUse = sampleTimeUse;
+	}
+	/**
+	 * Set the time use type designator for later use
+	 * @param t
+	 */
+	public static void setTimeUseTypeDesignator(TimeUseTypeDesignator t) {
+		determineTimeUseType = t;
+	}
+	/**
+	 * Return the Time-Use Type for the person
+	 * @return
+	 */
+	public TimeUseType getTimeUseType() {
+		return determineTimeUseType.getTimeUseType(this);
 	}
 	/**
 	 * @return the personId

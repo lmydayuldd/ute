@@ -112,6 +112,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	private ArrayList<SpatialUnitScore> residentialSatisfactionEstimate;
 	private short currentResidentialSatisfaction;
 	// residential satisfaction components
+	// TODO: move to extra class HouseholdResidentialSatisfaction or similar
 	private short rsUdpCentrality;
 	private short rsUdpPublicTransportAccessibility;
 	private short rsCostEffectiveness;
@@ -121,6 +122,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	private short numAdults = 0, adultMaxAge = 0, adultMinAge = 255;
 	private short femAdultMaxAge = 0, femAdultMinAge = 255;		// This is still necessary to identify children (age difference of >15 with mother)
 	private boolean adultMale = false, adultFemale = false;
+	private boolean householdWithChildrenBelow18;
 	
 	/**
 	 * 
@@ -315,11 +317,11 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 //	}
 
 	public void countAdults() {
+		householdWithChildrenBelow18 = false;
 		if (householdType == null) {	// first time counting based on age only
 			numAdults = 0; adultMaxAge = 0; adultMinAge = 255; 
 			femAdultMaxAge = 0; femAdultMinAge = 255;
 			adultMale = false; adultFemale = false;
-			boolean child = false;
 			int childMinAge = 99;
 			for (PersonRow member : members) {
 				if (member.getAge() >= 18) {
@@ -338,13 +340,13 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 					if (member.getSex() == 2)
 						adultMale = true;
 				} else {
-					child = true;
+					householdWithChildrenBelow18 = true;
 					if (member.getAge() < childMinAge)
 						childMinAge = member.getAge();
 				}
 			}
 			// identify household children
-			if (child) {
+			if (householdWithChildrenBelow18) {
 				if (femAdultMaxAge - childMinAge >= 15) {
 					// children are there!
 					for (PersonRow member : members) {
@@ -376,31 +378,39 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 					}
 					if (member.getSex() == 2)
 						adultMale = true;
+				} else {
+					householdWithChildrenBelow18 = true;
 				}
 			}
 		}
 		assert (femAdultMinAge >= 18 && adultMinAge >= 18) : "Adult min age < 18";
 	}
-
-	
+	/**
+	 * 
+	 * @return
+	 */
 	public short getAdultsCount() {
 		return numAdults;
 	}
-	
 	/**
 	 * @return the adultMale
 	 */
-	public boolean isAdultMale() {
+	public boolean hasAdultMale() {
 		return adultMale;
 	}
-
 	/**
 	 * @return the adultFemale
 	 */
-	public boolean isAdultFemale() {
+	public boolean hasAdultFemale() {
 		return adultFemale;
 	}
-
+	/**
+	 * Does the household have children below 18 yrs?
+	 * @return
+	 */
+	public boolean hasChildrenBelow18() {
+		return householdWithChildrenBelow18;
+	}
 	/**
 	 * Determine the household type from the household structure and save it for later use
 	 * This function is only intended for the first determination of the household type. Later on in the

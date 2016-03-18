@@ -46,7 +46,7 @@ public class MovingTogether {
 		case SINGLE_YOUNG:
 		case SINGLE_PARENT:
 			household.countAdults();
-			if (household.isAdultFemale())
+			if (household.hasAdultFemale())
 				femaleHouseholds.add(household);
 			else
 				maleHouseholds.add(household);

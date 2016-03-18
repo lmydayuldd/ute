@@ -26,6 +26,8 @@ public class Scenario {
 	private String fertilityScenario;
 	private String migrationIncomeScenario;
 	private String travelTimesScenario;
+	private String timeUseTypeScenario;
+	private String travelTimeModifierScenario;
 	
 	public Scenario(Database db, short scenarioId) throws SQLException {
 		String sql = "select * from _DM_Scenarios where scenarioId = ?";
@@ -45,6 +47,8 @@ public class Scenario {
 			if (rentScenario == null) rentScenario = "NULL";
 			fertilityScenario = rs.getString("FertilityScenarioName");
 			travelTimesScenario = rs.getString("TravelTimesScenarioName");
+			timeUseTypeScenario = rs.getString("TimeUseTypeScenarioName");
+			travelTimeModifierScenario = rs.getString("TravelTimeModifierScenarioName");
 		} else {
 			throw new AssertionError("Scenario " + scenarioId + " not found!");
 		}
@@ -125,5 +129,19 @@ public class Scenario {
 	 */
 	public String getTravelTimesScenario() {
 		return travelTimesScenario;
+	}
+
+	/**
+	 * @return the timeUseTypeScenario
+	 */
+	public String getTimeUseTypeScenario() {
+		return timeUseTypeScenario;
+	}
+
+	/**
+	 * @return the travelTimeModifierScenario
+	 */
+	public String getTravelTimeModifierScenario() {
+		return travelTimeModifierScenario;
 	}
 }
