@@ -30,6 +30,7 @@ import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.entities.TimeUseRow;
 import at.sume.dm.indicators.AggregatedDwellings;
+import at.sume.dm.indicators.AggregatedTimeUse;
 import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
@@ -83,6 +84,7 @@ public class Main {
 	private static CountMigrationDetails migrationDetails;
 	private static CountDemographicMovements demographicMovementsPerSpatialUnit;
 	private static AggregatedDwellings aggregatedDwellings;
+	private static AggregatedTimeUse aggregatedTimeUse;
 	private static RentPerSpatialUnit rentPerSpatialUnit;
 	private static Scenario scenario;
 
@@ -221,6 +223,9 @@ public class Main {
 	        aggregatedDwellings = new AggregatedDwellings();
 	        fileableList.add(aggregatedDwellings.getIndicatorList());
 	        fileNameList.add("AggregatedDwellings");
+	        aggregatedTimeUse = new AggregatedTimeUse();
+	        fileableList.add(aggregatedTimeUse.getIndicatorList());
+	        fileNameList.add("AggregatedTimeUse");
 	//        fileableList.add(migrationPerSpatialUnit.getIndicatorList());
 	//        fileNameList.add("Migrations");
 	        outputManager = new OutputManager(Common.getPathOutput(), fileNameList, fileableList);
@@ -308,6 +313,7 @@ public class Main {
 			buildIndicators();			
 	        System.out.println(printInfo() + ": build of model indicators complete");
 	        aggregatedDwellings.build(dwellings.getRowList());
+	        aggregatedTimeUse.build(persons.getRowList());
 	        outputManager.output((short) modelYear);
 	        System.out.println(printInfo() + ": model data output to database");
 	        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
