@@ -32,21 +32,21 @@ public enum TimeUseType {
 	public String toString() {
 		switch (this) {
 		case MALE_CHILD_WORK:
-			return "MALE_CHILD_WORK";
+			return "1 male/child/work";
 		case MALE_CHILD_NOWORK: 
-			return "MALE_CHILD_NOWORK";
+			return "2 male/child/no work";
 		case FEMALE_CHILD_WORK: 
-			return "FEMALE_CHILD_WORK";
+			return "3 female/child/work";
 		case FEMALE_CHILD_NOWORK: 
-			return "FEMALE_CHILD_NOWORK";
+			return "4 female/child/no work";
 		case MALE_NOCHILD_WORK: 
-			return "MALE_NOCHILD_WORK";
+			return "5 male/no child/work";
 		case MALE_NOCHILD_NOWORK: 
-			return "MALE_NOCHILD_NOWORK";
+			return "6 male/no child/no work";
 		case FEMALE_NOCHILD_WORK: 
-			return "FEMALE_NOCHILD_WORK";
+			return "7 female/no child/work";
 		case FEMALE_NOCHILD_NOWORK:
-			return "FEMALE_NOCHILD_NOWORK";
+			return "8 female/no child/no work";
 		case SINGLE_YOUNG:
 			return "SINGLE_YOUNG";
 		case SINGLE_OLD:
