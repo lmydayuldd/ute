@@ -10,6 +10,7 @@ package at.sume.dm.model.timeuse;
  *
  */
 public enum TimeUseType {
+	// TODO: implement similar to Activity.java
 	MALE_CHILD_WORK,
 	MALE_CHILD_NOWORK, 
 	FEMALE_CHILD_WORK, 

@@ -151,9 +151,9 @@ public class Main {
 		        	}
 		        }
 		        System.out.println(printInfo(modelRun) + ": loaded " + j + " time-use records for " + persons.size() + " persons");
-		        // TODO: put sampling of other travel times here!
 		        SampleTimeUse sampleTimeUse = new SampleTimeUse();
 		        sampleTimeUse.registerSampleActivity(new SampleTravelTimesByDistance(db, scenario, spatialUnits.getRowList().stream().map(i -> i.getSpatialUnitId()).collect(Collectors.toList())));
+//		        sampleTimeUse.registerSampleActivity(new SampleTravelTimesByResidentialLocation());
 		        PersonRow.setSampleTimeUse(sampleTimeUse);
 		        // Time Use Types
 		        // TODO: put this in enum/class? TimeUseTypeScenario and just pass the Scenario string there!
