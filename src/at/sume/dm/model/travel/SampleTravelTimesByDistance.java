@@ -27,6 +27,7 @@ public class SampleTravelTimesByDistance implements SampleActivity {
 	private TimeUseSamplingParameters timeUseSamplingParameters;
 	
 	public SampleTravelTimesByDistance(Database db, Scenario scenario, List<Integer> cells) throws InstantiationException, IllegalAccessException, SQLException {
+		assert cells.size() > 0 : "No cell in list of cells for loading travel times by distance between cells"; 
 		travelInfo = new HashMap<Integer,HashMap<Integer,List<TravelInfo>>>();
 		// Load _DM_TravelTimes & build nested HashSets
 		for (Integer s : cells) {
@@ -38,25 +39,26 @@ public class SampleTravelTimesByDistance implements SampleActivity {
 					"FROM _DM_TravelTimes " +
 					"WHERE ScenarioName = '" + scenario.getTravelTimesScenario() + "' AND origin = " + s +
 					" ORDER BY Destination, StartYear;";
-			ArrayList<TravelTimeRow> travelTimes = db.select(TravelTimeRow.class, sqlStatement);
-			assert travelTimes.size() > 0 : "No records found from '" + sqlStatement + "' for cell " + s + " - maybe wrong SpatialUnitLevel?";
+			ArrayList<TravelTimeRow> tableData = db.select(TravelTimeRow.class, sqlStatement);
+			assert tableData.size() > 0 : "No records found from '" + sqlStatement + "' for cell " + s + " - maybe wrong SpatialUnitLevel?";
 			int dest = 0;
-			List<TravelInfo> travelInfoList = new ArrayList<TravelInfo>();
-			for (TravelTimeRow t : travelTimes) {
+			List<TravelInfo> travelInfoPerYear = new ArrayList<TravelInfo>();
+			for (TravelTimeRow t : tableData) {
 				if (dest != t.destination) {
 					if (dest != 0) {
-						travelInfoOrigin.put(dest, travelInfoList);
+						travelInfoOrigin.put(dest, travelInfoPerYear);
+						travelInfoPerYear = new ArrayList<TravelInfo>();
 					}
-					travelInfoList = new ArrayList<TravelInfo>();
 				}
-				TravelInfo travelInfo = new TravelInfo();
-				travelInfo.hoursMIT = t.hoursMit;
-				travelInfo.hoursPublic = t.hoursPublic;
-				travelInfo.beginYear = (short) t.startYear;
-				travelInfo.distanceKm = t.distanceKm;
-				travelInfoList.add(travelInfo);
+				TravelInfo ti = new TravelInfo();
+				ti.hoursMIT = t.hoursMit;
+				ti.hoursPublic = t.hoursPublic;
+				ti.beginYear = (short) t.startYear;
+				ti.distanceKm = t.distanceKm;
+				travelInfoPerYear.add(ti);
 				dest = t.destination;
 			}
+			travelInfoOrigin.put(dest, travelInfoPerYear);
 		}
 	}
 	/**

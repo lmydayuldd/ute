@@ -46,23 +46,25 @@ public class AggregatedTimeUse {
 	 * @param person
 	 */
 	public void build(PersonRow person) {
-		for (TimeUseRow timeUse : person.getTimeUse()) {
-			AggregatedTimeUseRow lookup = setupIndicator(person, timeUse);
-			int pos = Collections.binarySearch(indicatorList, lookup);  
-			if (pos < 0) {
-				// insert at position pos
-				pos = (pos + 1) * -1;
-				lookup.setParticipatingPersonCount(1);
-				lookup.setParticipatingHouseholdCount(1);
-				lookup.setTimeUseSum(timeUse.avgTimeUse);
-				indicatorList.add(pos, lookup);
-			} else {
-				// available at position pos
-				AggregatedTimeUseRow b = indicatorList.get(pos);
-				b.setParticipatingPersonCount(b.getParticipatingPersonCount() + 1);
-				b.setParticipatingHouseholdCount(b.getParticipatingHouseholdCount() + 1);
-				b.setTimeUseSum(b.getTimeUseSum() + timeUse.avgTimeUse);
-				indicatorList.set(pos, b);
+		if (person.getTimeUse() != null) {
+			for (TimeUseRow timeUse : person.getTimeUse()) {
+				AggregatedTimeUseRow lookup = setupIndicator(person, timeUse);
+				int pos = Collections.binarySearch(indicatorList, lookup);  
+				if (pos < 0) {
+					// insert at position pos
+					pos = (pos + 1) * -1;
+					lookup.setParticipatingPersonCount(1);
+					lookup.setParticipatingHouseholdCount(1);
+					lookup.setTimeUseSum(timeUse.avgTimeUse);
+					indicatorList.add(pos, lookup);
+				} else {
+					// available at position pos
+					AggregatedTimeUseRow b = indicatorList.get(pos);
+					b.setParticipatingPersonCount(b.getParticipatingPersonCount() + 1);
+					b.setParticipatingHouseholdCount(b.getParticipatingHouseholdCount() + 1);
+					b.setTimeUseSum(b.getTimeUseSum() + timeUse.avgTimeUse);
+					indicatorList.set(pos, b);
+				}
 			}
 		}
 	}
