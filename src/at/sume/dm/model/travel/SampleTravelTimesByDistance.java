@@ -49,12 +49,12 @@ public class SampleTravelTimesByDistance implements SampleActivity {
 					}
 					travelInfoList = new ArrayList<TravelInfo>();
 				}
-				TravelInfo travelInfo = new TravelInfo();
-				travelInfo.hoursMIT = t.hoursMit;
-				travelInfo.hoursPublic = t.hoursPublic;
-				travelInfo.beginYear = (short) t.startYear;
-				travelInfo.distanceKm = t.distanceKm;
-				travelInfoList.add(travelInfo);
+				TravelInfo ti = new TravelInfo();
+				ti.hoursMIT = t.hoursMit;
+				ti.hoursPublic = t.hoursPublic;
+				ti.beginYear = (short) t.startYear;
+				ti.distanceKm = t.distanceKm;
+				travelInfoList.add(ti);
 				dest = t.destination;
 			}
 		}
