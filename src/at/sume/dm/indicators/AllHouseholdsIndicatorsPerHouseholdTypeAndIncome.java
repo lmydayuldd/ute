@@ -6,11 +6,13 @@ package at.sume.dm.indicators;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.indicators.base.Indicator;
 import at.sume.dm.model.output.Fileable;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
+import at.sume.dm.types.IncomeGroup3;
 
 /**
  * @author Alexander Remesch
@@ -131,7 +133,7 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 		}
 		@Override
 		public String toString(String delimiter) {
-			return householdType.toString() + delimiter + IncomeGroup.getIncomeGroupNameDirect(incomeGroup) + delimiter + householdCount +
+			return householdType.toString() + delimiter + incomeGroup + delimiter + householdCount +
 				delimiter + personCount + delimiter + livingSpaceSum + delimiter + livingSpacePerHouseholdMemberSum + delimiter +
 				livingSpacePerWeightedHouseholdMemberSum;
 		}
@@ -149,7 +151,17 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 	@Override
 	public void add(HouseholdRow household) {
 		HouseholdType householdType = household.getHouseholdType();
-		byte incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
+//		byte incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
+		byte incomeGroup = 0;
+		switch(Common.getOutputIncomeGroups()) {
+		case 3:
+			incomeGroup = IncomeGroup3.getIncomeGroupId(household.getYearlyIncome());
+		case 18:
+			incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
+			break;
+		default:
+			throw new IllegalArgumentException("Unknown number of income groups - only 3 and 18 allowed!");
+		}
 		int pos = lookupIndicator(householdType, incomeGroup);
 		if (pos < 0) {
 			// insert at position pos
@@ -189,7 +201,17 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 	@Override
 	public void remove(HouseholdRow household) {
 		HouseholdType householdType = household.getHouseholdType();
-		byte incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
+//		byte incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
+		byte incomeGroup = 0;
+		switch(Common.getOutputIncomeGroups()) {
+		case 3:
+			incomeGroup = IncomeGroup3.getIncomeGroupId(household.getYearlyIncome());
+		case 18:
+			incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
+			break;
+		default:
+			throw new IllegalArgumentException("Unknown number of income groups - only 3 and 18 allowed!");
+		}
 		int pos = lookupIndicator(householdType, incomeGroup);
 		if (pos < 0) {
 			// not there, unable to remove - throw exception

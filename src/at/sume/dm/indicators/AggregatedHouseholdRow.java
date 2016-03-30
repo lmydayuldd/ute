@@ -5,7 +5,6 @@ package at.sume.dm.indicators;
 
 import at.sume.dm.model.output.Fileable;
 import at.sume.dm.types.HouseholdType;
-import at.sume.dm.types.IncomeGroup;
 import at.sume.dm.types.LivingSpaceGroup6;
 
 /**
@@ -126,7 +125,7 @@ public class AggregatedHouseholdRow implements Comparable<AggregatedHouseholdRow
 
 	@Override
 	public String toString(String delimiter) {
-		return spatialUnitId + delimiter + IncomeGroup.getIncomeGroupNameDirect(incomeGroupId) + delimiter + LivingSpaceGroup6.getLivingSpaceGroupName(livingSpaceGroupId) +
+		return spatialUnitId + delimiter + incomeGroupId + delimiter + LivingSpaceGroup6.getLivingSpaceGroupName(livingSpaceGroupId) +
 			delimiter + householdSize + delimiter + householdType.toString() + delimiter + householdCount + delimiter + personCount;
 	}
 

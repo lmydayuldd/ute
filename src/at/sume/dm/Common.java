@@ -52,6 +52,7 @@ public class Common {
 	private static byte modelRuns;
 	private static byte youngHouseholdAgeLimit;
 	private static short modelYear;
+	private static byte outputIncomeGroups;
 	
 	/**
 	 * @return the iniFilename
@@ -273,6 +274,13 @@ public class Common {
 	}
 
 	/**
+	 * @return the outputIncomeGroups
+	 */
+	public static byte getOutputIncomeGroups() {
+		return outputIncomeGroups;
+	}
+
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -360,6 +368,7 @@ public class Common {
 		}
 		modelRuns = Byte.parseByte(getSysParam("ModelRuns"));
 		youngHouseholdAgeLimit = Byte.parseByte(getSysParam("YoungHouseholdAgeLimit"));
+		outputIncomeGroups = Byte.parseByte(getSysParam("OutputIncomeGroups"));
 	}
 	
 	/**

@@ -6,7 +6,6 @@ package at.sume.dm.indicators;
 import at.sume.dm.model.output.Fileable;
 import at.sume.dm.model.timeuse.TimeUseType;
 import at.sume.dm.types.HouseholdType;
-import at.sume.dm.types.IncomeGroup;
 
 /**
  * @author Alexander Remesch
@@ -166,7 +165,7 @@ public class AggregatedTimeUseRow implements Fileable, Comparable<AggregatedTime
 	 */
 	@Override
 	public String toString(String delimiter) {
-		return spatialUnitId + delimiter + activity + delimiter + IncomeGroup.getIncomeGroupNameDirect(incomeGroupId) + delimiter + householdType.toString() +
+		return spatialUnitId + delimiter + activity + delimiter + incomeGroupId + delimiter + householdType.toString() +
 				delimiter + timeUseType.toString() + delimiter + timeUseSum + delimiter + participatingPersonCount + delimiter + participatingHouseholdCount;
 	}
 }

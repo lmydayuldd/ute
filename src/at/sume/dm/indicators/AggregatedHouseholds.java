@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.indicators.base.Indicator;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
+import at.sume.dm.types.IncomeGroup3;
 
 /**
  * 
@@ -22,14 +24,25 @@ public class AggregatedHouseholds implements Indicator<HouseholdRow> {
 	
 	@Override
 	public void add(HouseholdRow household) {
-		int pos = lookupIndicator(household.getSpatialunitId(), IncomeGroup.getIncomeGroupId(household.getYearlyIncome()), household.getLivingSpaceGroupId(), 
+		byte incomeGroup = 0;
+		switch(Common.getOutputIncomeGroups()) {
+		case 3:
+			incomeGroup = IncomeGroup3.getIncomeGroupId(household.getYearlyIncome());
+			break;
+		case 18:
+			incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
+			break;
+		default:
+			throw new IllegalArgumentException("Unknown number of income groups - only 3 and 18 allowed!");
+		}
+		int pos = lookupIndicator(household.getSpatialunitId(), incomeGroup, household.getLivingSpaceGroupId(), 
 				household.getHouseholdSize(), household.getHouseholdType());
 		if (pos < 0) {
 			// insert at position pos
 			pos = (pos + 1) * -1;
 			AggregatedHouseholdRow b = new AggregatedHouseholdRow();
 			b.setSpatialUnitId(household.getSpatialunitId());
-			b.setIncomeGroupId(IncomeGroup.getIncomeGroupId(household.getYearlyIncome()));
+			b.setIncomeGroupId(incomeGroup);
 			b.setLivingSpaceGroupId(household.getLivingSpaceGroupId());
 			b.setHouseholdSize(household.getHouseholdSize());
 			b.setHouseholdType(household.getHouseholdType());

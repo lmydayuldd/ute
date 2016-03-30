@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import at.sume.dm.Common;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.TimeUseRow;
 import at.sume.dm.model.output.Fileable;
 import at.sume.dm.types.IncomeGroup;
+import at.sume.dm.types.IncomeGroup3;
 
 /**
  * Collect aggregated time use for model output
@@ -26,7 +28,16 @@ public class AggregatedTimeUse {
 		AggregatedTimeUseRow result = new AggregatedTimeUseRow();
 		result.setSpatialUnitId(person.getHousehold().getDwelling().getSpatialunitId());
 		result.setActivity(timeUse.activity);
-		result.setIncomeGroupId(IncomeGroup.getIncomeGroupId(person.getYearlyIncome()));
+		switch(Common.getOutputIncomeGroups()) {
+		case 3:
+			result.setIncomeGroupId(IncomeGroup3.getIncomeGroupId(person.getYearlyIncome()));
+			break;
+		case 18:
+			result.setIncomeGroupId(IncomeGroup.getIncomeGroupId(person.getYearlyIncome()));
+			break;
+		default:
+			throw new IllegalArgumentException("Unknown number of income groups - only 3 and 18 allowed!");
+		}
 		result.setHouseholdType(person.getHousehold().getHouseholdType());
 		result.setTimeUseType(person.getTimeUseType());
 		return result;
