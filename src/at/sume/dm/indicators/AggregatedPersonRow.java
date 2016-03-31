@@ -4,6 +4,7 @@
 package at.sume.dm.indicators;
 
 import at.sume.dm.model.output.Fileable;
+import at.sume.dm.model.timeuse.TimeUseType;
 import at.sume.dm.types.AgeGroup;
 
 /**
@@ -17,6 +18,7 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 	private boolean livingWithParents;
 	private short householdSize6;
 	private int personCount;
+	private TimeUseType timeUseType;
 	
 	/**
 	 * @return the spatialUnitId
@@ -116,13 +118,27 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 		this.personCount = personCount;
 	}
 
+	/**
+	 * @return the timeUseType
+	 */
+	public TimeUseType getTimeUseType() {
+		return timeUseType;
+	}
+
+	/**
+	 * @param timeUseType the timeUseType to set
+	 */
+	public void setTimeUseType(TimeUseType timeUseType) {
+		this.timeUseType = timeUseType;
+	}
+
 	/* (non-Javadoc)
 	 * @see at.sume.dm.model.output.Fileable#toCsvHeadline(java.lang.String)
 	 */
 	@Override
 	public String toCsvHeadline(String delimiter) {
 		return "SpatialUnit" + delimiter + "IncomeGroup" + delimiter + "Sex" + delimiter + "AgeGroup" + 
-			delimiter + "LivingWithParents" + delimiter + "HouseholdSize6" + delimiter + "PersonCount";
+			delimiter + "LivingWithParents" + delimiter + "TimeUseType" + delimiter + "HouseholdSize6" + delimiter + "PersonCount";
 	}
 
 	/* (non-Javadoc)
@@ -132,7 +148,7 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 	public String toString(String delimiter) {
 		return spatialUnitId + delimiter + incomeGroupId + delimiter + sex +
 			delimiter + AgeGroup.getAgeGroupNameDirect(ageGroupId) + delimiter + livingWithParents + 
-			delimiter + householdSize6 + delimiter + personCount;
+			delimiter + timeUseType + delimiter + householdSize6 + delimiter + personCount;
 	}
 
 	@Override
@@ -149,6 +165,8 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 		result = ((Boolean)livingWithParents).compareTo(o.livingWithParents);
 		if (result != 0) return(result);
 		result = ((Short)householdSize6).compareTo(o.householdSize6);
+		if (result != 0) return(result);
+		result = timeUseType.compareTo(o.timeUseType);
 		if (result != 0) return(result);
 		return 0;
 	}

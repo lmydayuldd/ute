@@ -301,6 +301,7 @@ public class Main {
 		ResidentialMobility residentialMobility = new ResidentialMobility(minimumIncome);
 		int modelStartYear = Common.getModelStartYear();
 		int modelEndYear = modelStartYear + iterations;
+		byte modelOutputInterval = Common.getOutputInterval();
 		for (short modelYear = (short) modelStartYear; modelYear != modelEndYear; modelYear++) {
 			// Set model year for time use sampling
 			Common.setModelYear(modelYear);
@@ -312,11 +313,14 @@ public class Main {
 	        // (Re)build household indicators - this must be done each model year because with add/remove it is a problem when the age of a person changes
 			buildIndicators();			
 	        System.out.println(printInfo() + ": build of model indicators complete");
-	        aggregatedDwellings.build(dwellings.getRowList());
-	        aggregatedTimeUse.build(persons.getRowList());
-	        outputManager.output((short) modelYear);
-	        System.out.println(printInfo() + ": model data output to database");
-	        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
+	        if ((modelYear == modelStartYear) || (modelYear == modelEndYear) || ((modelYear - modelStartYear) % modelOutputInterval == 0)) {
+	        	// Model output only at set interval + begin/end of model run
+		        aggregatedDwellings.build(dwellings.getRowList());
+		        aggregatedTimeUse.build(persons.getRowList());
+		        outputManager.output((short) modelYear);
+		        System.out.println(printInfo() + ": model data output to database");
+		        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
+	        }
 	        
 	        // Create new-built dwellings
 	        List<DwellingRow> newDwellings = sampleBuildingProjects.sample(modelYear);
