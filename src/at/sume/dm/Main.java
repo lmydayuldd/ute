@@ -313,7 +313,7 @@ public class Main {
 	        // (Re)build household indicators - this must be done each model year because with add/remove it is a problem when the age of a person changes
 			buildIndicators();			
 	        System.out.println(printInfo() + ": build of model indicators complete");
-	        if ((modelYear == modelStartYear) || (modelYear == modelEndYear) || ((modelYear - modelStartYear) % modelOutputInterval == 0)) {
+	        if ((modelYear == modelStartYear) || (modelYear == (modelEndYear - 1)) || ((modelYear - modelStartYear) % modelOutputInterval == 0)) {
 	        	// Model output only at set interval + begin/end of model run
 		        aggregatedDwellings.build(dwellings.getRowList());
 		        aggregatedTimeUse.build(persons.getRowList());
