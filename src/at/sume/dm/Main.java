@@ -358,6 +358,7 @@ public class Main {
 				if (j % 100000 == 0) {
 					System.out.println(printInfo(modelRun) + ": Processing household " + j + " of " + households.size() + " in year " + modelYear + ", nr. of persons: " + persons.size());
 				}
+				j++;
 				// Process demographic events for all household members
 				ArrayList<PersonRow> p_helper = (ArrayList<PersonRow>) ((ArrayList<PersonRow>) household.getMembers()).clone();
 				for (PersonRow person : p_helper) {
@@ -413,7 +414,6 @@ public class Main {
 					// Add children leaving parents
 					leavingParents.addHousehold(household);
 				}
-				j++;
 			}
 			// Update rent prices for each spatial unit from last years data (from the movers indicators)
 			// from the second year on
