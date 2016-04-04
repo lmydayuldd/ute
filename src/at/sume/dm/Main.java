@@ -301,6 +301,7 @@ public class Main {
 		ResidentialMobility residentialMobility = new ResidentialMobility(minimumIncome);
 		int modelStartYear = Common.getModelStartYear();
 		int modelEndYear = modelStartYear + iterations;
+		byte modelOutputInterval = Common.getOutputInterval();
 		for (short modelYear = (short) modelStartYear; modelYear != modelEndYear; modelYear++) {
 			// Set model year for time use sampling
 			Common.setModelYear(modelYear);
@@ -312,11 +313,14 @@ public class Main {
 	        // (Re)build household indicators - this must be done each model year because with add/remove it is a problem when the age of a person changes
 			buildIndicators();			
 	        System.out.println(printInfo() + ": build of model indicators complete");
-	        aggregatedDwellings.build(dwellings.getRowList());
-	        aggregatedTimeUse.build(persons.getRowList());
-	        outputManager.output((short) modelYear);
-	        System.out.println(printInfo() + ": model data output to database");
-	        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
+	        if ((modelYear == modelStartYear) || (modelYear == (modelEndYear - 1)) || ((modelYear - modelStartYear) % modelOutputInterval == 0)) {
+	        	// Model output only at set interval + begin/end of model run
+		        aggregatedDwellings.build(dwellings.getRowList());
+		        aggregatedTimeUse.build(persons.getRowList());
+		        outputManager.output((short) modelYear);
+		        System.out.println(printInfo() + ": model data output to database");
+		        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
+	        }
 	        
 	        // Create new-built dwellings
 	        List<DwellingRow> newDwellings = sampleBuildingProjects.sample(modelYear);
@@ -354,6 +358,7 @@ public class Main {
 				if (j % 100000 == 0) {
 					System.out.println(printInfo(modelRun) + ": Processing household " + j + " of " + households.size() + " in year " + modelYear + ", nr. of persons: " + persons.size());
 				}
+				j++;
 				// Process demographic events for all household members
 				ArrayList<PersonRow> p_helper = (ArrayList<PersonRow>) ((ArrayList<PersonRow>) household.getMembers()).clone();
 				for (PersonRow person : p_helper) {
@@ -409,7 +414,6 @@ public class Main {
 					// Add children leaving parents
 					leavingParents.addHousehold(household);
 				}
-				j++;
 			}
 			// Update rent prices for each spatial unit from last years data (from the movers indicators)
 			// from the second year on
