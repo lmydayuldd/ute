@@ -340,7 +340,7 @@ public class Main {
 	        int movingTogetherCount = Common.getMovingTogetherRate() * (persons.size() / 1000);
 	        MovingTogether movingTogether = new MovingTogether(movingTogetherCount, modelYear, dwellingsOnMarket);
 	        
-	        LeavingParents leavingParents = new LeavingParents(Common.getLeavingParentsProbability(), Common.getChildrenMaxAge(), modelYear);
+	        LeavingParents leavingParents = new LeavingParents(db, Common.getLeavingParentsProbability(), Common.getChildrenMaxAge(), modelYear);
 	        
 			ArrayList<HouseholdRow> potentialMovers = new ArrayList<HouseholdRow>();
 	        int j = 0;

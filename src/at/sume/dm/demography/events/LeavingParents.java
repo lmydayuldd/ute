@@ -3,12 +3,16 @@
  */
 package at.sume.dm.demography.events;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
-import net.remesch.probability.SingleProbability;
-import net.remesch.util.Random;
+import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
+import at.sume.sampling.SampleWorkplaces;
+import net.remesch.db.Database;
+import net.remesch.probability.SingleProbability;
+import net.remesch.util.Random;
 
 /**
  * This is a very simple implementation to make children leave their parental home. The (annual) rate of children
@@ -21,12 +25,17 @@ public class LeavingParents {
 	private int modelYear;
 	private ArrayList<PersonRow> childrenLeaving;
 	private byte childrenMaxAge;
+	private SampleWorkplaces sampleWorkplaces;
+	private int minIncomeForWorkplace;
+	private Database db;
 
-	public LeavingParents(SingleProbability leavingParentsProbability, byte childrenMaxAge, int modelYear) {
+	public LeavingParents(Database db, SingleProbability leavingParentsProbability, byte childrenMaxAge, int modelYear) {
 		this.leavingParentsProbability = leavingParentsProbability;
 		this.modelYear = modelYear;
 		childrenLeaving = new ArrayList<PersonRow>();
 		this.childrenMaxAge = childrenMaxAge;
+		minIncomeForWorkplace = Integer.parseInt(Common.getSysParamDataPreparation("MinIncomeForWorkplace"));
+		this.db = db;
 	}
 
 	public void addHousehold(HouseholdRow existingHousehold) {
@@ -47,7 +56,7 @@ public class LeavingParents {
 		}
 	}
 	
-	public ArrayList<HouseholdRow> getNewSingleHouseholds() {
+	public ArrayList<HouseholdRow> getNewSingleHouseholds() throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
 		ArrayList<HouseholdRow> result = new ArrayList<HouseholdRow>(childrenLeaving.size());
 		for (PersonRow childLeaving : childrenLeaving) {
 			if (childLeaving.getHousehold().getHouseholdSize() > 1) {
@@ -66,7 +75,7 @@ public class LeavingParents {
 		return result;
 	}
 	
-	private HouseholdRow createNewSingleHousehold(PersonRow person) {
+	private HouseholdRow createNewSingleHousehold(PersonRow person) throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
 		Random r = new Random();
 		HouseholdRow parentHousehold = person.getHousehold();
 		int yearlyIncome = 0;
@@ -87,7 +96,21 @@ public class LeavingParents {
 		person.setYearlyIncome(yearlyIncome);
 		newHousehold.setDwelling(parentHousehold.getDwelling()); // this is needed to be able to count leaving parent moves per spatial unit
 		assert newHousehold.hasDwelling() == true : "Children household has no dwelling!";
-		
+
+		// Put workplace sampling here similar to SampleDbPersons.randomSample()
+		// TODO: Work place (matching income & age!) - same as in SampleDbPersons.randomSample()
+		// TODO: this must be more elaborated: persons age and are either looking for a job or not and therefore taking up a workplace
+		// TODO: initial work place sampling doesn't make sense at this stage since the final place of residence is not assigned to the
+		//       household at this point
+		if (yearlyIncome >= minIncomeForWorkplace) { 
+//			person.setInEducation(false);
+			// set workplace
+			sampleWorkplaces.loadCommuterMatrix(db, newHousehold.getDwelling().getSpatialunit().getSpatialUnitId());
+			person.setWorkplaceCellId(sampleWorkplaces.randomSample());
+		} else  if (person.getAge() >= 6 && person.getAge() <= 18) {
+//			person.setInEducation(true);
+			person.setWorkplaceCellId(sampleWorkplaces.randomSample());
+		}	
 		return newHousehold;
 	}
 }
