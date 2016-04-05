@@ -29,11 +29,13 @@ public class LeavingParents {
 	private int minIncomeForWorkplace;
 	private Database db;
 
-	public LeavingParents(Database db, SingleProbability leavingParentsProbability, byte childrenMaxAge, int modelYear) {
+	public LeavingParents(Database db, SingleProbability leavingParentsProbability, byte childrenMaxAge, int modelYear) throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
 		this.leavingParentsProbability = leavingParentsProbability;
 		this.modelYear = modelYear;
 		childrenLeaving = new ArrayList<PersonRow>();
 		this.childrenMaxAge = childrenMaxAge;
+		// Sampling of workplaces
+		sampleWorkplaces = new SampleWorkplaces(db);
 		minIncomeForWorkplace = Integer.parseInt(Common.getSysParamDataPreparation("MinIncomeForWorkplace"));
 		this.db = db;
 	}
@@ -102,10 +104,10 @@ public class LeavingParents {
 		// TODO: this must be more elaborated: persons age and are either looking for a job or not and therefore taking up a workplace
 		// TODO: initial work place sampling doesn't make sense at this stage since the final place of residence is not assigned to the
 		//       household at this point
+		sampleWorkplaces.loadCommuterMatrix(db, newHousehold.getDwelling().getSpatialunit().getSpatialUnitId());
 		if (yearlyIncome >= minIncomeForWorkplace) { 
 //			person.setInEducation(false);
 			// set workplace
-			sampleWorkplaces.loadCommuterMatrix(db, newHousehold.getDwelling().getSpatialunit().getSpatialUnitId());
 			person.setWorkplaceCellId(sampleWorkplaces.randomSample());
 		} else  if (person.getAge() >= 6 && person.getAge() <= 18) {
 //			person.setInEducation(true);
