@@ -17,6 +17,14 @@ import net.remesch.util.Random;
  * will be decreased. The outcome is a number of sampled elements according to a given distribution where only
  * the order of these elements may vary. 
  * 
+ * TODO: Basically this class doesn't seem to be working correctly and additionally its value is questionable.
+ * 
+ * Discussion: sampling an exact distribution is nothing else than creating each element in random order. Probably this doesn't make sense
+ * apart from the fact that it is not really working here...
+ * 
+ * To make it work, the number of sampled elements per class should be counted and compared and each element should be resampled once this limit
+ * has been reached!
+ * 
  * @author Alexander Remesch
  */
 public class ExactDistribution<E> extends Distribution<E> {
@@ -70,6 +78,7 @@ public class ExactDistribution<E> extends Distribution<E> {
 		assert exactThresholdStore.get(index) > exactThresholdStore.get(index - 1) : "Can't decrease threshold @ " + index + " below that of the previous element";
 		for (int i = index; i != exactThresholdStore.size(); i++) {
 			exactThresholdStore.set(i, exactThresholdStore.get(i) - 1);
+			assert exactThresholdStore.get(i) >= 0 : "exactThresholdStore for " + i + " got negative!";
 		}
 		maxExactThreshold--;
 		assert maxExactThreshold >= 0 : "maxExactThreshold = " + maxExactThreshold;
@@ -84,13 +93,15 @@ public class ExactDistribution<E> extends Distribution<E> {
 		Random r = new Random();
 		assert maxExactThreshold > 0 : "maxExcatThreshold = " + maxExactThreshold;
 		// generate random number for sampling
-		long rand = (long) r.nextInt((int) maxExactThreshold);
+		long rand = 0;
+		if (maxExactThreshold > 0)
+			rand = (long) r.nextInt((int) maxExactThreshold);
 		// lookup index of element where random number falls within the boundaries
 		int index = Collections.binarySearch(exactThresholdStore, rand);
 		if (index < 0)
 			index = (index + 1) * -1;
 		// get to first element of the same threshold (that is avoid all elements that have already been fully created)
-		if (index > 0) {
+		if ((index > 0) && (index < exactThresholdStore.size() - 1)) {
 			index--;
 			while (exactThresholdStore.get(index) == exactThresholdStore.get(index + 1)) {
 				if (index <= 0)
