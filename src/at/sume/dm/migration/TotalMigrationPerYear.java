@@ -160,9 +160,9 @@ public class TotalMigrationPerYear {
 		MigrationsPerYear m = migrationsPerYear.get(index);
 		assert m.getModelYear() == modelYear : "Calculated index for year " + modelYear + " returns data for year " + m.getModelYear();
 		switch (migrationRealm) {
-		case NATIONAL:
+		case NATIONAL_INCOMING:
 			return m.getImmigrationNational();
-		case INTERNATIONAL:
+		case INTERNATIONAL_INCOMING:
 			return m.getImmigrationInternational();
 		default:
 			throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());

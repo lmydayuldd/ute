@@ -3,6 +3,9 @@
  */
 package at.sume.dm.indicators.simple;
 
+import java.util.ArrayList;
+
+import at.sume.dm.entities.PersonRow;
 import at.sume.dm.types.HouseholdType;
 
 /**
@@ -12,4 +15,5 @@ import at.sume.dm.types.HouseholdType;
 public interface HouseholdCharacteristics {
 	public HouseholdType getHouseholdType();
 	public short getHouseholdSize();
+	public ArrayList<PersonRow> getMembers();
 }

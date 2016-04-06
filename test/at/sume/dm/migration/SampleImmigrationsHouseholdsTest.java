@@ -3,8 +3,6 @@
  */
 package at.sume.dm.migration;
 
-import static org.junit.Assert.assertEquals;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -43,7 +41,7 @@ public class SampleImmigrationsHouseholdsTest {
 	 */
 	@Test
 	public void testSample() {
-		ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(2001, MigrationRealm.INTERNATIONAL);
+		ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(2001, MigrationRealm.INTERNATIONAL_INCOMING);
 //		assertEquals("Number of immigrating households", 6, immigratingHouseholds.size());
 		int hc = 1;
 		int pc = 1;

@@ -35,6 +35,7 @@ import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
 import at.sume.dm.indicators.managers.MoversIndicatorManager;
 import at.sume.dm.indicators.managers.PercentileIndicatorManager;
 import at.sume.dm.indicators.simple.CountDemographicMovements;
+import at.sume.dm.indicators.simple.CountMigrationAgeSex;
 import at.sume.dm.indicators.simple.CountMigrationDetails;
 import at.sume.dm.indicators.simple.CountMigrationPerSpatialUnit;
 import at.sume.dm.migration.SampleMigratingHouseholds;
@@ -82,6 +83,7 @@ public class Main {
 	private static OutputManager outputManager;
 	private static CountMigrationPerSpatialUnit migrationPerSpatialUnit;
 	private static CountMigrationDetails migrationDetails;
+	private static CountMigrationAgeSex migrationAgeSex;
 	private static CountDemographicMovements demographicMovementsPerSpatialUnit;
 	private static AggregatedDwellings aggregatedDwellings;
 	private static AggregatedTimeUse aggregatedTimeUse;
@@ -189,9 +191,11 @@ public class Main {
 	        // create migration counter + register with households (once!)
 	        migrationPerSpatialUnit = new CountMigrationPerSpatialUnit();
 	        migrationDetails = new CountMigrationDetails();
+	        migrationAgeSex = new CountMigrationAgeSex();
 	        // TODO: find a way to make this registration out of the MigrationPerSpatialUnit() class directly (but only once!!!)
 	        households.get(0).registerMigrationObserver(migrationPerSpatialUnit);
 	        households.get(0).registerMigrationObserver(migrationDetails);
+	        households.get(0).registerMigrationObserver(migrationAgeSex);
 	        demographicMovementsPerSpatialUnit = new CountDemographicMovements();
 	        persons.get(0).registerDemographyObserver(demographicMovementsPerSpatialUnit);
 	        
@@ -310,6 +314,7 @@ public class Main {
 			migrationPerSpatialUnit.clearIndicatorList();
 			demographicMovementsPerSpatialUnit.clearIndicatorList();
 			migrationDetails.clear();
+			migrationAgeSex.clear();
 	        // (Re)build household indicators - this must be done each model year because with add/remove it is a problem when the age of a person changes
 			buildIndicators();			
 	        System.out.println(printInfo() + ": build of model indicators complete");
@@ -479,7 +484,7 @@ public class Main {
 									if (hhMovedAwayMemberCount <  maxOutMigrationNational) {
 										hhMovedAway++;
 										hhMovedAwayMemberCount += household.getMemberCount();
-										household.emigrate(dwellingsOnMarket, MigrationRealm.NATIONAL);
+										household.emigrate(dwellingsOnMarket, MigrationRealm.NATIONAL_OUTGOING);
 										dwelling = null;
 										break;
 									}
@@ -564,7 +569,7 @@ public class Main {
 			// Out-Migration: randomly remove households
 			int numOutMigrationInternational = sampleMigratingHouseholds.getOutMigrationInternational(modelYear) + sampleMigratingHouseholds.getOutMigrationNational(modelYear) - hhMovedAwayMemberCount;
 			if (numOutMigrationInternational > 0) {
-				int numOutMigrationIntlHouseholds = households.randomRemoveHouseholds(dwellingsOnMarket, numOutMigrationInternational, MigrationRealm.INTERNATIONAL);
+				int numOutMigrationIntlHouseholds = households.randomRemoveHouseholds(dwellingsOnMarket, numOutMigrationInternational, MigrationRealm.INTERNATIONAL_OUTGOING);
 				System.out.println(printInfo(modelRun) + ": " + numOutMigrationInternational + " persons (" + numOutMigrationIntlHouseholds + " households) out-migrated internationally");
 			}
 	        System.out.println(printInfo(modelRun) + ": free dwellings after out-migration: " + dwellingsOnMarket.getFreeDwellingsCount());
@@ -575,8 +580,8 @@ public class Main {
 			if (Common.isDemographyOnly() == false) {
 				childrenHouseholds = leavingParents.getNewSingleHouseholds();
 			}
-			ArrayList<HouseholdRow> immigratingHouseholdsNational = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.NATIONAL);
-			ArrayList<HouseholdRow> immigratingHouseholdsIntl = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.INTERNATIONAL);
+			ArrayList<HouseholdRow> immigratingHouseholdsNational = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.NATIONAL_INCOMING);
+			ArrayList<HouseholdRow> immigratingHouseholdsIntl = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.INTERNATIONAL_INCOMING);
 
 			int dwellingExcessShare = Common.getDwellingsOnMarketAutoAdjust();
 			if (dwellingExcessShare >= 0) {
@@ -606,9 +611,9 @@ public class Main {
 				forcedMoves(childrenHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.LEAVING_PARENTS, cheapestSpatialUnits);
 		        System.out.println(printInfo(modelRun) + ": free dwellings after " + childrenHouseholds.size() + " children leaving parents homes: " + dwellingsOnMarket.getFreeDwellingsCount());
 			}
-			forcedMoves(immigratingHouseholdsNational, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL, cheapestSpatialUnits);
+			forcedMoves(immigratingHouseholdsNational, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL_INCOMING, cheapestSpatialUnits);
 	        System.out.println(printInfo(modelRun) + ": free dwellings after " + immigratingHouseholdsNational.size() + " immigrating households (national): " + dwellingsOnMarket.getFreeDwellingsCount());
-			forcedMoves(immigratingHouseholdsIntl, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.INTERNATIONAL, cheapestSpatialUnits);
+			forcedMoves(immigratingHouseholdsIntl, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.INTERNATIONAL_INCOMING, cheapestSpatialUnits);
 	        System.out.println(printInfo(modelRun) + ": free dwellings after " + immigratingHouseholdsIntl.size() + " immigrating households (international): " + dwellingsOnMarket.getFreeDwellingsCount());
 		
 			//if (modelYear == modelEndYear - 1)
@@ -616,6 +621,7 @@ public class Main {
 			outputMigrationCount(modelYear);
 			outputDemographicMovementCount(modelYear);
 			outputMigrationDetailsCount(modelYear);
+			outputMigrationAgeSexCount(modelYear);
 			
 			// Aging of persons (household-wise)
 			households.aging();
@@ -628,8 +634,8 @@ public class Main {
 			case LEAVING_PARENTS:
 				migrationPerSpatialUnit.addPotentialLeftParentsOriginCount(household.getDwelling().getSpatialunit().getSpatialUnitId(), 1);
 				break;
-			case NATIONAL:
-			case INTERNATIONAL:
+			case NATIONAL_INCOMING:
+			case INTERNATIONAL_INCOMING:
 				// TODO: doesn't work because spatialUnit is not known in advance for an immigrant household
 //				migrationPerSpatialUnit.addPotentialImmigrationCounters(household.getDwelling().getSpatialunit().getSpatialUnitId(), 1, household.getMemberCount(), migrationRealm);
 				break;
@@ -651,8 +657,8 @@ public class Main {
 				case LEAVING_PARENTS:
 					household.leaveParentsHome(dwellingsOnMarket, dwelling);
 					break;
-				case NATIONAL:
-				case INTERNATIONAL:
+				case NATIONAL_INCOMING:
+				case INTERNATIONAL_INCOMING:
 					household.relocate(dwellingsOnMarket, dwelling, migrationRealm);
 					break;
 				default:
@@ -678,8 +684,8 @@ public class Main {
 					case LEAVING_PARENTS:
 						household.leaveParentsHome(dwellingsOnMarket, dwelling);
 						break;
-					case NATIONAL:
-					case INTERNATIONAL:
+					case NATIONAL_INCOMING:
+					case INTERNATIONAL_INCOMING:
 						household.relocate(dwellingsOnMarket, dwelling, migrationRealm);
 						break;
 					default:
@@ -705,6 +711,7 @@ public class Main {
 	private static String freeDwellingsFileName = "FreeDwellings.csv";
 	private static String migrationCountFileName = "Migrations.csv";
 	private static String migrationDetailsCountFileName = "MigrationDetails.csv";
+	private static String migrationAgeSexFileName = "MigrationAgeSex.csv";
 	private static String demographicMovementsFileName = "DemographicMovements.csv";
 	
 	public static void initSimpleOutputFiles() {
@@ -716,6 +723,8 @@ public class Main {
 		pathName = Common.createPathName(demographicMovementsFileName);
 		FileUtil.rotateFile(pathName);
 		pathName = Common.createPathName(migrationDetailsCountFileName);
+		FileUtil.rotateFile(pathName);
+		pathName = Common.createPathName(migrationAgeSexFileName);
 		FileUtil.rotateFile(pathName);
 	}
 	
@@ -754,5 +763,11 @@ public class Main {
 		FileOutputStream outputFile = new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(outputFile);
 		migrationDetails.output(ps, modelYear);
+	}
+	public static void outputMigrationAgeSexCount(int modelYear) throws FileNotFoundException {
+		String pathName = Common.createPathName(migrationAgeSexFileName);
+		FileOutputStream outputFile = new FileOutputStream(pathName, true);
+		PrintStream ps = new PrintStream(outputFile);
+		migrationAgeSex.output(ps, modelYear);
 	}
 }

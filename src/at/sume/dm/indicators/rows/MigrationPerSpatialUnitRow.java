@@ -53,11 +53,11 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 			householdLocalImmigrationCount++;
 			personLocalImmigrationCount += householdMemberCount;
 			break;
-		case NATIONAL:
+		case NATIONAL_INCOMING:
 			householdNationalImmigrationCount++;
 			personNationalImmigrationCount += householdMemberCount;
 			break;
-		case INTERNATIONAL:
+		case INTERNATIONAL_INCOMING:
 			householdIntlImmigrationCount++;
 			personIntlImmigrationCount += householdMemberCount;
 			break;
@@ -71,11 +71,11 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 			householdLocalEmigrationCount++;
 			personLocalEmigrationCount += householdMemberCount;
 			break;
-		case NATIONAL:
+		case NATIONAL_OUTGOING:
 			householdNationalEmigrationCount++;
 			personNationalEmigrationCount += householdMemberCount;
 			break;
-		case INTERNATIONAL:
+		case INTERNATIONAL_OUTGOING:
 			householdIntlEmigrationCount++;
 			personIntlEmigrationCount += householdMemberCount;
 			break;
@@ -101,11 +101,11 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 		switch (migrationRealm) {
 		case LOCAL:
 			throw new AssertionError("Not possible for local migration");
-		case NATIONAL:
+		case NATIONAL_INCOMING:
 			householdPotentialNationalImmigrationCount += householdCount;
 			personPotentialNationalImmigrationCount += householdMemberCount;
 			break;
-		case INTERNATIONAL:
+		case INTERNATIONAL_INCOMING:
 			householdPotentialIntlImmigrationCount += householdCount;
 			personPotentialIntlImmigrationCount += householdMemberCount;
 			break;

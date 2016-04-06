@@ -7,8 +7,10 @@ package at.sume.dm.types;
  */
 public enum MigrationRealm {
 	LOCAL,
-	NATIONAL,
-	INTERNATIONAL,
+	NATIONAL_INCOMING,
+	NATIONAL_OUTGOING,
+	INTERNATIONAL_INCOMING,
+	INTERNATIONAL_OUTGOING,
 	LEAVING_PARENTS,
 	MOVETOGETHER;
 	// TODO: LeavingParents and moving together don't really fit into a type "migration realm" - Probably it would be
