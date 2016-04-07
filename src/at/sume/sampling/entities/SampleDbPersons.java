@@ -37,7 +37,7 @@ public class SampleDbPersons {
 		distributionPersonAgeSex = new PersonDistributionAgeSex(db, spatialUnitId);
 		this.spatialUnitId = spatialUnitId;
 		// Workplace sampling: Load commuter matrix for current residential spatial unit
-		sampleWorkplaces.loadCommuterMatrix(db, spatialUnitId);
+		sampleWorkplaces.loadCommuterMatrix(spatialUnitId);
 	}
 	/**
 	 * Sample a single person including their time use

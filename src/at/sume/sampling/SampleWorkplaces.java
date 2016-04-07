@@ -23,6 +23,7 @@ import net.remesch.db.Database;
 public class SampleWorkplaces {
 	Distribution<CommuterMatrixRow> commuterMatrix;
 	HashMap<Integer,Distribution<WorkplacesPerZBRow>> workplaceADtoZB;
+	Database db;
 
 	/**
 	 * Load the distributions of workplaces per place of residence (AD) and workplaces per Zähbezirk
@@ -36,6 +37,7 @@ public class SampleWorkplaces {
 	 * @throws NoSuchFieldException
 	 */
 	public SampleWorkplaces(Database db) throws InstantiationException, IllegalAccessException, SQLException, SecurityException, IllegalArgumentException, NoSuchFieldException {
+		this.db = db;
 		String sqlStatement = "SELECT DISTINCT WorkplaceAD FROM _DM_Workplaces_ZB ORDER BY WorkplaceAD";
 		ResultSet resultSet = db.executeQuery(sqlStatement);
 		List<Integer> districts = new ArrayList<Integer>();
@@ -62,7 +64,7 @@ public class SampleWorkplaces {
 	 * @throws IllegalArgumentException 
 	 * @throws SecurityException 
 	 */
-	public void loadCommuterMatrix(Database db, int residenceId) throws InstantiationException, IllegalAccessException, SQLException, SecurityException, IllegalArgumentException, NoSuchFieldException {
+	public void loadCommuterMatrix(int residenceId) throws InstantiationException, IllegalAccessException, SQLException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		// Convert residenceId to AD level
 		int r = Integer.parseInt(Integer.toString(residenceId).substring(0, 3) + "01");
 		// Load commuter matrix for the residenceId

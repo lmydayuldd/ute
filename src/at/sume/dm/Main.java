@@ -58,6 +58,7 @@ import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.dm.scenario_handling.Scenario;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.MigrationRealm;
+import at.sume.sampling.SampleWorkplaces;
 import at.sume.sampling.entities.DbTimeUseRow;
 import net.remesch.db.Database;
 import net.remesch.db.Sequence;
@@ -89,6 +90,7 @@ public class Main {
 	private static AggregatedTimeUse aggregatedTimeUse;
 	private static RentPerSpatialUnit rentPerSpatialUnit;
 	private static Scenario scenario;
+	private static SampleWorkplaces sampleWorkplaces;
 
 	private static String printInfo() {
 		return DateUtil.now() + " (usedmem=" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576 + "m)";
@@ -169,11 +171,21 @@ public class Main {
 		        default:
 		        	throw new IllegalArgumentException("Unknown TimeUseTypeScenarioName " + scenario.getTimeUseTypeScenario());
 		        }
+		        sampleWorkplaces = new SampleWorkplaces(db);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} catch (InstantiationException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchFieldException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	
@@ -627,7 +639,7 @@ public class Main {
 			households.aging();
 		} // model year
 	}
-	public static void forcedMoves(ArrayList<HouseholdRow> dwellingSeekers, int modelYear, int modelStartYear, int highestYearlyRentPer100Sqm, ResidentialMobility residentialMobility, MigrationRealm migrationRealm, ArrayList<Integer> cheapestSpatialUnits) {
+	public static void forcedMoves(ArrayList<HouseholdRow> dwellingSeekers, int modelYear, int modelStartYear, int highestYearlyRentPer100Sqm, ResidentialMobility residentialMobility, MigrationRealm migrationRealm, ArrayList<Integer> cheapestSpatialUnits) throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
 		for (HouseholdRow household : dwellingSeekers) {
 			// Count potential movers (TODO: should be implemented over an interface too!)
 			switch (migrationRealm) {
@@ -692,6 +704,13 @@ public class Main {
 						throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
 					}
 					assert household.getDwelling() != null : "No dwelling for household found";
+				}
+			}
+			// Sample workplace
+			for (PersonRow member : household.getMembers()) {
+				if (member.getWorkplaceCellId() == -1) {
+					sampleWorkplaces.loadCommuterMatrix(household.getDwelling().getSpatialunit().getSpatialUnitId());
+					member.setWorkplaceCellId(sampleWorkplaces.randomSample());
 				}
 			}
 		}

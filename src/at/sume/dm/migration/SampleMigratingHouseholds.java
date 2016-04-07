@@ -9,9 +9,6 @@ import java.util.ArrayList;
 import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
-import at.sume.dm.indicators.IncomePercentiles;
-import at.sume.dm.indicators.managers.PercentileIndicatorManager;
-import at.sume.dm.policy.MinimumYearlyIncome;
 import at.sume.dm.types.AgeGroup;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
@@ -165,6 +162,7 @@ public class SampleMigratingHouseholds {
 	private Distribution<MigrationIncomeRow> migrationIncome;
 	private ArrayList<MigrationHouseholdSize> migrationHouseholdSize;
 	private long migrationHouseholdSizeShareTotal = 0;
+	private byte immigrationWorkplaceShare = 0;
 	
 	public SampleMigratingHouseholds(String migrationScenarioName, String migrationPerAgeSexScenarioName, String migrationHouseholdSizeScenarioName, String migrationIncomeScenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
@@ -188,6 +186,8 @@ public class SampleMigratingHouseholds {
 		selectStatement = "SELECT incomeGroupId, probability from _DM_MigrationIncome " + 
 			"where scenarioName = '" + migrationIncomeScenarioName + "' order by incomeGroupId";
 		migrationIncome = new Distribution<MigrationIncomeRow>(Common.db.select(MigrationIncomeRow.class, selectStatement), "probability");
+		// Sampling of workplaces
+		immigrationWorkplaceShare = Byte.parseByte(Common.getSysParam("ImmigrationWorkplaceShare"));
 	}
 	
 	public ArrayList<HouseholdRow> sample(int modelYear, MigrationRealm migrationRealm) {
@@ -249,7 +249,6 @@ public class SampleMigratingHouseholds {
 	 * @param householdSize
 	 * @return
 	 */
-	@SuppressWarnings("unused")
 	private HouseholdRow sampleHousehold(short householdSize, int modelYear) {
 		ArrayList<PersonRow> members = new ArrayList<PersonRow>(householdSize);
 		HouseholdRow result = new HouseholdRow();
@@ -272,59 +271,18 @@ public class SampleMigratingHouseholds {
 		// calculate income for each household member
 		for (PersonRow person : result.getMembers()) {
 			int yearlyIncome = 0;
-			if (true) {
-				// Alternative income calculation - just get the income from the income distribution of the present population as a quick solution to
-				// have the income distribution of the current residents for the immigrants
-				if (person.getAge() > 17) {
-					// The following calculation has a bias for very high household incomes (after 50 yrs.) about 70% of all households have an income > 200.000 €
-					// Solution: calculate income by choosing an existing person and taking their income (each person has the same chance to be picked)
-					Random r = new Random();
-//					int minIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 0);
-//					int maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 100);
-//					// TODO: mode = median - not fully correct!
-//					int modeIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 50);
-//					assert maxIncome - minIncome > 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
-//					yearlyIncome = (int) r.triangular(minIncome, maxIncome, modeIncome);
-//					int numPersons = persons.size();
-//					int index = r.nextInt(numPersons);
-//					PersonRow t = persons.get(index);
-//					while (t.getAge() <= 17) {
-//						index = r.nextInt(numPersons);
-//						t = persons.get(index);
-//					}
-//					yearlyIncome = t.getYearlyIncome() * (100 + Common.getImmigrationIncomeModifier()) / 100;
+			// Alternative income calculation - just get the income from the income distribution of the present population as a quick solution to
+			// have the income distribution of the current residents for the immigrants
+			if (person.getAge() >= 15 && person.getAge() <= 64) {
+				// The following calculation has a bias for very high household incomes (after 50 yrs.) about 70% of all households have an income > 200.000 €
+				// Solution: calculate income by choosing an existing person and taking their income (each person has the same chance to be picked)
+				// TODO: Is the above still true?
+				Random r = new Random();
+				if (r.nextInt(100) < immigrationWorkplaceShare) {
 					int index = migrationIncome.randomSample();
 					yearlyIncome = IncomeGroup.sampleIncome(migrationIncome.get(index).getIncomeGroupId());
-				}
-			} else {
-				// TODO: put this data into the database (but how?)
-				// since Austria only seems to have statistics about origin, age, sex and destination of immigrants,
-				// all of the data here comes from Germany:
-				// Statistisches Bundesamt, Diehl, Claudia; Grobecker, Claire: Neuzuwanderer in Deutschland. Ergebnisse des Mikrozensus 2000 bis 2003, 2006, URL: http://www.destatis.de/jetspeed/portal/cms/Sites/destatis/Internet/DE/Content/Publikationen/Querschnittsveroeffentlichungen/WirtschaftStatistik/Bevoelkerung/NeuzuwandererDeutschland,property=file.pdf [11.11.2010]
-				if ((person.getAge() >= 20) && (person.getAge() <= 70)) { // should be between 20 & 40, but we assume this to be similiar for simplicity in that larger age-group
-					// 47,7% are employed
-					Random r = new Random();
-					if (r.nextInt(100) <= 48) {
-						// estimates: 33% from western europe have a high income, 66% from the rest of the world have a low income (we would need more data here)
-						// so: the 33% have a income in the range of the top 20% of the residents and the 66% have a income in the range of the lowest 20% of the residents
-						int maxIncome, minIncome;
-						if (r.nextInt(100) <= 33) {
-							minIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 80);
-							maxIncome = ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 100);
-							assert maxIncome - minIncome > 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
-							yearlyIncome = minIncome + r.nextInt((int) (maxIncome - minIncome));
-						} else {
-							MinimumYearlyIncome minimumYearlyIncome = MinimumYearlyIncome.getInstance();
-							minIncome = minimumYearlyIncome.get(modelYear, (byte) result.getAdultsCount(), (byte) (result.getMemberCount() - result.getAdultsCount()));
-							maxIncome = Math.max(minIncome, ((IncomePercentiles)PercentileIndicatorManager.INCOME_PERCENTILES.getIndicator()).getPersonIncomePercentile((byte) 20));
-							if (maxIncome <= minIncome) {
-								yearlyIncome = minIncome;
-							} else {
-	//							assert maxIncome - minIncome >= 0 : "SampleImmigratingHouseholds: Warning: maxIncome = " + maxIncome + ", minIncome = " + minIncome;
-								yearlyIncome = minIncome + r.nextInt((int) (maxIncome - minIncome));
-							}
-						}
-					}
+					// set workplace temporarily (we cannot sample it here since we don't know where the household lives yet)
+					person.setWorkplaceCellId(-1);
 				}
 			}
 			person.setYearlyIncome(yearlyIncome);
