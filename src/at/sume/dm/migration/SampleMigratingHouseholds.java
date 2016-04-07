@@ -166,14 +166,14 @@ public class SampleMigratingHouseholds {
 	private ArrayList<MigrationHouseholdSize> migrationHouseholdSize;
 	private long migrationHouseholdSizeShareTotal = 0;
 	
-	public SampleMigratingHouseholds(String migrationScenarioName, String migrationHouseholdSizeScenarioName, String migrationIncomeScenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
+	public SampleMigratingHouseholds(String migrationScenarioName, String migrationPerAgeSexScenarioName, String migrationHouseholdSizeScenarioName, String migrationIncomeScenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
 		selectStatement = "SELECT id, ageGroupId, sex, share " +
 			"FROM _DM_MigrationAgeSex " +
-			"WHERE scenarioName = '" + migrationScenarioName + "' " +
+			"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' " +
 			"ORDER BY ageGroupId, sex";
 		migrationsPerAgeSex = new Distribution<MigrationsPerAgeSex>(Common.db.select(MigrationsPerAgeSex.class, selectStatement), "share");
-		assert migrationsPerAgeSex.size() > 0 : "No rows selected from _DM_MigrationAgeSex (scenarioName = " + migrationScenarioName + ")";
+		assert migrationsPerAgeSex.size() > 0 : "No rows selected from _DM_MigrationAgeSex (scenarioName = " + migrationPerAgeSexScenarioName + ")";
 
 		selectStatement = "SELECT id, householdSize, share " +
 			"FROM _DM_MigrationHouseholdSize " +

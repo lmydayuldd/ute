@@ -296,7 +296,7 @@ public class Main {
 		PersonDeath personDeath = new PersonDeath(db, personEventManager, Common.getPersonMaxAge(), Common.getDeathAdjustment());
 		@SuppressWarnings("unused")
 		ChildBirth childBirth = new ChildBirth(db, scenario.getFertilityScenario(), personEventManager, Common.getBirthAdjustment());
-		SampleMigratingHouseholds sampleMigratingHouseholds = new SampleMigratingHouseholds(scenario.getMigrationScenario(), scenario.getMigrationHouseholdSizeScenario(), scenario.getMigrationIncomeScenario());
+		SampleMigratingHouseholds sampleMigratingHouseholds = new SampleMigratingHouseholds(scenario.getMigrationScenario(), scenario.getMigrationPerAgeSexScenario(), scenario.getMigrationHouseholdSizeScenario(), scenario.getMigrationIncomeScenario());
 		SampleBuildingProjects sampleBuildingProjects = new SampleBuildingProjects(scenario.getBuildingProjectScenario(), scenario.getNewDwellingSizeScenario(), spatialUnits);
 		AdditionalDwellingsPerYear additionalDwellingsPerYear = new AdditionalDwellingsPerYear(scenario.getAdditionalDwellingsScenario());
 		

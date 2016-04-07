@@ -29,8 +29,8 @@ public class SampleImmigrationsHouseholdsTest {
 		Common.init();
 		try {
 			Scenario scenario = new Scenario(db, Common.getScenarioId());
-//			sampleImmigratingHouseholds = new SampleMigratingHouseholds(scenario.getMigrationScenario(), scenario.getMigrationHouseholdSizeScenario(), scenario.getMigrationIncomeScenario());
-			sampleImmigratingHouseholds = new SampleMigratingHouseholds("TEST", scenario.getMigrationHouseholdSizeScenario(), scenario.getMigrationIncomeScenario());
+//			sampleMigratingHouseholds = new SampleMigratingHouseholds(scenario.getMigrationScenario(), scenario.getMigrationPerAgeSexScenario(), scenario.getMigrationHouseholdSizeScenario(), scenario.getMigrationIncomeScenario());
+			sampleImmigratingHouseholds = new SampleMigratingHouseholds(scenario.getMigrationScenario(), "TEST", scenario.getMigrationHouseholdSizeScenario(), scenario.getMigrationIncomeScenario());
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
