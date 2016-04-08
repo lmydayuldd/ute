@@ -123,7 +123,7 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 			System.out.println("Problem: maxThreshold = 0");
 //			return 0;
 		} else {
-			sampleThreshold = (int) maxThreshold;
+			sampleThreshold = (int) maxThreshold + 1;
 		}
 		long rand = (long) r.nextInt(sampleThreshold);
 		// lookup index of element where random number falls within the boundaries
