@@ -19,6 +19,7 @@ public enum TimeUseType {
 	MALE_NOCHILD_NOWORK, 
 	FEMALE_NOCHILD_WORK, 
 	FEMALE_NOCHILD_NOWORK,
+	NONE,
 	
 	SINGLE_YOUNG,
 	SINGLE_OLD,
@@ -48,6 +49,8 @@ public enum TimeUseType {
 			return "7 female/no child/work";
 		case FEMALE_NOCHILD_NOWORK:
 			return "8 female/no child/no work";
+		case NONE:
+			return "0 none";
 		case SINGLE_YOUNG:
 			return "SINGLE_YOUNG";
 		case SINGLE_OLD:
