@@ -195,6 +195,8 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * @return the number of members in the household
 	 */
 	public short getHouseholdSize() {
+		if (members == null)
+			return (short) 0;
 		return (short) members.size();
 	}
 

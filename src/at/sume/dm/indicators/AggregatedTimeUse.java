@@ -49,6 +49,10 @@ public class AggregatedTimeUse {
 	public void build(ArrayList<PersonRow> persons) {
 		clear();
 		for (PersonRow person : persons) {
+			// some checks
+			assert person.getHousehold() != null : "Person " + person.getPersonId() + " has no household assigned";
+			assert person.getHousehold().getMembers() != null : "Household " + person.getHousehold().getHouseholdId() + " of person " + person.getPersonId() + " has no members!";
+			assert person.getHousehold().getMembers().contains(person) == true : "Household " + person.getHousehold().getHouseholdId() + " of person " + person.getPersonId() + " does not have this person in its member list!";
 			build(person);
 		}
 	}

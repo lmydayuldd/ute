@@ -722,6 +722,9 @@ public class Main {
 		AllHouseholdsIndicatorManager.resetIndicators();
 		PercentileIndicatorManager.resetIndicators();
 		for (HouseholdRow household : households) {
+			// do some checks here
+			assert household.getDwelling().getHousehold() == household : "Household " + household.getHouseholdId() + " lives in dwelling " + household.getDwelling().getDwellingId() + " which has household " + household.getDwelling().getHousehold().getHouseholdId() + " as resident";
+			assert household.getMembers().size() > 0 : "Household " + household.getHouseholdId() + " membercount == 0!";
 			AllHouseholdsIndicatorManager.addHousehold(household);
 			PercentileIndicatorManager.addHousehold(household);
 		}
