@@ -18,21 +18,27 @@ public abstract class Event<T extends RecordSetRow<?>> {
 	}
 
 	protected abstract double probability(T entity);
-	
-	public void occur(T entity) {
+	/**
+	 * Perform occuring event
+	 * @param entity
+	 * @return Continue with other events for the same object?
+	 */
+	public boolean occur(T entity) {
 		// generate random number for sampling
 		double rand = r.nextDouble();
 		double p = probability(entity);
 		if (rand < p) {
-			action(entity);
+			return action(entity);
 		}
+		return true;
 	}
 	
 	/**
 	 * What shall happen when the event occurs on an entity? (consequences)
 	 * @param entity
+	 * @return Continue with other events for the same object?
 	 */
-	public abstract void action(T entity);
+	public abstract boolean action(T entity);
 
 	/**
 	 * Filter entities on which an event can't happen

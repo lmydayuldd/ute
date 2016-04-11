@@ -53,10 +53,11 @@ public class PersonDeath extends Event<PersonRow> {
 	 * @see at.sume.dm.demography.events.Event#action(at.sume.dm.demography.events.EventAction)
 	 */
 	@Override
-	public void action(PersonRow entity) {
+	public boolean action(PersonRow entity) {
 		// if a person dies, it will be simply removed
 		// the corresponding household will be notified via an Observer/Observable 
 		// and will check itself if any further action is necessary
 		entity.die();
+		return false;
 	}
 }

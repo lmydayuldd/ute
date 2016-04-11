@@ -380,14 +380,15 @@ public class Main {
 				// Process demographic events for all household members
 				ArrayList<PersonRow> p_helper = (ArrayList<PersonRow>) ((ArrayList<PersonRow>) household.getMembers()).clone();
 				for (PersonRow person : p_helper) {
+//					if (person.getHousehold() != null)
 					personEventManager.process(person);
 				}
 				// Household was removed during demographic events -> process next household 
-				if (household.getMembers().size() == 0) {
+				if ((household.getMembers().size() == 0) || !household.hasDwelling()) {
 					household.remove(dwellingsOnMarket, ObjectSource.NO_PERSONS);
 					continue;
 				}
-					
+
 				if (Common.isDemographyOnly() == false) {
 					// Add household if it already made a moving decision previously
 					if (household.getMovingDecisionYear() != 0) {

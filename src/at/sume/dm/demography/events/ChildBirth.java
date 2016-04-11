@@ -60,7 +60,7 @@ public class ChildBirth extends Event<PersonRow> {
 	 * @see at.sume.dm.demography.events.Event#action(at.sume.dm.demography.events.EventAction)
 	 */
 	@Override
-	public void action(PersonRow entity) {
+	public boolean action(PersonRow entity) {
 		// if a child is born, it will be added to the household of the mother
 		HouseholdRow household = entity.getHousehold();
 		PersonRow child = PersonRow.giveBirth(household);
@@ -74,6 +74,7 @@ public class ChildBirth extends Event<PersonRow> {
 			child.setSex((byte)1);
 		}
 		entity.getPersons().add(child);
+		return true;
 	}
 	
 	/**

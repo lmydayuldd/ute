@@ -32,7 +32,8 @@ public class EventManager<E extends RecordSetRow<?>> {
 	public void process(E entity) {
 		for (Event<E> eventHandler : eventHandlers) {
 			if (eventHandler.condition(entity)) {
-				eventHandler.occur(entity);
+				if (!eventHandler.occur(entity))
+					break;
 			}
 		}
 	}

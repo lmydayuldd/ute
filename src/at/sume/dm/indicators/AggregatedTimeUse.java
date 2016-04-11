@@ -52,6 +52,8 @@ public class AggregatedTimeUse {
 			// some checks
 			assert person.getHousehold() != null : "Person " + person.getPersonId() + " has no household assigned";
 			assert person.getHousehold().getMembers() != null : "Household " + person.getHousehold().getHouseholdId() + " of person " + person.getPersonId() + " has no members!";
+			if (!person.getHousehold().hasDwelling()) // AR 160411 - there might be left-over emigrated households at this stage, so ignore them here!
+				continue;
 			assert person.getHousehold().getMembers().contains(person) == true : "Household " + person.getHousehold().getHouseholdId() + " of person " + person.getPersonId() + " does not have this person in its member list!";
 			build(person);
 		}
