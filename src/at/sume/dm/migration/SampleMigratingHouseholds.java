@@ -268,6 +268,7 @@ public class SampleMigratingHouseholds {
 //			members.add(person);
 		}
 		result.addMembers(members);
+		assert result.getHouseholdSize() <> householdSize : "Invalid household size: " + result.getHouseholdSize() + ", should be: " + householdSize;
 		result.determineInitialHouseholdType(false);	// countAdults() was already done in addMembers()
 		// calculate income for each household member
 		for (PersonRow person : result.getMembers()) {
