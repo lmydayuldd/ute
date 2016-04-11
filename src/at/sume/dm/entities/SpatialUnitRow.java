@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import at.sume.db.RecordSetRow;
+import at.sume.dm.tracing.ObjectSource;
+import net.remesch.db.schema.Ignore;
 
 /**
  * List of spatial units in the model including information about the area size and land use.
@@ -24,12 +26,25 @@ public class SpatialUnitRow extends RecordSetRow<SpatialUnits> {
 	private byte areaShareForest;
 	private byte areaShareWater;
 	private boolean freeDwellingsAlwaysAvailable;
+	@Ignore
+	private ObjectSource src;
 	
 	/**
+	 * @param src 
 	 * @param rowList
 	 */
 	public SpatialUnitRow() {
 		super();
+		this.src = ObjectSource.INIT;
+	}
+
+	/**
+	 * @param src 
+	 * @param rowList
+	 */
+	public SpatialUnitRow(ObjectSource src) {
+		super();
+		this.src = src;
 	}
 
 	/**

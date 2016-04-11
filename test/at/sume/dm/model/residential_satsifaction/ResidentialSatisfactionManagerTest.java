@@ -21,6 +21,7 @@ import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
+import at.sume.dm.tracing.ObjectSource;
 
 /**
  * @author Alexander Remesch
@@ -55,9 +56,9 @@ public class ResidentialSatisfactionManagerTest {
 		hh.setDb(db);
 		dw = new Dwellings();
 		dw.setDb(db);
-		hhr1 = new HouseholdRow();
+		hhr1 = new HouseholdRow(ObjectSource.INIT);
 		hhr1.setId(1);
-		dr = new DwellingRow();
+		dr = new DwellingRow(ObjectSource.INIT);
 		hhr1.setDwelling(dr);
 		dr.setSpatialunitId(90101);
 		dr.setTotalYearlyDwellingCosts(12000);
@@ -67,14 +68,14 @@ public class ResidentialSatisfactionManagerTest {
 		p = new Persons();
 		p.setDb(db);
 		
-		PersonRow pr = new PersonRow();
+		PersonRow pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(1);
 		pr.setAge((byte)45);
 		pr.setSex((byte)2);
 		pr.setYearlyIncome(30000);
 		hhr1.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(2);
 		pr.setAge((byte)40);
 		pr.setSex((byte)1);
@@ -84,30 +85,30 @@ public class ResidentialSatisfactionManagerTest {
 		hh.add(hhr1);
 		
 		// Household 1: 2 persons + 1 child, 30000 + 0
-		hhr2 = new HouseholdRow();
+		hhr2 = new HouseholdRow(ObjectSource.INIT);
 		hhr2.setId(2);
-		dr = new DwellingRow();
+		dr = new DwellingRow(ObjectSource.INIT);
 		hhr2.setDwelling(dr);
 		dr.setSpatialunitId(90101);
 		dr.setTotalYearlyDwellingCosts(15000);
 		dr.setDwellingSize((short) 120);
 		dw.add(dr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(3);
 		pr.setAge((byte)35);
 		pr.setSex((byte)2);
 		pr.setYearlyIncome(30000);
 		hhr2.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(4);
 		pr.setAge((byte)37);
 		pr.setSex((byte)1);
 		pr.setYearlyIncome(0);
 		hhr2.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(5);
 		pr.setAge((byte)6);
 		pr.setSex((byte)1);

@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import at.sume.dm.Common;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.HouseholdType;
 
 public class HouseholdTypeTest {
@@ -26,12 +27,12 @@ public class HouseholdTypeTest {
 	public void setUp() throws SQLException, ClassNotFoundException {
 		db = Common.openDatabase();
 		Common.init();
-		hh = new HouseholdRow();
+		hh = new HouseholdRow(ObjectSource.INIT);
 	}
 	
 	@Test
 	public void testSingleYoung() {
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)45);
 		p.setSex((byte)2);
 		hh.addMember(p);
@@ -41,11 +42,11 @@ public class HouseholdTypeTest {
 	
 	@Test
 	public void testCoupleYoung() {
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)45);
 		p.setSex((byte)2);
 		hh.addMember(p);
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)35);
 		p.setSex((byte)1);
 		hh.addMember(p);
@@ -55,15 +56,15 @@ public class HouseholdTypeTest {
 	
 	@Test
 	public void testSmallFamily() {
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)45);
 		p.setSex((byte)2);
 		hh.addMember(p);
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)35);
 		p.setSex((byte)1);
 		hh.addMember(p);
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)10);
 		p.setSex((byte)1);
 		hh.addMember(p);
@@ -73,19 +74,19 @@ public class HouseholdTypeTest {
 
 	@Test
 	public void testLargeFamily1() {
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)45);
 		p.setSex((byte)2);
 		hh.addMember(p);
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)35);
 		p.setSex((byte)1);
 		hh.addMember(p);
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)10);
 		p.setSex((byte)1);
 		hh.addMember(p);
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)8);
 		p.setSex((byte)1);
 		hh.addMember(p);
@@ -95,23 +96,23 @@ public class HouseholdTypeTest {
 	
 	@Test
 	public void testLargeFamily2() {
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)45);
 		p.setSex((byte)2);
 		hh.addMember(p);
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)35);
 		p.setSex((byte)1);
 		hh.addMember(p);
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)10);
 		p.setSex((byte)1);
 		hh.addMember(p);
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)8);
 		p.setSex((byte)1);
 		hh.addMember(p);
-		p = new PersonRow();
+		p = new PersonRow(ObjectSource.INIT);
 		p.setAge((byte)6);
 		p.setSex((byte)1);
 		hh.addMember(p);

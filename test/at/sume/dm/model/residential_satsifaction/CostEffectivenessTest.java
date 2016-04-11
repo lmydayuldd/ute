@@ -20,6 +20,7 @@ import at.sume.dm.entities.Persons;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.model.residential_satisfaction.CostEffectiveness;
+import at.sume.dm.tracing.ObjectSource;
 
 
 /**
@@ -47,16 +48,16 @@ public class CostEffectivenessTest {
 	public void setUp() throws SQLException, ClassNotFoundException {
 		db = Common.openDatabase();
 		Common.init();
-		sur1 = new SpatialUnitRow();
+		sur1 = new SpatialUnitRow(ObjectSource.INIT);
 		sur1.setSpatialUnitId(90101);
 //		sur2 = new SpatialUnitRow();
 //		sur2.setSpatialUnitId(90102)
 		// Household 1: 2 persons, 30000 + 20000
 //		hh = new Households();
 //		hh.setDb(db);
-		hhr1 = new HouseholdRow();
+		hhr1 = new HouseholdRow(ObjectSource.INIT);
 		hhr1.setId(1);
-		DwellingRow dr = new DwellingRow();
+		DwellingRow dr = new DwellingRow(ObjectSource.INIT);
 		hhr1.setDwelling(dr);
 		dr.setSpatialunitId(90101);
 		dr.setSpatialunit(sur1);
@@ -66,14 +67,14 @@ public class CostEffectivenessTest {
 		p = new Persons();
 		p.setDb(db);
 		
-		PersonRow pr = new PersonRow();
+		PersonRow pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(1);
 		pr.setAge((byte)45);
 		pr.setSex((byte)2);
 		pr.setYearlyIncome(30000);
 		hhr1.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(2);
 		pr.setAge((byte)40);
 		pr.setSex((byte)1);
@@ -82,30 +83,30 @@ public class CostEffectivenessTest {
 		hhr1.determineInitialHouseholdType(true);
 		
 		// Household 2: 2 persons + 1 child, 30000 + 0
-		hhr2 = new HouseholdRow();
+		hhr2 = new HouseholdRow(ObjectSource.INIT);
 		hhr2.setId(2);
-		dr = new DwellingRow();
+		dr = new DwellingRow(ObjectSource.INIT);
 		hhr2.setDwelling(dr);
 		dr.setSpatialunitId(90101);
 		dr.setSpatialunit(sur1);
 		dr.setTotalYearlyDwellingCosts(15000);
 		dr.setDwellingSize((short) 120);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(3);
 		pr.setAge((byte)35);
 		pr.setSex((byte)2);
 		pr.setYearlyIncome(30000);
 		hhr2.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(4);
 		pr.setAge((byte)37);
 		pr.setSex((byte)1);
 		pr.setYearlyIncome(0);
 		hhr2.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(5);
 		pr.setAge((byte)6);
 		pr.setSex((byte)1);
@@ -114,19 +115,19 @@ public class CostEffectivenessTest {
 		hhr2.determineInitialHouseholdType(true);
 		
 		// Household 3: immigration household - no current dwelling, 2 persons + 1 child, 4000 + 4000
-		hhr3 = new HouseholdRow();
+		hhr3 = new HouseholdRow(ObjectSource.INIT);
 		hhr3.setId(3);
 		p = new Persons();
 		p.setDb(db);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(5);
 		pr.setAge((byte)28);
 		pr.setSex((byte)2);
 		pr.setYearlyIncome(4000);
 		hhr3.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(6);
 		pr.setAge((byte)26);
 		pr.setSex((byte)1);
@@ -135,19 +136,19 @@ public class CostEffectivenessTest {
 		hhr3.determineInitialHouseholdType(true);
 
 		// Household 3: immigration household - no current dwelling, 2 persons + 1 child, 4000 + 4000
-		hhr4 = new HouseholdRow();
+		hhr4 = new HouseholdRow(ObjectSource.INIT);
 		hhr4.setId(4);
 		p = new Persons();
 		p.setDb(db);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(7);
 		pr.setAge((byte)80);
 		pr.setSex((byte)1);
 		pr.setYearlyIncome(32063);
 		hhr4.addMember(pr);
 		hhr4.determineInitialHouseholdType(true);
-		dr = new DwellingRow();
+		dr = new DwellingRow(ObjectSource.INIT);
 		hhr4.setDwelling(dr);
 		dr.setSpatialunitId(90101);
 		dr.setSpatialunit(sur1);
@@ -164,7 +165,7 @@ public class CostEffectivenessTest {
 
 		SpatialUnits su = new SpatialUnits();
 		su.setDb(db);
-		SpatialUnitRow sur = new SpatialUnitRow();
+		SpatialUnitRow sur = new SpatialUnitRow(ObjectSource.INIT);
 		sur.setSpatialUnitId(92222);
 		long residentialSatisfaction1 = costEffectiveness.calc(hhr1, sur, 2001);
 //		System.out.println(residentialSatisfaction1);

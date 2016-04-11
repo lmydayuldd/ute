@@ -10,7 +10,6 @@ import java.util.Arrays;
 
 import at.sume.db.RecordSet;
 import at.sume.db.RecordSetRow;
-
 import net.remesch.db.Database;
 
 

@@ -22,6 +22,7 @@ import at.sume.dm.entities.SpatialUnitLevel;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
 import at.sume.dm.model.residential_satisfaction.UDPCentrality;
+import at.sume.dm.tracing.ObjectSource;
 
 /**
  * @author Alexander Remesch
@@ -50,9 +51,9 @@ public class UDPClassificationTest {
 		// Household 1: 2 persons, 30000 + 20000
 		hh = new Households();
 		hh.setDb(db);
-		hhr1 = new HouseholdRow();
+		hhr1 = new HouseholdRow(ObjectSource.INIT);
 		hhr1.setId(1);
-		DwellingRow dr = new DwellingRow();
+		DwellingRow dr = new DwellingRow(ObjectSource.INIT);
 		hhr1.setDwelling(dr);
 		dr.setSpatialunitId(90101);
 		dr.setTotalYearlyDwellingCosts(3000);
@@ -61,14 +62,14 @@ public class UDPClassificationTest {
 		p = new Persons();
 		p.setDb(db);
 		
-		PersonRow pr = new PersonRow();
+		PersonRow pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(1);
 		pr.setAge((byte)45);
 		pr.setSex((byte)2);
 		pr.setYearlyIncome(30000);
 		hhr1.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(2);
 		pr.setAge((byte)40);
 		pr.setSex((byte)1);
@@ -77,29 +78,29 @@ public class UDPClassificationTest {
 		hhr1.determineInitialHouseholdType(true);
 		
 		// Household 1: 2 persons + 1 child, 30000 + 0
-		hhr2 = new HouseholdRow();
+		hhr2 = new HouseholdRow(ObjectSource.INIT);
 		hhr2.setId(2);
-		dr = new DwellingRow();
+		dr = new DwellingRow(ObjectSource.INIT);
 		hhr1.setDwelling(dr);
 		dr.setSpatialunitId(90101);
 		dr.setTotalYearlyDwellingCosts(5000);
 		dr.setDwellingSize((short) 120);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(3);
 		pr.setAge((byte)35);
 		pr.setSex((byte)2);
 		pr.setYearlyIncome(30000);
 		hhr2.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(4);
 		pr.setAge((byte)37);
 		pr.setSex((byte)1);
 		pr.setYearlyIncome(0);
 		hhr2.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(5);
 		pr.setAge((byte)6);
 		pr.setSex((byte)1);
@@ -117,7 +118,7 @@ public class UDPClassificationTest {
 
 		SpatialUnits su = new SpatialUnits();
 		su.setDb(db);
-		SpatialUnitRow sur = new SpatialUnitRow();
+		SpatialUnitRow sur = new SpatialUnitRow(ObjectSource.INIT);
 		sur.setSpatialUnitId(92222);
 		long residentialSatisfaction1 = udpClassification.calc(hhr1, sur, 2001);
 		assertEquals("Residential satisfaction hh1", 500, residentialSatisfaction1);

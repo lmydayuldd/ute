@@ -19,6 +19,7 @@ import at.sume.dm.entities.Households;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.indicators.managers.AllHouseholdsIndicatorManager;
+import at.sume.dm.tracing.ObjectSource;
 
 /**
  * @author Alexander Remesch
@@ -38,10 +39,10 @@ public class IndicatorManagerTest {
 		Households hh;
 		hh = new Households();
 		hh.setDb(db);
-		HouseholdRow hhr = new HouseholdRow();
+		HouseholdRow hhr = new HouseholdRow(ObjectSource.INIT);
 		hhr.setId(1);
 //		hhr.setHouseholdSize((short)2);
-		DwellingRow dr = new DwellingRow();
+		DwellingRow dr = new DwellingRow(ObjectSource.INIT);
 		hhr.setDwelling(dr);
 		dr.setSpatialunitId(90101);
 		dr.setTotalYearlyDwellingCosts(3000);
@@ -50,7 +51,7 @@ public class IndicatorManagerTest {
 		p = new Persons();
 		p.setDb(db);
 		
-		PersonRow pr = new PersonRow();
+		PersonRow pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(1);
 		pr.setAge((byte)45);
 		pr.setSex((byte)2);
@@ -59,7 +60,7 @@ public class IndicatorManagerTest {
 		pr.setYearlyIncome(30000);
 		hhr.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(2);
 		pr.setAge((byte)40);
 		pr.setSex((byte)1);
@@ -71,16 +72,16 @@ public class IndicatorManagerTest {
 		AllHouseholdsIndicatorManager.addHousehold(hhr);
 		
 		// Household 1: 2 persons + 1 child, 30000 + 0
-		hhr = new HouseholdRow();
+		hhr = new HouseholdRow(ObjectSource.INIT);
 		hhr.setId(2);
 //		hhr.setHouseholdSize((short)3);
-		dr = new DwellingRow();
+		dr = new DwellingRow(ObjectSource.INIT);
 		hhr.setDwelling(dr);
 		dr.setSpatialunitId(90101);
 		dr.setTotalYearlyDwellingCosts(5000);
 		dr.setDwellingSize((short) 120);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(3);
 		pr.setAge((byte)35);
 		pr.setSex((byte)2);
@@ -89,7 +90,7 @@ public class IndicatorManagerTest {
 		pr.setYearlyIncome(30000);
 		hhr.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(4);
 		pr.setAge((byte)37);
 		pr.setSex((byte)1);
@@ -98,7 +99,7 @@ public class IndicatorManagerTest {
 		pr.setYearlyIncome(0);
 		hhr.addMember(pr);
 		
-		pr = new PersonRow();
+		pr = new PersonRow(ObjectSource.INIT);
 		pr.setId(5);
 		pr.setAge((byte)6);
 		pr.setSex((byte)1);

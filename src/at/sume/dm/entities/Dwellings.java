@@ -5,12 +5,13 @@ package at.sume.dm.entities;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import net.remesch.util.Random;
 
-import net.remesch.db.Database;
 import at.sume.db.RecordSet;
 import at.sume.dm.Common;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.LivingSpaceGroup6;
+import net.remesch.db.Database;
+import net.remesch.util.Random;
 
 /**
  * @author Alexander Remesch
@@ -77,7 +78,7 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	 */
 	@Override
 	public DwellingRow createRecordSetRow() {
-		return new DwellingRow();
+		return new DwellingRow(ObjectSource.INIT);
 	}
 
 	/**

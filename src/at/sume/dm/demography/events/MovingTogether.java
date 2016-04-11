@@ -9,6 +9,7 @@ import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
+import at.sume.dm.tracing.ObjectSource;
 import net.remesch.util.Random;
 
 /**
@@ -74,7 +75,7 @@ public class MovingTogether {
 			HouseholdRow femaleHousehold = femaleHouseholds.get(index);
 			femaleHouseholds.remove(index);
 			// Create a fictive household to determine the direction of the move
-			HouseholdRow temp = new HouseholdRow();
+			HouseholdRow temp = new HouseholdRow(ObjectSource.MOVING_TOGETHER_TEMP);
 			temp.addMembers(maleHousehold.getMembers());
 			temp.addMembers(femaleHousehold.getMembers());
 			temp.determineInitialHouseholdType(false);

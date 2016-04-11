@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.AgeGroup;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
@@ -251,11 +252,11 @@ public class SampleMigratingHouseholds {
 	 */
 	private HouseholdRow sampleHousehold(short householdSize, int modelYear) {
 		ArrayList<PersonRow> members = new ArrayList<PersonRow>(householdSize);
-		HouseholdRow result = new HouseholdRow();
+		HouseholdRow result = new HouseholdRow(ObjectSource.IMMIGRATION);
 		result.setMovingDecisionYear((short) modelYear);
 		// sample persons
 		for (int i = 0; i != householdSize; i++) {
-			PersonRow person = new PersonRow();
+			PersonRow person = new PersonRow(ObjectSource.IMMIGRATION);
 			// TODO: why are we not using randomExactSample() here when we use a ExactDistribution?
 			int index = migrationsPerAgeSex.randomSample();
 //			migrationsPerAgeSex.modifyDistribution(index);

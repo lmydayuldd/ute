@@ -13,6 +13,7 @@ import at.sume.db.RecordSetRowFileable;
 import at.sume.dm.Common;
 import at.sume.dm.model.residential_mobility.RentPerSpatialUnit;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionDwellingProperties;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.LivingSpaceGroup6;
 
 /**
@@ -33,11 +34,20 @@ public class DwellingRow extends RecordSetRowFileable<Dwellings> implements Resi
 	private HouseholdRow household;
 	@Ignore
 	private static Sequence dwellingIdSeq = null;
-	
+	@Ignore
+	private ObjectSource src;
+		
 	public DwellingRow() {
 		if (dwellingIdSeq != null) {
 			setDwellingId(dwellingIdSeq.getNext());
 		}
+		src = ObjectSource.INIT;
+	}
+	public DwellingRow(ObjectSource src) {
+		if (dwellingIdSeq != null) {
+			setDwellingId(dwellingIdSeq.getNext());
+		}
+		this.src = src;
 	}
 //	public DwellingRow(Dwellings dwellings) {
 //		this.rowList = dwellings;

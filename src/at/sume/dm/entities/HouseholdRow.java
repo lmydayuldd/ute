@@ -22,6 +22,7 @@ import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionDwellingProperties;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionHouseholdProperties;
 import at.sume.dm.model.residential_satisfaction.ResidentialSatisfactionManager;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
 import at.sume.dm.types.MigrationRealm;
@@ -123,11 +124,14 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	private short femAdultMaxAge = 0, femAdultMinAge = 255;		// This is still necessary to identify children (age difference of >15 with mother)
 	private boolean adultMale = false, adultFemale = false;
 	private boolean householdWithChildrenBelow18;
+	@SuppressWarnings("unused")
+	private ObjectSource src;
 	
 	/**
 	 * 
 	 */
-	public HouseholdRow() {
+	public HouseholdRow(ObjectSource src) {
+		this.src = src;
 		members = new ArrayList<PersonRow>();
 		if (childrenWeight == 0) {
 			String sp = Common.getSysParam("ChildrenWeight");

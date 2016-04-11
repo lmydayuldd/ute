@@ -12,6 +12,7 @@ import at.sume.dm.Common;
 import at.sume.dm.entities.DwellingRow;
 import at.sume.dm.entities.SpatialUnitRow;
 import at.sume.dm.entities.SpatialUnits;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.LivingSpaceGroup6;
 import at.sume.sampling.Distribution;
 
@@ -98,7 +99,7 @@ public class SampleBuildingProjects {
 		// Sample them!
 		for (NewDwellingsPerSpatialUnit n : newDwellingsPerSpatialUnit) {
 			for (int i = 0; i != n.newDwellingCount; i++) {
-				DwellingRow dwelling = new DwellingRow();
+				DwellingRow dwelling = new DwellingRow(ObjectSource.BUILDING_PROJECT);
 				dwelling.setSpatialunit(spatialUnits.lookup(n.spatialUnitId));
 				int index = newDwellingSize.randomSample();
 				dwelling.setLivingSpaceGroup6Id(newDwellingSize.get(index).livingSpaceGroupId);
@@ -119,7 +120,7 @@ public class SampleBuildingProjects {
 		Random r = new Random();
 		List<DwellingRow> result = new ArrayList<DwellingRow>();
 		for (int i = 0; i != numberOfDwellings; i++) {
-			DwellingRow dwelling = new DwellingRow();
+			DwellingRow dwelling = new DwellingRow(ObjectSource.BUILDING_PROJECT);
 			int index = r.nextInt(spatialUnits.size());
 			SpatialUnitRow spatialUnit = spatialUnits.get(index);
 			while (spatialUnit.isFreeDwellingsAlwaysAvailable()) {

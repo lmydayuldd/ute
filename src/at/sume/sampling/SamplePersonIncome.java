@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.sampling.distributions.IncomeDistributionRow;
 import net.remesch.db.Database;
 import net.remesch.util.Random;
@@ -45,7 +46,7 @@ public class SamplePersonIncome extends SamplingDistribution<IncomeDistributionR
 	 */
 	@Override
 	public IncomeDistributionRow createRecordSetRow() {
-		return new IncomeDistributionRow();
+		return new IncomeDistributionRow(ObjectSource.INIT);
 	}
 
 	/* (non-Javadoc)

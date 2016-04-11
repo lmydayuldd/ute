@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.sampling.SampleWorkplaces;
 import net.remesch.db.Database;
 import net.remesch.probability.SingleProbability;
@@ -87,7 +88,7 @@ public class LeavingParents {
 			yearlyIncome = parentHousehold.getHighestAdultIncome();
 		}
 		person.setLivingWithParents(false);
-		HouseholdRow newHousehold = new HouseholdRow();
+		HouseholdRow newHousehold = new HouseholdRow(ObjectSource.LEAVING_PARENTS);
 		newHousehold.setMovingDecisionYear((short) modelYear);
 		newHousehold.addMember(person);
 		parentHousehold.removeMember(person);

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import at.sume.db.RecordSet;
+import at.sume.dm.tracing.ObjectSource;
 import net.remesch.db.Database;
 
 /**
@@ -56,7 +57,7 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	 */
 	@Override
 	public SpatialUnitRow createRecordSetRow() {
-		return new SpatialUnitRow();
+		return new SpatialUnitRow(ObjectSource.INIT);
 	}
 
 	/* (non-Javadoc)
@@ -107,7 +108,7 @@ public class SpatialUnits extends RecordSet<SpatialUnitRow> {
 	 * @return
 	 */
 	public SpatialUnitRow getSpatialUnit(int spatialUnitId) {
-		SpatialUnitRow lookup = new SpatialUnitRow();
+		SpatialUnitRow lookup = new SpatialUnitRow(ObjectSource.TEMP_LOOKUP);
 		lookup.setSpatialUnitId(spatialUnitId);
 		int index = Collections.binarySearch(rowList, lookup);
 		return rowList.get(index);

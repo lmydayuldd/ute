@@ -10,6 +10,7 @@ import java.util.Comparator;
 import at.sume.db.RecordSetClonable;
 import at.sume.db.RecordSetRow;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.MigrationRealm;
 import net.remesch.db.Database;
 import net.remesch.util.MathUtil;
@@ -65,7 +66,7 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	 */
 	@Override
 	public HouseholdRow createRecordSetRow() {
-		return new HouseholdRow();
+		return new HouseholdRow(ObjectSource.INIT);
 	}
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSet#fieldnames()

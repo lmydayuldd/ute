@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import at.sume.db.RecordSetRow;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.sampling.SamplePersonIncome;
 
 /**
@@ -22,6 +23,10 @@ public class IncomeDistributionRow extends RecordSetRow<SamplePersonIncome> {
 	private long minIncome;
 	private long maxIncome;
 	
+	public IncomeDistributionRow(ObjectSource src) {
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * @return the spatialUnitId
 	 */

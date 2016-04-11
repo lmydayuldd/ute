@@ -16,6 +16,7 @@ import at.sume.dm.model.timeuse.SampleTimeUse;
 import at.sume.dm.model.timeuse.TimeUseType;
 import at.sume.dm.model.timeuse.TimeUseTypeDesignator;
 import at.sume.dm.model.timeuse.TravelTimeSamplingParameters;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.AgeGroup;
 import net.remesch.db.Database;
 import net.remesch.db.Sequence;
@@ -46,9 +47,12 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	private static SampleTimeUse sampleTimeUse;
 	@Ignore
 	private static TimeUseTypeDesignator determineTimeUseType;
+	@Ignore
+	private ObjectSource src;
 	
-	public PersonRow() {
+	public PersonRow(ObjectSource src) {
 		super();
+		this.src = src;
 		if (personIdSeq != null) {
 			setPersonId(personIdSeq.getNext());
 		}
@@ -305,7 +309,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	 * @return
 	 */
 	public static PersonRow giveBirth(HouseholdRow household) {
-		PersonRow child = new PersonRow();
+		PersonRow child = new PersonRow(ObjectSource.BIRTH);
 		child.setHousehold(household);
 		child.setLivingWithParents(true);
 		household.addMember(child);

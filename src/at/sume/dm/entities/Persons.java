@@ -5,8 +5,9 @@ package at.sume.dm.entities;
 
 import java.sql.SQLException;
 
-import net.remesch.db.Database;
 import at.sume.db.RecordSetClonable;
+import at.sume.dm.tracing.ObjectSource;
+import net.remesch.db.Database;
 
 /**
  * @author Alexander Remesch
@@ -34,7 +35,7 @@ public class Persons extends RecordSetClonable<PersonRow> {
 	 */
 	@Override
 	public PersonRow createRecordSetRow() {
-		return new PersonRow();
+		return new PersonRow(ObjectSource.INIT);
 	}
 
 	/* (non-Javadoc)
