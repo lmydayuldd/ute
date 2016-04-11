@@ -45,6 +45,10 @@ public class IncomeGroup {
 	 * @return
 	 */
 	public static byte getIncomeGroupId(int income) {
+		if (income > incomeGroups.get(incomeGroups.size() - 1).maxincome)
+			return (byte) (incomeGroups.size() - 1);
+		if (income < incomeGroups.get(0).minincome)
+			return 0;
 		for (IncomeGroupRow i : incomeGroups) {
 			if ((i.minincome <= income) && (income <= i.maxincome)) {
 				return i.id;
