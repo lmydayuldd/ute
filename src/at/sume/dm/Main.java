@@ -380,8 +380,10 @@ public class Main {
 				// Process demographic events for all household members
 				ArrayList<PersonRow> p_helper = (ArrayList<PersonRow>) ((ArrayList<PersonRow>) household.getMembers()).clone();
 				for (PersonRow person : p_helper) {
-//					if (person.getHousehold() != null)
-					personEventManager.process(person);
+					if (person.getHousehold() != null)
+						personEventManager.process(person);
+					else
+						person.remove();
 				}
 				// Household was removed during demographic events -> process next household 
 				if ((household.getMembers().size() == 0) || !household.hasDwelling()) {
