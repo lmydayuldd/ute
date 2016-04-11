@@ -81,6 +81,7 @@ public class MovingTogether {
 			// Choose dwelling by comparison of residential satisfaction
 			int maleDwellingResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(temp, maleHousehold.getDwelling(), modelYear);
 			int femaleDwellingResidentialSatisfaction = ResidentialSatisfactionManager.calcResidentialSatisfaction(temp, femaleHousehold.getDwelling(), modelYear);
+			temp = null;
 			// Reset household pointed to by the persons (was changed by temp.addMembers() above!
 			// TODO: this is a mess!
 			for (PersonRow person : maleHousehold.getMembers())

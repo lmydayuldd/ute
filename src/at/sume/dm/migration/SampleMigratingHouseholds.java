@@ -264,7 +264,8 @@ public class SampleMigratingHouseholds {
 			person.setAge(AgeGroup.sampleAge(person.getAgeGroupId()));
 			person.setSex(m.getSex());
 			person.setHousehold(result);
-			members.add(person);
+			// adds a person to a household twice togehter with result.addMembers(members) below - AR 160411
+//			members.add(person);
 		}
 		result.addMembers(members);
 		result.determineInitialHouseholdType(false);	// countAdults() was already done in addMembers()
