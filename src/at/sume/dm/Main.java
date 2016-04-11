@@ -56,6 +56,7 @@ import at.sume.dm.model.timeuse.TimeUseTypeByGenderChildWork;
 import at.sume.dm.model.timeuse.TimeUseTypeByHouseholdType;
 import at.sume.dm.model.travel.SampleTravelTimesByDistance;
 import at.sume.dm.scenario_handling.Scenario;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.MigrationRealm;
 import at.sume.sampling.SampleWorkplaces;
@@ -383,7 +384,7 @@ public class Main {
 				}
 				// Household was removed during demographic events -> process next household 
 				if (household.getMembers().size() == 0) {
-					household.remove(dwellingsOnMarket);
+					household.remove(dwellingsOnMarket, ObjectSource.NO_PERSONS);
 					continue;
 				}
 					
@@ -677,6 +678,7 @@ public class Main {
 					throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
 				}
 				assert household.getDwelling() != null : "No dwelling for household found";
+				assert household.getDwelling().getHousehold() == household : "Household " + household.getHouseholdId() + " lives in dwelling " + household.getDwelling().getDwellingId() + " which has household " + household.getDwelling().getHousehold().getHouseholdId() + " as resident";
 			} else {
 				for (long spatialUnitId : cheapestSpatialUnits) {
 					dwelling = dwellingsOnMarket.getFirstMatchingDwelling(spatialUnitId, (short) 0, household.getAspirationRegionLivingSpaceMax());
@@ -704,6 +706,7 @@ public class Main {
 						throw new IllegalArgumentException("Unexpected migration realm " + migrationRealm.toString());
 					}
 					assert household.getDwelling() != null : "No dwelling for household found";
+					assert household.getDwelling().getHousehold() == household : "Household " + household.getHouseholdId() + " lives in dwelling " + household.getDwelling().getDwellingId() + " which has household " + household.getDwelling().getHousehold().getHouseholdId() + " as resident";
 				}
 			}
 			// Sample workplace

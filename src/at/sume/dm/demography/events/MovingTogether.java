@@ -68,12 +68,22 @@ public class MovingTogether {
 		numMovesTogether = Math.min(numMovesTogether, maleHouseholds.size());
 		numMovesTogether = Math.min(numMovesTogether, femaleHouseholds.size());
 		for (int i = 0; i != numMovesTogether; i++) {
-			index = (int) (r.nextDouble() * maleHouseholds.size());
-			HouseholdRow maleHousehold = maleHouseholds.get(index);
-			maleHouseholds.remove(index);
-			index = (int) (r.nextDouble() * femaleHouseholds.size());
-			HouseholdRow femaleHousehold = femaleHouseholds.get(index);
-			femaleHouseholds.remove(index);
+			HouseholdRow maleHousehold; 
+			do {
+				index = (int) (r.nextDouble() * maleHouseholds.size());
+				maleHousehold = maleHouseholds.get(index);
+				maleHouseholds.remove(index);
+			} while (!maleHousehold.hasDwelling() && maleHouseholds.size() > 0);
+			if (!maleHousehold.hasDwelling())
+				break;
+			HouseholdRow femaleHousehold;
+			do {
+				index = (int) (r.nextDouble() * femaleHouseholds.size());
+				femaleHousehold = femaleHouseholds.get(index);
+				femaleHouseholds.remove(index);
+			} while (!femaleHousehold.hasDwelling() && femaleHouseholds.size() > 0);
+			if (!femaleHousehold.hasDwelling())
+				break;
 			// Create a fictive household to determine the direction of the move
 			HouseholdRow temp = new HouseholdRow(ObjectSource.MOVING_TOGETHER_TEMP);
 			temp.addMembers(maleHousehold.getMembers());
@@ -91,11 +101,11 @@ public class MovingTogether {
 				person.setHousehold(femaleHousehold);
 			if (femaleDwellingResidentialSatisfaction > maleDwellingResidentialSatisfaction) {
 				femaleHousehold.join(maleHousehold);
-				maleHousehold.remove(dwellingsOnMarket);
+				maleHousehold.remove(dwellingsOnMarket, ObjectSource.MOVED_TOGETHER);
 				assert femaleHousehold.hasDwelling() == true : "New household has no dwelling!";
 			} else {
 				maleHousehold.join(femaleHousehold);
-				femaleHousehold.remove(dwellingsOnMarket);
+				femaleHousehold.remove(dwellingsOnMarket, ObjectSource.MOVED_TOGETHER);
 				assert maleHousehold.hasDwelling() == true : "New household has no dwelling!";
 			}
 		}

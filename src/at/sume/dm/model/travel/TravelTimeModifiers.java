@@ -20,6 +20,7 @@ import net.remesch.db.Database;
  */
 public class TravelTimeModifiers {
 	private class ModifierRecord {
+		@SuppressWarnings("unused")
 		public int spatialUnitId;
 		public String activityNoMode;
 		public double modifier;

@@ -60,7 +60,8 @@ public class LeavingParents {
 	public ArrayList<HouseholdRow> getNewSingleHouseholds() throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
 		ArrayList<HouseholdRow> result = new ArrayList<HouseholdRow>(childrenLeaving.size());
 		for (PersonRow childLeaving : childrenLeaving) {
-			if (childLeaving.getHousehold().getHouseholdSize() > 1) {
+			if (childLeaving.getHousehold().getHouseholdSize() > 1 &&
+					childLeaving.getHousehold().hasDwelling()) {
 				// create new single household
 				HouseholdRow parentHousehold = childLeaving.getHousehold();
 				HouseholdRow newHousehold = createNewSingleHousehold(childLeaving);

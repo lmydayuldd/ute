@@ -1057,9 +1057,12 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * 
 	 * @param dwellingsOnMarket List of dwellings on market to be able to put the household's dwelling on the market
 	 */
-	public void remove(DwellingsOnMarket dwellingsOnMarket) {
-		if (hasDwelling())
+	public void remove(DwellingsOnMarket dwellingsOnMarket, ObjectSource src) {
+		this.src = src;
+		if (hasDwelling()) {
 			dwellingsOnMarket.putDwellingOnMarket(getDwelling());
+			dwelling = null;
+		}
 		// Remove household members as well
 		if (members != null) {
 			for (PersonRow member : members) {
@@ -1072,7 +1075,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	public void emigrate(DwellingsOnMarket dwellingsOnMarket, MigrationRealm migrationRealm) {
 		notifyEmigration(getSpatialunitId(), migrationRealm);
 		notifyMigration(getSpatialunitId(), null, migrationRealm, this);
-		remove(dwellingsOnMarket);
+		remove(dwellingsOnMarket, ObjectSource.EMIGRATED);
 	}
 	
 	/* (non-Javadoc)
