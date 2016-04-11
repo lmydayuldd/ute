@@ -261,14 +261,18 @@ public class SampleMigratingHouseholds {
 //			migrationsPerAgeSex.modifyDistribution(index);
 			MigrationsPerAgeSex m = migrationsPerAgeSex.get(index);
 			person.setAgeGroupId(m.getAgeGroupId());
-			person.setAge(AgeGroup.sampleAge(person.getAgeGroupId()));
+			if (householdSize == 1) {
+				person.setAge(AgeGroup.sampleAge(person.getAgeGroupId(), (short) 18));
+			} else {
+				person.setAge(AgeGroup.sampleAge(person.getAgeGroupId()));
+			}
 			person.setSex(m.getSex());
 			person.setHousehold(result);
 			// adds a person to a household twice togehter with result.addMembers(members) below - AR 160411
 			members.add(person);
 		}
 		result.addMembers(members);
-		assert result.getHouseholdSize() != householdSize : "Invalid household size: " + result.getHouseholdSize() + ", should be: " + householdSize;
+		assert result.getHouseholdSize() == householdSize : "Invalid household size: " + result.getHouseholdSize() + ", should be: " + householdSize;
 		result.determineInitialHouseholdType(false);	// countAdults() was already done in addMembers()
 		// calculate income for each household member
 		for (PersonRow person : result.getMembers()) {
