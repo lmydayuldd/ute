@@ -123,6 +123,7 @@ public class Main {
         int modelRuns = Common.getModelRuns();
         for (int modelRun = 0; modelRun != modelRuns; modelRun++) {
             System.out.println(printInfo(modelRun) + ": ======================= model run " + (modelRun + 1) + " of " + modelRuns);
+            System.out.println(printInfo(modelRun) + ": running with every " + Common.getHouseholdReductionFactor() + ". household");
 			// Load entity sets from database
 			try {
 				spatialUnits = new SpatialUnits(db, Common.getSpatialUnitLevel());

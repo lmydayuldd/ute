@@ -54,6 +54,7 @@ public class Common {
 	private static short modelYear;
 	private static byte outputIncomeGroups;
 	private static byte outputInterval;
+	private static byte householdReductionFactor;
 	
 	/**
 	 * @return the iniFilename
@@ -289,6 +290,13 @@ public class Common {
 	}
 
 	/**
+	 * @return the householdReductionFactor
+	 */
+	public static byte getHouseholdReductionFactor() {
+		return householdReductionFactor;
+	}
+
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -378,6 +386,7 @@ public class Common {
 		youngHouseholdAgeLimit = Byte.parseByte(getSysParam("YoungHouseholdAgeLimit"));
 		outputIncomeGroups = Byte.parseByte(getSysParam("OutputIncomeGroups"));
 		outputInterval = Byte.parseByte(getSysParam("OutputInterval"));
+		householdReductionFactor = Byte.parseByte(getSysParam("HouseholdReductionFactor"));
 	}
 	
 	/**
