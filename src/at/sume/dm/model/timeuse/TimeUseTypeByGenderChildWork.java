@@ -18,7 +18,7 @@ public class TimeUseTypeByGenderChildWork implements TimeUseTypeDesignator {
 	 */
 	@Override
 	public TimeUseType getTimeUseType(PersonRow person) {
-		if (person.getAge() > 10) {
+		if (person.getAge() >= 10) {
 			if (person.getSex() == 1) { // female
 				if (person.getWorkplaceCellId() != 0) { // employed
 					if (person.getHousehold().hasChildrenBelow18() && person.getHousehold().getHouseholdSize() > 1) {
