@@ -10,6 +10,7 @@ import at.sume.dm.entities.PersonRow;
 import at.sume.dm.indicators.base.Indicator;
 import at.sume.dm.model.output.Fileable;
 import at.sume.dm.model.timeuse.TimeUseType;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.AgeGroup;
 import at.sume.dm.types.IncomeGroup;
 import at.sume.dm.types.IncomeGroup3;
@@ -42,7 +43,8 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 			}
 			if (householdSize6 > 6) householdSize6 = 6;
 			int pos = lookupIndicator(household.getSpatialunitId(), incomeGroup, person.getSex(), 
-					AgeGroup.getAgeGroupId(person.getAge()), person.isLivingWithParents(), householdSize6, person.getTimeUseType());
+					AgeGroup.getAgeGroupId(person.getAge()), person.isLivingWithParents(), householdSize6, 
+					person.getTimeUseType(), person.getSrc());
 			if (pos < 0) {
 				// insert at position pos
 				pos = (pos + 1) * -1;
@@ -54,6 +56,7 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 				b.setLivingWithParents(person.isLivingWithParents());
 				b.setHouseholdSize6(householdSize6);
 				b.setTimeUseType(person.getTimeUseType());
+				b.setSrc(person.getSrc());
 				b.setPersonCount(1);
 				indicatorList.add(pos, b);
 			} else {
@@ -75,7 +78,7 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 		indicatorList.clear();
 	}
 	
-	private int lookupIndicator(int spatialUnitId, byte incomeGroupId, byte sex, byte ageGroupId, boolean livingWithParents, short householdSize6, TimeUseType timeUseType) {
+	private int lookupIndicator(int spatialUnitId, byte incomeGroupId, byte sex, byte ageGroupId, boolean livingWithParents, short householdSize6, TimeUseType timeUseType, ObjectSource src) {
 		AggregatedPersonRow lookup = new AggregatedPersonRow();
 		lookup.setSpatialUnitId(spatialUnitId);
 		lookup.setIncomeGroupId(incomeGroupId);
@@ -84,6 +87,7 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 		lookup.setLivingWithParents(livingWithParents);
 		lookup.setHouseholdSize6(householdSize6);
 		lookup.setTimeUseType(timeUseType);
+		lookup.setSrc(src);
 		return Collections.binarySearch(indicatorList, lookup);
 	}
 

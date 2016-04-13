@@ -272,6 +272,13 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 		return recordSet;
 	}
 
+	/**
+	 * @return the src
+	 */
+	public ObjectSource getSrc() {
+		return src;
+	}
+
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSetRow#set(java.sql.ResultSet, java.lang.String)
 	 */
