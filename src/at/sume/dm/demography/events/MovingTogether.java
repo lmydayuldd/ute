@@ -68,6 +68,8 @@ public class MovingTogether {
 		numMovesTogether = Math.min(numMovesTogether, maleHouseholds.size());
 		numMovesTogether = Math.min(numMovesTogether, femaleHouseholds.size());
 		for (int i = 0; i != numMovesTogether; i++) {
+			if ((maleHouseholds.size() == 0) || (femaleHouseholds.size() == 0))
+				break;
 			HouseholdRow maleHousehold; 
 			do {
 				index = (int) (r.nextDouble() * maleHouseholds.size());
