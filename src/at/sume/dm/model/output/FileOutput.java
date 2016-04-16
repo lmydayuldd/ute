@@ -46,13 +46,13 @@ public class FileOutput {
 	 * @param modelYear
 	 * @throws IOException 
 	 */
-	public void persistDb(short modelYear) {
+	public void persistDb(int modelRun, short modelYear) {
 		if (!headLineWritten) {
 			psOut.println("ModelYear" + delimiter + rowList.get(0).toCsvHeadline(delimiter));
 			headLineWritten = true;
 		}
 		for (Fileable row : rowList) {
-			String orow = modelYear + delimiter + row.toString(delimiter);
+			String orow = modelYear + delimiter + row.toString(modelRun, delimiter);
 			psOut.println(orow);
 		}
 	}

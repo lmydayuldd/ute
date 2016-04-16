@@ -33,7 +33,7 @@ public class CountDemographicMovements implements DemographyObserver {
 	 * @param ps
 	 * @param modelYear
 	 */
-	public void output(PrintStream ps, int modelYear) {
+	public void output(PrintStream ps, int modelYear, int modelRun) {
 		assert indicatorList.size() > 0 : "DemographicMovementCount is empty!";
 		StringBuffer output = new StringBuffer();
 		// Headline - written only once per model run
@@ -44,7 +44,7 @@ public class CountDemographicMovements implements DemographyObserver {
 			headLineWritten = true;
 		}
 		for (DemographicMovementsRow row : indicatorList) {
-			output = new StringBuffer(modelYear + ";" + row.toString(";"));
+			output = new StringBuffer(modelYear + ";" + row.toString(modelRun, ";"));
 			ps.println(output);
 		}
 	}

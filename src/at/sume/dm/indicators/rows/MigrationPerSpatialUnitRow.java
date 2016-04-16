@@ -118,7 +118,7 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 	}
 	@Override
 	public String toCsvHeadline(String delimiter) {
-		return "SpatialUnit" + delimiter + "HHfromLocal" + delimiter + "HHfromCountry" + delimiter + "HHfromIntl" + delimiter + 
+		return "ModelRun" + delimiter + "SpatialUnit" + delimiter + "HHfromLocal" + delimiter + "HHfromCountry" + delimiter + "HHfromIntl" + delimiter + 
 			"PersFromLocal" + delimiter + "PersFromCountry" + delimiter + "PersFromIntl" + delimiter +
 			"HHtoLocal" + delimiter + "HHtoCountry" + delimiter + "HHtoIntl" + delimiter +
 			"PersToLocal" + delimiter + "PersToCountry" + delimiter + "PersToIntl" + delimiter + "LeftParentsFrom" + delimiter +
@@ -127,8 +127,8 @@ public class MigrationPerSpatialUnitRow implements Comparable<Integer>, Fileable
 			"PotentialPersFromCountry" + delimiter + "PotentialPersFromIntl" + delimiter + "PotentialLeftParentsFrom";
 	}
 	@Override
-	public String toString(String delimiter) {
-		return spatialUnitId + delimiter + householdLocalImmigrationCount + delimiter + householdNationalImmigrationCount + delimiter + householdIntlImmigrationCount + delimiter +
+	public String toString(int modelRun, String delimiter) {
+		return modelRun + delimiter + spatialUnitId + delimiter + householdLocalImmigrationCount + delimiter + householdNationalImmigrationCount + delimiter + householdIntlImmigrationCount + delimiter +
 			personLocalImmigrationCount + delimiter + personNationalImmigrationCount + delimiter + personIntlImmigrationCount + delimiter +
 			householdLocalEmigrationCount + delimiter + householdNationalEmigrationCount + delimiter + householdIntlEmigrationCount + delimiter +
 			personLocalEmigrationCount + delimiter + personNationalEmigrationCount + delimiter + personIntlEmigrationCount + delimiter + leftParentsOriginCount + delimiter +

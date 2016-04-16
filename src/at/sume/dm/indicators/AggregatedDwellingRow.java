@@ -79,12 +79,12 @@ public class AggregatedDwellingRow implements Comparable<AggregatedDwellingRow>,
 	}
 	@Override
 	public String toCsvHeadline(String delimiter) {
-		return "SpatialUnit" + delimiter + "YearlyRentPerSqmGroup" + delimiter + "LivingSpaceGroup" + delimiter + "Vacant" + 
+		return "ModelRun" + delimiter + "SpatialUnit" + delimiter + "YearlyRentPerSqmGroup" + delimiter + "LivingSpaceGroup" + delimiter + "Vacant" + 
 			delimiter + "DwellingCount";
 	}
 	@Override
-	public String toString(String delimiter) {
-		return spatialUnitId + delimiter + CostOfResidenceGroup.getCostOfResidenceGroupName(costOfResidenceGroupId) + delimiter + LivingSpaceGroup6.getLivingSpaceGroupName(livingSpaceGroupId) +
+	public String toString(int modelRun, String delimiter) {
+		return modelRun + delimiter + spatialUnitId + delimiter + CostOfResidenceGroup.getCostOfResidenceGroupName(costOfResidenceGroupId) + delimiter + LivingSpaceGroup6.getLivingSpaceGroupName(livingSpaceGroupId) +
 			delimiter + Boolean.toString(isVacant()) + delimiter + dwellingCount;
 	}
 	@Override

@@ -164,8 +164,8 @@ public class AggregatedTimeUseRow implements Fileable, Comparable<AggregatedTime
 	 * @see at.sume.dm.model.output.Fileable#toString(java.lang.String)
 	 */
 	@Override
-	public String toString(String delimiter) {
-		return spatialUnitId + delimiter + activity + delimiter + incomeGroupId + delimiter + householdType.toString() +
+	public String toString(int modelRun, String delimiter) {
+		return modelRun + delimiter + spatialUnitId + delimiter + activity + delimiter + incomeGroupId + delimiter + householdType.toString() +
 				delimiter + timeUseType.toString() + delimiter + timeUseSum + delimiter + participatingPersonCount + delimiter + participatingHouseholdCount;
 	}
 }

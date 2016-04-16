@@ -119,13 +119,13 @@ public class AggregatedHouseholdRow implements Comparable<AggregatedHouseholdRow
 
 	@Override
 	public String toCsvHeadline(String delimiter) {
-		return "SpatialUnit" + delimiter + "IncomeGroup" + delimiter + "LivingSpaceGroup" + delimiter + "HouseholdSize" + 
+		return "ModelRun" + delimiter + "SpatialUnit" + delimiter + "IncomeGroup" + delimiter + "LivingSpaceGroup" + delimiter + "HouseholdSize" + 
 			delimiter + "HouseholdType" + delimiter + "HouseholdCount" + delimiter + "PersonCount";
 	}
 
 	@Override
-	public String toString(String delimiter) {
-		return spatialUnitId + delimiter + incomeGroupId + delimiter + LivingSpaceGroup6.getLivingSpaceGroupName(livingSpaceGroupId) +
+	public String toString(int modelRun, String delimiter) {
+		return modelRun + delimiter + spatialUnitId + delimiter + incomeGroupId + delimiter + LivingSpaceGroup6.getLivingSpaceGroupName(livingSpaceGroupId) +
 			delimiter + householdSize + delimiter + householdType.toString() + delimiter + householdCount + delimiter + personCount;
 	}
 

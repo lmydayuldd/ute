@@ -108,11 +108,11 @@ public class MigrationAgeSexRow implements Comparable<MigrationAgeSexRow>, Filea
 
 	@Override
 	public String toCsvHeadline(String delimiter) {
-		return "Sex" + delimiter + "AgeGroup" + delimiter + "HouseholdType" + delimiter + "MigrationType" + delimiter + "PersonCount";
+		return "ModelRun" + delimiter + "Sex" + delimiter + "AgeGroup" + delimiter + "HouseholdType" + delimiter + "MigrationType" + delimiter + "PersonCount";
 	}
 
 	@Override
-	public String toString(String delimiter) {
-		return sex + delimiter + ageGroupId + delimiter + householdType + delimiter + migrationRealm + delimiter + personCount;
+	public String toString(int modelRun, String delimiter) {
+		return modelRun + delimiter + sex + delimiter + ageGroupId + delimiter + householdType + delimiter + migrationRealm + delimiter + personCount;
 	}
 }

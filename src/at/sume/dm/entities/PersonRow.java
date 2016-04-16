@@ -395,7 +395,8 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 
 	@Override
 	public String toCsvHeadline(String delimiter) {
-		return "PersonId" + delimiter + 
+		return "ModelRun" + delimiter + 
+				"PersonId" + delimiter + 
 				"HouseholdId" + delimiter + 
 				"Sex" + delimiter + 
 				"Age" + delimiter + 
@@ -405,8 +406,9 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	}
 
 	@Override
-	public String toString(String delimiter) {
-		return getPersonId() + delimiter + 
+	public String toString(int modelRun, String delimiter) {
+		return modelRun + delimiter + 
+				getPersonId() + delimiter + 
 				getHousehold().getHouseholdId() + delimiter + 
 				getSex() + delimiter + 
 				getAge() + delimiter + 
@@ -419,7 +421,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	 */
 	@Override
 	public String toString() {
-		return toString(";");
+		return toString(0, ";");
 	}
 
 	private static ArrayList<DemographyObserver> demographyObservers = new ArrayList<DemographyObserver>();

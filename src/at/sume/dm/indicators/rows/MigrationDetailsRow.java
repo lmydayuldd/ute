@@ -130,11 +130,11 @@ public class MigrationDetailsRow implements Comparable<MigrationDetailsRow>, Fil
 
 	@Override
 	public String toCsvHeadline(String delimiter) {
-		return "From" + delimiter + "To" + delimiter + "HouseholdType" + delimiter + "MigrationType" + delimiter + "HouseholdCount" + delimiter + "PersonCount";
+		return "ModelRun" + delimiter + "From" + delimiter + "To" + delimiter + "HouseholdType" + delimiter + "MigrationType" + delimiter + "HouseholdCount" + delimiter + "PersonCount";
 	}
 
 	@Override
-	public String toString(String delimiter) {
-		return spatialUnitIdFrom + delimiter + spatialUnitIdTo + delimiter + householdType + delimiter + migrationRealm + delimiter + householdCount + delimiter + personCount;
+	public String toString(int modelRun, String delimiter) {
+		return modelRun + delimiter + spatialUnitIdFrom + delimiter + spatialUnitIdTo + delimiter + householdType + delimiter + migrationRealm + delimiter + householdCount + delimiter + personCount;
 	}
 }

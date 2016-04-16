@@ -87,15 +87,15 @@ public class RentPerSpatialUnit {
 		}
 		@Override
 		public String toCsvHeadline(String delimiter) {
-			return "SpatialUnitId" + delimiter + "YearlyRentPer100Sqm" + delimiter + "MonthlyRentPerSqm" + delimiter + "NumSamples" + delimiter + "SampleYear";
+			return "ModelRun" + delimiter + "SpatialUnitId" + delimiter + "YearlyRentPer100Sqm" + delimiter + "MonthlyRentPerSqm" + delimiter + "NumSamples" + delimiter + "SampleYear";
 		}
 		@Override
-		public String toString(String delimiter) {
+		public String toString(int modelRun, String delimiter) {
 			NumberFormat nf = NumberFormat.getNumberInstance(Locale.GERMAN);
 			DecimalFormat df = (DecimalFormat)nf;
 			double monthlyRentPerSqm = ((double) Math.round(yearlyRentPer100Sqm / 12)) / 100.0;
 			String output = df.format(monthlyRentPerSqm);
-			return spatialUnitId + delimiter + yearlyRentPer100Sqm + delimiter + output + delimiter + numSamples + delimiter + sampleYear;
+			return modelRun + delimiter + spatialUnitId + delimiter + yearlyRentPer100Sqm + delimiter + output + delimiter + numSamples + delimiter + sampleYear;
 		}
 	}
 

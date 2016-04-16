@@ -82,9 +82,9 @@ public class OutputManager {
 	 * @param modelYear
 	 * @throws IOException 
 	 */
-	public void fileOutput(short modelYear) {
+	public void fileOutput(int modelRun, short modelYear) {
 		for (FileOutput fileOutput : fileOutputList) {
-			fileOutput.persistDb(modelYear);
+			fileOutput.persistDb(modelRun, modelYear);
 		}
 //		fileOutputHouseholds.persistDb(modelYear);
 //		fileOutputPersons.persistDb(modelYear);
@@ -98,11 +98,11 @@ public class OutputManager {
 	 * @throws IllegalAccessException
 	 * @throws IOException 
 	 */
-	public void output(short modelYear) throws IllegalArgumentException, SQLException, IllegalAccessException, IOException {
+	public void output(int modelRun, short modelYear) throws IllegalArgumentException, SQLException, IllegalAccessException, IOException {
 		if (dbOutputHouseholds != null)
 			dbOutput(modelYear);
 		else
-			fileOutput(modelYear);
+			fileOutput(modelRun, modelYear);
 	}
 
 	public void close() {

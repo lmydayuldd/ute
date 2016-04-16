@@ -33,11 +33,11 @@ public class DemographicMovementsRow implements Comparable<Integer>, Fileable {
 	}
 	@Override
 	public String toCsvHeadline(String delimiter) {
-		return "SpatialUnit" + delimiter + "BirthCount" + delimiter + "DeathCount";
+		return "ModelRun" + delimiter + "SpatialUnit" + delimiter + "BirthCount" + delimiter + "DeathCount";
 	}
 	@Override
-	public String toString(String delimiter) {
-		return spatialUnitId + delimiter + birthCount + delimiter + deathCount;
+	public String toString(int modelRun, String delimiter) {
+		return modelRun + delimiter + spatialUnitId + delimiter + birthCount + delimiter + deathCount;
 	}
 
 	@Override

@@ -28,7 +28,7 @@ public class CountMigrationAgeSex implements MigrationDetailsObserver {
 	 * @param ps
 	 * @param modelYear
 	 */
-	public void output(PrintStream ps, int modelYear) {
+	public void output(PrintStream ps, int modelYear, int modelRun) {
 		assert migrationDetailsList.size() > 0 : "MigrationCount is empty!";
 		StringBuffer output = new StringBuffer();
 		// Headline - written only once per model run
@@ -39,7 +39,7 @@ public class CountMigrationAgeSex implements MigrationDetailsObserver {
 			headLineWritten = true;
 		}
 		for (MigrationAgeSexRow row : migrationDetailsList) {
-			output = new StringBuffer(modelYear + ";" + row.toString(";"));
+			output = new StringBuffer(modelYear + ";" + row.toString(modelRun, ";"));
 			ps.println(output);
 		}
 	}

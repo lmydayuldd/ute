@@ -221,15 +221,15 @@ public class DwellingRow extends RecordSetRowFileable<Dwellings> implements Resi
 	}
 	@Override
 	public String toCsvHeadline(String delimiter) {
-		return "DwellingId" + delimiter + "SpatialunitId" + delimiter + "DwellingSize" + delimiter + "TotalYearlyDwellingCosts" + delimiter + "HouseholdId";
+		return "ModelRun" + delimiter + "DwellingId" + delimiter + "SpatialunitId" + delimiter + "DwellingSize" + delimiter + "TotalYearlyDwellingCosts" + delimiter + "HouseholdId";
 	}
 	@Override
-	public String toString(String delimiter) {
+	public String toString(int modelRun, String delimiter) {
 		if (getHousehold() != null) 
-			return getDwellingId() + delimiter + getSpatialunit().getSpatialUnitId() + delimiter + getDwellingSize() + delimiter + 
+			return modelRun + delimiter + getDwellingId() + delimiter + getSpatialunit().getSpatialUnitId() + delimiter + getDwellingSize() + delimiter + 
 				getTotalYearlyDwellingCosts() + delimiter + getHousehold().getHouseholdId();
 		else
-			return getDwellingId() + delimiter + getSpatialunit().getSpatialUnitId() + delimiter + getDwellingSize() + delimiter + 
+			return modelRun + delimiter + getDwellingId() + delimiter + getSpatialunit().getSpatialUnitId() + delimiter + getDwellingSize() + delimiter + 
 			getTotalYearlyDwellingCosts() + delimiter + "0";
 	}
 }

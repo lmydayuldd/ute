@@ -128,12 +128,12 @@ public class AllHouseholdsIndicatorsPerHouseholdTypeAndIncome implements Indicat
 		}
 		@Override
 		public String toCsvHeadline(String delimiter) {
-			return "HouseholdType" + delimiter + "IncomeGroup" + delimiter + "HouseholdCount" + delimiter + "PersonCount" + delimiter + "LivingSpaceSum" + delimiter +
+			return "ModelRun" + delimiter + "HouseholdType" + delimiter + "IncomeGroup" + delimiter + "HouseholdCount" + delimiter + "PersonCount" + delimiter + "LivingSpaceSum" + delimiter +
 				"LivingSpacePerHouseholdMemberSum" + delimiter + "LivingSpacePerWeightedHouseholdMemberSum";
 		}
 		@Override
-		public String toString(String delimiter) {
-			return householdType.toString() + delimiter + incomeGroup + delimiter + householdCount +
+		public String toString(int modelRun, String delimiter) {
+			return modelRun + delimiter + householdType.toString() + delimiter + incomeGroup + delimiter + householdCount +
 				delimiter + personCount + delimiter + livingSpaceSum + delimiter + livingSpacePerHouseholdMemberSum + delimiter +
 				livingSpacePerWeightedHouseholdMemberSum;
 		}

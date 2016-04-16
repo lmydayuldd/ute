@@ -1216,15 +1216,15 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 
 	@Override
 	public String toCsvHeadline(String delimiter) {
-		return "HouseholdId" + delimiter + "HouseholdSize" + delimiter + "DwellingId" + delimiter + "HouseholdType" + delimiter + "MovingDecisionYear" + delimiter + "" +
+		return "ModelRun" + delimiter + "HouseholdId" + delimiter + "HouseholdSize" + delimiter + "DwellingId" + delimiter + "HouseholdType" + delimiter + "MovingDecisionYear" + delimiter + "" +
 			"AspirationRegionLivingSpaceMin" + delimiter + "AspirationRegionLivingSpaceMax" + delimiter + "AspirationRegionMaxCosts" + delimiter + "" + 
 			"CurrentResidentialSatisfaction" + delimiter + "rsUdpCentrality" + delimiter + "rsUdpPublicTransportAccessibility" + delimiter + "" +
 			"rsCostEffectiveness" + delimiter + "rsEnvironmentalAmenities" + delimiter + "rsSocialPrestige" + delimiter + "rsDesiredLivingSpace";
 	}
 
 	@Override
-	public String toString(String delimiter) {
-		return getHouseholdId() + delimiter + (byte) getMemberCount() + delimiter + getDwelling().getDwellingId() + delimiter + 
+	public String toString(int modelRun, String delimiter) {
+		return modelRun + delimiter + getHouseholdId() + delimiter + (byte) getMemberCount() + delimiter + getDwelling().getDwellingId() + delimiter + 
 			householdType + delimiter + movingDecisionYear + delimiter + aspirationRegionLivingSpaceMin + delimiter +
 			aspirationRegionLivingSpaceMax + delimiter + aspirationRegionMaxCosts + delimiter + currentResidentialSatisfaction + delimiter +
 			rsUdpCentrality + delimiter + rsUdpPublicTransportAccessibility + delimiter + rsCostEffectiveness + delimiter + rsEnvironmentalAmenities + delimiter + rsSocialPrestige + delimiter + rsDesiredLivingSpace;

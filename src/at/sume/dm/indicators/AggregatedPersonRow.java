@@ -153,7 +153,7 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 	 */
 	@Override
 	public String toCsvHeadline(String delimiter) {
-		return "SpatialUnit" + delimiter + "IncomeGroup" + delimiter + "Sex" + delimiter + "AgeGroup" + 
+		return "ModelRun" + delimiter + "SpatialUnit" + delimiter + "IncomeGroup" + delimiter + "Sex" + delimiter + "AgeGroup" + 
 			delimiter + "LivingWithParents" + delimiter + "TimeUseType" + delimiter + "ObjectSource" + 
 			delimiter + "HouseholdSize6" + delimiter + "PersonCount";
 	}
@@ -162,8 +162,8 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 	 * @see at.sume.dm.model.output.Fileable#toString(java.lang.String)
 	 */
 	@Override
-	public String toString(String delimiter) {
-		return spatialUnitId + delimiter + incomeGroupId + delimiter + sex +
+	public String toString(int modelRun, String delimiter) {
+		return modelRun + delimiter + spatialUnitId + delimiter + incomeGroupId + delimiter + sex +
 			delimiter + AgeGroup.getAgeGroupNameDirect(ageGroupId) + delimiter + livingWithParents + 
 			delimiter + timeUseType + delimiter + src + delimiter + householdSize6 + delimiter + personCount;
 	}

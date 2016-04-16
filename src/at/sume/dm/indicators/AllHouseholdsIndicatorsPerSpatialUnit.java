@@ -149,7 +149,7 @@ public class AllHouseholdsIndicatorsPerSpatialUnit implements Indicator<Househol
 			throw new AssertionError("not yet implemented");
 		}
 		@Override
-		public String toString(String delimiter) {
+		public String toString(int modelRun, String delimiter) {
 			throw new AssertionError("not yet implemented");
 		}
 	}

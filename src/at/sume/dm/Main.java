@@ -247,7 +247,7 @@ public class Main {
 	//        fileableList.add(migrationPerSpatialUnit.getIndicatorList());
 	//        fileNameList.add("Migrations");
 	        outputManager = new OutputManager(Common.getPathOutput(), fileNameList, fileableList);
-	        initSimpleOutputFiles();
+	        initSimpleOutputFiles(modelRun);
 	        
 			// Model main loop
 			// - Biographical events for all persons/households
@@ -336,7 +336,7 @@ public class Main {
 	        	// Model output only at set interval + begin/end of model run
 		        aggregatedDwellings.build(dwellings.getRowList());
 		        aggregatedTimeUse.build(persons.getRowList());
-		        outputManager.output((short) modelYear);
+		        outputManager.output(modelRun, (short) modelYear);
 		        System.out.println(printInfo() + ": model data output to database");
 		        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
 	        }
@@ -635,10 +635,10 @@ public class Main {
 		
 			//if (modelYear == modelEndYear - 1)
 			outputFreeDwellings(modelYear, "after immigration");
-			outputMigrationCount(modelYear);
-			outputDemographicMovementCount(modelYear);
-			outputMigrationDetailsCount(modelYear);
-			outputMigrationAgeSexCount(modelYear);
+			outputMigrationCount(modelYear, modelRun);
+			outputDemographicMovementCount(modelYear, modelRun);
+			outputMigrationDetailsCount(modelYear, modelRun);
+			outputMigrationAgeSexCount(modelYear, modelRun);
 			
 			// Aging of persons (household-wise)
 			households.aging();
@@ -743,18 +743,20 @@ public class Main {
 	private static String migrationAgeSexFileName = "MigrationAgeSex.csv";
 	private static String demographicMovementsFileName = "DemographicMovements.csv";
 	
-	public static void initSimpleOutputFiles() {
-		String pathName = Common.createPathName(freeDwellingsFileName);
-		// TODO: put this in an extra class and delete the file once per model run
-		FileUtil.rotateFile(pathName);
-		pathName = Common.createPathName(migrationCountFileName);
-		FileUtil.rotateFile(pathName);
-		pathName = Common.createPathName(demographicMovementsFileName);
-		FileUtil.rotateFile(pathName);
-		pathName = Common.createPathName(migrationDetailsCountFileName);
-		FileUtil.rotateFile(pathName);
-		pathName = Common.createPathName(migrationAgeSexFileName);
-		FileUtil.rotateFile(pathName);
+	public static void initSimpleOutputFiles(int modelRun) {
+		if (modelRun == 0) { // Initialize only for the first run, otherwise append
+			String pathName = Common.createPathName(freeDwellingsFileName);
+			// TODO: put this in an extra class and delete the file once per model run
+			FileUtil.rotateFile(pathName);
+			pathName = Common.createPathName(migrationCountFileName);
+			FileUtil.rotateFile(pathName);
+			pathName = Common.createPathName(demographicMovementsFileName);
+			FileUtil.rotateFile(pathName);
+			pathName = Common.createPathName(migrationDetailsCountFileName);
+			FileUtil.rotateFile(pathName);
+			pathName = Common.createPathName(migrationAgeSexFileName);
+			FileUtil.rotateFile(pathName);
+		}
 	}
 	
 	public static void outputFreeDwellings(int modelYear, String label) throws FileNotFoundException {
@@ -775,28 +777,28 @@ public class Main {
 	 * @param modelYear
 	 * @throws FileNotFoundException
 	 */
-	public static void outputMigrationCount(int modelYear) throws FileNotFoundException {
+	public static void outputMigrationCount(int modelYear, int modelRun) throws FileNotFoundException {
 		String pathName = Common.createPathName(migrationCountFileName);
 		FileOutputStream migrationCountFile= new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(migrationCountFile);
-		migrationPerSpatialUnit.output(ps, modelYear);
+		migrationPerSpatialUnit.output(ps, modelYear, modelRun);
 	}
-	public static void outputDemographicMovementCount(int modelYear) throws FileNotFoundException {
+	public static void outputDemographicMovementCount(int modelYear, int modelRun) throws FileNotFoundException {
 		String pathName = Common.createPathName(demographicMovementsFileName);
 		FileOutputStream demographicMovementCountFile= new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(demographicMovementCountFile);
-		demographicMovementsPerSpatialUnit.output(ps, modelYear);
+		demographicMovementsPerSpatialUnit.output(ps, modelYear, modelRun);
 	}
-	public static void outputMigrationDetailsCount(int modelYear) throws FileNotFoundException {
+	public static void outputMigrationDetailsCount(int modelYear, int modelRun) throws FileNotFoundException {
 		String pathName = Common.createPathName(migrationDetailsCountFileName);
 		FileOutputStream outputFile = new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(outputFile);
-		migrationDetails.output(ps, modelYear);
+		migrationDetails.output(ps, modelYear, modelRun);
 	}
-	public static void outputMigrationAgeSexCount(int modelYear) throws FileNotFoundException {
+	public static void outputMigrationAgeSexCount(int modelYear, int modelRun) throws FileNotFoundException {
 		String pathName = Common.createPathName(migrationAgeSexFileName);
 		FileOutputStream outputFile = new FileOutputStream(pathName, true);
 		PrintStream ps = new PrintStream(outputFile);
-		migrationAgeSex.output(ps, modelYear);
+		migrationAgeSex.output(ps, modelYear, modelRun);
 	}
 }

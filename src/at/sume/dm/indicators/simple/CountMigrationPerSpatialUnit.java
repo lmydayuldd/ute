@@ -36,7 +36,7 @@ public class CountMigrationPerSpatialUnit implements MigrationObserver {
 	 * @param ps
 	 * @param modelYear
 	 */
-	public void output(PrintStream ps, int modelYear) {
+	public void output(PrintStream ps, int modelYear, int modelRun) {
 		assert indicatorList.size() > 0 : "MigrationCount is empty!";
 		StringBuffer output = new StringBuffer();
 		// Headline - written only once per model run
@@ -47,7 +47,7 @@ public class CountMigrationPerSpatialUnit implements MigrationObserver {
 			headLineWritten = true;
 		}
 		for (MigrationPerSpatialUnitRow row : indicatorList) {
-			output = new StringBuffer(modelYear + ";" + row.toString(";"));
+			output = new StringBuffer(modelYear + ";" + row.toString(modelRun, ";"));
 			ps.println(output);
 		}
 	}

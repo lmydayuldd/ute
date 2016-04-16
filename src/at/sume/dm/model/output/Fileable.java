@@ -9,5 +9,5 @@ package at.sume.dm.model.output;
  */
 public interface Fileable {
 	public String toCsvHeadline(String delimiter);
-	public String toString(String delimiter);
+	public String toString(int modelRun, String delimiter);
 }

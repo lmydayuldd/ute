@@ -93,7 +93,7 @@ public class MoversIndicatorsPerSpatialUnit implements Indicator<HouseholdRow> {
 			throw new AssertionError("not yet implemented");
 		}
 		@Override
-		public String toString(String delimiter) {
+		public String toString(int modelRun, String delimiter) {
 			// TODO Auto-generated method stub
 			throw new AssertionError("not yet implemented");
 		}
