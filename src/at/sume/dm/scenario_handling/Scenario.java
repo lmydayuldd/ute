@@ -37,20 +37,34 @@ public class Scenario {
 		ResultSet rs = ps.executeQuery();
 		if (rs.next()) {
 			scenarioName = rs.getString("ScenarioName");
+			System.out.println("    Scenario: " + scenarioName + " (id = " + scenarioId + ")");
 			migrationScenario = rs.getString("MigrationScenarioName");
+			System.out.println("    Scenario: MigrationScenarioName = " + migrationScenario);
 			migrationHouseholdSizeScenario = rs.getString("MigrationHouseholdSizeScenarioName");
+			System.out.println("    Scenario: MigrationHouseholdSizeScenarioName = " + migrationHouseholdSizeScenario);
 			householdPrefsScenario = rs.getString("HouseholdPrefsScenarioName");
+			System.out.println("    Scenario: HouseholdPrefsScenarioName = " + householdPrefsScenario);
 			buildingProjectScenario = rs.getString("BuildingProjectScenarioName");
+			System.out.println("    Scenario: BuildingProjectScenarioName = " + buildingProjectScenario);
 			additionalDwellingsScenario = rs.getString("AdditionalDwellingsScenarioName");
+			System.out.println("    Scenario: AdditionalDwellingsScenarioName = " + additionalDwellingsScenario);
 			newDwellingSizeScenario = rs.getString("NewDwellingSizeScenarioName");
+			System.out.println("    Scenario: NewDwellingSizeScenarioName = " + newDwellingSizeScenario);
 			migrationIncomeScenario = rs.getString("MigrationIncomeScenarioName");
+			System.out.println("    Scenario: MigrationIncomeScenarioName = " + migrationIncomeScenario);
 			rentScenario = rs.getString("RentScenarioName");
 			if (rentScenario == null) rentScenario = "NULL";
+			System.out.println("    Scenario: RentScenarioName = " + rentScenario);
 			fertilityScenario = rs.getString("FertilityScenarioName");
+			System.out.println("    Scenario: FertilityScenarioName = " + migrationScenario);
 			travelTimesScenario = rs.getString("TravelTimesScenarioName");
+			System.out.println("    Scenario: MigrationScenarioName = " + fertilityScenario);
 			timeUseTypeScenario = rs.getString("TimeUseTypeScenarioName");
+			System.out.println("    Scenario: TimeUseTypeScenarioName = " + timeUseTypeScenario);
 			travelTimeModifierScenario = rs.getString("TravelTimeModifierScenarioName");
+			System.out.println("    Scenario: TravelTimeModifierScenarioName = " + travelTimeModifierScenario);
 			migrationPerAgeSexScenario = rs.getString("MigrationPerAgeSexScenarioName");
+			System.out.println("    Scenario: MigrationPerAgeSexScenarioName = " + migrationPerAgeSexScenario);
 		} else {
 			throw new AssertionError("Scenario " + scenarioId + " not found!");
 		}

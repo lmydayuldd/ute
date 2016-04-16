@@ -396,15 +396,17 @@ public class Common {
 	 */
 	public static String getSysParam(String paramName) {
 		Object rv = null;
+		String result = null;;
 		try {
 			rv = db.lookupSql("select wert from SysParamsRuntime where name='" + paramName + "'");
 			if (rv != null)
-				return (String)rv;
+				result = (String)rv;
 		} catch (SQLException e) {
 			System.err.println("getSysParam: error looking up parameter " + paramName);
 			e.printStackTrace();
 		}
-		return null;
+		System.out.println("   Sysparam " + paramName + " = " + result);
+		return result;
 	}
 
 	/**
