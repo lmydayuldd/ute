@@ -36,8 +36,9 @@ public class AggregatedDwellings {
 		clear();
 		for (DwellingRow dwelling : dwellings) {
 			// TODO: stop using double for currencies!
+			double x = (double) dwelling.getTotalYearlyDwellingCosts() / (double) dwelling.getDwellingSize() / 12d;
 			// round to two decimal places here!
-			double monthlyRentPerSqm = Math.round((((double) dwelling.getTotalYearlyDwellingCosts()) / dwelling.getDwellingSize() / 12) * 100) / 100;
+			double monthlyRentPerSqm = Math.round(x * 100d) / 100d;
 			short costOfResidenceGroupId = CostOfResidenceGroup.getCostOfResidenceGroupId(monthlyRentPerSqm);
 			byte livingSpaceGroup6 = LivingSpaceGroup6.getLivingSpaceGroupId(dwelling.getDwellingSize());
 			boolean vacant = (dwelling.getHousehold() == null);
