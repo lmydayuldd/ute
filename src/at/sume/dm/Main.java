@@ -246,7 +246,7 @@ public class Main {
 	        fileNameList.add("AggregatedTimeUse");
 	//        fileableList.add(migrationPerSpatialUnit.getIndicatorList());
 	//        fileNameList.add("Migrations");
-	        outputManager = new OutputManager(Common.getPathOutput(), fileNameList, fileableList);
+	        outputManager = new OutputManager(modelRun, Common.getPathOutput(), fileNameList, fileableList);
 	        initSimpleOutputFiles(modelRun);
 	        
 			// Model main loop

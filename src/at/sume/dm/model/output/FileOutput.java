@@ -29,7 +29,7 @@ public class FileOutput {
 	 * @throws FileNotFoundException
 	 */
 	@SuppressWarnings("unchecked")
-	public FileOutput(String path, String fileName, List<? extends Fileable> rowList) throws FileNotFoundException {
+	public FileOutput(String path, String fileName, List<? extends Fileable> rowList, boolean createNewOutputFile) throws FileNotFoundException {
 		String pathName;
 		this.rowList = (ArrayList<Fileable>) rowList;
 		if (path.endsWith("\\"))
@@ -37,7 +37,8 @@ public class FileOutput {
 		else
 			pathName = path + "\\" + fileName + ".csv";
 		// Rename existing file to a unique filename
-		FileUtil.rotateFile(pathName);
+		if (createNewOutputFile)
+			FileUtil.rotateFile(pathName);
 		FileOutputStream fileOutputStream = new FileOutputStream(pathName, true);
 		psOut = new PrintStream(fileOutputStream);
 	}

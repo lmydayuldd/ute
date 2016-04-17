@@ -21,6 +21,7 @@ import at.sume.dm.entities.Persons;
 public class OutputManager {
 	DbOutputHouseholds dbOutputHouseholds;
 	ArrayList<FileOutput> fileOutputList;
+	boolean createNewOutputFile = false;
 //	FileOutput fileOutputHouseholds;
 //	FileOutput fileOutputPersons;
 //	FileOutput fileOutputDwellings;
@@ -42,7 +43,7 @@ public class OutputManager {
 	 * @param fileableList
 	 * @throws FileNotFoundException 
 	 */
-	public OutputManager(String path, List<String> fileNameList, List<List<? extends Fileable>> fileableList) throws FileNotFoundException {
+	public OutputManager(int modelRun, String path, List<String> fileNameList, List<List<? extends Fileable>> fileableList) throws FileNotFoundException {
 		assert fileNameList.size() == fileableList.size() : "fileNameList is longer/shorter than fileableList";
 		fileOutputList = new ArrayList<FileOutput>();
 		int i = 0;
@@ -53,6 +54,8 @@ public class OutputManager {
 //		fileOutputPersons = new FileOutput(path, "persons", persons.getRowList());
 //		fileOutputDwellings = new FileOutput(path, "dwellings", dwellings.getRowList());
 //		fileOutputRentPerSpatialUnit = new FileOutput(path, "rent_prices", )
+		if (modelRun == 0)
+			createNewOutputFile = true;
 	}
 	/**
 	 * Add a new fileable output entity
@@ -64,7 +67,7 @@ public class OutputManager {
 		// Fileable list may yet be empty (in case of indicators)
 //		assert fileable.size() > 0 : "List fileable is empty!";
 //		String entityName = fileable.get(0).getClass().getSimpleName();
-		FileOutput fileoutput = new FileOutput(path, fileName, fileable);
+		FileOutput fileoutput = new FileOutput(path, fileName, fileable, createNewOutputFile);
 		fileOutputList.add(fileoutput);
 	}
 	/**
