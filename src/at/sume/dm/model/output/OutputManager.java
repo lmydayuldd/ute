@@ -19,9 +19,9 @@ import at.sume.dm.entities.Persons;
  *
  */
 public class OutputManager {
-	DbOutputHouseholds dbOutputHouseholds;
-	ArrayList<FileOutput> fileOutputList;
-	boolean createNewOutputFile = false;
+	private DbOutputHouseholds dbOutputHouseholds;
+	private ArrayList<FileOutput> fileOutputList;
+	private int modelRun;
 //	FileOutput fileOutputHouseholds;
 //	FileOutput fileOutputPersons;
 //	FileOutput fileOutputDwellings;
@@ -54,8 +54,7 @@ public class OutputManager {
 //		fileOutputPersons = new FileOutput(path, "persons", persons.getRowList());
 //		fileOutputDwellings = new FileOutput(path, "dwellings", dwellings.getRowList());
 //		fileOutputRentPerSpatialUnit = new FileOutput(path, "rent_prices", )
-		if (modelRun == 0)
-			createNewOutputFile = true;
+		this.modelRun = modelRun;
 	}
 	/**
 	 * Add a new fileable output entity
@@ -67,7 +66,7 @@ public class OutputManager {
 		// Fileable list may yet be empty (in case of indicators)
 //		assert fileable.size() > 0 : "List fileable is empty!";
 //		String entityName = fileable.get(0).getClass().getSimpleName();
-		FileOutput fileoutput = new FileOutput(path, fileName, fileable, createNewOutputFile);
+		FileOutput fileoutput = new FileOutput(path, fileName, fileable, modelRun);
 		fileOutputList.add(fileoutput);
 	}
 	/**
@@ -85,9 +84,9 @@ public class OutputManager {
 	 * @param modelYear
 	 * @throws IOException 
 	 */
-	public void fileOutput(int modelRun, short modelYear) {
+	public void fileOutput(short modelYear) {
 		for (FileOutput fileOutput : fileOutputList) {
-			fileOutput.persistDb(modelRun, modelYear);
+			fileOutput.persistDb(modelYear);
 		}
 //		fileOutputHouseholds.persistDb(modelYear);
 //		fileOutputPersons.persistDb(modelYear);
@@ -101,11 +100,11 @@ public class OutputManager {
 	 * @throws IllegalAccessException
 	 * @throws IOException 
 	 */
-	public void output(int modelRun, short modelYear) throws IllegalArgumentException, SQLException, IllegalAccessException, IOException {
+	public void output(short modelYear) throws IllegalArgumentException, SQLException, IllegalAccessException, IOException {
 		if (dbOutputHouseholds != null)
 			dbOutput(modelYear);
 		else
-			fileOutput(modelRun, modelYear);
+			fileOutput(modelYear);
 	}
 
 	public void close() {

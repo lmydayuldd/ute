@@ -31,7 +31,7 @@ public class CountMigrationDetails implements MigrationDetailsObserver {
 		assert migrationDetailsList.size() > 0 : "MigrationCount is empty!";
 		StringBuffer output = new StringBuffer();
 		// Headline - written only once per model run
-		if (!headLineWritten) {
+		if (!headLineWritten && modelRun == 0) {
 			output.append("ModelYear;");
 			output.append(migrationDetailsList.get(0).toCsvHeadline(";"));
 			ps.println(output);

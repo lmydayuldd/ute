@@ -21,6 +21,7 @@ public class FileOutput {
 	private ArrayList<Fileable> rowList;
 	private final static String delimiter = ";";
 	private boolean headLineWritten = false;
+	private int modelRun;
 	
 	/**
 	 * 
@@ -29,7 +30,7 @@ public class FileOutput {
 	 * @throws FileNotFoundException
 	 */
 	@SuppressWarnings("unchecked")
-	public FileOutput(String path, String fileName, List<? extends Fileable> rowList, boolean createNewOutputFile) throws FileNotFoundException {
+	public FileOutput(String path, String fileName, List<? extends Fileable> rowList, int modelRun) throws FileNotFoundException {
 		String pathName;
 		this.rowList = (ArrayList<Fileable>) rowList;
 		if (path.endsWith("\\"))
@@ -37,8 +38,11 @@ public class FileOutput {
 		else
 			pathName = path + "\\" + fileName + ".csv";
 		// Rename existing file to a unique filename
-		if (createNewOutputFile)
+		if (modelRun == 0)
 			FileUtil.rotateFile(pathName);
+		else
+			headLineWritten = true;
+		this.modelRun = modelRun;
 		FileOutputStream fileOutputStream = new FileOutputStream(pathName, true);
 		psOut = new PrintStream(fileOutputStream);
 	}
@@ -47,7 +51,7 @@ public class FileOutput {
 	 * @param modelYear
 	 * @throws IOException 
 	 */
-	public void persistDb(int modelRun, short modelYear) {
+	public void persistDb(short modelYear) {
 		if (!headLineWritten) {
 			psOut.println("ModelYear" + delimiter + rowList.get(0).toCsvHeadline(delimiter));
 			headLineWritten = true;

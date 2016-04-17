@@ -336,7 +336,7 @@ public class Main {
 	        	// Model output only at set interval + begin/end of model run
 		        aggregatedDwellings.build(dwellings.getRowList());
 		        aggregatedTimeUse.build(persons.getRowList());
-		        outputManager.output(modelRun, (short) modelYear);
+		        outputManager.output((short) modelYear);
 		        System.out.println(printInfo() + ": model data output to database");
 		        AllHouseholdsIndicatorManager.outputIndicators(modelYear);
 	        }
