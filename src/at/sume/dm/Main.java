@@ -578,67 +578,63 @@ public class Main {
 	        System.out.println(printInfo(modelRun) + ": free dwellings after moving: " + dwellingsOnMarket.getFreeDwellingsCount());
 			outputFreeDwellings(modelYear, "after moving households, before immigration");
 
-			// households moving together
-			int numMovingTogether = movingTogether.randomJoinHouseholds();
-			System.out.println(printInfo(modelRun) + ": " + numMovingTogether + " of "+ movingTogetherCount + " projected household move-togethers/marriages took place");
-	        System.out.println(printInfo(modelRun) + ": free dwellings after moving together: " + dwellingsOnMarket.getFreeDwellingsCount());
-			
-			// Out-Migration: randomly remove households
-			int numOutMigrationInternational = sampleMigratingHouseholds.getOutMigrationInternational(modelYear) + sampleMigratingHouseholds.getOutMigrationNational(modelYear) - hhMovedAwayMemberCount;
-			if (numOutMigrationInternational > 0) {
-				int numOutMigrationIntlHouseholds = households.randomRemoveHouseholds(dwellingsOnMarket, numOutMigrationInternational, MigrationRealm.INTERNATIONAL_OUTGOING);
-				System.out.println(printInfo(modelRun) + ": " + numOutMigrationInternational + " persons (" + numOutMigrationIntlHouseholds + " households) out-migrated internationally");
-			}
-	        System.out.println(printInfo(modelRun) + ": free dwellings after out-migration: " + dwellingsOnMarket.getFreeDwellingsCount());
-			
-			// Immigrating households + Children moving out from home
-			System.out.println(printInfo(modelRun) + ": generating immigrating households and new single households form children moving out of parents homes");
-			ArrayList<HouseholdRow> childrenHouseholds = null;
 			if (Common.isDemographyOnly() == false) {
+				// households moving together
+				int numMovingTogether = movingTogether.randomJoinHouseholds();
+				System.out.println(printInfo(modelRun) + ": " + numMovingTogether + " of "+ movingTogetherCount + " projected household move-togethers/marriages took place");
+		        System.out.println(printInfo(modelRun) + ": free dwellings after moving together: " + dwellingsOnMarket.getFreeDwellingsCount());
+				
+				// Out-Migration: randomly remove households
+				int numOutMigrationInternational = sampleMigratingHouseholds.getOutMigrationInternational(modelYear) + sampleMigratingHouseholds.getOutMigrationNational(modelYear) - hhMovedAwayMemberCount;
+				if (numOutMigrationInternational > 0) {
+					int numOutMigrationIntlHouseholds = households.randomRemoveHouseholds(dwellingsOnMarket, numOutMigrationInternational, MigrationRealm.INTERNATIONAL_OUTGOING);
+					System.out.println(printInfo(modelRun) + ": " + numOutMigrationInternational + " persons (" + numOutMigrationIntlHouseholds + " households) out-migrated internationally");
+				}
+		        System.out.println(printInfo(modelRun) + ": free dwellings after out-migration: " + dwellingsOnMarket.getFreeDwellingsCount());
+				
+				// Immigrating households + Children moving out from home
+				System.out.println(printInfo(modelRun) + ": generating immigrating households and new single households form children moving out of parents homes");
+				ArrayList<HouseholdRow> childrenHouseholds = null;
 				childrenHouseholds = leavingParents.getNewSingleHouseholds();
-			}
-			ArrayList<HouseholdRow> immigratingHouseholdsNational = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.NATIONAL_INCOMING);
-			ArrayList<HouseholdRow> immigratingHouseholdsIntl = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.INTERNATIONAL_INCOMING);
-
-			int dwellingExcessShare = Common.getDwellingsOnMarketAutoAdjust();
-			if (dwellingExcessShare >= 0) {
-				// Auto-adjust dwellings if necessary
-				int dwellingsDemandCount = 0;
-				if (Common.isDemographyOnly() == false) {
+				ArrayList<HouseholdRow> immigratingHouseholdsNational = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.NATIONAL_INCOMING);
+				ArrayList<HouseholdRow> immigratingHouseholdsIntl = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.INTERNATIONAL_INCOMING);
+	
+				int dwellingExcessShare = Common.getDwellingsOnMarketAutoAdjust();
+				if (dwellingExcessShare >= 0) {
+					// Auto-adjust dwellings if necessary
+					int dwellingsDemandCount = 0;
 					dwellingsDemandCount = childrenHouseholds.size() + immigratingHouseholdsNational.size() + immigratingHouseholdsIntl.size();
-				} else {
-					dwellingsDemandCount = immigratingHouseholdsNational.size() + immigratingHouseholdsIntl.size();
+					int dwellingsAvailableCount = dwellingsOnMarket.getFreeDwellingsCount();
+					int dwellingsExcessSupplyCount = (dwellingsDemandCount * (100 + dwellingExcessShare)) / 100;
+					System.out.println(printInfo() + ": number of dwellings needed for immigration + children leaving parents: " + dwellingsDemandCount);
+					System.out.println(printInfo() + ": number of total dwellings needed incl. excess: " + dwellingsExcessSupplyCount);
+					System.out.println(printInfo() + ": number of dwellings available on the market: " + dwellingsAvailableCount);
+					if (dwellingsExcessSupplyCount > dwellingsAvailableCount) {
+						int dwellingsMissingCount = dwellingsExcessSupplyCount - dwellingsAvailableCount;
+						newDwellings = sampleBuildingProjects.sampleRandomDwellings(dwellingsMissingCount);
+				        dwellings.addAll(newDwellings);
+				        dwellingsOnMarket.addAll(newDwellings);
+					}
+			        System.out.println(printInfo(modelRun) + ": free dwellings after auto-adjustment: " + dwellingsOnMarket.getFreeDwellingsCount());
 				}
-				int dwellingsAvailableCount = dwellingsOnMarket.getFreeDwellingsCount();
-				int dwellingsExcessSupplyCount = (dwellingsDemandCount * (100 + dwellingExcessShare)) / 100;
-				System.out.println(printInfo() + ": number of dwellings needed for immigration + children leaving parents: " + dwellingsDemandCount);
-				System.out.println(printInfo() + ": number of total dwellings needed incl. excess: " + dwellingsExcessSupplyCount);
-				System.out.println(printInfo() + ": number of dwellings available on the market: " + dwellingsAvailableCount);
-				if (dwellingsExcessSupplyCount > dwellingsAvailableCount) {
-					int dwellingsMissingCount = dwellingsExcessSupplyCount - dwellingsAvailableCount;
-					newDwellings = sampleBuildingProjects.sampleRandomDwellings(dwellingsMissingCount);
-			        dwellings.addAll(newDwellings);
-			        dwellingsOnMarket.addAll(newDwellings);
-				}
-		        System.out.println(printInfo(modelRun) + ": free dwellings after auto-adjustment: " + dwellingsOnMarket.getFreeDwellingsCount());
-			}
-
-			// Now move the immigrating households + children leaving parents
-			if (Common.isDemographyOnly() == false) {
+	
+				// Now move the immigrating households + children leaving parents
 				forcedMoves(childrenHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.LEAVING_PARENTS, cheapestSpatialUnits);
 		        System.out.println(printInfo(modelRun) + ": free dwellings after " + childrenHouseholds.size() + " children leaving parents homes: " + dwellingsOnMarket.getFreeDwellingsCount());
+				forcedMoves(immigratingHouseholdsNational, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL_INCOMING, cheapestSpatialUnits);
+		        System.out.println(printInfo(modelRun) + ": free dwellings after " + immigratingHouseholdsNational.size() + " immigrating households (national): " + dwellingsOnMarket.getFreeDwellingsCount());
+				forcedMoves(immigratingHouseholdsIntl, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.INTERNATIONAL_INCOMING, cheapestSpatialUnits);
+		        System.out.println(printInfo(modelRun) + ": free dwellings after " + immigratingHouseholdsIntl.size() + " immigrating households (international): " + dwellingsOnMarket.getFreeDwellingsCount());
 			}
-			forcedMoves(immigratingHouseholdsNational, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL_INCOMING, cheapestSpatialUnits);
-	        System.out.println(printInfo(modelRun) + ": free dwellings after " + immigratingHouseholdsNational.size() + " immigrating households (national): " + dwellingsOnMarket.getFreeDwellingsCount());
-			forcedMoves(immigratingHouseholdsIntl, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.INTERNATIONAL_INCOMING, cheapestSpatialUnits);
-	        System.out.println(printInfo(modelRun) + ": free dwellings after " + immigratingHouseholdsIntl.size() + " immigrating households (international): " + dwellingsOnMarket.getFreeDwellingsCount());
 		
 			//if (modelYear == modelEndYear - 1)
 			outputFreeDwellings(modelYear, "after immigration");
-			outputMigrationCount(modelYear, modelRun);
 			outputDemographicMovementCount(modelYear, modelRun);
-			outputMigrationDetailsCount(modelYear, modelRun);
-			outputMigrationAgeSexCount(modelYear, modelRun);
+			if (Common.isDemographyOnly() == false) {
+				outputMigrationCount(modelYear, modelRun);
+				outputMigrationDetailsCount(modelYear, modelRun);
+				outputMigrationAgeSexCount(modelYear, modelRun);
+			}
 			
 			// Aging of persons (household-wise)
 			households.aging();

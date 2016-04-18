@@ -44,6 +44,7 @@ public class OutputManager {
 	 * @throws FileNotFoundException 
 	 */
 	public OutputManager(int modelRun, String path, List<String> fileNameList, List<List<? extends Fileable>> fileableList) throws FileNotFoundException {
+		this.modelRun = modelRun;
 		assert fileNameList.size() == fileableList.size() : "fileNameList is longer/shorter than fileableList";
 		fileOutputList = new ArrayList<FileOutput>();
 		int i = 0;
@@ -54,7 +55,6 @@ public class OutputManager {
 //		fileOutputPersons = new FileOutput(path, "persons", persons.getRowList());
 //		fileOutputDwellings = new FileOutput(path, "dwellings", dwellings.getRowList());
 //		fileOutputRentPerSpatialUnit = new FileOutput(path, "rent_prices", )
-		this.modelRun = modelRun;
 	}
 	/**
 	 * Add a new fileable output entity
