@@ -619,12 +619,12 @@ public class Main {
 				}
 	
 				// Now move the immigrating households + children leaving parents
-				forcedMoves(childrenHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.LEAVING_PARENTS, cheapestSpatialUnits);
-		        System.out.println(printInfo(modelRun) + ": free dwellings after " + childrenHouseholds.size() + " children leaving parents homes: " + dwellingsOnMarket.getFreeDwellingsCount());
-				forcedMoves(immigratingHouseholdsNational, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL_INCOMING, cheapestSpatialUnits);
-		        System.out.println(printInfo(modelRun) + ": free dwellings after " + immigratingHouseholdsNational.size() + " immigrating households (national): " + dwellingsOnMarket.getFreeDwellingsCount());
-				forcedMoves(immigratingHouseholdsIntl, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.INTERNATIONAL_INCOMING, cheapestSpatialUnits);
-		        System.out.println(printInfo(modelRun) + ": free dwellings after " + immigratingHouseholdsIntl.size() + " immigrating households (international): " + dwellingsOnMarket.getFreeDwellingsCount());
+				int hhMoved = forcedMoves(childrenHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.LEAVING_PARENTS, cheapestSpatialUnits);
+		        System.out.println(printInfo(modelRun) + ": free dwellings after moving " + hhMoved + " out of " + childrenHouseholds.size() + " children leaving parents homes: " + dwellingsOnMarket.getFreeDwellingsCount());
+				hhMoved = forcedMoves(immigratingHouseholdsNational, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL_INCOMING, cheapestSpatialUnits);
+		        System.out.println(printInfo(modelRun) + ": free dwellings after moving " + hhMoved + " out of " + immigratingHouseholdsNational.size() + " immigrating households (national): " + dwellingsOnMarket.getFreeDwellingsCount());
+				hhMoved = forcedMoves(immigratingHouseholdsIntl, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.INTERNATIONAL_INCOMING, cheapestSpatialUnits);
+		        System.out.println(printInfo(modelRun) + ": free dwellings after moving " + hhMoved + " out of " + immigratingHouseholdsIntl.size() + " immigrating households (international): " + dwellingsOnMarket.getFreeDwellingsCount());
 			}
 		
 			//if (modelYear == modelEndYear - 1)
@@ -640,7 +640,25 @@ public class Main {
 			households.aging();
 		} // model year
 	}
-	public static void forcedMoves(ArrayList<HouseholdRow> dwellingSeekers, int modelYear, int modelStartYear, int highestYearlyRentPer100Sqm, ResidentialMobility residentialMobility, MigrationRealm migrationRealm, ArrayList<Integer> cheapestSpatialUnits) throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
+	/**
+	 * 
+	 * @param dwellingSeekers
+	 * @param modelYear
+	 * @param modelStartYear
+	 * @param highestYearlyRentPer100Sqm
+	 * @param residentialMobility
+	 * @param migrationRealm
+	 * @param cheapestSpatialUnits
+	 * @return The number of households that found a dwelling
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws SecurityException
+	 * @throws IllegalArgumentException
+	 * @throws NoSuchFieldException
+	 * @throws SQLException
+	 */
+	public static int forcedMoves(ArrayList<HouseholdRow> dwellingSeekers, int modelYear, int modelStartYear, int highestYearlyRentPer100Sqm, ResidentialMobility residentialMobility, MigrationRealm migrationRealm, ArrayList<Integer> cheapestSpatialUnits) throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
+		int dwellingFound = 0;
 		for (HouseholdRow household : dwellingSeekers) {
 			// Count potential movers (TODO: should be implemented over an interface too!)
 			switch (migrationRealm) {
@@ -709,14 +727,18 @@ public class Main {
 					assert household.getDwelling().getHousehold() == household : "Household " + household.getHouseholdId() + " lives in dwelling " + household.getDwelling().getDwellingId() + " which has household " + household.getDwelling().getHousehold().getHouseholdId() + " as resident";
 				}
 			}
-			// Sample workplace
-			for (PersonRow member : household.getMembers()) {
-				if (member.getWorkplaceCellId() == -1) {
-					sampleWorkplaces.loadCommuterMatrix(household.getDwelling().getSpatialunit().getSpatialUnitId());
-					member.setWorkplaceCellId(sampleWorkplaces.randomSample());
+			if (dwelling != null) {
+				// Sample workplace
+				for (PersonRow member : household.getMembers()) {
+					if (member.getWorkplaceCellId() == -1) {
+						sampleWorkplaces.loadCommuterMatrix(household.getDwelling().getSpatialunit().getSpatialUnitId());
+						member.setWorkplaceCellId(sampleWorkplaces.randomSample());
+					}
 				}
+				dwellingFound++;
 			}
 		}
+		return dwellingFound;
 	}
 	/**
 	 * Rebuild Household Indicators (AllHouseholdsIndicatorManager) 
