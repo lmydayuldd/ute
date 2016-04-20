@@ -12,7 +12,8 @@ public class SingleProbability {
 	int threshold;
 	int minimum;
 	int maximum;
-	
+	private Random r = new Random();
+
 	public SingleProbability(int threshold, int maximum) {
 		this(threshold, 0, maximum);
 	}
@@ -26,7 +27,6 @@ public class SingleProbability {
 	}
 	
 	public boolean occurs() {
-		Random r = new Random();
 		int p = r.nextInt(maximum - minimum) + minimum;
 		return p <= threshold;
 	}

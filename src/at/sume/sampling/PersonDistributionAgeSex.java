@@ -12,7 +12,8 @@ public class PersonDistributionAgeSex {
 	private Distribution<PersonsPerAgeSex> personsPerAgeSexRepr, personsPerAgeSexNonRepr;
 	private PersonsPerAgeSex result;
 	private short resultAge;
-	
+	private Random r = new Random();
+
 	/**
 	 * Load distribution of households per spatial unit from database
 	 * @throws IllegalAccessException 
@@ -41,7 +42,6 @@ public class PersonDistributionAgeSex {
 			result = personsPerAgeSexRepr.get(personsPerAgeSexRepr.randomSample());
 			// Group 15-19: person must be of full age to be a household representative!
 			if ((AgeGroup.getMinAge(result.ageGroupId) < 18) && (AgeGroup.getMaxAge(result.ageGroupId) >= 18)) {
-				Random r = new Random();
 				resultAge = (byte) (18 + r.nextInt(2));
 			}
 		} else {

@@ -58,7 +58,8 @@ public class DwellingsOnMarket {
 	private ArrayList<DwellingRow> suitableDwellings;
 	private boolean headLineWritten = false;
 	private NoDwellingFoundReason noDwellingFoundReason = NoDwellingFoundReason.NO_REASON;
-
+	private Random r = new Random();
+	
 	@SuppressWarnings("unchecked")
 	public DwellingsOnMarket(Dwellings dwellings, SpatialUnits spatialUnits, int dwellingsOnMarketShare) {
 		this.spatialUnits = spatialUnits;
@@ -108,7 +109,6 @@ public class DwellingsOnMarket {
 	 * @param dwellingsOnMarketShare Share of dwellings that will be selected
 	 */
 	public void addAll(List<DwellingRow> dwellings, int dwellingsOnMarketShare) {
-		Random r = new Random();
 		for (DwellingRow row : dwellings) {
 			if (row.getHousehold() == null) {
 				int pos = spatialUnits.indexOf(row.getSpatialunit());
@@ -133,7 +133,6 @@ public class DwellingsOnMarket {
 		int result = 0;
 		if (dwellingsNotOnMarketFullList.size() == 0)
 			return result;
-		Random r = new Random();
 		double share = (double) additionalDwellingsCount / dwellingsNotOnMarketFullList.size();
 		for (DwellingRow row : dwellingsNotOnMarketFullList) {
 			int pos = spatialUnits.indexOf(row.getSpatialunit());
@@ -220,7 +219,6 @@ public class DwellingsOnMarket {
 	 * @return
 	 */
 	public DwellingRow pickRandomSuitableDwelling() {
-		Random r = new Random();
 		assert suitableDwellings.size() > 0 : "no suitable dwellings";
 		return suitableDwellings.get(r.nextInt(suitableDwellings.size()));
 	}
@@ -276,7 +274,6 @@ public class DwellingsOnMarket {
 	 * @return
 	 */
 	public DwellingRow getFirstMatchingDwelling(short minSize, short maxSize, long maxYearlyPricePerSqm) {
-		Random r = new Random();
 		int startPos = (int)(r.nextDouble() * dwellingsOnMarketFullList.size());
 		int endPos = dwellingsOnMarketFullList.size();
 		for (int i = startPos; i != endPos; i++) {

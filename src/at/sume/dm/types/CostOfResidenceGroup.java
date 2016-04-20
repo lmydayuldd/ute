@@ -30,7 +30,8 @@ public class CostOfResidenceGroup {
 	}
 
 	static ArrayList<CostOfResidenceGroupRow> costOfResidenceGroups;
-	
+	private static Random r = new Random();
+
 	static {
 		String selectStatement = "select costOfResidenceGroupId, costOfResidenceGroup, minCosts, maxCosts from ISIS_CostOfResidenceGroups order by costOfResidenceGroupId";
 		try {
@@ -70,7 +71,6 @@ public class CostOfResidenceGroup {
 	public static double sampleCostOfResidence(short costOfResidenceGroupId) {
 		assert costOfResidenceGroupId > 0 : "costOfResidenceGroupId <= 0";
 		assert costOfResidenceGroupId <= costOfResidenceGroups.size() : "costOfResidenceGroupId > " + costOfResidenceGroups.size();
-		Random r = new Random();
 		CostOfResidenceGroupRow sample = costOfResidenceGroups.get(costOfResidenceGroupId - 1);
 		return (short) (sample.minCosts + (r.nextDouble() * (sample.maxCosts - sample.minCosts)));
 	}

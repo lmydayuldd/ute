@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import at.sume.dm.tracing.ObjectSource;
 import at.sume.sampling.distributions.IncomeDistributionRow;
 import net.remesch.db.Database;
-import net.remesch.util.Random;
 
 
 /**
@@ -25,7 +24,7 @@ public class SamplePersonIncome extends SamplingDistribution<IncomeDistributionR
 	private Integer spatialUnitId;
 	private byte sex;
 	private byte ageGroupId;
-	
+
 	public SamplePersonIncome(Database db) throws SQLException {
 		super(db);
 	}
@@ -105,7 +104,6 @@ public class SamplePersonIncome extends SamplingDistribution<IncomeDistributionR
 	public int determineIncome() {
 		if (rowList.size() > 0) {
 			IncomeDistributionRow row = rowList.get(randomSample());
-			Random r = new Random();
 			return (int) (row.getMinIncome() + (r.nextDouble() * (row.getMaxIncome() - row.getMinIncome())));
 		} else {
 			return 0;

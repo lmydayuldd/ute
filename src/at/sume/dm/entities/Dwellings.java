@@ -18,7 +18,9 @@ import net.remesch.util.Random;
  *
  */
 public class Dwellings extends RecordSet<DwellingRow> {
-	SpatialUnitLevel spatialUnitLevel;
+	private SpatialUnitLevel spatialUnitLevel;
+	private Random r = new Random();
+	
 	public Dwellings() {
 		
 	}
@@ -111,7 +113,6 @@ public class Dwellings extends RecordSet<DwellingRow> {
 	 * @return
 	 */
 	public ArrayList<DwellingRow> getDwellingsOnMarket() {
-		Random r = new Random();
 		ArrayList<DwellingRow> freeDwellings = new ArrayList<DwellingRow>();
 		for (DwellingRow dwelling : rowList) {
 			if (dwelling.getHousehold() == null) {

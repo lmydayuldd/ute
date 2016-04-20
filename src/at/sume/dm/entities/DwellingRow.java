@@ -36,6 +36,8 @@ public class DwellingRow extends RecordSetRowFileable<Dwellings> implements Resi
 	private static Sequence dwellingIdSeq = null;
 	@Ignore
 	private ObjectSource src;
+	@Ignore
+	private static Random r = new Random();
 		
 	public DwellingRow() {
 		if (dwellingIdSeq != null) {
@@ -134,7 +136,6 @@ public class DwellingRow extends RecordSetRowFileable<Dwellings> implements Resi
 	 */
 	public void calcTotalYearlyDwellingCosts(boolean forceCalculation) {
 		if (((totalYearlyDwellingCosts == 0) || forceCalculation) && (spatialunitId != 0) && (dwellingSize != 0)) {
-			Random r = new Random();
 			RentPerSpatialUnit rentPerSpatialUnit = RentPerSpatialUnit.getInstance();
 			long yearlyRentPer100Sqm = rentPerSpatialUnit.getYearlyAverageRentPer100Sqm(spatialunitId);
 			assert yearlyRentPer100Sqm > 0 : "yearly rent per 100m² must be > 0";

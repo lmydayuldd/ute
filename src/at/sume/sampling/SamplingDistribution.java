@@ -32,6 +32,8 @@ public abstract class SamplingDistribution<E extends RecordSetRow<?>> extends Re
 	private ArrayList<Long> thresholdList;
 	private long maxThreshold;
 	protected Database db;
+	protected Random r = new Random();
+
 	
 	/**
 	 * Construct class and load distribution count from the database. Variable parts have to be implemented in implementation
@@ -87,7 +89,6 @@ public abstract class SamplingDistribution<E extends RecordSetRow<?>> extends Re
 	 */
 	public int randomSample() throws ArrayIndexOutOfBoundsException
 	{
-		Random r = new Random();
 		// generate random number for sampling
 		long rand = (long) (r.nextDouble() * maxThreshold);
 		// lookup index of element where random number falls within the boundaries

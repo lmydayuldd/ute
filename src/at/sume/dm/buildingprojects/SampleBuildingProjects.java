@@ -73,6 +73,7 @@ public class SampleBuildingProjects {
 	private Distribution<NewDwellingSize> newDwellingSize;
 	private BuildingProjectsPerYear buildingProjectsPerYear;
 	private SpatialUnits spatialUnits;
+	private Random r = new Random();
 
 	public SampleBuildingProjects(String buildingProjectScenarioName, String newDwellingSizeScenarioName, SpatialUnits spatialUnits) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
@@ -117,7 +118,6 @@ public class SampleBuildingProjects {
 	 * @return
 	 */
 	public List<DwellingRow> sampleRandomDwellings(int numberOfDwellings) {
-		Random r = new Random();
 		List<DwellingRow> result = new ArrayList<DwellingRow>();
 		for (int i = 0; i != numberOfDwellings; i++) {
 			DwellingRow dwelling = new DwellingRow(ObjectSource.BUILDING_PROJECT);

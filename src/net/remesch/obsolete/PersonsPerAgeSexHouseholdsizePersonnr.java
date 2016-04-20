@@ -20,6 +20,7 @@ public class PersonsPerAgeSexHouseholdsizePersonnr {
 	private double personCountRunningTotal;
 	private short minAge;
 	private short maxAge;
+	private Random r = new Random();
 	
 	public long getId() {
 		return id;
@@ -101,7 +102,6 @@ public class PersonsPerAgeSexHouseholdsizePersonnr {
 	}
 	
 	public short getAge() {
-		Random r = new Random();
 		return (short) (getMinAge() + (r.nextDouble() * (getMaxAge() - getMinAge())));
 	}
 }

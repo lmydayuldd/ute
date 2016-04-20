@@ -23,6 +23,7 @@ public class IncomeGroup {
 		public int maxincome;
 	}
 	static ArrayList<IncomeGroupRow> incomeGroups;
+	private static Random r = new Random();
 	static {
 //		incomeGroups = new ArrayList<IncomeGroupRow>();
 		String selectStatement = "select id, incomeGroup, minincome, maxincome from _DM_IncomeGroup order by id";
@@ -82,7 +83,6 @@ public class IncomeGroup {
 	 */
 	public static int sampleIncome(byte incomeGroupId) {
 		IncomeGroupRow incomeGroupRow = lookupIncomeGroup(incomeGroupId);
-		Random r = new Random();
 		int result = 0;
 		int index = incomeGroups.indexOf(incomeGroupRow);
 		if (index == incomeGroups.size() - 1) {

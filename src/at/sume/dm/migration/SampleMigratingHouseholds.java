@@ -164,6 +164,7 @@ public class SampleMigratingHouseholds {
 	private ArrayList<MigrationHouseholdSize> migrationHouseholdSize;
 	private long migrationHouseholdSizeShareTotal = 0;
 	private byte immigrationWorkplaceShare = 0;
+	private Random r = new Random();
 	
 	public SampleMigratingHouseholds(String migrationScenarioName, String migrationPerAgeSexScenarioName, String migrationHouseholdSizeScenarioName, String migrationIncomeScenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
@@ -193,7 +194,6 @@ public class SampleMigratingHouseholds {
 	
 	public ArrayList<HouseholdRow> sample(int modelYear, MigrationRealm migrationRealm) {
 		ArrayList<HouseholdRow> result = new ArrayList<HouseholdRow>();
-		Random r = new Random();
 		
 		// 1) Get number of persons immigrating in that year
 		long numImmigrants = totalMigrationsPerYear.getImmigration(modelYear, migrationRealm);
@@ -284,7 +284,6 @@ public class SampleMigratingHouseholds {
 				// The following calculation has a bias for very high household incomes (after 50 yrs.) about 70% of all households have an income > 200.000 €
 				// Solution: calculate income by choosing an existing person and taking their income (each person has the same chance to be picked)
 				// TODO: Is the above still true?
-				Random r = new Random();
 				if (r.nextInt(100) < immigrationWorkplaceShare) {
 					int index = migrationIncome.randomSample();
 					yearlyIncome = IncomeGroup.sampleIncome(migrationIncome.get(index).getIncomeGroupId());

@@ -27,7 +27,8 @@ public class MovingTogether {
 	private int modelYear;
 	private DwellingsOnMarket dwellingsOnMarket;
 	private ArrayList<HouseholdRow> maleHouseholds, femaleHouseholds;
-	
+	private Random r = new Random();
+
 	public MovingTogether(int numMovesTogether, int modelYear, DwellingsOnMarket dwellingsOnMarket) {
 		this.numMovesTogether = numMovesTogether;
 		this.modelYear = modelYear;
@@ -63,7 +64,6 @@ public class MovingTogether {
 	 * @return the number of households joined
 	 */
 	public int randomJoinHouseholds() {
-		Random r = new Random();
 		int index = 0;
 		numMovesTogether = Math.min(numMovesTogether, maleHouseholds.size());
 		numMovesTogether = Math.min(numMovesTogether, femaleHouseholds.size());

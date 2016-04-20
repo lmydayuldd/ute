@@ -22,6 +22,7 @@ import net.remesch.util.Random;
  */
 public class Households extends RecordSetClonable<HouseholdRow> {
 	private SpatialUnits spatialunits;
+	private Random r = new Random();
 	
 	/**
 	 * @param db
@@ -208,7 +209,6 @@ public class Households extends RecordSetClonable<HouseholdRow> {
 	 * @return Number of households that were removed
 	 */
 	public int randomRemoveHouseholds(DwellingsOnMarket dwellingsOnMarket, int numPersons, MigrationRealm migrationRealm) {
-		Random r = new Random();
 		int i = 0, result = 0;
 		while (i <= numPersons) {
 			int householdNr = (int) (r.nextDouble() * rowList.size());

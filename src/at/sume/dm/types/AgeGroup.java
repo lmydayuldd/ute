@@ -34,6 +34,7 @@ public class AgeGroup {
 		}
 	}
 	static ArrayList<AgeGroupRow> ageGroups;
+	private static Random r = new Random();
 	static {
 		String selectStatement = "select ageGroupId, ageGroup, minAge, maxAge from MZ_AgeGroups order by ageGroupId";
 		try {
@@ -92,7 +93,6 @@ public class AgeGroup {
 	public static short sampleAge(byte ageGroupId) {
 		assert ageGroupId > 0 : "ageGroupId <= 0";
 		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
-		Random r = new Random();
 		AgeGroupRow sample = ageGroups.get(ageGroupId - 1);
 		if (ageGroupId == ageGroups.size()) {
 			// sample the lowest possible age in the highest age group
@@ -104,7 +104,6 @@ public class AgeGroup {
 	public static short sampleAge(byte ageGroupId, short minAge) {
 		assert ageGroupId > 0 : "ageGroupId <= 0";
 		assert ageGroupId <= ageGroups.size() : "ageGroupId > " + ageGroups.size();
-		Random r = new Random();
 		AgeGroupRow sample = ageGroups.get(ageGroupId - 1);
 		if (ageGroupId == ageGroups.size()) {
 			// sample the lowest possible age in the highest age group

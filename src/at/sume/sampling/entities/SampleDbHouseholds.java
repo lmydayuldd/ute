@@ -45,6 +45,7 @@ public class SampleDbHouseholds {
 	private SampleHouseholdCostOfResidence householdCostOfResidence;
 	private static SampleTimeUse sampleTimeUse = new SampleTimeUse();
 	private static SampleTravelTimesByDistance sampleTravelTimesByDistance;
+	private Random r = new Random();
 	
 	/**
 	 * Constructor - loads the spatial units, the dwellings, links them and creates a list of free
@@ -151,7 +152,6 @@ public class SampleDbHouseholds {
 				memberCount = avgHouseholdSize;
 			} else {
 				// Larger households still available
-				Random r = new Random();
 				memberCount = avgHouseholdSize;
 				// TODO: this results in a triangular distribution where an exponential distribution is needed!!!
 				// either use http://www.honeylocust.com/RngPack/ or http://introcs.cs.princeton.edu/java/stdlib/StdRandom.java.html

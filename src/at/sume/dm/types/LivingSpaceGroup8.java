@@ -31,7 +31,8 @@ public class LivingSpaceGroup8 {
 	}
 
 	static ArrayList<LivingSpaceGroupRow> livingSpaceGroups;
-	
+	private static Random r = new Random();
+
 	static {
 		String selectStatement = "select livingSpaceGroupId, livingSpaceGroup, minSpace, maxSpace from MZ_LivingSpaceGroups order by livingSpaceGroupId";
 		try {
@@ -72,7 +73,6 @@ public class LivingSpaceGroup8 {
 	public static short sampleLivingSpace(byte livingSpaceGroupId) {
 		assert livingSpaceGroupId > 0 : "livingSpaceGroupId <= 0";
 		assert livingSpaceGroupId <= livingSpaceGroups.size() : "livingSpaceGroupId > " + livingSpaceGroups.size();
-		Random r = new Random();
 		LivingSpaceGroupRow sample = livingSpaceGroups.get(livingSpaceGroupId - 1);
 		return (short) (sample.minSpace + r.nextInt(sample.maxSpace - sample.minSpace));
 	}

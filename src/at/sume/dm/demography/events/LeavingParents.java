@@ -28,6 +28,7 @@ public class LeavingParents {
 	private byte childrenMaxAge;
 	private SampleWorkplaces sampleWorkplaces;
 	private int minIncomeForWorkplace;
+	private Random r = new Random();
 
 	public LeavingParents(Database db, SingleProbability leavingParentsProbability, byte childrenMaxAge, int modelYear) throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
 		this.leavingParentsProbability = leavingParentsProbability;
@@ -78,7 +79,6 @@ public class LeavingParents {
 	}
 	
 	private HouseholdRow createNewSingleHousehold(PersonRow person) throws InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException, SQLException {
-		Random r = new Random();
 		HouseholdRow parentHousehold = person.getHousehold();
 		int yearlyIncome = 0;
 		if (r.nextDouble() < 0.5) {

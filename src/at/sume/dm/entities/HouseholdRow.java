@@ -92,6 +92,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		}
 	}
 	
+	private static Random r = new Random();
 	private static float childrenWeight = 0;
 	private static byte childrenMaxAge = 0;
 //	private static byte desiredLivingSpaceRandomPct = 0;
@@ -165,7 +166,6 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		if (householdIdSeq != null) {
 			setHouseholdId(householdIdSeq.getNext());
 		}
-		Random r = new Random();
 		int min = Common.getResidentialSatisfactionThresholdMod() * -1;
 		int max = Common.getResidentialSatisfactionThresholdMod();
 		setResidentialSatisfactionThreshMod(r.triangular(min, max, 0));
@@ -856,7 +856,6 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 */
 	public void estimateDesiredLivingSpace() {
 		if (getAspirationRegionLivingSpaceMin() == 0 && getAspirationRegionLivingSpaceMax() == 0) {
-			Random r = new Random();
 			// calculate mean
 			long desiredLivingSpaceSqm = AllHouseholdsIndicatorsPerHouseholdTypeAndIncome.getAvgLivingSpacePerHousehold(getHouseholdType(), IncomeGroup.getIncomeGroupId(getYearlyIncome()));
 //			short desiredLivingSpaceModifier = (short) (100 + desiredLivingSpaceRandomPct * r.nextGaussian());
@@ -911,7 +910,6 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * @return highest residential satisfaction found
 	 */
 	public int estimateResidentialSatisfaction(ArrayList<SpatialUnitRow> spatialUnitList, int modelYear, int residentialSatisfactionEstimateRange) {
-		Random r = new Random();
 		int result = 0;
 		assert spatialUnitList.size() > 0 : "spatialUnitList must be initialized (size > 0)";
 		residentialSatisfactionEstimate = new ArrayList<SpatialUnitScore>(spatialUnitList.size());

@@ -4,12 +4,11 @@
 package at.sume.dm.demography.events;
 
 import java.sql.SQLException;
-import net.remesch.util.Random;
 
-import net.remesch.db.Database;
 import at.sume.dm.demography.Fertility;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
+import net.remesch.db.Database;
 
 /**
  * @author Alexander Remesch
@@ -18,7 +17,7 @@ import at.sume.dm.entities.PersonRow;
 public class ChildBirth extends Event<PersonRow> {
 	Fertility fertilityDistribution;
 	// Sex proportion for births - number of male per female births
-	static Double sexProportion;
+	private static Double sexProportion;
 	private double birthAdjustment;
 
 	public ChildBirth(Database db, String scenarioName, EventManager<PersonRow> eventManager) throws SQLException, InstantiationException, IllegalAccessException {
@@ -66,7 +65,6 @@ public class ChildBirth extends Event<PersonRow> {
 		PersonRow child = PersonRow.giveBirth(household);
 		// determine sex - sexProportion male (2) per 1000 female (1) births
 		// TODO: move to PersonRow
-		Random r = new Random();
 		int rand = (int) (r.nextDouble() * (sexProportion + 1000));
 		if (rand > 1000) {
 			child.setSex((byte)2);
