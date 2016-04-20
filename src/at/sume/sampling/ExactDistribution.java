@@ -5,8 +5,7 @@ package at.sume.sampling;
 
 import java.util.ArrayList;
 import java.util.Collections;
-
-import net.remesch.util.Random;
+import java.util.List;
 
 /**
  * This class can be used to sample elements according to a distribution using the "Monte Carlo" method.
@@ -28,7 +27,7 @@ import net.remesch.util.Random;
  * @author Alexander Remesch
  */
 public class ExactDistribution<E> extends Distribution<E> {
-	private ArrayList<Long> exactThresholdStore;
+	private List<Long> exactThresholdStore;
 	private long maxExactThreshold;
 	/**
 	 * Construct an empty class
@@ -44,10 +43,11 @@ public class ExactDistribution<E> extends Distribution<E> {
 	 * @throws NoSuchFieldException
 	 * @throws IllegalAccessException
 	 */
-	public ExactDistribution(ArrayList<E> objectStore, String sourceFieldName)
+	public ExactDistribution(List<E> objectStore, String sourceFieldName, long maxExactThreshold)
 			throws SecurityException, IllegalArgumentException,
 			NoSuchFieldException, IllegalAccessException {
 		super(objectStore, sourceFieldName);
+		buildExactThresholds(maxExactThreshold);
 	}
 	/**
 	 * Constructor that reserves memory for a given number of records
@@ -90,7 +90,6 @@ public class ExactDistribution<E> extends Distribution<E> {
 	 */
 	public int randomExactSample() throws ArrayIndexOutOfBoundsException
 	{
-		Random r = new Random();
 		assert maxExactThreshold > 0 : "maxExcatThreshold = " + maxExactThreshold;
 		// generate random number for sampling
 		long rand = 0;

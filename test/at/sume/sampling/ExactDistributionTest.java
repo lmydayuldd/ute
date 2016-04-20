@@ -17,7 +17,7 @@ import org.junit.Test;
  * @author Alexander Remesch
  *
  */
-public class DistributionTest {
+public class ExactDistributionTest {
 	private class TestRow {
 		private byte classId;
 		public long probability;
@@ -33,7 +33,7 @@ public class DistributionTest {
 			return probability;
 		}
 	}
-	private Distribution<TestRow> testDistribution;
+	private ExactDistribution<TestRow> testDistribution;
 	private List<TestRow> baseData;
 	
 	private static final int TOTAL_SAMPLES = 1000;
@@ -47,7 +47,7 @@ public class DistributionTest {
 			add(new TestRow((byte) 3, 40));
 		}};
 		try {
-			testDistribution = new Distribution<TestRow>(baseData, "probability");
+			testDistribution = new ExactDistribution<TestRow>(baseData, "probability", TOTAL_SAMPLES);
 		} catch (SecurityException | IllegalArgumentException | NoSuchFieldException | IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -63,7 +63,7 @@ public class DistributionTest {
 		
 		// Sample all TestRows & count them
 		for (int i = 0; i != TOTAL_SAMPLES; i++) {
-			int sampleResult = testDistribution.randomSample();
+			int sampleResult = testDistribution.randomExactSample();
 			assertTrue("sampleResult not in byte range (" + sampleResult + ")", sampleResult >= 0 && sampleResult <= 255);
 			Long currentCount = resultCount.get((byte)sampleResult);
 			if (currentCount == null) currentCount = 0L;
