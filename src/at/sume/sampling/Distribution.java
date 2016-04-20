@@ -23,6 +23,9 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 	protected ArrayList<Long> thresholdStore;
 	protected List<E> objectStore;
 	protected long maxThreshold;
+	// AR 160420 - small change - big difference: see JUnit test, if r is definden within function
+	// randomSample() results will not even be remotely to the initially desired distribution!!! 
+	protected Random r = new Random();
 
 	/**
 	 * Construct an empty class
@@ -113,7 +116,6 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 	 */
 	public int randomSample() throws ArrayIndexOutOfBoundsException
 	{
-		Random r = new Random();
 		// generate random number for sampling
 		int sampleThreshold = 1;
 		if (maxThreshold == 0) {
