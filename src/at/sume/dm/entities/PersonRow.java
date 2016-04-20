@@ -206,7 +206,10 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	 */
 	public void setYearlyIncome(int yearlyIncome) {
 		assert yearlyIncome >= 0 : "Yearly income must be > 0 (= " + yearlyIncome + ")"; 
-		this.yearlyIncome = yearlyIncome;
+		if (yearlyIncome > Common.getMaxYearlyPersonIncome())
+			this.yearlyIncome = Common.getMaxYearlyPersonIncome();
+		else
+			this.yearlyIncome = yearlyIncome;
 	}
 
 	public HouseholdRow getHousehold() {

@@ -55,6 +55,7 @@ public class Common {
 	private static byte outputIncomeGroups;
 	private static byte outputInterval;
 	private static byte householdReductionFactor;
+	private static int maxYearlyPersonIncome;
 	
 	/**
 	 * @return the iniFilename
@@ -297,6 +298,13 @@ public class Common {
 	}
 
 	/**
+	 * @return the maxYearlyPersonIncome
+	 */
+	public static int getMaxYearlyPersonIncome() {
+		return maxYearlyPersonIncome;
+	}
+
+	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
 	 */
@@ -387,6 +395,7 @@ public class Common {
 		outputIncomeGroups = Byte.parseByte(getSysParam("OutputIncomeGroups"));
 		outputInterval = Byte.parseByte(getSysParam("OutputInterval"));
 		householdReductionFactor = Byte.parseByte(getSysParam("HouseholdReductionFactor"));
+		maxYearlyPersonIncome = Integer.parseInt(getSysParam("MaxYearlyPersonIncome"));
 	}
 	
 	/**
