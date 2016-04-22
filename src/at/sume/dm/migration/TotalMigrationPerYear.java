@@ -105,10 +105,15 @@ public class TotalMigrationPerYear {
 	private ArrayList<MigrationsPerYear> migrationsPerYear;
 	
 	public TotalMigrationPerYear(String scenarioName) throws SQLException, InstantiationException, IllegalAccessException {
-		String selectStatement = "SELECT id, modelYear, immigrationInternational, immigrationNational, outMigrationInternational, outMigrationNational " +
-			"FROM _DM_Migration " +
-			"WHERE scenarioName = '" + scenarioName + "' " +
-			"ORDER BY modelYear";
+		String selectStatement;
+		byte hRed = Common.getHouseholdReductionFactor();
+		selectStatement = "SELECT id, modelYear, immigrationInternational / " + hRed + " AS immigrationInternational, " + 
+				"immigrationNational / " + hRed + " AS immigrationNational, " +
+				"outMigrationInternational / " + hRed + " AS outMigrationInternational, " +
+				"outMigrationNational / " + hRed + " AS outMigrationNational " +
+				"FROM _DM_Migration " +
+				"WHERE scenarioName = '" + scenarioName + "' " +
+				"ORDER BY modelYear";
 		migrationsPerYear = Common.db.select(MigrationsPerYear.class, selectStatement);
 		assert migrationsPerYear.size() > 0 : "No rows selected from _DM_Migration (scenarioName = " + scenarioName + ")";
 	}
