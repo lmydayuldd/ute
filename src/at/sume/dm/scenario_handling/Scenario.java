@@ -56,9 +56,9 @@ public class Scenario {
 			if (rentScenario == null) rentScenario = "NULL";
 			System.out.println("    Scenario: RentScenarioName = " + rentScenario);
 			fertilityScenario = rs.getString("FertilityScenarioName");
-			System.out.println("    Scenario: FertilityScenarioName = " + migrationScenario);
+			System.out.println("    Scenario: FertilityScenarioName = " + fertilityScenario);
 			travelTimesScenario = rs.getString("TravelTimesScenarioName");
-			System.out.println("    Scenario: MigrationScenarioName = " + fertilityScenario);
+			System.out.println("    Scenario: TravelTimesScenarioName = " + travelTimesScenario);
 			timeUseTypeScenario = rs.getString("TimeUseTypeScenarioName");
 			System.out.println("    Scenario: TimeUseTypeScenarioName = " + timeUseTypeScenario);
 			travelTimeModifierScenario = rs.getString("TravelTimeModifierScenarioName");
