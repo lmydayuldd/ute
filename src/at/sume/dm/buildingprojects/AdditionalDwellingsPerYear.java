@@ -100,8 +100,10 @@ public class AdditionalDwellingsPerYear {
 	
 	public AdditionalDwellingsPerYear(String scenarioName) throws SQLException {
 		byte hRed = Common.getHouseholdReductionFactor();
-		String sql = "select modelYearStart, modelYearFinish, additionalDwellingsOnMarket / " + hRed + ", newlyBuiltDwellings / " + hRed + 
-			" from _DM_AdditionalDwellings where scenarioName = '" + scenarioName + "'";
+		String sql = "select modelYearStart, modelYearFinish, " +
+				"additionalDwellingsOnMarket / " + hRed + " as additionalDwellingsOnMarket, " +
+				"newlyBuiltDwellings / " + hRed + " as newlyBuiltDwellings " + 
+			"from _DM_AdditionalDwellings where scenarioName = '" + scenarioName + "'";
 		additionalDwellings = new ArrayList<AdditionalDwellingRow>();
 		ResultSet rs = Common.db.executeQuery(sql);
 		while (rs.next()) {
