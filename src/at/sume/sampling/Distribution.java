@@ -67,7 +67,7 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 			if (type.equals("long") || type.equals("java.lang.Long")) {
 				maxThreshold += field.getLong(objectStore.get(i));
 			} else if (type.equals("double") || type.equals("java.lang.Double")) {
-				maxThreshold += Math.round(field.getDouble(objectStore.get(i)) * 1000);
+				maxThreshold += Math.round(field.getDouble(objectStore.get(i)));
 			} else if (type.equals("int") || type.equals("java.lang.Integer")) {
 				maxThreshold += field.getInt(objectStore.get(i));
 			} else if (type.equals("short") || type.equals("java.lang.Short")) {
@@ -127,7 +127,7 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 		} else {
 			sampleThreshold = (int) maxThreshold + 1;
 		}
-		long rand = (long) r.nextInt(sampleThreshold);
+		long rand = r.nextLong(sampleThreshold);
 		// lookup index of element where random number falls within the boundaries
 		int index = Collections.binarySearch(thresholdStore, rand);
 		if (index < 0)

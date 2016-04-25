@@ -36,15 +36,16 @@ public class DistributionTest {
 	private Distribution<TestRow> testDistribution;
 	private List<TestRow> baseData;
 	
-	private static final int TOTAL_SAMPLES = 1000;
+	private static final int TOTAL_SAMPLES = 10000;
 	
 	@SuppressWarnings("serial")
 	@Before
 	public void setUp() {
 		baseData = new ArrayList<TestRow>() {{
-			add(new TestRow((byte) 1, 30));
-			add(new TestRow((byte) 2, 30));
+			add(new TestRow((byte) 1, 15));
+			add(new TestRow((byte) 2, 15));
 			add(new TestRow((byte) 3, 40));
+			add(new TestRow((byte) 4, 30));
 		}};
 		try {
 			testDistribution = new Distribution<TestRow>(baseData, "probability");
