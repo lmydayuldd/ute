@@ -14,7 +14,7 @@ import at.sume.dm.types.AgeGroup;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
 import at.sume.dm.types.MigrationRealm;
-import at.sume.sampling.Distribution;
+import at.sume.sampling.ExactDistribution;
 import net.remesch.util.Random;
 
 /**
@@ -159,8 +159,8 @@ public class SampleMigratingHouseholds {
 		}
 	}
 	private TotalMigrationPerYear totalMigrationsPerYear;
-	private Distribution<MigrationsPerAgeSex> migrationsPerAgeSex;
-	private Distribution<MigrationIncomeRow> migrationIncome;
+	private ExactDistribution<MigrationsPerAgeSex> migrationsPerAgeSex;
+	private ExactDistribution<MigrationIncomeRow> migrationIncome;
 	private ArrayList<MigrationHouseholdSize> migrationHouseholdSize;
 	private long migrationHouseholdSizeShareTotal = 0;
 	private byte immigrationWorkplaceShare = 0;
@@ -172,7 +172,7 @@ public class SampleMigratingHouseholds {
 			"FROM _DM_MigrationAgeSex " +
 			"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' " +
 			"ORDER BY ageGroupId, sex";
-		migrationsPerAgeSex = new Distribution<MigrationsPerAgeSex>(Common.db.select(MigrationsPerAgeSex.class, selectStatement), "share");
+		migrationsPerAgeSex = new ExactDistribution<MigrationsPerAgeSex>(Common.db.select(MigrationsPerAgeSex.class, selectStatement), "share");
 		assert migrationsPerAgeSex.size() > 0 : "No rows selected from _DM_MigrationAgeSex (scenarioName = " + migrationPerAgeSexScenarioName + ")";
 
 		selectStatement = "SELECT id, householdSize, share " +
@@ -187,7 +187,7 @@ public class SampleMigratingHouseholds {
 		
 		selectStatement = "SELECT incomeGroupId, probability from _DM_MigrationIncome " + 
 			"where scenarioName = '" + migrationIncomeScenarioName + "' order by incomeGroupId";
-		migrationIncome = new Distribution<MigrationIncomeRow>(Common.db.select(MigrationIncomeRow.class, selectStatement), "probability");
+		migrationIncome = new ExactDistribution<MigrationIncomeRow>(Common.db.select(MigrationIncomeRow.class, selectStatement), "probability");
 		// Sampling of workplaces
 		immigrationWorkplaceShare = Byte.parseByte(Common.getSysParam("ImmigrationWorkplaceShare"));
 	}
@@ -198,8 +198,8 @@ public class SampleMigratingHouseholds {
 		// 1) Get number of persons immigrating in that year
 		long numImmigrants = totalMigrationsPerYear.getImmigration(modelYear, migrationRealm);
 		//    and calculate the exact age & sex distribution
-//		migrationsPerAgeSex.buildExactThresholds(numImmigrants);
-//		migrationIncome.buildExactThresholds(numImmigrants);
+		migrationsPerAgeSex.buildExactThresholds(numImmigrants);
+		migrationIncome.buildExactThresholds(numImmigrants);
 		
 		// 2) Calculate the number of households per household size
 		int numHouseholds = 0;
@@ -236,10 +236,10 @@ public class SampleMigratingHouseholds {
 				HouseholdRow household = sampleHousehold((short) (householdSize + 1), modelYear);
 				// AR 160425 this seriously skews the sampling algorithm in a way that children are over-represented
 				// so we need to get rid of this somehow
-				while (household.getHouseholdType() == HouseholdType.OTHER) {
-					// TODO: Ignore OTHER households - this must be eliminated by the sampling algorithm in future
-					household = sampleHousehold((short) (householdSize + 1), modelYear);
-				}
+//				while (household.getHouseholdType() == HouseholdType.OTHER) {
+//					// TODO: Ignore OTHER households - this must be eliminated by the sampling algorithm in future
+//					household = sampleHousehold((short) (householdSize + 1), modelYear);
+//				}
 				result.add(household);
 			}
 		}
@@ -259,10 +259,9 @@ public class SampleMigratingHouseholds {
 		// sample persons
 		for (int i = 0; i != householdSize; i++) {
 			PersonRow person = new PersonRow(ObjectSource.IMMIGRATION);
-			// TODO: why are we not using randomExactSample() here when we use a ExactDistribution?
 			int index = migrationsPerAgeSex.randomSample();
-//			migrationsPerAgeSex.modifyDistribution(index);
 			MigrationsPerAgeSex m = migrationsPerAgeSex.get(index);
+			migrationsPerAgeSex.modifyDistribution(index);
 			person.setAgeGroupId(m.getAgeGroupId());
 			if (householdSize == 1) {
 				person.setAge(AgeGroup.sampleAge(person.getAgeGroupId(), (short) 18));

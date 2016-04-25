@@ -82,14 +82,19 @@ public class ExactDistribution<E> extends Distribution<E> {
 	 * @param index The index of the last sampled element that was usable (by criteria unknown to this function) for the sample
 	 */
 	public void modifyDistribution(int index) {
+		boolean modified = false;
 		assert (index >= 0) && (index < exactThresholdStore.size()) : "Index " + index + " >= exact threshold store size " + exactThresholdStore.size();
-		assert exactThresholdStore.get(index) > exactThresholdStore.get(index - 1) : "Can't decrease threshold @ " + index + " below that of the previous element";
+		long previousValue = 0;
 		for (int i = index; i != exactThresholdStore.size(); i++) {
-			exactThresholdStore.set(i, exactThresholdStore.get(i) - 1);
-			assert exactThresholdStore.get(i) >= 0 : "exactThresholdStore for " + i + " got negative!";
+			long currentValue = exactThresholdStore.get(i);
+			if ((currentValue > 0) && (currentValue > previousValue)) {
+				exactThresholdStore.set(i, currentValue - 1);
+				modified = true;
+			}
+			previousValue = currentValue;
 		}
-		maxExactThreshold--;
-		assert maxExactThreshold >= 0 : "maxExactThreshold = " + maxExactThreshold;
+		if ((maxExactThreshold > 0) && modified)
+			maxExactThreshold--;
 	}
 	/**
 	 * Random selection ("sampling") of a record out of the sample
@@ -98,7 +103,7 @@ public class ExactDistribution<E> extends Distribution<E> {
 	 */
 	public int randomExactSample() throws ArrayIndexOutOfBoundsException
 	{
-		assert maxExactThreshold > 0 : "maxExcatThreshold = " + maxExactThreshold;
+		assert maxExactThreshold > 0 : "maxExactThreshold = " + maxExactThreshold;
 		// generate random number for sampling
 		long rand = 0;
 		if (maxExactThreshold > 0)
@@ -119,7 +124,7 @@ public class ExactDistribution<E> extends Distribution<E> {
 				index++;
 		}
 		assert (index >= 0) && (index < exactThresholdStore.size()) : "Array index too large; rand = " + rand + ", max exact threshold = " + maxExactThreshold + ", index = " + index + ", max index = " + exactThresholdStore.size();
-		modifyDistribution(index);
+		assert index < objectStore.size() : "Array index too large; rand = " + rand + ", max object store index = " + objectStore.size(); 
 		return index;
 	}
 	/* (non-Javadoc)
