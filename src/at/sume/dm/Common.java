@@ -20,6 +20,7 @@ import at.sume.dm.entities.SpatialUnitLevel;
  */
 public class Common {
 	public final static String INI_FILENAME = "sume_dm.ini";
+	private static boolean v = true;
 	public static Database db, odb;
 	private static short scenarioId;
 	private static int residentialSatisfactionThreshold;
@@ -348,6 +349,10 @@ public class Common {
 	}
 	
 	public static void init() {
+		init(true);
+	}
+	public static void init(boolean verbose) {
+		v = verbose;
 		scenarioId = Short.parseShort(getSysParam("DefaultScenario"));
 		residentialSatisfactionThreshold = Integer.parseInt(getSysParam("THR_ResSatisfaction"));
 		residentialSatisfactionThresholdMod = Integer.parseInt(getSysParam("ResidentialSatisfactionThreshMod"));
@@ -414,7 +419,8 @@ public class Common {
 			System.err.println("getSysParam: error looking up parameter " + paramName);
 			e.printStackTrace();
 		}
-		System.out.println("   Sysparam " + paramName + " = " + result);
+		if (v)
+			System.out.println("   Sysparam " + paramName + " = " + result);
 		return result;
 	}
 
