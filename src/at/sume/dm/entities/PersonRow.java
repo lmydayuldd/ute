@@ -508,4 +508,10 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 			timeUse = sampleTimeUse.randomSample(p);
 		}
 	}
+	/**
+	 * Is the person an adult?
+	 */
+	public boolean isAdult() {
+		return age >= 18 ? true : false;
+	}
 }
