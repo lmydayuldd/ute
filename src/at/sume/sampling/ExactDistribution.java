@@ -16,13 +16,8 @@ import java.util.List;
  * will be decreased. The outcome is a number of sampled elements according to a given distribution where only
  * the order of these elements may vary. 
  * 
- * TODO: Basically this class doesn't seem to be working correctly and additionally its value is questionable.
- * 
- * Discussion: sampling an exact distribution is nothing else than creating each element in random order. Probably this doesn't make sense
- * apart from the fact that it is not really working here...
- * 
- * To make it work, the number of sampled elements per class should be counted and compared and each element should be resampled once this limit
- * has been reached!
+ * Discussion: sampling an exact distribution is nothing else than creating each element in random order. However,
+ * this does make sense in order to have a simple way of making sure, deviations in sampled elements can be kept small.
  * 
  * @author Alexander Remesch
  */
@@ -34,6 +29,19 @@ public class ExactDistribution<E> extends Distribution<E> {
 	 */
 	public ExactDistribution() {
 		super();
+	}
+	/**
+	 * @param objectStore
+	 * @param sourceFieldName
+	 * @throws SecurityException
+	 * @throws IllegalArgumentException
+	 * @throws NoSuchFieldException
+	 * @throws IllegalAccessException
+	 */
+	public ExactDistribution(List<E> objectStore, String sourceFieldName)
+			throws SecurityException, IllegalArgumentException,
+			NoSuchFieldException, IllegalAccessException {
+		super(objectStore, sourceFieldName);
 	}
 	/**
 	 * @param objectStore
@@ -70,7 +78,7 @@ public class ExactDistribution<E> extends Distribution<E> {
 		assert exactThresholdStore.size() == objectStore.size() : "exactThresholdStore.size() != objectStore.size()";
 	}
 	/**
-	 * Decrease the number of elements in the distribution at position index by 1
+	 * Decrease the number of elements in the distribution at position index and above by 1
 	 * @param index The index of the last sampled element that was usable (by criteria unknown to this function) for the sample
 	 */
 	public void modifyDistribution(int index) {
@@ -94,7 +102,7 @@ public class ExactDistribution<E> extends Distribution<E> {
 		// generate random number for sampling
 		long rand = 0;
 		if (maxExactThreshold > 0)
-			rand = (long) r.nextInt((int) maxExactThreshold);
+			rand = r.nextLong(maxExactThreshold);
 		// lookup index of element where random number falls within the boundaries
 		int index = Collections.binarySearch(exactThresholdStore, rand);
 		if (index < 0)
@@ -111,6 +119,7 @@ public class ExactDistribution<E> extends Distribution<E> {
 				index++;
 		}
 		assert (index >= 0) && (index < exactThresholdStore.size()) : "Array index too large; rand = " + rand + ", max exact threshold = " + maxExactThreshold + ", index = " + index + ", max index = " + exactThresholdStore.size();
+		modifyDistribution(index);
 		return index;
 	}
 	/* (non-Javadoc)
