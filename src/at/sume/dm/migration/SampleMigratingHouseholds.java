@@ -5,13 +5,13 @@ package at.sume.dm.migration;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.AgeGroup;
+import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
 import at.sume.dm.types.MigrationRealm;
 import at.sume.sampling.Distribution;
@@ -161,15 +161,10 @@ public class SampleMigratingHouseholds {
 	private TotalMigrationPerYear totalMigrationsPerYear;
 	private Distribution<MigrationsPerAgeSex> migrationsPerAgeSex;
 	private Distribution<MigrationIncomeRow> migrationIncome;
-	private List<MigrationHouseholdSize> migrationHouseholdSize;
+	private ArrayList<MigrationHouseholdSize> migrationHouseholdSize;
 	private long migrationHouseholdSizeShareTotal = 0;
 	private byte immigrationWorkplaceShare = 0;
 	private Random r = new Random();
-	// The following two Lists are needed in order not to skew the random distribution and remember already create persons for later use
-	// Problem with this is that in sequential creation of household sizes you always tend to have large hangovers of either children or adults
-	// so that you never can use all of them and always tend to have a bias in sex/age distributions of persons
-	private List<PersonRow> spareAdults = new ArrayList<PersonRow>();
-	private List<PersonRow> spareChildren = new ArrayList<PersonRow>();
 	
 	public SampleMigratingHouseholds(String migrationScenarioName, String migrationPerAgeSexScenarioName, String migrationHouseholdSizeScenarioName, String migrationIncomeScenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
@@ -239,37 +234,17 @@ public class SampleMigratingHouseholds {
 			}
 			for (int i = 0; i != numHouseholds; i++) {
 				HouseholdRow household = sampleHousehold((short) (householdSize + 1), modelYear);
+				// AR 160425 this seriously skews the sampling algorithm in a way that children are over-represented
+				// so we need to get rid of this somehow
+				while (household.getHouseholdType() == HouseholdType.OTHER) {
+					// TODO: Ignore OTHER households - this must be eliminated by the sampling algorithm in future
+					household = sampleHousehold((short) (householdSize + 1), modelYear);
+				}
 				result.add(household);
 			}
 		}
-		System.out.println(Common.printInfo() + ": Left over spare adults = " + spareAdults.size());
-		System.out.println(Common.printInfo() + ": Left over spare children = " + spareChildren.size());
+		
 		return result;
-	}
-	/**
-	 * Indicate whether an adult is needed during sampling for the given household parameters
-	 * @param householdSize
-	 * @param adultCount
-	 * @param childrenCount
-	 * @return
-	 */
-	private boolean adultNeeded(short householdSize, short adultCount) {
-		boolean result;
-		if (householdSize == 1) {
-			result = true;
-		} else {
-			result =  adultCount < 1 ? true : false;
-		}
-		return result;
-	}
-	/**
-	 * Indicate whether a child is needed during sampling for the given household parameters
-	 * @param householdSize
-	 * @param adultCount
-	 * @return
-	 */
-	private boolean childNeeded(short householdSize, short adultCount) {
-		return ((householdSize > 2) && (adultCount == 2)) ? true : false;
 	}
 	/**
 	 * Sample a household
@@ -282,44 +257,22 @@ public class SampleMigratingHouseholds {
 		HouseholdRow result = new HouseholdRow(ObjectSource.IMMIGRATION);
 		result.setMovingDecisionYear((short) modelYear);
 		// sample persons
-		short adultCount = 0;
-		while (members.size() != householdSize) {
-			PersonRow person;
-			if (adultNeeded(householdSize, adultCount)) {
-				if (spareAdults.size() > 0) {			// Adults available?
-					person = spareAdults.remove(0);		// Yes -> get them from the list
-				} else {								// No -> sample them
-					person = samplePerson();
-					if (!person.isAdult()) {
-						// we don't have an adult -> put on list for later & sample next person
-						spareChildren.add(person);
-						continue;
-					}
-				}
-			} else if (childNeeded(householdSize, adultCount)) {
-				if (spareChildren.size() > 0) {
-					person = spareChildren.remove(0);
-				} else {
-					person = samplePerson();
-					if (person.isAdult()) {
-						// we don't have a child -> put on list for later & sample next person
-						spareAdults.add(person);
-						continue;
-					}
-				}
-			} else { // Nothing special needed -> supply any person
-				if ((spareAdults.size() > 0) && (spareAdults.size() > spareChildren.size())) {
-					person = spareAdults.remove(0);
-				} else if (spareChildren.size() > 0) {
-					person = spareChildren.remove(0);
-				} else {
-					person = samplePerson();
-				}
+		for (int i = 0; i != householdSize; i++) {
+			PersonRow person = new PersonRow(ObjectSource.IMMIGRATION);
+			// TODO: why are we not using randomExactSample() here when we use a ExactDistribution?
+			int index = migrationsPerAgeSex.randomSample();
+//			migrationsPerAgeSex.modifyDistribution(index);
+			MigrationsPerAgeSex m = migrationsPerAgeSex.get(index);
+			person.setAgeGroupId(m.getAgeGroupId());
+			if (householdSize == 1) {
+				person.setAge(AgeGroup.sampleAge(person.getAgeGroupId(), (short) 18));
+			} else {
+				person.setAge(AgeGroup.sampleAge(person.getAgeGroupId()));
 			}
-			// adds person to the list of household members for later addition to the household (below)
+			person.setSex(m.getSex());
 			person.setHousehold(result);
+			// adds a person to a household twice togehter with result.addMembers(members) below - AR 160411
 			members.add(person);
-			if (person.isAdult()) adultCount++;
 		}
 		result.addMembers(members);
 		assert result.getHouseholdSize() == householdSize : "Invalid household size: " + result.getHouseholdSize() + ", should be: " + householdSize;
@@ -344,19 +297,6 @@ public class SampleMigratingHouseholds {
 		}
 		// TODO: each household requires at least one adult (is this a good idea? - maybe not for single households)
 		return result;
-	}
-	/**
-	 * Sample a single person
-	 * @return
-	 */
-	private PersonRow samplePerson() {
-		PersonRow person = new PersonRow(ObjectSource.IMMIGRATION);
-		int index = migrationsPerAgeSex.randomSample();
-		MigrationsPerAgeSex m = migrationsPerAgeSex.get(index);
-		person.setAgeGroupId(m.getAgeGroupId());
-		person.setAge(AgeGroup.sampleAge(person.getAgeGroupId()));
-		person.setSex(m.getSex());
-		return person;
 	}
 	/**
 	 * Get total international out migration (nr. of persons) for the given year
