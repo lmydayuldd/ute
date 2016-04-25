@@ -23,7 +23,7 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 	protected ArrayList<Long> thresholdStore;
 	protected List<E> objectStore;
 	protected long maxThreshold;
-	// AR 160420 - small change - big difference: see JUnit test, if r is definden within function
+	// AR 160420 - small change - big difference: see JUnit test, if r is defined within function
 	// randomSample() results will not even be remotely to the initially desired distribution!!! 
 	protected Random r = new Random();
 
@@ -125,9 +125,9 @@ public class Distribution<E> implements Collection<E>, Iterable<E> {
 			System.out.println("Problem: maxThreshold = 0");
 //			return 0;
 		} else {
-			sampleThreshold = (int) maxThreshold + 1;
+			sampleThreshold = (int) maxThreshold;
 		}
-		long rand = r.nextLong(sampleThreshold);
+		long rand = r.nextLong(sampleThreshold) + 1;
 		// lookup index of element where random number falls within the boundaries
 		int index = Collections.binarySearch(thresholdStore, rand);
 		if (index < 0)

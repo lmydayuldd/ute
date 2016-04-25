@@ -14,9 +14,20 @@ public class Random extends MersenneTwisterFast {
 
 	public Random() {
 		super();
+//		primeGenerator();
 	}
 	public Random(long seed) {
 		super(seed);
+//		primeGenerator();
+	}
+	/**
+	 * Mason Documentation p.60
+	 * MASON primes the MT generator for you by calling nextInt() 1249 times.
+	 */
+	public void primeGenerator() {
+		for (int i = 0; i != 1249; i++) {
+			nextInt();
+		}
 	}
 	/**
 	 * Use nextGaussian() to return the next pseudorandom, Gaussian ("normally") distributed double value within the given range.

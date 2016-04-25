@@ -234,6 +234,8 @@ public class SampleMigratingHouseholds {
 			}
 			for (int i = 0; i != numHouseholds; i++) {
 				HouseholdRow household = sampleHousehold((short) (householdSize + 1), modelYear);
+				// AR 160425 this seriously skews the sampling algorithm in a way that children are over-represented
+				// so we need to get rid of this somehow
 				while (household.getHouseholdType() == HouseholdType.OTHER) {
 					// TODO: Ignore OTHER households - this must be eliminated by the sampling algorithm in future
 					household = sampleHousehold((short) (householdSize + 1), modelYear);

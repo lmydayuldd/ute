@@ -98,7 +98,7 @@ public class AgeGroup {
 			// sample the lowest possible age in the highest age group
 			return sample.minage;
 		} else {
-			return (short) (sample.minage + r.nextInt(sample.maxage - sample.minage));
+			return (short) (sample.minage + r.nextInt(sample.maxage + 1 - sample.minage));
 		}
 	}
 	public static short sampleAge(byte ageGroupId, short minAge) {
@@ -112,8 +112,8 @@ public class AgeGroup {
 			if (minAge < sample.minage)
 				minAge = sample.minage;
 			if (minAge > sample.maxage)
-				return (short) sample.maxage;
-			return (short) (minAge + r.nextInt(sample.maxage - minAge));
+				return minAge;
+			return (short) (minAge + r.nextInt(sample.maxage + 1 - minAge));
 		}
 	}
 	public static short getMinAge(byte ageGroupId) {
