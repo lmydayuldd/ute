@@ -11,7 +11,7 @@ import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.tracing.ObjectSource;
-import at.sume.dm.types.AgeGroup16;
+import at.sume.dm.types.AgeGroup20;
 import at.sume.dm.types.IncomeGroup;
 import at.sume.dm.types.MigrationRealm;
 import at.sume.sampling.ExactDistribution;
@@ -171,7 +171,7 @@ public class SampleMigratingHouseholds {
 	public SampleMigratingHouseholds(String migrationScenarioName, String migrationPerAgeSexScenarioName, String migrationHouseholdSizeScenarioName, String migrationIncomeScenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
 
-		this.migrationPerAgeSexScenarioName = migrationHouseholdSizeScenarioName;
+		this.migrationPerAgeSexScenarioName = migrationPerAgeSexScenarioName;
 
 		selectStatement = "SELECT id, householdSize, share " +
 			"FROM _DM_MigrationHouseholdSize " +
@@ -200,7 +200,7 @@ public class SampleMigratingHouseholds {
 			if (baseData.size() == 0) {
 				selectStatement = "SELECT id, ageGroupId, sex, share " +
 						"FROM _DM_MigrationAgeSex " +
-						"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' AND year = null" + 
+						"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' AND year is null" + 
 						" ORDER BY ageGroupId, sex";
 				baseData = Common.db.select(MigrationsPerAgeSex.class, selectStatement);
 				migrationPerAgeSexConstant = true;
@@ -284,9 +284,9 @@ public class SampleMigratingHouseholds {
 			migrationsPerAgeSex.modifyDistribution(index);
 			person.setAgeGroupId(m.getAgeGroupId());
 			if (householdSize == 1) {
-				person.setAge(AgeGroup16.sampleAge(person.getAgeGroupId(), (short) 18));
+				person.setAge(AgeGroup20.sampleAge(person.getAgeGroupId(), (short) 18));
 			} else {
-				person.setAge(AgeGroup16.sampleAge(person.getAgeGroupId()));
+				person.setAge(AgeGroup20.sampleAge(person.getAgeGroupId()));
 			}
 			person.setSex(m.getSex());
 			person.setHousehold(result);
