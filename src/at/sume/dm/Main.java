@@ -596,14 +596,13 @@ public class Main {
 				System.out.println(printInfo(modelRun) + ": generating immigrating households and new single households form children moving out of parents homes");
 				ArrayList<HouseholdRow> childrenHouseholds = null;
 				childrenHouseholds = leavingParents.getNewSingleHouseholds();
-				ArrayList<HouseholdRow> immigratingHouseholdsNational = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.NATIONAL_INCOMING);
-				ArrayList<HouseholdRow> immigratingHouseholdsIntl = sampleMigratingHouseholds.sample(modelYear, MigrationRealm.INTERNATIONAL_INCOMING);
+				ArrayList<HouseholdRow> immigratingHouseholdsNatAndIntl = sampleMigratingHouseholds.sample(modelYear);
 	
 				int dwellingExcessShare = Common.getDwellingsOnMarketAutoAdjust();
 				if (dwellingExcessShare >= 0) {
 					// Auto-adjust dwellings if necessary
 					int dwellingsDemandCount = 0;
-					dwellingsDemandCount = childrenHouseholds.size() + immigratingHouseholdsNational.size() + immigratingHouseholdsIntl.size();
+					dwellingsDemandCount = childrenHouseholds.size() + immigratingHouseholdsNatAndIntl.size();
 					int dwellingsAvailableCount = dwellingsOnMarket.getFreeDwellingsCount();
 					int dwellingsExcessSupplyCount = (dwellingsDemandCount * (100 + dwellingExcessShare)) / 100;
 					System.out.println(printInfo() + ": number of dwellings needed for immigration + children leaving parents: " + dwellingsDemandCount);
@@ -621,10 +620,8 @@ public class Main {
 				// Now move the immigrating households + children leaving parents
 				int hhMoved = forcedMoves(childrenHouseholds, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.LEAVING_PARENTS, cheapestSpatialUnits);
 		        System.out.println(printInfo(modelRun) + ": free dwellings after moving " + hhMoved + " out of " + childrenHouseholds.size() + " children leaving parents homes: " + dwellingsOnMarket.getFreeDwellingsCount());
-				hhMoved = forcedMoves(immigratingHouseholdsNational, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL_INCOMING, cheapestSpatialUnits);
-		        System.out.println(printInfo(modelRun) + ": free dwellings after moving " + hhMoved + " out of " + immigratingHouseholdsNational.size() + " immigrating households (national): " + dwellingsOnMarket.getFreeDwellingsCount());
-				hhMoved = forcedMoves(immigratingHouseholdsIntl, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.INTERNATIONAL_INCOMING, cheapestSpatialUnits);
-		        System.out.println(printInfo(modelRun) + ": free dwellings after moving " + hhMoved + " out of " + immigratingHouseholdsIntl.size() + " immigrating households (international): " + dwellingsOnMarket.getFreeDwellingsCount());
+				hhMoved = forcedMoves(immigratingHouseholdsNatAndIntl, modelYear, modelStartYear, highestYearlyRentPer100Sqm, residentialMobility, MigrationRealm.NATIONAL_INCOMING, cheapestSpatialUnits);
+		        System.out.println(printInfo(modelRun) + ": free dwellings after moving " + hhMoved + " out of " + immigratingHouseholdsNatAndIntl.size() + " immigrating households (national + international): " + dwellingsOnMarket.getFreeDwellingsCount());
 			}
 		
 			//if (modelYear == modelEndYear - 1)

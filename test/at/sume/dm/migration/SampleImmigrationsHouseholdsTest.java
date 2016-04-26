@@ -19,7 +19,6 @@ import at.sume.dm.entities.PersonRow;
 import at.sume.dm.migration.SampleMigratingHouseholds.MigrationsPerAgeSex;
 import at.sume.dm.scenario_handling.Scenario;
 import at.sume.dm.types.AgeGroup16;
-import at.sume.dm.types.MigrationRealm;
 import net.remesch.db.Database;
 
 /**
@@ -51,10 +50,16 @@ public class SampleImmigrationsHouseholdsTest {
 
 	/**
 	 * Test method for {@link at.sume.dm.migration.SampleMigratingHouseholds#sample(int)}.
+	 * @throws SQLException 
+	 * @throws InstantiationException 
+	 * @throws IllegalAccessException 
+	 * @throws NoSuchFieldException 
+	 * @throws IllegalArgumentException 
+	 * @throws SecurityException 
 	 */
 	@Test
-	public void testSample() {
-		ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(2001, MigrationRealm.INTERNATIONAL_INCOMING);
+	public void testSample() throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, SQLException {
+		ArrayList<HouseholdRow> immigratingHouseholds = sampleImmigratingHouseholds.sample(2001);
 		Map<Byte,Long> resultCountMale = new HashMap<Byte,Long>();
 		Map<Byte,Long> resultCountFemale = new HashMap<Byte,Long>();
 		// Count results

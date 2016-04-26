@@ -5,13 +5,13 @@ package at.sume.dm.migration;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.AgeGroup16;
-import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
 import at.sume.dm.types.MigrationRealm;
 import at.sume.sampling.ExactDistribution;
@@ -165,15 +165,13 @@ public class SampleMigratingHouseholds {
 	private long migrationHouseholdSizeShareTotal = 0;
 	private byte immigrationWorkplaceShare = 0;
 	private Random r = new Random();
+	private String migrationPerAgeSexScenarioName;
+	private boolean migrationPerAgeSexConstant = false;
 	
 	public SampleMigratingHouseholds(String migrationScenarioName, String migrationPerAgeSexScenarioName, String migrationHouseholdSizeScenarioName, String migrationIncomeScenarioName) throws SQLException, InstantiationException, IllegalAccessException, SecurityException, IllegalArgumentException, NoSuchFieldException {
 		String selectStatement;
-		selectStatement = "SELECT id, ageGroupId, sex, share " +
-			"FROM _DM_MigrationAgeSex " +
-			"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' " +
-			"ORDER BY ageGroupId, sex";
-		migrationsPerAgeSex = new ExactDistribution<MigrationsPerAgeSex>(Common.db.select(MigrationsPerAgeSex.class, selectStatement), "share");
-		assert migrationsPerAgeSex.size() > 0 : "No rows selected from _DM_MigrationAgeSex (scenarioName = " + migrationPerAgeSexScenarioName + ")";
+
+		this.migrationPerAgeSexScenarioName = migrationHouseholdSizeScenarioName;
 
 		selectStatement = "SELECT id, householdSize, share " +
 			"FROM _DM_MigrationHouseholdSize " +
@@ -192,11 +190,33 @@ public class SampleMigratingHouseholds {
 		immigrationWorkplaceShare = Byte.parseByte(Common.getSysParam("ImmigrationWorkplaceShare"));
 	}
 	
-	public ArrayList<HouseholdRow> sample(int modelYear, MigrationRealm migrationRealm) {
+	private void loadMigrationAgeSexDistribution(int modelYear) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, SQLException {
+		if (!migrationPerAgeSexConstant) {
+			String selectStatement = "SELECT id, ageGroupId, sex, share " +
+					"FROM _DM_MigrationAgeSex " +
+					"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' AND year = " + modelYear + 
+					" ORDER BY ageGroupId, sex";
+			List<MigrationsPerAgeSex> baseData = Common.db.select(MigrationsPerAgeSex.class, selectStatement);
+			if (baseData.size() == 0) {
+				selectStatement = "SELECT id, ageGroupId, sex, share " +
+						"FROM _DM_MigrationAgeSex " +
+						"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' AND year = null" + 
+						" ORDER BY ageGroupId, sex";
+				baseData = Common.db.select(MigrationsPerAgeSex.class, selectStatement);
+				migrationPerAgeSexConstant = true;
+			}
+			assert baseData.size() > 0 : "No rows selected from _DM_MigrationAgeSex (scenarioName = " + migrationPerAgeSexScenarioName + ", year = " + modelYear + ")";
+			migrationsPerAgeSex = new ExactDistribution<MigrationsPerAgeSex>(baseData, "share");
+		}
+	}
+	
+	public ArrayList<HouseholdRow> sample(int modelYear) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, SQLException {
 		ArrayList<HouseholdRow> result = new ArrayList<HouseholdRow>();
 		
+		loadMigrationAgeSexDistribution(modelYear);
+		
 		// 1) Get number of persons immigrating in that year
-		long numImmigrants = totalMigrationsPerYear.getImmigration(modelYear, migrationRealm);
+		long numImmigrants = totalMigrationsPerYear.getImmigration(modelYear, MigrationRealm.NATIONAL_INCOMING) + totalMigrationsPerYear.getImmigration(modelYear, MigrationRealm.INTERNATIONAL_INCOMING);
 		//    and calculate the exact age & sex distribution
 		migrationsPerAgeSex.buildExactThresholds(numImmigrants);
 		migrationIncome.buildExactThresholds(numImmigrants);
