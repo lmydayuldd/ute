@@ -15,7 +15,7 @@ import at.sume.dm.Common;
  *
  * @author Alexander Remesch
  */
-public class AgeGroup {
+public class AgeGroup16 {
 	public static class AgeGroupRow implements Comparable<AgeGroupRow> {
 		public byte ageGroupId;
 		public String ageGroup;

@@ -11,7 +11,7 @@ import at.sume.dm.indicators.base.Indicator;
 import at.sume.dm.model.output.Fileable;
 import at.sume.dm.model.timeuse.TimeUseType;
 import at.sume.dm.tracing.ObjectSource;
-import at.sume.dm.types.AgeGroup;
+import at.sume.dm.types.AgeGroup16;
 import at.sume.dm.types.IncomeGroup;
 import at.sume.dm.types.IncomeGroup3;
 
@@ -43,7 +43,7 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 			}
 			if (householdSize6 > 6) householdSize6 = 6;
 			int pos = lookupIndicator(household.getSpatialunitId(), incomeGroup, person.getSex(), 
-					AgeGroup.getAgeGroupId(person.getAge()), person.isLivingWithParents(), householdSize6, 
+					AgeGroup16.getAgeGroupId(person.getAge()), person.isLivingWithParents(), householdSize6, 
 					person.getTimeUseType(), person.getSrc());
 			if (pos < 0) {
 				// insert at position pos
@@ -52,7 +52,7 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 				b.setSpatialUnitId(household.getSpatialunitId());
 				b.setIncomeGroupId(incomeGroup);
 				b.setSex(person.getSex());
-				b.setAgeGroupId(AgeGroup.getAgeGroupId(person.getAge()));
+				b.setAgeGroupId(AgeGroup16.getAgeGroupId(person.getAge()));
 				b.setLivingWithParents(person.isLivingWithParents());
 				b.setHouseholdSize6(householdSize6);
 				b.setTimeUseType(person.getTimeUseType());

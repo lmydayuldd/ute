@@ -10,7 +10,7 @@ import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.tracing.ObjectSource;
-import at.sume.dm.types.AgeGroup;
+import at.sume.dm.types.AgeGroup16;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.IncomeGroup;
 import at.sume.dm.types.MigrationRealm;
@@ -264,9 +264,9 @@ public class SampleMigratingHouseholds {
 			migrationsPerAgeSex.modifyDistribution(index);
 			person.setAgeGroupId(m.getAgeGroupId());
 			if (householdSize == 1) {
-				person.setAge(AgeGroup.sampleAge(person.getAgeGroupId(), (short) 18));
+				person.setAge(AgeGroup16.sampleAge(person.getAgeGroupId(), (short) 18));
 			} else {
-				person.setAge(AgeGroup.sampleAge(person.getAgeGroupId()));
+				person.setAge(AgeGroup16.sampleAge(person.getAgeGroupId()));
 			}
 			person.setSex(m.getSex());
 			person.setHousehold(result);

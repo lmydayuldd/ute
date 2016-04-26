@@ -3,7 +3,7 @@ package at.sume.sampling;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import at.sume.dm.types.AgeGroup;
+import at.sume.dm.types.AgeGroup16;
 import at.sume.sampling.distributions.PersonsPerAgeSex;
 import net.remesch.db.Database;
 import net.remesch.util.Random;
@@ -41,13 +41,13 @@ public class PersonDistributionAgeSex {
 		if (householdRepresentative) {
 			result = personsPerAgeSexRepr.get(personsPerAgeSexRepr.randomSample());
 			// Group 15-19: person must be of full age to be a household representative!
-			if ((AgeGroup.getMinAge(result.ageGroupId) < 18) && (AgeGroup.getMaxAge(result.ageGroupId) >= 18)) {
+			if ((AgeGroup16.getMinAge(result.ageGroupId) < 18) && (AgeGroup16.getMaxAge(result.ageGroupId) >= 18)) {
 				resultAge = (byte) (18 + r.nextInt(2));
 			}
 		} else {
 			result = personsPerAgeSexNonRepr.get(personsPerAgeSexNonRepr.randomSample());
 		}
-		resultAge = AgeGroup.sampleAge(result.ageGroupId);
+		resultAge = AgeGroup16.sampleAge(result.ageGroupId);
 	}
 	
 	public short getSampledAge() {
