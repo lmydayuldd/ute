@@ -49,7 +49,7 @@ public class ChildBirth extends Event<PersonRow> {
 	@Override
 	protected double probability(PersonRow entity) {
 		if (entity.getSex() == 1) { // speedup - calculate probability for females only
-			return fertilityDistribution.probability(entity.getAgeGroupId(), entity.getHousehold().getHouseholdSize()) * birthAdjustment;
+			return fertilityDistribution.probability(entity.getAgeGroup16Id(), entity.getHousehold().getHouseholdSize()) * birthAdjustment;
 		} else {
 			return 0;
 		}

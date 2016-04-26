@@ -18,6 +18,7 @@ import at.sume.dm.model.timeuse.TimeUseTypeDesignator;
 import at.sume.dm.model.timeuse.TravelTimeSamplingParameters;
 import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.AgeGroup16;
+import at.sume.dm.types.AgeGroup20;
 import net.remesch.db.Database;
 import net.remesch.db.Sequence;
 import net.remesch.db.schema.Ignore;
@@ -141,12 +142,15 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	 */
 	public byte getAgeGroupId() {
 		if (ageGroupId == 0) {
-			ageGroupId = AgeGroup16.getAgeGroupId(age);
+			ageGroupId = AgeGroup20.getAgeGroupId(age);
 		}
 		assert ageGroupId > 0 : "ageGroupId <= 0";
 		return ageGroupId;
 	}
 
+	public byte getAgeGroup16Id() {
+		return AgeGroup16.getAgeGroupId(age);
+	}
 	/**
 	 * @param ageGroupId the ageGroupId to set
 	 */
@@ -161,7 +165,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	public void setAge(short age) {
 		assert age >= 0 : "Age < 0 (" + age + ")";
 		this.age = age;
-		ageGroupId = AgeGroup16.getAgeGroupId(age);
+		ageGroupId = AgeGroup20.getAgeGroupId(age);
 	}
 
 	/**
@@ -174,7 +178,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	public void aging() {
 		age++;
 		assert age >= 0 : "Age < 0 (" + age + ")";
-		ageGroupId = AgeGroup16.getAgeGroupId(age);
+		ageGroupId = AgeGroup20.getAgeGroupId(age);
 		// Create time use data for all households becoming 10 yrs
 		if (age == 10)
 			updateTimeUse();

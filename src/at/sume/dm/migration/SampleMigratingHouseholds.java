@@ -41,13 +41,13 @@ public class SampleMigratingHouseholds {
 		/**
 		 * @return the ageGroupId
 		 */
-		public byte getAgeGroupId() {
+		public byte getAgeGroup20Id() {
 			return ageGroupId;
 		}
 		/**
 		 * @param ageGroupId the ageGroupId to set
 		 */
-		public void setAgeGroupId(byte ageGroupId) {
+		public void setAgeGroup20Id(byte ageGroupId) {
 			this.ageGroupId = ageGroupId;
 		}
 		/**
@@ -282,11 +282,11 @@ public class SampleMigratingHouseholds {
 			int index = migrationsPerAgeSex.randomSample();
 			MigrationsPerAgeSex m = migrationsPerAgeSex.get(index);
 			migrationsPerAgeSex.modifyDistribution(index);
-			person.setAgeGroupId(m.getAgeGroupId());
+			person.setAgeGroupId(m.getAgeGroup20Id());
 			if (householdSize == 1) {
-				person.setAge(AgeGroup20.sampleAge(person.getAgeGroupId(), (short) 18));
+				person.setAge(AgeGroup20.sampleAge(m.getAgeGroup20Id(), (short) 18));
 			} else {
-				person.setAge(AgeGroup20.sampleAge(person.getAgeGroupId()));
+				person.setAge(AgeGroup20.sampleAge(m.getAgeGroup20Id()));
 			}
 			person.setSex(m.getSex());
 			person.setHousehold(result);

@@ -9,7 +9,7 @@ import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.indicators.base.IndicatorBase;
 import at.sume.dm.indicators.rows.PopulationPerAgeGroupRow;
-import at.sume.dm.types.AgeGroup16;
+import at.sume.dm.types.AgeGroup20;
 
 /**
  * @author Alexander Remesch
@@ -43,7 +43,7 @@ public class PopulationPerAgeGroup extends IndicatorBase<PopulationPerAgeGroupRo
 			int pos = lookup(person);
 			if (pos < 0) {
 				// not there, unable to remove - throw exception
-				throw new AssertionError("PopulationPerAgeGroup.remove() - Spatial unit " + person.getHousehold().getDwelling().getSpatialunitId() + " & age group " + AgeGroup16.getAgeGroupId(person.getAge()) + " are not in the list of spatial units");
+				throw new AssertionError("PopulationPerAgeGroup.remove() - Spatial unit " + person.getHousehold().getDwelling().getSpatialunitId() + " & age group " + AgeGroup20.getAgeGroupId(person.getAge()) + " are not in the list of spatial units");
 			} else {
 				// available at position pos
 				update(pos, person, true);
@@ -58,7 +58,7 @@ public class PopulationPerAgeGroup extends IndicatorBase<PopulationPerAgeGroupRo
 	public int lookup(PersonRow person) {
 		PopulationPerAgeGroupRow lookup = new PopulationPerAgeGroupRow();
 		lookup.setSpatialUnitId(person.getHousehold().getDwelling().getSpatialunitId());
-		lookup.setAgeGroupId(AgeGroup16.getAgeGroupId(person.getAge()));
+		lookup.setAgeGroupId(AgeGroup20.getAgeGroupId(person.getAge()));
 		return Collections.binarySearch(indicatorList, lookup);
 	}
 	/**
@@ -70,7 +70,7 @@ public class PopulationPerAgeGroup extends IndicatorBase<PopulationPerAgeGroupRo
 	public void insert(int pos, PersonRow person) {
 		PopulationPerAgeGroupRow b = new PopulationPerAgeGroupRow();
 		b.setSpatialUnitId(person.getHousehold().getDwelling().getSpatialunitId());
-		b.setAgeGroupId(AgeGroup16.getAgeGroupId(person.getAge()));
+		b.setAgeGroupId(AgeGroup20.getAgeGroupId(person.getAge()));
 		b.setPersonCount(1);
 		indicatorList.add(pos, b);
 	}
@@ -87,7 +87,7 @@ public class PopulationPerAgeGroup extends IndicatorBase<PopulationPerAgeGroupRo
 			b.setPersonCount(b.getPersonCount() - 1);
 		else
 			b.setPersonCount(b.getPersonCount() + 1);
-		assert b.getPersonCount() >= 0 : "Spatial unit " + person.getHousehold().getDwelling().getSpatialunitId() + " & age group " + AgeGroup16.getAgeGroupId(person.getAge()) + " - person count < 0";
+		assert b.getPersonCount() >= 0 : "Spatial unit " + person.getHousehold().getDwelling().getSpatialunitId() + " & age group " + AgeGroup20.getAgeGroupId(person.getAge()) + " - person count < 0";
 		indicatorList.set(pos, b);
 	}
 	/* (non-Javadoc)

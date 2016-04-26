@@ -12,7 +12,7 @@ import org.junit.Test;
 import at.sume.dm.Common;
 import at.sume.dm.migration.SampleMigratingHouseholds.MigrationsPerAgeSex;
 import at.sume.dm.scenario_handling.Scenario;
-import at.sume.dm.types.AgeGroup16;
+import at.sume.dm.types.AgeGroup20;
 import at.sume.sampling.Distribution;
 import net.remesch.db.Database;
 
@@ -45,9 +45,9 @@ public class MigrationsPerAgeSexTest {
 			int index = migrationsPerAgeSex.randomSample();
 			MigrationsPerAgeSex m = migrationsPerAgeSex.get(index);
 			Map<Byte,Long> resultCount = m.getSex() == 1 ? resultCountFemale : resultCountMale;
-			Long currentCount = resultCount.get(m.getAgeGroupId());
+			Long currentCount = resultCount.get(m.getAgeGroup20Id());
 			if (currentCount == null) currentCount = 0L;
-			resultCount.put(m.getAgeGroupId(), currentCount + 1);
+			resultCount.put(m.getAgeGroup20Id(), currentCount + 1);
 		}
 		// Output comparison of baseData & resultCount
 		double desiredTotal = baseData.stream().mapToDouble(i -> i.getShare()).sum();
@@ -55,9 +55,9 @@ public class MigrationsPerAgeSexTest {
 		for(MigrationsPerAgeSex b : baseData) {
 			long desired = (long)b.getShare();
 			Map<Byte,Long> resultCount = b.getSex() == 1 ? resultCountFemale : resultCountMale;
-			Long actual = resultCount.get(b.getAgeGroupId());
+			Long actual = resultCount.get(b.getAgeGroup20Id());
 			if (actual == null) actual = 0L;
-			System.out.println((b.getSex() == 1 ? "female " : "male   ") + AgeGroup16.getAgeGroupName(b.getAgeGroupId()) + 
+			System.out.println((b.getSex() == 1 ? "female " : "male   ") + AgeGroup20.getAgeGroupName(b.getAgeGroup20Id()) + 
 					": desired = " + df.format(desired / desiredTotal) + " (" + desired + ")" + 
 					", actual = " + df.format(actual / (double) TOTAL_SAMPLES) + " (" + actual + ") ");
 		}

@@ -4,7 +4,7 @@
 package at.sume.dm.indicators.rows;
 
 import at.sume.dm.indicators.base.IndicatorRow;
-import at.sume.dm.types.AgeGroup16;
+import at.sume.dm.types.AgeGroup20;
 
 /**
  * @author Alexander Remesch
@@ -64,13 +64,13 @@ public class PopulationPerAgeGroupRow extends IndicatorRow implements Comparable
 	@Override
 	public String toString() {
 		delimiter = ";";
-		return spatialUnitId + delimiter + AgeGroup16.getAgeGroupNameDirect(ageGroupId) + delimiter + personCount;
+		return spatialUnitId + delimiter + AgeGroup20.getAgeGroupNameDirect(ageGroupId) + delimiter + personCount;
 	}
 	/* (non-Javadoc)
 	 * @see at.sume.dm.indicators.rows.IndicatorRow#display()
 	 */
 	@Override
 	public String display() {
-		return spatialUnitId + delimiter + AgeGroup16.getAgeGroupNameDirect(ageGroupId) + delimiter + personCount;
+		return spatialUnitId + delimiter + AgeGroup20.getAgeGroupNameDirect(ageGroupId) + delimiter + personCount;
 	}
 }
