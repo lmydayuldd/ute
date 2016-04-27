@@ -40,7 +40,7 @@ public class SampleImmigrationsHouseholdsTest {
 			// Load comparison data
 			String selectStatement = "SELECT id, ageGroupId, sex, share " +
 					"FROM _DM_MigrationAgeSex " +
-					"WHERE scenarioName = '" + scenario.getMigrationPerAgeSexScenario() + "' " +
+					"WHERE scenarioName = '" + scenario.getMigrationPerAgeSexScenario() + "' and year = 2001 " +
 					"ORDER BY sex, ageGroupId";
 			baseData = Common.db.select(MigrationsPerAgeSex.class, selectStatement);
 		} catch (SQLException e1) {
