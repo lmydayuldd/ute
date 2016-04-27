@@ -87,7 +87,7 @@ public class ExactDistribution<E> extends Distribution<E> {
 		long previousValue = 0;
 		for (int i = index; i != exactThresholdStore.size(); i++) {
 			long currentValue = exactThresholdStore.get(i);
-			if ((currentValue > 0) && (currentValue > previousValue)) {
+			if ((currentValue > 0) && (currentValue >= previousValue)) {
 				exactThresholdStore.set(i, currentValue - 1);
 				modified = true;
 			}

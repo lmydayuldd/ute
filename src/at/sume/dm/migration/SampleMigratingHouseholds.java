@@ -279,12 +279,12 @@ public class SampleMigratingHouseholds {
 		// sample persons
 		for (int i = 0; i != householdSize; i++) {
 			PersonRow person = new PersonRow(ObjectSource.IMMIGRATION);
-			int index = migrationsPerAgeSex.randomSample();
+			int index = migrationsPerAgeSex.randomExactSample();
 			MigrationsPerAgeSex m = migrationsPerAgeSex.get(index);
-			if (i == 0) { // Sample an adult as first person in a household!!!
+			if (householdSize == 1) { // Sample an adult for single households!
 				short age = AgeGroup20.sampleAge(m.getAgeGroup20Id());
 				while (age < 18) {
-					index = migrationsPerAgeSex.randomSample();
+					index = migrationsPerAgeSex.randomExactSample();
 					m = migrationsPerAgeSex.get(index);
 					age = AgeGroup20.sampleAge(m.getAgeGroup20Id());
 				}
