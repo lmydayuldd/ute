@@ -36,7 +36,7 @@ public class AgeGroup20 {
 	static ArrayList<AgeGroupRow> ageGroups;
 	private static Random r = new Random();
 	static {
-		String selectStatement = "select ageGroupId, minAge || '-' || maxAge ageGroup, minAge, maxAge from _DM_AgeGroupsNew order by ageGroupId";
+		String selectStatement = "select ageGroupId, ageGroup, minAge, maxAge from _DM_AgeGroupsNew order by ageGroupId";
 		try {
 			ageGroups = Common.db.select(AgeGroupRow.class, selectStatement);
 		} catch (SQLException e) {
