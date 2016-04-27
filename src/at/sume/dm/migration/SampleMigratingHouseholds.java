@@ -281,13 +281,19 @@ public class SampleMigratingHouseholds {
 			PersonRow person = new PersonRow(ObjectSource.IMMIGRATION);
 			int index = migrationsPerAgeSex.randomSample();
 			MigrationsPerAgeSex m = migrationsPerAgeSex.get(index);
-			migrationsPerAgeSex.modifyDistribution(index);
-			person.setAgeGroupId(m.getAgeGroup20Id());
-			if (householdSize == 1) {
-				person.setAge(AgeGroup20.sampleAge(m.getAgeGroup20Id(), (short) 18));
+			if (i == 0) { // Sample an adult as first person in a household!!!
+				short age = AgeGroup20.sampleAge(m.getAgeGroup20Id());
+				while (age < 18) {
+					index = migrationsPerAgeSex.randomSample();
+					m = migrationsPerAgeSex.get(index);
+					age = AgeGroup20.sampleAge(m.getAgeGroup20Id());
+				}
+				person.setAge(age);
 			} else {
 				person.setAge(AgeGroup20.sampleAge(m.getAgeGroup20Id()));
 			}
+			person.setAgeGroupId(m.getAgeGroup20Id());
+			migrationsPerAgeSex.modifyDistribution(index);
 			person.setSex(m.getSex());
 			person.setHousehold(result);
 			// adds a person to a household twice togehter with result.addMembers(members) below - AR 160411
