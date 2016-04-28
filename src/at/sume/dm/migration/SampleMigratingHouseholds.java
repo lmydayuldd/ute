@@ -25,7 +25,9 @@ public class SampleMigratingHouseholds {
 		private int id;
 		private byte ageGroupId;
 		private byte sex;
-		public double share;
+		// public is necessary for use of Distribution/ExactDistribution classes
+		public long incoming;
+		public long outgoing;
 		/**
 		 * @return the id
 		 */
@@ -65,14 +67,26 @@ public class SampleMigratingHouseholds {
 		/**
 		 * @return the share
 		 */
-		public double getShare() {
-			return share;
+		public long getIncoming() {
+			return incoming;
 		}
 		/**
-		 * @param share the share to set
+		 * @param incoming the share to set
 		 */
-		public void setShare(double share) {
-			this.share = share;
+		public void setIncoming(long incoming) {
+			this.incoming = incoming;
+		}
+		/**
+		 * @return the outgoing
+		 */
+		public long getOutgoing() {
+			return outgoing;
+		}
+		/**
+		 * @param outgoing the outgoing to set
+		 */
+		public void setOutgoing(long outgoing) {
+			this.outgoing = outgoing;
 		}
 		/* (non-Javadoc)
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
@@ -192,13 +206,13 @@ public class SampleMigratingHouseholds {
 	
 	private void loadMigrationAgeSexDistribution(int modelYear) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, SQLException {
 		if (!migrationPerAgeSexConstant) {
-			String selectStatement = "SELECT id, ageGroupId, sex, share " +
+			String selectStatement = "SELECT id, ageGroupId, sex, incoming, outgoing " +
 					"FROM _DM_MigrationAgeSex " +
 					"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' AND year = " + modelYear + 
 					" ORDER BY ageGroupId, sex";
 			List<MigrationsPerAgeSex> baseData = Common.db.select(MigrationsPerAgeSex.class, selectStatement);
 			if (baseData.size() == 0) {
-				selectStatement = "SELECT id, ageGroupId, sex, share " +
+				selectStatement = "SELECT id, ageGroupId, sex, incoming, outgoing " +
 						"FROM _DM_MigrationAgeSex " +
 						"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' AND year is null" + 
 						" ORDER BY ageGroupId, sex";
@@ -206,7 +220,7 @@ public class SampleMigratingHouseholds {
 				migrationPerAgeSexConstant = true;
 			}
 			assert baseData.size() > 0 : "No rows selected from _DM_MigrationAgeSex (scenarioName = " + migrationPerAgeSexScenarioName + ", year = " + modelYear + ")";
-			migrationsPerAgeSex = new ExactDistribution<MigrationsPerAgeSex>(baseData, "share");
+			migrationsPerAgeSex = new ExactDistribution<MigrationsPerAgeSex>(baseData, "incoming");
 		}
 	}
 	
