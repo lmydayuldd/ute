@@ -57,6 +57,7 @@ public class Common {
 	private static byte outputInterval;
 	private static byte householdReductionFactor;
 	private static int maxYearlyPersonIncome;
+	private static boolean useMigrationSaldo;
 	
 	/**
 	 * @return the iniFilename
@@ -304,7 +305,14 @@ public class Common {
 	public static int getMaxYearlyPersonIncome() {
 		return maxYearlyPersonIncome;
 	}
-
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static boolean isUseMigrationSaldo() {
+		return useMigrationSaldo;
+	}
 	/**
 	 * Get the location of the database from the INI-file
 	 * @return pathname of the database
@@ -401,6 +409,7 @@ public class Common {
 		outputInterval = Byte.parseByte(getSysParam("OutputInterval"));
 		householdReductionFactor = Byte.parseByte(getSysParam("HouseholdReductionFactor"));
 		maxYearlyPersonIncome = Integer.parseInt(getSysParam("MaxYearlyPersonIncome"));
+		useMigrationSaldo = Boolean.parseBoolean(getSysParam("UseMigrationSaldo"));
 	}
 	
 	/**
