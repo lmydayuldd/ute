@@ -50,10 +50,10 @@ public class MigrationsPerAgeSexTest {
 			resultCount.put(m.getAgeGroup20Id(), currentCount + 1);
 		}
 		// Output comparison of baseData & resultCount
-		double desiredTotal = baseData.stream().mapToDouble(i -> i.getIncoming()).sum();
+		double desiredTotal = baseData.stream().mapToDouble(i -> i.getShare()).sum();
 		DecimalFormat df = new DecimalFormat("#0.00%");
 		for(MigrationsPerAgeSex b : baseData) {
-			long desired = (long)b.getIncoming();
+			long desired = (long)b.getShare();
 			Map<Byte,Long> resultCount = b.getSex() == 1 ? resultCountFemale : resultCountMale;
 			Long actual = resultCount.get(b.getAgeGroup20Id());
 			if (actual == null) actual = 0L;

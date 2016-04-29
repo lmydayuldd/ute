@@ -38,7 +38,7 @@ public class SampleImmigrationsHouseholdsTest {
 			sampleImmigratingHouseholds = new SampleMigratingHouseholds(scenario.getMigrationScenario(), scenario.getMigrationPerAgeSexScenario(), scenario.getMigrationHouseholdSizeScenario(), scenario.getMigrationIncomeScenario());
 //			sampleImmigratingHouseholds = new SampleMigratingHouseholds(scenario.getMigrationScenario(), "TEST", scenario.getMigrationHouseholdSizeScenario(), scenario.getMigrationIncomeScenario());
 			// Load comparison data
-			String selectStatement = "SELECT id, ageGroupId, sex, incoming, outgoing " +
+			String selectStatement = "SELECT id, ageGroupId, sex, incoming as share " +
 					"FROM _DM_MigrationAgeSex " +
 					"WHERE scenarioName = '" + scenario.getMigrationPerAgeSexScenario() + "' and year = 2001 " +
 					"ORDER BY sex, ageGroupId";
@@ -74,10 +74,10 @@ public class SampleImmigrationsHouseholdsTest {
 			}
 		}
 		// Output comparison of baseData & resultCount
-		double desiredTotal = baseData.stream().mapToDouble(i -> i.getIncoming()).sum();
+		double desiredTotal = baseData.stream().mapToDouble(i -> i.getShare()).sum();
 		DecimalFormat df = new DecimalFormat("#0.00%");
 		for(MigrationsPerAgeSex b : baseData) {
-			long desired = (long)b.getIncoming();
+			long desired = (long)b.getShare();
 			Map<Byte,Long> resultCount = b.getSex() == 1 ? resultCountFemale : resultCountMale;
 			Long actual = resultCount.get(b.getAgeGroup20Id());
 			if (actual == null) actual = 0L;
