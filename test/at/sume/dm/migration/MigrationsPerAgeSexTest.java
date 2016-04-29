@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import at.sume.dm.Common;
-import at.sume.dm.migration.SampleMigratingHouseholds.MigrationsPerAgeSex;
 import at.sume.dm.scenario_handling.Scenario;
 import at.sume.dm.types.AgeGroup20;
 import at.sume.sampling.Distribution;
@@ -26,7 +25,7 @@ public class MigrationsPerAgeSexTest {
 		Database db = Common.openDatabase();
 		Common.init(false);
 		Scenario scenario = new Scenario(db, Common.getScenarioId(), false);
-		String selectStatement = "SELECT id, ageGroupId, sex, share " +
+		String selectStatement = "SELECT id, ageGroupId, sex, incoming as share " +
 				"FROM _DM_MigrationAgeSex " +
 				"WHERE scenarioName = '" + scenario.getMigrationPerAgeSexScenario() + "' " +
 				"ORDER BY sex, ageGroupId";

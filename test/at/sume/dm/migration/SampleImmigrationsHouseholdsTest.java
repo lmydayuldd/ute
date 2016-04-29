@@ -16,7 +16,6 @@ import org.junit.Test;
 import at.sume.dm.Common;
 import at.sume.dm.entities.HouseholdRow;
 import at.sume.dm.entities.PersonRow;
-import at.sume.dm.migration.SampleMigratingHouseholds.MigrationsPerAgeSex;
 import at.sume.dm.scenario_handling.Scenario;
 import at.sume.dm.types.AgeGroup20;
 import net.remesch.db.Database;
