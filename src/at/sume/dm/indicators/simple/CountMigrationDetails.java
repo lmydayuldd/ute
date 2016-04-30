@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import at.sume.dm.entities.PersonRow;
 import at.sume.dm.indicators.rows.MigrationDetailsRow;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.MigrationRealm;
@@ -75,6 +76,29 @@ public class CountMigrationDetails implements MigrationDetailsObserver {
 			MigrationDetailsRow updateRow = migrationDetailsList.get(index);
 			updateRow.setHouseholdCount(updateRow.getHouseholdCount() + 1);
 			updateRow.setPersonCount(updateRow.getPersonCount() + householdCharacteristics.getHouseholdSize());
+			migrationDetailsList.set(index, updateRow);
+		}
+	}
+	@Override
+	public void addSingleMigration(Integer spatialUnitIdFrom, Integer spatialUnitIdTo, MigrationRealm migrationRealm,
+			PersonRow person) {
+		int index = lookupMigrationDetailsRow(spatialUnitIdFrom, spatialUnitIdTo, migrationRealm, person.getHousehold().getHouseholdType());
+		if (index < 0) {
+			// insert at position index
+			index = (index + 1) * -1;
+			MigrationDetailsRow insertRow = new MigrationDetailsRow();
+			insertRow.setSpatialUnitIdFrom(spatialUnitIdFrom);
+			insertRow.setSpatialUnitIdTo(spatialUnitIdTo);
+			insertRow.setMigrationRealm(migrationRealm);
+			insertRow.setHouseholdType(person.getHousehold().getHouseholdType());
+			insertRow.setHouseholdCount(1);
+			insertRow.setPersonCount(1);
+			migrationDetailsList.add(index, insertRow);
+		} else {
+			// available at position index
+			MigrationDetailsRow updateRow = migrationDetailsList.get(index);
+			updateRow.setHouseholdCount(updateRow.getHouseholdCount() + 1);
+			updateRow.setPersonCount(updateRow.getPersonCount() + 1);
 			migrationDetailsList.set(index, updateRow);
 		}
 	}

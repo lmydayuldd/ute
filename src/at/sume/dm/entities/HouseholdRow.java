@@ -256,7 +256,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		}
 		setAspirationRegionLivingSpaceMax((short) 0);
 		setAspirationRegionLivingSpaceMin((short) 0);
-		countAdults();
+		updateHouseholdTypeAfterDeathOrMemberLeaving();
 	}
 	
 	public ArrayList<PersonRow> getMembers() {
@@ -1064,7 +1064,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		// Remove household members as well
 		if (members != null) {
 			for (PersonRow member : members) {
-				member.remove();
+				member.remove(src, false);
 			}
 		}
 		super.remove();
@@ -1228,7 +1228,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 			rsUdpCentrality + delimiter + rsUdpPublicTransportAccessibility + delimiter + rsCostEffectiveness + delimiter + rsEnvironmentalAmenities + delimiter + rsSocialPrestige + delimiter + rsDesiredLivingSpace;
 	}
 
-	private static ArrayList<MigrationObserver> migrationObservers = new ArrayList<MigrationObserver>();
+	public static ArrayList<MigrationObserver> migrationObservers = new ArrayList<MigrationObserver>();
 	
 	@Override
 	public void registerMigrationObserver(MigrationObserver o) {
@@ -1285,7 +1285,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		}
 	}
 
-	private static ArrayList<MigrationDetailsObserver> migrationDetailsObservers = new ArrayList<MigrationDetailsObserver>();
+	public static ArrayList<MigrationDetailsObserver> migrationDetailsObservers = new ArrayList<MigrationDetailsObserver>();
 
 	@Override
 	public void registerMigrationObserver(MigrationDetailsObserver o) {

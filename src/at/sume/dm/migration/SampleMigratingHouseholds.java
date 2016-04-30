@@ -120,7 +120,8 @@ public class SampleMigratingHouseholds {
 		assert migrationHouseholdSize.size() > 0 : "No rows selected from _DM_MigrationHouseholdSize (scenarioName = " + migrationHouseholdSizeScenarioName + ")";
 		migrationHouseholdSizeShareTotal = (Integer)Common.db.lookupSql("select sum(share) from _DM_MigrationHouseholdSize where scenarioName = '" + migrationHouseholdSizeScenarioName + "'");
 		
-		totalMigrationsPerYear = new TotalMigrationPerYear(migrationScenarioName);
+		if (!Common.isUseMigrationSaldo())
+			totalMigrationsPerYear = new TotalMigrationPerYear(migrationScenarioName);
 		
 		selectStatement = "SELECT incomeGroupId, probability from _DM_MigrationIncome " + 
 			"where scenarioName = '" + migrationIncomeScenarioName + "' order by incomeGroupId";
@@ -130,22 +131,34 @@ public class SampleMigratingHouseholds {
 	}
 	
 	private void loadMigrationAgeSexDistribution(int modelYear) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, SQLException {
-		if (!migrationPerAgeSexConstant) {
-			String selectStatement = "SELECT id, ageGroupId, sex, incoming as share " +
+		if (Common.isUseMigrationSaldo()) {
+			// Use the difference between incoming & outgoing only for immigration numbers
+			String selectStatement = "SELECT id, ageGroupId, sex, incoming - outgoing as share " +
 					"FROM _DM_MigrationAgeSex " +
 					"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' AND year = " + modelYear + 
-					" ORDER BY ageGroupId, sex";
+					" AND incoming > outgoing ORDER BY ageGroupId, sex";
 			List<MigrationsPerAgeSex> baseData = Common.db.select(MigrationsPerAgeSex.class, selectStatement);
-			if (baseData.size() == 0) {
-				selectStatement = "SELECT id, ageGroupId, sex, incoming as share " +
-						"FROM _DM_MigrationAgeSex " +
-						"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' AND year is null" + 
-						" ORDER BY ageGroupId, sex";
-				baseData = Common.db.select(MigrationsPerAgeSex.class, selectStatement);
-				migrationPerAgeSexConstant = true;
-			}
-			assert baseData.size() > 0 : "No rows selected from _DM_MigrationAgeSex (scenarioName = " + migrationPerAgeSexScenarioName + ", year = " + modelYear + ")";
+			if (baseData.size() == 0) 
+				System.out.println(Common.printInfo() + ": no immigration records (incoming > outgoing) found in _DM_MigrationAgeSex for scenario " + migrationPerAgeSexScenarioName + " and year " + modelYear);
 			migrationsPerAgeSex = new ExactDistribution<MigrationsPerAgeSex>(baseData, "share");
+		} else {
+			if (!migrationPerAgeSexConstant) {
+				String selectStatement = "SELECT id, ageGroupId, sex, incoming as share " +
+						"FROM _DM_MigrationAgeSex " +
+						"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' AND year = " + modelYear + 
+						" ORDER BY ageGroupId, sex";
+				List<MigrationsPerAgeSex> baseData = Common.db.select(MigrationsPerAgeSex.class, selectStatement);
+				if (baseData.size() == 0) {
+					selectStatement = "SELECT id, ageGroupId, sex, incoming as share " +
+							"FROM _DM_MigrationAgeSex " +
+							"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' AND year is null" + 
+							" ORDER BY ageGroupId, sex";
+					baseData = Common.db.select(MigrationsPerAgeSex.class, selectStatement);
+					migrationPerAgeSexConstant = true;
+				}
+				assert baseData.size() > 0 : "No rows selected from _DM_MigrationAgeSex (scenarioName = " + migrationPerAgeSexScenarioName + ", year = " + modelYear + ")";
+				migrationsPerAgeSex = new ExactDistribution<MigrationsPerAgeSex>(baseData, "share");
+			}
 		}
 	}
 	
@@ -155,9 +168,15 @@ public class SampleMigratingHouseholds {
 		loadMigrationAgeSexDistribution(modelYear);
 		
 		// 1) Get number of persons immigrating in that year
-		long numImmigrants = totalMigrationsPerYear.getImmigration(modelYear, MigrationRealm.NATIONAL_INCOMING) + totalMigrationsPerYear.getImmigration(modelYear, MigrationRealm.INTERNATIONAL_INCOMING);
-		//    and calculate the exact age & sex distribution
-		migrationsPerAgeSex.buildExactThresholds(numImmigrants);
+		long numImmigrants = 0;
+		if (Common.isUseMigrationSaldo()) {
+			numImmigrants = migrationsPerAgeSex.getMaxThreshold();
+			migrationsPerAgeSex.buildExactThresholds();
+		} else {
+			numImmigrants = totalMigrationsPerYear.getImmigration(modelYear, MigrationRealm.NATIONAL_INCOMING) + totalMigrationsPerYear.getImmigration(modelYear, MigrationRealm.INTERNATIONAL_INCOMING);
+			//    and calculate the exact age & sex distribution
+			migrationsPerAgeSex.buildExactThresholds(numImmigrants);
+		}
 		migrationIncome.buildExactThresholds(numImmigrants);
 		
 		// 2) Calculate the number of households per household size

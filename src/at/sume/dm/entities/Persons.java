@@ -8,13 +8,15 @@ import java.sql.SQLException;
 import at.sume.db.RecordSetClonable;
 import at.sume.dm.tracing.ObjectSource;
 import net.remesch.db.Database;
+import net.remesch.util.Random;
 
 /**
  * @author Alexander Remesch
  *
  */
 public class Persons extends RecordSetClonable<PersonRow> {
-
+	Random r = new Random();
+	
 	/**
 	 * needed for cloning
 	 */
@@ -83,5 +85,14 @@ public class Persons extends RecordSetClonable<PersonRow> {
 	@Override
 	public RecordSetClonable<PersonRow> factory() {
 		return new Persons();
+	}
+	
+	/**
+	 * Return a random person
+	 * @return
+	 */
+	public PersonRow getRandomPerson() {
+		int index = r.nextInt(rowList.size() + 1);
+		return rowList.get(index);
 	}
 }

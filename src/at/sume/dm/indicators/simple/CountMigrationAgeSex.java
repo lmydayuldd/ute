@@ -79,4 +79,25 @@ public class CountMigrationAgeSex implements MigrationDetailsObserver {
 			}
 		}
 	}
+	@Override
+	public void addSingleMigration(Integer spatialUnitIdFrom, Integer spatialUnitIdTo, MigrationRealm migrationRealm,
+			PersonRow p) {
+		int index = lookupMigrationDetailsRow(p.getSex(), p.getAgeGroupId(), migrationRealm, p.getHousehold().getHouseholdType());
+		if (index < 0) {
+			// insert at position index
+			index = (index + 1) * -1;
+			MigrationAgeSexRow insertRow = new MigrationAgeSexRow();
+			insertRow.setSex(p.getSex());
+			insertRow.setAgeGroupId(p.getAgeGroupId());
+			insertRow.setMigrationRealm(migrationRealm);
+			insertRow.setHouseholdType(p.getHousehold().getHouseholdType());
+			insertRow.setPersonCount(1);
+			migrationDetailsList.add(index, insertRow);
+		} else {
+			// available at position index
+			MigrationAgeSexRow updateRow = migrationDetailsList.get(index);
+			updateRow.setPersonCount(updateRow.getPersonCount() + 1);
+			migrationDetailsList.set(index, updateRow);
+		}
+	}
 }

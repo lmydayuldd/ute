@@ -39,6 +39,7 @@ import at.sume.dm.indicators.simple.CountMigrationAgeSex;
 import at.sume.dm.indicators.simple.CountMigrationDetails;
 import at.sume.dm.indicators.simple.CountMigrationPerSpatialUnit;
 import at.sume.dm.migration.SampleMigratingHouseholds;
+import at.sume.dm.migration.SampleEmigrationPersons;
 import at.sume.dm.model.core.EntityDecisionManager;
 import at.sume.dm.model.output.Fileable;
 import at.sume.dm.model.output.OutputManager;
@@ -584,12 +585,19 @@ public class Main {
 				System.out.println(printInfo(modelRun) + ": " + numMovingTogether + " of "+ movingTogetherCount + " projected household move-togethers/marriages took place");
 		        System.out.println(printInfo(modelRun) + ": free dwellings after moving together: " + dwellingsOnMarket.getFreeDwellingsCount());
 				
-				// Out-Migration: randomly remove households
-				int numOutMigrationInternational = sampleMigratingHouseholds.getOutMigrationInternational(modelYear) + sampleMigratingHouseholds.getOutMigrationNational(modelYear) - hhMovedAwayMemberCount;
-				if (numOutMigrationInternational > 0) {
-					int numOutMigrationIntlHouseholds = households.randomRemoveHouseholds(dwellingsOnMarket, numOutMigrationInternational, MigrationRealm.INTERNATIONAL_OUTGOING);
-					System.out.println(printInfo(modelRun) + ": " + numOutMigrationInternational + " persons (" + numOutMigrationIntlHouseholds + " households) out-migrated internationally");
-				}
+		        if (!Common.isUseMigrationSaldo()) {
+					// Out-Migration: randomly remove households
+					int numOutMigrationInternational = sampleMigratingHouseholds.getOutMigrationInternational(modelYear) + sampleMigratingHouseholds.getOutMigrationNational(modelYear) - hhMovedAwayMemberCount;
+					if (numOutMigrationInternational > 0) {
+						int numOutMigrationIntlHouseholds = households.randomRemoveHouseholds(dwellingsOnMarket, numOutMigrationInternational, MigrationRealm.INTERNATIONAL_OUTGOING);
+						System.out.println(printInfo(modelRun) + ": " + numOutMigrationInternational + " persons (" + numOutMigrationIntlHouseholds + " households) out-migrated internationally");
+					}
+		        } else {
+		        	// New variant: remove single persons according to a given distribution
+		        	SampleEmigrationPersons sampleEmigration = new SampleEmigrationPersons(scenario.getMigrationPerAgeSexScenario(), persons);
+		        	long emigrationPersonCount = sampleEmigration.randomEmigration(modelYear, dwellingsOnMarket);
+					System.out.println(printInfo(modelRun) + ": " + emigrationPersonCount + " persons emigrated nationally + internationally");
+		        }
 		        System.out.println(printInfo(modelRun) + ": free dwellings after out-migration: " + dwellingsOnMarket.getFreeDwellingsCount());
 				
 				// Immigrating households + Children moving out from home

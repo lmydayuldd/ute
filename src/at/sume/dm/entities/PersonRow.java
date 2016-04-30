@@ -12,6 +12,9 @@ import at.sume.db.RecordSetRowFileable;
 import at.sume.dm.Common;
 import at.sume.dm.indicators.simple.DemographyObservable;
 import at.sume.dm.indicators.simple.DemographyObserver;
+import at.sume.dm.indicators.simple.MigrationDetailsObserver;
+import at.sume.dm.indicators.simple.MigrationObserver;
+import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
 import at.sume.dm.model.timeuse.SampleTimeUse;
 import at.sume.dm.model.timeuse.TimeUseType;
 import at.sume.dm.model.timeuse.TimeUseTypeDesignator;
@@ -19,6 +22,7 @@ import at.sume.dm.model.timeuse.TravelTimeSamplingParameters;
 import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.AgeGroup16;
 import at.sume.dm.types.AgeGroup20;
+import at.sume.dm.types.MigrationRealm;
 import net.remesch.db.Database;
 import net.remesch.db.Sequence;
 import net.remesch.db.schema.Ignore;
@@ -342,8 +346,7 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 		household.removeMember(this);
 		household.updateHouseholdTypeAfterDeathOrMemberLeaving();
 		household = null;
-		src = ObjectSource.DIED;
-		remove();
+		remove(ObjectSource.DIED, true);
 	}
 	
 	/**
@@ -351,11 +354,14 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	 */
 	@Override
 	public void remove() {
-//		household.removeMember(this);
-//		household.updateHouseholdTypeAfterDeath();
 		recordSet.remove(this);
 	}
-
+	public void remove(ObjectSource src, boolean removeFromHousehold) {
+		this.src = src;
+		if (household != null && removeFromHousehold)
+			household.removeMember(this);
+		recordSet.remove(this);
+	}
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSetRow#saveToDatabase()
 	 */
@@ -517,5 +523,27 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	 */
 	public boolean isAdult() {
 		return age >= 18 ? true : false;
+	}
+	/**
+	 * Emigration of person
+	 * @param migrationRealm
+	 */
+	public void emigrate(DwellingsOnMarket dwellingsOnMarket, MigrationRealm migrationRealm) {
+		notifyEmigration(migrationRealm);
+		notifyMigration(null, migrationRealm);
+//		if (household.getMemberCount() == 1)
+//			household.remove(dwellingsOnMarket, ObjectSource.EMIGRATED);
+//		else
+			remove(ObjectSource.EMIGRATED, true);
+	}
+	public void notifyEmigration(MigrationRealm migrationRealm) {
+		for (MigrationObserver obs : HouseholdRow.migrationObservers) {
+			obs.addEmigration(household.getSpatialunitId(), (short) 1, migrationRealm);
+		}
+	}
+	public void notifyMigration(Integer spatialUnitIdTo, MigrationRealm migrationRealm) {
+		for (MigrationDetailsObserver obs : HouseholdRow.migrationDetailsObservers) {
+			obs.addSingleMigration(household.getSpatialunitId(), spatialUnitIdTo, migrationRealm, this);
+		}
 	}
 }

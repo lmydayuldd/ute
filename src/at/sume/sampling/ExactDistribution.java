@@ -78,6 +78,18 @@ public class ExactDistribution<E> extends Distribution<E> {
 		assert exactThresholdStore.size() == objectStore.size() : "exactThresholdStore.size() != objectStore.size()";
 	}
 	/**
+	 * Build exact distribution from given sample distribution and maximum element size
+	 * @param maxExactThreshold
+	 */
+	public void buildExactThresholds() {
+		exactThresholdStore = new ArrayList<Long>();
+		for (int i = 0; i != thresholdStore.size(); i++) {
+			exactThresholdStore.add(i, thresholdStore.get(i));
+		}
+		this.maxExactThreshold = maxThreshold;
+		assert exactThresholdStore.size() == objectStore.size() : "exactThresholdStore.size() != objectStore.size()";
+	}
+	/**
 	 * Decrease the number of elements in the distribution at position index and above by 1
 	 * @param index The index of the last sampled element that was usable (by criteria unknown to this function) for the sample
 	 */
@@ -133,5 +145,12 @@ public class ExactDistribution<E> extends Distribution<E> {
 	@Override
 	public int randomSample() throws ArrayIndexOutOfBoundsException {
 		return randomExactSample();
+	}
+	/**
+	 * Return the object store
+	 * @return
+	 */
+	public List<E> getObjectStore() {
+		return objectStore;
 	}
 }
