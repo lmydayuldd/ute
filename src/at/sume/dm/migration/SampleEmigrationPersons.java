@@ -33,8 +33,9 @@ public class SampleEmigrationPersons {
 	
 	private void loadMigrationAgeSexDistribution(int modelYear) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, SQLException {
 		if (Common.isUseMigrationSaldo()) {
+			byte hRed = Common.getHouseholdReductionFactor();
 			// Use the difference between incoming & outgoing only for immigration numbers
-			String selectStatement = "SELECT id, ageGroupId, sex, outgoing - incoming as share " +
+			String selectStatement = "SELECT id, ageGroupId, sex, (outgoing - incoming) / " + hRed + " as share " +
 					"FROM _DM_MigrationAgeSex " +
 					"WHERE scenarioName = '" + migrationPerAgeSexScenarioName + "' AND year = " + modelYear + 
 					" AND incoming < outgoing ORDER BY ageGroupId, sex";
