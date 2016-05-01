@@ -354,13 +354,14 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	 */
 	@Override
 	public void remove() {
-		recordSet.remove(this);
+//		recordSet.remove(this);
+		super.remove();
 	}
 	public void remove(ObjectSource src, boolean removeFromHousehold) {
 		this.src = src;
 		if (household != null && removeFromHousehold)
 			household.removeMember(this);
-		recordSet.remove(this);
+		super.remove();
 	}
 	/* (non-Javadoc)
 	 * @see at.sume.db.RecordSetRow#saveToDatabase()
@@ -531,10 +532,11 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	public void emigrate(DwellingsOnMarket dwellingsOnMarket, MigrationRealm migrationRealm) {
 		notifyEmigration(migrationRealm);
 		notifyMigration(null, migrationRealm);
-//		if (household.getMemberCount() == 1)
-//			household.remove(dwellingsOnMarket, ObjectSource.EMIGRATED);
-//		else
+		if (household.getMemberCount() == 1)
+			household.remove(dwellingsOnMarket, ObjectSource.EMIGRATED);
+		else
 			remove(ObjectSource.EMIGRATED, true);
+		household = null;
 	}
 	public void notifyEmigration(MigrationRealm migrationRealm) {
 		for (MigrationObserver obs : HouseholdRow.migrationObservers) {

@@ -92,7 +92,7 @@ public class Persons extends RecordSetClonable<PersonRow> {
 	 * @return
 	 */
 	public PersonRow getRandomPerson() {
-		int index = r.nextInt(rowList.size() + 1);
+		int index = r.nextInt(rowList.size());
 		return rowList.get(index);
 	}
 }

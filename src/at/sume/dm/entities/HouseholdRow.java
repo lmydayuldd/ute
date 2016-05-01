@@ -248,6 +248,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		// remove a household if there are no members left
 		if (members.size() <= 0) {
 			recordSet.remove(this);
+//			throw new AssertionError("HouseholdRow.remove() must not be used - use HouseholdRow.remove(DwellingsOnMarket) instead!");
 //		} else {
 //			if (person.isHouseholdRepresentative()) {
 //				// TODO: make the oldest person in the household the household-representative

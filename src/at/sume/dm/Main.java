@@ -457,7 +457,9 @@ public class Main {
 			int hhNotMoving = 0, hhMovedAwayMemberCount = 0;
 			j = 0;
 	        System.out.println(printInfo(modelRun) + ": free dwellings before moving: " + dwellingsOnMarket.getFreeDwellingsCount());
-	        int maxOutMigrationNational = sampleMigratingHouseholds.getOutMigrationNational(modelYear);
+	        int maxOutMigrationNational = 0;
+	        if (!Common.isUseMigrationSaldo())
+	        	maxOutMigrationNational = sampleMigratingHouseholds.getOutMigrationNational(modelYear);
 			for (HouseholdRow household : potentialMovers) {
 				boolean notMoving = false;
 				if (j % 10000 == 0) {

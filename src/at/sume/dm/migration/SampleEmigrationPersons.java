@@ -12,6 +12,7 @@ import at.sume.dm.Common;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
+import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.MigrationRealm;
 
 /**
@@ -66,15 +67,25 @@ public class SampleEmigrationPersons {
 			PersonRow p = persons.getRandomPerson();
 			byte ageGroupId = p.getAgeGroupId();
 			byte sex = p.getSex();
-			while (!emigratorsAvailable(ageGroupId, sex)) {
+			int j = 0;
+			while (!emigratorsAvailable(ageGroupId, sex) || (p.getHousehold() == null)) {
 				p = persons.getRandomPerson();
+				ageGroupId = p.getAgeGroupId();
+				sex = p.getSex();
+				if (j++ > 1000) { // just emigrate any person if no suitable person found after 1000 iterations
+					System.out.println("emigrating an arbitrary person after no suitable person was found");
+					break;
+				}
 			}
+			if (p.getHousehold() == null)
+				continue;
 			// Let person emigrate
 			// TODO: check if other household members (if any) can emigrate too and emigrate the household (at a random probability)
 			// TODO: migration realm is not correct here - all we do know is OUTGOING but not NATIONAL or INTERNATIONAL
 			p.emigrate(dwellingsOnMarket, MigrationRealm.NATIONAL_OUTGOING);
-			if (!decrementEmigratorsCount(ageGroupId, sex))
-				throw new IllegalArgumentException("decrementEmigratorsCount(ageGroupId = " + ageGroupId + ", sex = " + sex + " unexpecedtly failed");
+			if (j <= 1000)
+				if (!decrementEmigratorsCount(ageGroupId, sex))
+					throw new IllegalArgumentException("decrementEmigratorsCount(ageGroupId = " + ageGroupId + ", sex = " + sex + " unexpecedtly failed");
 		}
 		return totalEmigrationCount;
 	}
@@ -88,7 +99,7 @@ public class SampleEmigrationPersons {
 		Map<Byte,Long> resultMap = sex == 1 ? emigrationCountFemale : emigrationCountMale;
 		Long actual = resultMap.get(ageGroupId);
 		if (actual == null) return false;
-		if (actual >= 0) return false;
+		if (actual <= 0) return false;
 		return true;
 	}
 	/**
@@ -101,7 +112,7 @@ public class SampleEmigrationPersons {
 		Map<Byte,Long> resultMap = sex == 1 ? emigrationCountFemale : emigrationCountMale;
 		Long actual = resultMap.get(ageGroupId);
 		if (actual == null) return false;
-		if (actual >= 0) return false;
+		if (actual <= 0) return false;
 		resultMap.put(ageGroupId, --actual);
 		return true;
 	}
