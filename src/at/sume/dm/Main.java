@@ -586,7 +586,7 @@ public class Main {
 				int numMovingTogether = movingTogether.randomJoinHouseholds();
 				System.out.println(printInfo(modelRun) + ": " + numMovingTogether + " of "+ movingTogetherCount + " projected household move-togethers/marriages took place");
 		        System.out.println(printInfo(modelRun) + ": free dwellings after moving together: " + dwellingsOnMarket.getFreeDwellingsCount());
-				
+				// TODO: need another system parameter for emigration type here!!!
 		        if (!Common.isUseMigrationSaldo()) {
 					// Out-Migration: randomly remove households
 					int numOutMigrationInternational = sampleMigratingHouseholds.getOutMigrationInternational(modelYear) + sampleMigratingHouseholds.getOutMigrationNational(modelYear) - hhMovedAwayMemberCount;

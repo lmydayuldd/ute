@@ -12,7 +12,6 @@ import at.sume.dm.Common;
 import at.sume.dm.entities.PersonRow;
 import at.sume.dm.entities.Persons;
 import at.sume.dm.model.residential_mobility.DwellingsOnMarket;
-import at.sume.dm.tracing.ObjectSource;
 import at.sume.dm.types.MigrationRealm;
 
 /**
@@ -20,12 +19,11 @@ import at.sume.dm.types.MigrationRealm;
  *
  */
 public class SampleEmigrationPersons {
-	private Map<Byte,Long> emigrationCountMale = new HashMap<Byte,Long>();
-	private Map<Byte,Long> emigrationCountFemale = new HashMap<Byte,Long>();
+	private Map<Byte,Long> emigrationCountMale, emigrationCountFemale;
 	private String migrationPerAgeSexScenarioName;
 	private Persons persons;
 	private List<MigrationsPerAgeSex> baseData;
-	private long totalEmigrationCount = 0;
+	private long totalEmigrationCount;
 	
 	public SampleEmigrationPersons(String migrationPerAgeSexScenarioName, Persons persons) {
 		this.migrationPerAgeSexScenarioName = migrationPerAgeSexScenarioName;
@@ -51,6 +49,9 @@ public class SampleEmigrationPersons {
 			baseData = Common.db.select(MigrationsPerAgeSex.class, selectStatement);
 			assert baseData.size() > 0 : "No rows selected from _DM_MigrationAgeSex (scenarioName = " + migrationPerAgeSexScenarioName + ", year = " + modelYear + ")";
 		}
+		emigrationCountMale = new HashMap<Byte,Long>();
+		emigrationCountFemale = new HashMap<Byte,Long>();
+		totalEmigrationCount = 0;
 		// Build hash maps
 		for (MigrationsPerAgeSex b : baseData) {
 			Map<Byte,Long> countMap = b.getSex() == 1 ? emigrationCountFemale : emigrationCountMale;
