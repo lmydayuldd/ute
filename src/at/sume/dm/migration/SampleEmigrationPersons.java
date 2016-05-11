@@ -62,7 +62,7 @@ public class SampleEmigrationPersons {
 	
 	public long randomEmigration(int modelYear, DwellingsOnMarket dwellingsOnMarket) throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, SQLException {
 		loadMigrationAgeSexDistribution(modelYear);
-		
+		int arbitraryMigrationCount = 0;
 		for (long i = 0; i != totalEmigrationCount; i++) {
 			// Choose random person
 			PersonRow p = persons.getRandomPerson();
@@ -74,7 +74,7 @@ public class SampleEmigrationPersons {
 				ageGroupId = p.getAgeGroupId();
 				sex = p.getSex();
 				if (j++ > 1000) { // just emigrate any person if no suitable person found after 1000 iterations
-					System.out.println("emigrating an arbitrary person after no suitable person was found");
+					arbitraryMigrationCount++;
 					break;
 				}
 			}
@@ -88,6 +88,7 @@ public class SampleEmigrationPersons {
 				if (!decrementEmigratorsCount(ageGroupId, sex))
 					throw new IllegalArgumentException("decrementEmigratorsCount(ageGroupId = " + ageGroupId + ", sex = " + sex + " unexpecedtly failed");
 		}
+		System.out.println("Arbitrary migrations (not complying to the empirical emigrations per age&sex): " + arbitraryMigrationCount);
 		return totalEmigrationCount;
 	}
 	/**
