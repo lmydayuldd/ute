@@ -156,7 +156,7 @@ public class AggregatedTimeUseRow implements Fileable, Comparable<AggregatedTime
 	 */
 	@Override
 	public String toCsvHeadline(String delimiter) {
-		return "SpatialUnit" + delimiter + "Activity" + delimiter + "IncomeGroup" + delimiter + "HouseholdType" + delimiter + "TimeUseType" + 
+		return "ModelRun" + delimiter + "SpatialUnit" + delimiter + "Activity" + delimiter + "IncomeGroup" + delimiter + "HouseholdType" + delimiter + "TimeUseType" + 
 				delimiter + "TotalTimeUse" + delimiter + "ParticipatingPersons" + delimiter + "ParticipatingHouseholds";
 	}
 
