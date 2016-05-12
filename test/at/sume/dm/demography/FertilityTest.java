@@ -38,7 +38,7 @@ public class FertilityTest {
 	@Test
 	public void testProbability() {
 		int hitCount = 0;
-		double p = fertility.probability((byte)5, (short)3);
+		double p = fertility.probability((byte)5);
 		for (int sampleCount = 0; sampleCount != TOTAL_SAMPLES; sampleCount++) {
 			double rand = r.nextDouble();
 			if (rand < p) {

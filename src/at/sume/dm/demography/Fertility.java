@@ -15,7 +15,7 @@ import net.remesch.db.Database;
  * @author Alexander Remesch
  */
 public class Fertility {
-	private ArrayList<FertilityProbabilityRow> probabilityRow;
+	private ArrayList<FertilityProbabilityRow> pList;
 	
 	/**
 	 * @param db
@@ -24,14 +24,11 @@ public class Fertility {
 	 * @throws InstantiationException 
 	 */
 	public Fertility(Database db, String scenarioName) throws SQLException, InstantiationException, IllegalAccessException {
-//		String sqlStatement = "SELECT AgeGroupId, Fertziff/1000 AS p " +
-//			"FROM StatA_FertZiff_W " +
-//			"WHERE Jahr = 2009";
-		String sqlStatement = "select ageGroupId, householdSize, Fertility/1000 AS ProbabilityBirth " +
+		String sqlStatement = "select ageGroupId, Fertility/1000 AS ProbabilityBirth " +
 			"from _DM_FertilityAgeHouseholdSize " +
 			"where fertilityScenarioName = '" + scenarioName + "' " +
-			"order by ageGroupId, householdSize";
-		probabilityRow = db.select(FertilityProbabilityRow.class, sqlStatement);
+			"order by ageGroupId";
+		pList = db.select(FertilityProbabilityRow.class, sqlStatement);
 	}
 
 	/**
@@ -39,13 +36,12 @@ public class Fertility {
 	 * @param ageGroupId
 	 * @return
 	 */
-	public double probability(byte ageGroupId, short householdSize) {
+	public double probability(byte ageGroupId) {
 		FertilityProbabilityRow lookup = new FertilityProbabilityRow();
 		lookup.setAgeGroupId(ageGroupId);
-		lookup.setHouseholdSize(householdSize);
-		int index = Collections.binarySearch(probabilityRow, lookup);
+		int index = Collections.binarySearch(pList, lookup);
 		if (index >= 0) {
-			return probabilityRow.get(index).getProbabilityBirth();
+			return pList.get(index).getProbabilityBirth();
 		} else {
 			return 0;
 		}

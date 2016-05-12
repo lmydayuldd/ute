@@ -3,6 +3,7 @@
  */
 package at.sume.dm.demography;
 
+import net.remesch.db.schema.Ignore;
 
 /**
  * Implementation of ProbabilityItem for fertility (= event) depending on age (= properties)
@@ -10,6 +11,7 @@ package at.sume.dm.demography;
  */
 public class FertilityProbabilityRow implements Comparable<FertilityProbabilityRow> {
 	private byte ageGroupId;
+	@Ignore
 	private short householdSize;
 	private double probabilityBirth;
 	
