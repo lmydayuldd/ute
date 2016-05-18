@@ -127,6 +127,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	private boolean householdWithChildrenBelow18;
 	@SuppressWarnings("unused")
 	private ObjectSource src;
+	private float totalOecdWeight;
 	
 	/**
 	 * 
@@ -228,6 +229,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		setAspirationRegionLivingSpaceMax((short) 0);
 		setAspirationRegionLivingSpaceMin((short) 0);
 		countAdults();
+		calcOecdWeights();
 	}
 	
 	public void addMember(PersonRow person) {
@@ -236,6 +238,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		setAspirationRegionLivingSpaceMax((short) 0);
 		setAspirationRegionLivingSpaceMin((short) 0);
 		countAdults();
+		calcOecdWeights();
 	}
 	
 	public void removeMember(PersonRow person) {
@@ -430,6 +433,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		// determine the number of adults, whether it is a mixed household, etc.
 		if (forceCount || (householdType == null)) {
 			countAdults();
+			calcOecdWeights();
 		}
 		switch (numAdults) {
 		case 0:
@@ -520,6 +524,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 		if ((householdType == HouseholdType.SINGLE_YOUNG) || (householdType == HouseholdType.SINGLE_OLD))
 			return;
 		countAdults();
+		calcOecdWeights();
 		if (numAdults == 0) {
 			for (PersonRow member : members) {
 				member.setLivingWithParents(false);
@@ -548,6 +553,7 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	
 	public void updateHouseholdTypeAfterBirth() {
 		countAdults();
+		calcOecdWeights();
 		switch (householdType) {
 		case OTHER:			// no useful previous information - start from scratch
 			determineInitialHouseholdType(false);
@@ -738,14 +744,53 @@ public class HouseholdRow extends RecordSetRowFileable<Households> implements Re
 	 * @return the yearly income
 	 */
 	public int getYearlyIncome() {
-		int yearlyIncome = 0;
+		int result = 0;
 		for (PersonRow person : members) {
-			yearlyIncome += person.getYearlyIncome();
-			assert yearlyIncome >= 0 : "Yearly income must be >= 0 (= " + yearlyIncome + ")";
+			result += person.getYearlyIncome();
+			assert result >= 0 : "Yearly income must be >= 0 (= " + result + ")";
 		}
-		return yearlyIncome;
+		return result;
 	}
-
+	/**
+	 * Calc OECD scale weights for each person in the household and return the total weight
+	 * OECD-weight is documented here: https://de.wikipedia.org/wiki/OECD-Skala
+	 * 1 for first adult, 0.5 for each other member >= 14 yrs, 0.3 for each other member < 14 yrs.
+	 * @return
+	 */
+	public float calcOecdWeights() {
+		boolean adultFound = false;
+		float totalOecdWeight = 0;
+		for (PersonRow person : members) {
+			float oecdWeight = 0;
+			if (person.getAge() >= 14) {
+				if (adultFound) {
+					oecdWeight = 0.5f;
+				} else {
+					adultFound = true;
+					oecdWeight = 1;
+				}
+			} else {
+				oecdWeight = 0.3f;
+			}
+			person.setOecdWeight(oecdWeight);
+			totalOecdWeight += oecdWeight;
+		}
+		if (!adultFound) {  // No adult found -> one of the persons < 14 must be household representative
+			PersonRow person = members.get(0);
+			person.setOecdWeight(1);
+			totalOecdWeight += 0.7f;
+		}
+		return totalOecdWeight;
+	}
+	/**
+	 * Return the total OECD scale weight for the household previously calculated by calcOecdWeights()
+	 * OECD-weight is documented here: https://de.wikipedia.org/wiki/OECD-Skala
+	 * 1 for first adult, 0.5 for each other member >= 14 yrs, 0.3 for each other member < 14 yrs.
+	 * @return
+	 */
+	public float getTotalOecdWeight() {
+		return totalOecdWeight;
+	}
 	/**
 	 * Calculate and return the yearly household income per household member
 	 * @return the yearly household income per household member

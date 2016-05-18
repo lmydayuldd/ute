@@ -33,9 +33,11 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 			byte incomeGroup = 0;
 			switch(Common.getOutputIncomeGroups()) {
 			case 3:
+//				incomeGroup = IncomeGroup3.getIncomeGroupId(person.getYearlyOecdIncome());
 				incomeGroup = IncomeGroup3.getIncomeGroupId(household.getYearlyIncome());
 				break;
 			case 18:
+//				incomeGroup = IncomeGroup.getIncomeGroupId(person.getYearlyOecdIncome());
 				incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
 				break;
 			default:

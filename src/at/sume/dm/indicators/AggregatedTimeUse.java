@@ -30,9 +30,11 @@ public class AggregatedTimeUse {
 		result.setActivity(timeUse.activity);
 		switch(Common.getOutputIncomeGroups()) {
 		case 3:
+//			result.setIncomeGroupId(IncomeGroup3.getIncomeGroupId(person.getYearlyOecdIncome()));
 			result.setIncomeGroupId(IncomeGroup3.getIncomeGroupId(person.getHousehold().getYearlyIncome()));
 			break;
 		case 18:
+//			result.setIncomeGroupId(IncomeGroup.getIncomeGroupId(person.getYearlyOecdIncome()));
 			result.setIncomeGroupId(IncomeGroup.getIncomeGroupId(person.getHousehold().getYearlyIncome()));
 			break;
 		default:

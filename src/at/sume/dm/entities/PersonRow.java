@@ -54,6 +54,8 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 	private static TimeUseTypeDesignator determineTimeUseType;
 	@Ignore
 	private ObjectSource src;
+	@Ignore
+	private float oecdWeight;
 	
 	public PersonRow(ObjectSource src) {
 		super();
@@ -219,7 +221,23 @@ public class PersonRow extends RecordSetRowFileable<Persons> implements Demograp
 		else
 			this.yearlyIncome = yearlyIncome;
 	}
-
+	/**
+	 * Return the relative OECD weight of the person in its household
+	 * @return
+	 */
+	public float getOecdWeight() {
+		return oecdWeight;
+	}
+	public void setOecdWeight(float oecdWeight) {
+		this.oecdWeight = oecdWeight;
+	}
+	/**
+	 * Return the OECD-weighed income for this person
+	 * @return
+	 */
+	public int getYearlyOecdIncome() {
+		return Math.round(household.getYearlyIncome() * getOecdWeight() / household.getTotalOecdWeight());
+	}
 	public HouseholdRow getHousehold() {
 		return household;
 	}
