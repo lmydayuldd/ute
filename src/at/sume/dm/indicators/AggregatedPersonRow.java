@@ -153,7 +153,7 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 	 */
 	@Override
 	public String toCsvHeadline(String delimiter) {
-		return "ModelRun" + delimiter + "SpatialUnit" + delimiter + "IncomeGroup" + delimiter + "Sex" + delimiter + "AgeGroup" + 
+		return "ModelRun" + delimiter + "SpatialUnit" + delimiter + "HouseholdIncomeGroup" + delimiter + "Sex" + delimiter + "AgeGroup" + 
 			delimiter + "LivingWithParents" + delimiter + "TimeUseType" + delimiter + "ObjectSource" + 
 			delimiter + "HouseholdSize6" + delimiter + "PersonCount";
 	}

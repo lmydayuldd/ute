@@ -30,10 +30,10 @@ public class AggregatedTimeUse {
 		result.setActivity(timeUse.activity);
 		switch(Common.getOutputIncomeGroups()) {
 		case 3:
-			result.setIncomeGroupId(IncomeGroup3.getIncomeGroupId(person.getYearlyIncome()));
+			result.setIncomeGroupId(IncomeGroup3.getIncomeGroupId(person.getHousehold().getYearlyIncome()));
 			break;
 		case 18:
-			result.setIncomeGroupId(IncomeGroup.getIncomeGroupId(person.getYearlyIncome()));
+			result.setIncomeGroupId(IncomeGroup.getIncomeGroupId(person.getHousehold().getYearlyIncome()));
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown number of income groups - only 3 and 18 allowed!");

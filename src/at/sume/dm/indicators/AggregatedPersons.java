@@ -33,10 +33,10 @@ public class AggregatedPersons implements Indicator<HouseholdRow> {
 			byte incomeGroup = 0;
 			switch(Common.getOutputIncomeGroups()) {
 			case 3:
-				incomeGroup = IncomeGroup3.getIncomeGroupId(person.getYearlyIncome());
+				incomeGroup = IncomeGroup3.getIncomeGroupId(household.getYearlyIncome());
 				break;
 			case 18:
-				incomeGroup = IncomeGroup.getIncomeGroupId(person.getYearlyIncome());
+				incomeGroup = IncomeGroup.getIncomeGroupId(household.getYearlyIncome());
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown number of income groups - only 3 and 18 allowed!");
