@@ -242,7 +242,8 @@ public class SampleMigratingHouseholds {
 			MigrationsPerAgeSex m = migrationsPerAgeSex.get(index);
 			if (householdSize == 1) { // Sample an adult for single households!
 				short age = AgeGroup20.sampleAge(m.getAgeGroup20Id());
-				while (age < 18) {
+				int j = 0;
+				while ((age < 18) && (j++ < 100)) {
 					index = migrationsPerAgeSex.randomExactSample();
 					m = migrationsPerAgeSex.get(index);
 					age = AgeGroup20.sampleAge(m.getAgeGroup20Id());
