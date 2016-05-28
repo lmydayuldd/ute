@@ -3,6 +3,7 @@
  */
 package at.sume.dm.indicators.rows;
 
+import at.sume.dm.Common;
 import at.sume.dm.model.output.Fileable;
 import at.sume.dm.types.HouseholdType;
 import at.sume.dm.types.MigrationRealm;
@@ -113,6 +114,6 @@ public class MigrationAgeSexRow implements Comparable<MigrationAgeSexRow>, Filea
 
 	@Override
 	public String toString(int modelRun, String delimiter) {
-		return modelRun + delimiter + sex + delimiter + ageGroupId + delimiter + householdType + delimiter + migrationRealm + delimiter + personCount;
+		return modelRun + delimiter + sex + delimiter + ageGroupId + delimiter + householdType + delimiter + migrationRealm + delimiter + personCount * Common.getHouseholdReductionFactor();
 	}
 }

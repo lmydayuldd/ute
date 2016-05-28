@@ -3,6 +3,7 @@
  */
 package at.sume.dm.indicators;
 
+import at.sume.dm.Common;
 import at.sume.dm.model.output.Fileable;
 import at.sume.dm.model.timeuse.TimeUseType;
 import at.sume.dm.tracing.ObjectSource;
@@ -165,7 +166,7 @@ public class AggregatedPersonRow implements Comparable<AggregatedPersonRow>, Fil
 	public String toString(int modelRun, String delimiter) {
 		return modelRun + delimiter + spatialUnitId + delimiter + incomeGroupId + delimiter + sex +
 			delimiter + AgeGroup20.getAgeGroupNameDirect(ageGroupId) + delimiter + livingWithParents + 
-			delimiter + timeUseType + delimiter + src + delimiter + householdSize6 + delimiter + personCount;
+			delimiter + timeUseType + delimiter + src + delimiter + householdSize6 + delimiter + personCount * Common.getHouseholdReductionFactor();
 	}
 
 	@Override
